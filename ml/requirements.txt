@@ -1,7 +1,7 @@
 # ---- Core data stack ----
 numpy==2.2.1
 pandas==2.2.3
-scipy==1.15.1
+scipy==1.17.1
 
 # ---- Classical ML ----
 scikit-learn==1.6.0
