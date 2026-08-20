@@ -16,14 +16,14 @@
   },
   "dependencies": {
     "next": "15.5.23",
-    "react": "19.0.0",
+    "react": "19.2.8",
     "react-dom": "19.0.0",
     "recharts": "3.10.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@types/node": "22.10.7",
-    "@types/react": "19.0.7",
+    "@types/react": "19.2.18",
     "@types/react-dom": "19.0.3",
     "autoprefixer": "10.4.20",
     "eslint": "9.18.0",
