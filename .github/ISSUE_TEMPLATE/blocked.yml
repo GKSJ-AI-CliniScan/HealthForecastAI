@@ -1,0 +1,52 @@
+name: I am blocked
+description: Something is stopping you from making progress. Ask early.
+title: "[blocked] "
+labels: ["blocked"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Being stuck for a day is normal. Being stuck for a week in silence is not.
+        Fill this in and your mentor will pick it up.
+
+  - type: input
+    id: branch
+    attributes:
+      label: Your branch
+      placeholder: intern/firstname-lastname
+    validations:
+      required: true
+
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Milestone
+      options:
+        - "1 - Project initialization, design and core setup"
+        - "2 - Risk prediction and readmission forecasting"
+        - "3 - Treatment effectiveness and healthcare analytics"
+        - "4 - Testing, deployment and documentation"
+    validations:
+      required: true
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: What are you trying to do?
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What have you already tried?
+      description: List the things you ruled out. This is the most useful part.
+    validations:
+      required: true
+
+  - type: textarea
+    id: error
+    attributes:
+      label: Error message or failing output
+      description: Paste the full text, not a screenshot. Remove any credential first.
+      render: shell

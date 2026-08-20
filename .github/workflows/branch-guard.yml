@@ -1,0 +1,98 @@
+name: Branch guard
+
+# Nobody merges into main. Interns work on their own branch and their work is
+# reviewed there. This workflow makes that rule visible instead of relying on
+# everyone remembering it.
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited, labeled, unlabeled]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  block-merges-to-main:
+    name: Block pull requests into main
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Check the target branch
+        env:
+          BASE: ${{ github.base_ref }}
+          HEAD: ${{ github.head_ref }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: |
+          echo "Pull request: $HEAD -> $BASE"
+          echo "Labels: ${LABELS:-none}"
+
+          if [ "$BASE" != "main" ] && [ "$BASE" != "master" ]; then
+            echo "Target branch is not main. Nothing to enforce."
+            exit 0
+          fi
+
+          if printf '%s' "$LABELS" | tr ',' '\n' | grep -qx 'mentor-approved'; then
+            echo "::notice::Labelled 'mentor-approved' - allowing this pull request."
+            {
+              echo "## Branch guard"
+              echo ""
+              echo "This pull request targets \`$BASE\` and carries the"
+              echo "\`mentor-approved\` label, so the guard let it through."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          {
+            echo "## Branch guard: pull requests into \`main\` are not accepted"
+            echo ""
+            echo "Your work is reviewed **on your own branch**, not through a merge."
+            echo ""
+            echo "**What to do instead**"
+            echo ""
+            echo '```bash'
+            echo "git checkout intern/<your-name>"
+            echo "git add ."
+            echo "git commit -m \"feat: what you did\""
+            echo "git push origin intern/<your-name>"
+            echo '```'
+            echo ""
+            echo "Then close this pull request and send your mentor the branch link."
+            echo ""
+            echo "A mentor who genuinely wants this merged can add the"
+            echo "\`mentor-approved\` label and re-run this check."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "::error::Pull requests into '$BASE' are not accepted. Push to your own branch instead."
+          exit 1
+
+  protect-shared-files:
+    name: Warn on changes to shared files
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: List shared files touched by this branch
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          changed=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- \
+            '.github/**' 'scripts/ci/**' 'INTERN_GUIDE.md' || true)
+          if [ -z "$changed" ]; then
+            echo "No shared files touched."
+            exit 0
+          fi
+          echo "::warning::This branch changes shared CI or guide files:"
+          printf '%s\n' "$changed"
+          {
+            echo "## Shared files changed"
+            echo ""
+            echo "These files are shared by all 26 interns. Changing them on your"
+            echo "branch only affects your branch, but check with your mentor first:"
+            echo ""
+            printf -- '- `%s`\n' $changed
+          } >> "$GITHUB_STEP_SUMMARY"

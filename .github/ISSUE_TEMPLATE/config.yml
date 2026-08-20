@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Project brief
+    url: https://github.com/GKSJ-AI-CliniScan/HealthForecastAI/blob/main/docs/brief/README.md
+    about: The original specification - objective, modules, RBAC matrix, milestones.
+  - name: Intern guide
+    url: https://github.com/GKSJ-AI-CliniScan/HealthForecastAI/blob/main/INTERN_GUIDE.md
+    about: Setup, branch rules, CI checks and submission steps. Read this first.

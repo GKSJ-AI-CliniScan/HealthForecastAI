@@ -1,0 +1,66 @@
+# HealthForecast AI - modelling configuration
+# Every experiment must be reproducible from this file alone.
+
+dataset:
+  name: diabetes_130_us_hospitals
+  source_url: https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008
+  raw_path: ml/data/raw/diabetic_data.csv
+  processed_path: ml/data/processed/admissions_features.parquet
+  target_column: readmitted
+  # The brief targets 30-day readmission: map "<30" -> 1, {">30", "NO"} -> 0
+  positive_label: "<30"
+
+split:
+  test_size: 0.2
+  validation_size: 0.1
+  random_state: 42
+  stratify: true
+
+preprocessing:
+  drop_columns:
+    - encounter_id
+    - patient_nbr
+    - weight
+    - payer_code
+    - medical_specialty
+  missing_value_token: "?"
+  numeric_imputation: median
+  categorical_imputation: most_frequent
+  scale_numeric: true
+  one_hot_encode: true
+
+imbalance:
+  strategy: class_weight   # one of: none | class_weight | smote
+
+models:
+  logistic_regression:
+    enabled: true
+    max_iter: 1000
+  random_forest:
+    enabled: true
+    n_estimators: 300
+    max_depth: 12
+    min_samples_leaf: 5
+  xgboost:
+    enabled: true
+    n_estimators: 400
+    max_depth: 6
+    learning_rate: 0.05
+    subsample: 0.8
+    colsample_bytree: 0.8
+
+evaluation:
+  primary_metric: roc_auc
+  # Minimum bar for a model to be promoted to the API. Do not lower these.
+  thresholds:
+    roc_auc: 0.65
+    recall: 0.50
+
+risk_bands:
+  high: 0.70
+  medium: 0.40
+
+artifacts:
+  output_dir: ml/artifacts
+  model_filename: readmission_model.joblib
+  metrics_filename: metrics.json

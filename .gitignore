@@ -1,0 +1,105 @@
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+dist/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.tox/
+.hypothesis/
+
+# ---------- Node / Next.js ----------
+node_modules/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---------- Environment & secrets ----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+service-account*.json
+secrets.yaml
+secrets.yml
+
+# ---------- Datasets (NEVER commit raw healthcare data) ----------
+ml/data/raw/*
+ml/data/processed/*
+ml/data/external/*
+!ml/data/**/.gitkeep
+!ml/data/**/README.md
+*.csv
+*.tsv
+*.parquet
+*.feather
+*.xlsx
+*.xls
+*.db
+*.sqlite
+*.sqlite3
+!database/**/*.sql
+
+# ---------- Model artifacts ----------
+ml/artifacts/*
+!ml/artifacts/.gitkeep
+*.pkl
+*.joblib
+*.h5
+*.keras
+*.pt
+*.pth
+*.onnx
+*.pb
+mlruns/
+wandb/
+
+# ---------- Notebooks ----------
+.ipynb_checkpoints/
+
+# ---------- IDE / OS ----------
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- Logs & temp ----------
+logs/
+*.log
+tmp/
+temp/
+
+# ---------- Internal (contains intern PII - do not publish) ----------
+Predictive Healthcare Intelligence System for Patient Readmission and Resource Optimization.xlsx
+*roster*.xlsx
+
+# Root copies of source documents - the committed copy lives in docs/brief/
+AI_Hospital Readmission Prediction & Patient Risk Intelligence System.pdf

@@ -1,0 +1,339 @@
+name: CI
+
+# Runs on every branch. Interns never merge into main, so the push event on
+# their own branch is the only signal they get - it has to be complete.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '22'
+
+jobs:
+  # --------------------------------------------------------------------------
+  # Work out which parts of the project this branch actually has, so a week-1
+  # branch is not failed for a frontend that does not exist yet.
+  # --------------------------------------------------------------------------
+  detect:
+    name: Detect project areas
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.check.outputs.backend }}
+      frontend: ${{ steps.check.outputs.frontend }}
+      ml: ${{ steps.check.outputs.ml }}
+      docker: ${{ steps.check.outputs.docker }}
+      compose: ${{ steps.check.outputs.compose }}
+      docker_changed: ${{ steps.changed.outputs.docker_changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect
+        id: check
+        run: |
+          exists() { if [ -e "$1" ]; then echo true; else echo false; fi; }
+          {
+            echo "backend=$(exists backend/requirements.txt)"
+            echo "frontend=$(exists frontend/package.json)"
+            echo "ml=$(exists ml/requirements.txt)"
+            echo "docker=$(exists backend/Dockerfile)"
+            echo "compose=$(exists docker-compose.yml)"
+          } >> "$GITHUB_OUTPUT"
+          cat "$GITHUB_OUTPUT"
+
+      # Image builds are the slowest job here. With 26 interns pushing daily,
+      # rebuilding on every commit wastes Actions minutes for no signal, so we
+      # only rebuild when something that affects the image actually changed.
+      # Anything we cannot determine defaults to building.
+      - name: Detect changes to Docker inputs
+        id: changed
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          changed=true
+          zero='0000000000000000000000000000000000000000'
+          if [ "$EVENT" = "push" ] && [ -n "$BEFORE" ] && [ "$BEFORE" != "$zero" ] \
+             && git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+            if git diff --name-only "$BEFORE" "$AFTER" | grep -qE \
+              '(Dockerfile|\.dockerignore|requirements.*\.txt|package(-lock)?\.json|docker-compose\.yml)$'
+            then
+              changed=true
+            else
+              changed=false
+            fi
+          fi
+          echo "docker_changed=$changed" >> "$GITHUB_OUTPUT"
+          echo "Rebuild images: $changed"
+
+  # --------------------------------------------------------------------------
+  # Repository hygiene. Runs on every branch, always.
+  # --------------------------------------------------------------------------
+  repo-checks:
+    name: Repository checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Branch naming
+        run: python scripts/ci/check_branch.py "${{ github.head_ref || github.ref_name }}"
+
+      - name: Folder structure
+        if: always()
+        run: python scripts/ci/check_structure.py
+
+      - name: Committed file policy
+        if: always()
+        run: python scripts/ci/check_files.py
+
+      - name: Secret scan
+        if: always()
+        run: python scripts/ci/check_secrets.py
+
+      - name: Notebook hygiene
+        if: always()
+        run: python scripts/ci/check_notebooks.py
+
+      - name: Documentation links
+        if: always()
+        run: python scripts/ci/check_docs.py
+
+      - name: Milestone reports
+        if: always()
+        run: python scripts/ci/check_milestones.py
+
+  # --------------------------------------------------------------------------
+  # Backend: lint, format, type check, test.
+  # --------------------------------------------------------------------------
+  backend:
+    name: Backend (FastAPI)
+    needs: detect
+    if: needs.detect.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Lint (ruff)
+        run: ruff check . --output-format=github
+
+      - name: Format check (black)
+        if: always()
+        run: black --check --diff .
+
+      - name: Type check (mypy)
+        if: always()
+        continue-on-error: true
+        run: mypy app
+
+      - name: Tests (pytest)
+        if: always()
+        env:
+          SECRET_KEY: ci-only-secret-not-used-anywhere-else
+          ENVIRONMENT: test
+        run: pytest --cov=app --cov-report=term-missing --cov-report=xml
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-${{ github.run_id }}
+          path: backend/coverage.xml
+          if-no-files-found: ignore
+          retention-days: 7
+
+  # --------------------------------------------------------------------------
+  # Frontend: lint, build, type check, test.
+  # --------------------------------------------------------------------------
+  frontend:
+    name: Frontend (Next.js)
+    needs: detect
+    if: needs.detect.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            echo "::warning::No package-lock.json - commit it so builds are reproducible."
+            npm install
+          fi
+
+      - name: Lint (eslint)
+        run: npm run lint
+
+      - name: Build (next build)
+        if: always()
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+        run: npm run build
+
+      - name: Type check (tsc)
+        if: always()
+        run: npm run typecheck
+
+      - name: Tests
+        if: always()
+        run: npm test --if-present
+
+  # --------------------------------------------------------------------------
+  # ML pipeline: lint, format, test. No dataset needed - these are unit tests.
+  # --------------------------------------------------------------------------
+  ml:
+    name: ML pipeline
+    needs: detect
+    if: needs.detect.outputs.ml == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ml
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: ml/requirements*.txt
+
+      - name: Install lint and test tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff==0.8.6 black==24.10.0 pytest==8.3.4 pyyaml==6.0.2 \
+                      numpy==2.2.1 pandas==2.2.3 scikit-learn==1.6.0
+
+      - name: Lint (ruff)
+        run: ruff check . --output-format=github
+
+      - name: Format check (black)
+        if: always()
+        run: black --check --diff .
+
+      - name: Tests (pytest)
+        if: always()
+        run: pytest
+
+  # --------------------------------------------------------------------------
+  # Container builds. Proves the deployment path still works.
+  # --------------------------------------------------------------------------
+  docker:
+    name: Docker build
+    needs: detect
+    if: >-
+      needs.detect.outputs.docker == 'true' &&
+      (needs.detect.outputs.docker_changed == 'true' ||
+       github.event_name == 'workflow_dispatch' ||
+       github.event_name == 'pull_request')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Validate docker-compose.yml
+        if: needs.detect.outputs.compose == 'true'
+        run: |
+          cp .env.example .env
+          docker compose config --quiet
+          rm -f .env
+          echo "docker-compose.yml is valid."
+
+      - name: Build backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: false
+          load: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build frontend image
+        if: needs.detect.outputs.frontend == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: false
+          load: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # --------------------------------------------------------------------------
+  # One place to look for the verdict.
+  # --------------------------------------------------------------------------
+  summary:
+    name: CI summary
+    runs-on: ubuntu-latest
+    needs: [detect, repo-checks, backend, frontend, ml, docker]
+    if: always()
+    steps:
+      - name: Write summary
+        run: |
+          {
+            echo "## CI result for \`${{ github.head_ref || github.ref_name }}\`"
+            echo ""
+            echo "| Check | Result |"
+            echo "|-------|--------|"
+            echo "| Repository checks | ${{ needs.repo-checks.result }} |"
+            echo "| Backend (FastAPI) | ${{ needs.backend.result }} |"
+            echo "| Frontend (Next.js) | ${{ needs.frontend.result }} |"
+            echo "| ML pipeline | ${{ needs.ml.result }} |"
+            echo "| Docker build | ${{ needs.docker.result }} |"
+            echo ""
+            echo "\`skipped\` means that part of the project does not exist on this branch yet."
+            echo ""
+            echo "Run the same checks locally before you push - see INTERN_GUIDE.md."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fail if any required check failed
+        if: >-
+          needs.repo-checks.result == 'failure' ||
+          needs.backend.result == 'failure' ||
+          needs.frontend.result == 'failure' ||
+          needs.ml.result == 'failure' ||
+          needs.docker.result == 'failure'
+        run: |
+          echo "::error::One or more checks failed. Open the failing job above for details."
+          exit 1
