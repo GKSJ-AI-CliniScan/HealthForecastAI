@@ -93,12 +93,25 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Install check tooling
+        run: pip install --quiet pyyaml==6.0.2 ruff==0.8.6
+
       - name: Branch naming
         run: python scripts/ci/check_branch.py "${{ github.head_ref || github.ref_name }}"
 
       - name: Folder structure
         if: always()
         run: python scripts/ci/check_structure.py
+
+      # Parses every tracked file by type, so a broken JSON config or workflow
+      # file is caught even though it sits outside backend/, frontend/ and ml/.
+      - name: File syntax validation
+        if: always()
+        run: python scripts/ci/check_syntax.py
+
+      - name: Lint the check scripts themselves
+        if: always()
+        run: ruff check scripts/ --line-length 100 --select E,F,W,I,B,UP --target-version py311
 
       - name: Committed file policy
         if: always()

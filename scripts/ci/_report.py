@@ -61,18 +61,23 @@ class Report:
             where = f"{item.path}:{item.line}" if item.line else (item.path or "")
             print(f"[{level}] {where} {text}".strip())
 
+    @staticmethod
+    def _where(item: Problem) -> str:
+        """Render a problem's location for the job summary."""
+        if not item.path:
+            return ""
+        return f"`{item.path}`" + (f" line {item.line}" if item.line else "")
+
     def _summary_lines(self) -> list[str]:
         lines = [f"### {self.check}", ""]
         if not self.problems and not self.warnings:
             lines.append("Passed.")
         for item in self.problems:
-            where = f"`{item.path}`" + (f" line {item.line}" if item.line else "") if item.path else ""
-            lines.append(f"- **FAIL** {item.message} {where}".rstrip())
+            lines.append(f"- **FAIL** {item.message} {self._where(item)}".rstrip())
             if item.hint:
                 lines.append(f"  - {item.hint}")
         for item in self.warnings:
-            where = f"`{item.path}`" + (f" line {item.line}" if item.line else "") if item.path else ""
-            lines.append(f"- warn: {item.message} {where}".rstrip())
+            lines.append(f"- warn: {item.message} {self._where(item)}".rstrip())
             if item.hint:
                 lines.append(f"  - {item.hint}")
         for note in self.notes:

@@ -275,7 +275,7 @@ frontend.
 | Job | What it does |
 |-----|--------------|
 | **Detect project areas** | Works out which parts of the project exist on your branch |
-| **Repository checks** | Branch name, folder structure, committed files, secrets, notebooks, doc links, milestone reports |
+| **Repository checks** | Branch name, folder structure, **every file you pushed parsed by type**, committed files, secrets, notebooks, doc links, milestone reports |
 | **Backend (FastAPI)** | `ruff check`, `black --check`, `mypy` (advisory), `pytest` with coverage |
 | **Frontend (Next.js)** | `npm ci`, `npm run lint`, `npm run build`, `npm run typecheck`, `npm test` |
 | **ML pipeline** | `ruff check`, `black --check`, `pytest` |
@@ -315,6 +315,7 @@ repository secrets, never in a file.
 |-------|-----------|
 | Branch naming | Your branch does not match `intern/<your-name>` |
 | Folder structure | A required directory or file was renamed or deleted, or a `.env` file was committed |
+| File syntax validation | Any file you pushed does not parse: Python, JSON, YAML, TOML, INI, SQL, shell, nginx config, notebook, or a markdown page with an unclosed code fence |
 | Committed file policy | A file is over 5 MB, or you committed a dataset, model artifact, key file or database file, or a filename suggests real patient data |
 | Secret scan | An API key, token, private key, or a database URL with a password appears in a tracked file |
 | Notebook hygiene | A committed `.ipynb` still contains saved cell outputs |
@@ -359,6 +360,7 @@ pytest
 
 ```bash
 python scripts/ci/check_structure.py
+python scripts/ci/check_syntax.py
 python scripts/ci/check_files.py
 python scripts/ci/check_secrets.py
 python scripts/ci/check_notebooks.py

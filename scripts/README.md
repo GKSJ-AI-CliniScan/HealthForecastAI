@@ -9,6 +9,7 @@ without installing anything. Run them from the repository root:
 
 ```bash
 python scripts/ci/check_structure.py
+python scripts/ci/check_syntax.py
 python scripts/ci/check_files.py
 python scripts/ci/check_secrets.py
 python scripts/ci/check_notebooks.py
