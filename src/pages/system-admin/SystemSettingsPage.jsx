@@ -145,7 +145,7 @@ const SystemSettingsPage = () => {
                 value={profileName}
                 onChange={(e) => setProfileName(e.target.value)}
                 className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 font-semibold text-slate-800 focus:border-emerald-500 focus:bg-white focus:outline-hidden"
-                placeholder="e.g. Devon Miller"
+                placeholder="e.g. Penchala Prasad"
               />
             </div>
 

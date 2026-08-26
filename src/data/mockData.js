@@ -34,7 +34,7 @@ export const mockUsers = [
     id: "U-104",
     email: "sysadmin@healthforecast.ai",
     password: "prasad1234",
-    name: "Devon Miller",
+    name: "Penchala Prasad",
     role: "system-admin",
     avatar: "https://images.unsplash.com/photo-1628157582853-a796fa650a6a?auto=format&fit=crop&q=80&w=150",
     clearance: "Level 5 (Super Admin)"
@@ -529,9 +529,9 @@ export const mockResearchAnalytics = {
 export const mockAuditLogs = [
   { id: "AL-5801", user: "Rambilas Sah (Admin)", action: "Exported Readmission Report", module: "Healthcare Analytics", timestamp: "2026-08-26 13:12:04", status: "Success" },
   { id: "AL-5802", user: "S.Saumya", action: "Discharged Patient HFC-001 (Marcus)", module: "Patient Management", timestamp: "2026-08-26 12:45:10", status: "Success" },
-  { id: "AL-5803", user: "Devon Miller (SysAdmin)", action: "Trained Random Forest V2.4", module: "AI Model Management", timestamp: "2026-08-26 10:20:00", status: "Success" },
+  { id: "AL-5803", user: "Penchala Prasad (SysAdmin)", action: "Trained Random Forest V2.4", module: "AI Model Management", timestamp: "2026-08-26 10:20:00", status: "Success" },
   { id: "AL-5804", user: "K.Deepak Raja", action: "Downloaded Anonymized Population Dataset", module: "Research Dashboard", timestamp: "2026-08-26 09:15:33", status: "Success" },
-  { id: "AL-5805", user: "Devon Miller (SysAdmin)", action: "Deactivated Mock User Accounts", module: "User Management", timestamp: "2026-08-25 18:04:12", status: "Success" },
+  { id: "AL-5805", user: "Penchala Prasad (SysAdmin)", action: "Deactivated Mock User Accounts", module: "User Management", timestamp: "2026-08-25 18:04:12", status: "Success" },
   { id: "AL-5806", user: "Dr. Robert Chen", action: "Prescribed Beta-Blockers (Arthur Dent)", module: "Clinical Insights", timestamp: "2026-08-25 14:35:48", status: "Success" },
   { id: "AL-5807", user: "Rambilas Sah (Admin)", action: "Generated Billing Performance Report", module: "Hospital Reports", timestamp: "2026-08-25 11:10:02", status: "Success" }
 ];
