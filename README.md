@@ -179,6 +179,19 @@ npm install
 # Start the Vite development server
 npm run dev
 ```
+
+### 4. Diabetes Dataset Import
+
+The repository does not contain the UCI Diabetes 130-US Hospitals dataset. Download `diabetic_data.csv` from the official UCI Machine Learning Repository source and place it at `backend/data/diabetic_data.csv` (the path is git-ignored). Validate and import it with:
+
+```bash
+cd backend
+node utils/importDiabetesDataset.js data/diabetic_data.csv
+```
+
+The importer requires the documented encounter columns, maps them to the `Encounter` schema, and upserts by `encounter_id`. It does not create fabricated records or commit the source dataset.
+
+See [DATASET_IMPORT.md](DATASET_IMPORT.md) and [WIREFRAMES_WORKFLOWS.md](WIREFRAMES_WORKFLOWS.md) for the reproducible import contract and Milestone 1 workflow artifacts.
 > 🌐 Frontend Application will be accessible at: `http://localhost:5173`
 
 ---
@@ -204,15 +217,15 @@ npm run dev
 | `POST` | `/api/v1/patients` | Register new clinical patient record | Yes (Doctor, Admin, SysAdmin) |
 | `GET` | `/api/v1/patients/:id` | Fetch complete patient clinical worksheet | Yes |
 | `PUT` | `/api/v1/patients/:id` | Update patient record and vitals | Yes (Doctor, Admin, SysAdmin) |
-| `POST` | `/api/v1/patients/:id/notes` | Add clinical progress note to patient | Yes (Doctor, Admin) |
-| `POST` | `/api/v1/patients/:id/treatments` | Add medication / treatment to patient | Yes (Doctor) |
-| `GET` | `/api/v1/analytics/hospital-dashboard` | Aggregate hospital KPIs & departmental metrics | Yes (Hospital Admin) |
-| `GET` | `/api/v1/analytics/research-data` | Retrieve de-identified research cohorts | Yes (Researcher) |
+| `POST` | `/api/v1/patients/:id/notes` | Add clinical progress note to patient | Yes (Doctor, System Admin) |
+| `POST` | `/api/v1/patients/:id/treatments` | Add medication / treatment to patient | Yes (Doctor, System Admin) |
+| `GET` | `/api/v1/analytics/hospital-dashboard` | Aggregate supported hospital KPIs | Yes (Doctor, Hospital Admin, System Admin) |
+| `GET` | `/api/v1/analytics/research` | Retrieve de-identified research cohorts | Yes (Researcher, System Admin) |
 | `GET` | `/api/v1/admin/dashboard` | Retrieve system telemetry and audit logs | Yes (System Admin) |
 | `GET` | `/api/v1/admin/users` | List staff directory user accounts | Yes (System Admin) |
 | `POST` | `/api/v1/admin/users` | Create new staff user account | Yes (System Admin) |
 | `PUT` | `/api/v1/admin/users/:id/role` | Update user RBAC permissions | Yes (System Admin) |
-| `PUT` | `/api/v1/admin/users/:id/toggle-status` | Toggle user active/inactive status | Yes (System Admin) |
+| `PUT` | `/api/v1/admin/users/:id/status` | Toggle user active/inactive status | Yes (System Admin) |
 
 ---
 

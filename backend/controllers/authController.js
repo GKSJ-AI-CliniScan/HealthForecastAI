@@ -1,7 +1,12 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { logSystemAction } = require('../middleware/auditMiddleware');
-const { seedUsers } = require('../utils/seeder');
+const getJwtSecret = () => {
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET is required for authentication');
+  }
+  return process.env.JWT_SECRET;
+};
 
 // Generate JWT token
 const generateToken = (user) => {
@@ -12,7 +17,7 @@ const generateToken = (user) => {
       email: user.email,
       role: user.role,
     },
-    process.env.JWT_SECRET || 'healthforecast_super_secret_jwt_key_2026_secure',
+    getJwtSecret(),
     {
       expiresIn: process.env.JWT_EXPIRES_IN || '7d',
     }
@@ -35,18 +40,6 @@ const loginUser = async (req, res) => {
 
     const cleanEmail = email.trim().toLowerCase();
     let user = await User.findOne({ email: cleanEmail }).select('+password');
-
-    // Auto-heal if database was empty but standard login is attempted
-    if (!user) {
-      const userCount = await User.countDocuments();
-      if (userCount === 0) {
-        console.log('[Auth] Database was empty during login. Initializing default accounts...');
-        for (const u of seedUsers) {
-          await User.create(u);
-        }
-        user = await User.findOne({ email: cleanEmail }).select('+password');
-      }
-    }
 
     if (!user) {
       return res.status(401).json({

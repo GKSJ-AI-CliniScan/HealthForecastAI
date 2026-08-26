@@ -50,3 +50,7 @@ Thumbs.db
 *.rar
 tmp/
 temp/
+
+# Local clinical dataset files (import from a separately downloaded source)
+backend/data/
+*.csv

@@ -1,6 +1,13 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const getJwtSecret = () => {
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET is required for authentication');
+  }
+  return process.env.JWT_SECRET;
+};
+
 // Protect routes - verify JWT token
 const protect = async (req, res, next) => {
   let token;
@@ -19,21 +26,10 @@ const protect = async (req, res, next) => {
         });
       }
 
-      // Handle legacy mock token strings from previous frontend tests
-      if (token.includes('mockToken_')) {
-        const match = token.match(/mockToken_for_([a-zA-Z0-9-]+)_only/);
-        const roleFromToken = match ? match[1] : 'doctor';
-        req.user = await User.findOne({ role: roleFromToken }).select('-password');
-      } else {
-        // Standard JWT verification
-        const decoded = jwt.verify(
-          token,
-          process.env.JWT_SECRET || 'healthforecast_super_secret_jwt_key_2026_secure'
-        );
-        req.user = await User.findById(decoded.id).select('-password');
-        if (!req.user) {
-          req.user = await User.findOne({ userId: decoded.userId || decoded.id }).select('-password');
-        }
+      const decoded = jwt.verify(token, getJwtSecret());
+      req.user = await User.findById(decoded.id).select('-password');
+      if (!req.user) {
+        req.user = await User.findOne({ userId: decoded.userId || decoded.id }).select('-password');
       }
 
       if (!req.user) {
@@ -45,6 +41,12 @@ const protect = async (req, res, next) => {
 
       next();
     } catch (error) {
+      if (error.message === 'JWT_SECRET is required for authentication') {
+        return res.status(500).json({
+          success: false,
+          message: error.message,
+        });
+      }
       return res.status(401).json({
         success: false,
         message: 'Not authorized, token expired or invalid',

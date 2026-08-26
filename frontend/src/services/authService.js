@@ -1,8 +1,4 @@
 import apiClient from './api';
-import { mockUsers } from '../data/mockData';
-
-// Simulated delay helper
-const delay = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const authService = {
   login: async (email, password) => {
@@ -16,49 +12,13 @@ export const authService = {
         window.dispatchEvent(new Event('auth-status-change'));
         return { token, user };
       }
+      throw new Error(response.data?.message || 'Authentication failed');
     } catch (apiError) {
-      console.warn('[authService] Backend API login attempt failed/unreachable. Falling back to local authentication mode:', apiError.message);
-      // If server returned a 401 or 400 error message, rethrow it
-      if (apiError.response && apiError.response.data && apiError.response.data.message) {
-        throw new Error(apiError.response.data.message);
-      }
+      throw new Error(apiError.response?.data?.message || 'Authentication service unavailable');
     }
-
-    // 2. Resilient fallback mode (if server is unreachable / offline)
-    await delay(300);
-    const defaultUser = mockUsers.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase()
-    );
-
-    if (!defaultUser || defaultUser.password !== password) {
-      throw new Error('Invalid email or password. Use: doctor@healthforecast.ai / password123, admin@healthforecast.ai / password123, researcher@healthforecast.ai / password123, or sysadmin@healthforecast.ai [System Admin Password]');
-    }
-
-    const storedUsersStr = localStorage.getItem('hf_users');
-    let user = { ...defaultUser };
-    if (storedUsersStr) {
-      try {
-        const usersList = JSON.parse(storedUsersStr);
-        const customUser = usersList.find(u => u.email.toLowerCase() === email.toLowerCase());
-        if (customUser) {
-          user.name = customUser.name || defaultUser.name;
-          user.avatar = customUser.avatar || defaultUser.avatar;
-        }
-      } catch (e) {
-        console.error('Failed to load credentials customization', e);
-      }
-    }
-
-    const mockToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mockToken_for_${user.role}_only`;
-    localStorage.setItem('token', mockToken);
-    localStorage.setItem('user', JSON.stringify(user));
-    window.dispatchEvent(new Event('auth-status-change'));
-
-    return { token: mockToken, user };
   },
 
   logout: async () => {
-    await delay(200);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.dispatchEvent(new Event('auth-status-change'));
@@ -74,6 +34,16 @@ export const authService = {
     return !!localStorage.getItem('token');
   },
 
+  updateProfile: async (updates) => {
+    const response = await apiClient.put('/auth/profile', updates);
+    if (!response.data?.success) {
+      throw new Error(response.data?.message || 'Profile update failed');
+    }
+    localStorage.setItem('user', JSON.stringify(response.data.user));
+    window.dispatchEvent(new Event('auth-status-change'));
+    return response.data.user;
+  },
+
   verifySession: async () => {
     try {
       const response = await apiClient.get('/auth/me');
@@ -82,9 +52,10 @@ export const authService = {
         return response.data.user;
       }
     } catch (e) {
-      // Fallback to local session
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.dispatchEvent(new Event('auth-status-change'));
+      throw e;
     }
-    const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
   }
 };

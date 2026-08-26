@@ -32,7 +32,7 @@ export const patientService = {
         return res.data.data;
       }
     } catch (e) {
-      console.warn('[patientService] Backend API unreachable. Using persistent local store:', e.message);
+      throw e;
     }
     await delay(150);
     return getPatientsFromStorage();
@@ -45,7 +45,7 @@ export const patientService = {
         return res.data.data;
       }
     } catch (e) {
-      console.warn(`[patientService] Failed to fetch patient ${id} from API. Falling back to local store:`, e.message);
+      throw e;
     }
     await delay(100);
     const patients = getPatientsFromStorage();
@@ -59,7 +59,7 @@ export const patientService = {
         return res.data.data;
       }
     } catch (e) {
-      // Fallback
+      throw e;
     }
     await delay(150);
     const patients = getPatientsFromStorage();
@@ -79,7 +79,7 @@ export const patientService = {
         return res.data.data;
       }
     } catch (e) {
-      console.warn('[patientService] API update failed. Updating local storage fallback:', e.message);
+      throw e;
     }
     await delay(150);
     const patients = getPatientsFromStorage();
@@ -134,7 +134,7 @@ export const patientService = {
         return res.data.data;
       }
     } catch (e) {
-      console.warn('[patientService] API add failed. Adding to local storage fallback:', e.message);
+      throw e;
     }
 
     await delay(150);
@@ -174,7 +174,7 @@ export const patientService = {
         return res.data.data;
       }
     } catch (e) {
-      console.warn('[patientService] API add note failed. Syncing local storage fallback:', e.message);
+      throw e;
     }
 
     await delay(100);
@@ -196,7 +196,7 @@ export const patientService = {
         return res.data.data;
       }
     } catch (e) {
-      console.warn('[patientService] API add treatment failed. Syncing local storage fallback:', e.message);
+      throw e;
     }
 
     await delay(100);

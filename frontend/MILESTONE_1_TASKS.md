@@ -22,6 +22,8 @@
 
 ## 📊 Current Project Status Overview
 
+Implementation verification is tracked separately from this original planning checklist. The current audit found the backend API test suite, strict JWT configuration, RBAC alignment, and reproducible dataset import documentation required additional work.
+
 | Component | Technology | Status | Progress |
 |---|---|:---:|:---:|
 | **Frontend UI & Routing** | React 19 + Vite + Tailwind CSS | ✅ Completed | 100% |

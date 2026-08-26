@@ -1,6 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { authService } from '../services/authService';
-import { mockUsers } from '../data/mockData';
 
 const AuthContext = createContext(null);
 
@@ -8,9 +7,9 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchSession = () => {
+  const fetchSession = async () => {
     try {
-      const currentUser = authService.getCurrentUser();
+      const currentUser = await authService.verifySession();
       setUser(currentUser);
     } catch (err) {
       console.error('Session retrieval error', err);
@@ -21,11 +20,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    // Initialize user mock database if not exists
-    if (!localStorage.getItem('hf_users')) {
-      localStorage.setItem('hf_users', JSON.stringify(mockUsers));
-    }
-
     // Initial session load
     fetchSession();
 
@@ -68,25 +62,8 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (updates) => {
     try {
-      const currentUser = authService.getCurrentUser();
-      if (!currentUser) return null;
-      
-      const updatedUser = { ...currentUser, ...updates };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      
-      // Persist to user list log
-      const storedUsersStr = localStorage.getItem('hf_users');
-      const usersList = storedUsersStr ? JSON.parse(storedUsersStr) : [...mockUsers];
-      const index = usersList.findIndex(u => u.id === currentUser.id);
-      if (index !== -1) {
-        usersList[index] = { ...usersList[index], ...updates };
-      } else {
-        usersList.push(updatedUser);
-      }
-      localStorage.setItem('hf_users', JSON.stringify(usersList));
-      
+      const updatedUser = await authService.updateProfile(updates);
       setUser(updatedUser);
-      window.dispatchEvent(new Event('auth-status-change'));
       return updatedUser;
     } catch (err) {
       console.error('Update profile error', err);

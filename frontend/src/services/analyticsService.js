@@ -12,7 +12,7 @@ export const analyticsService = {
         return res.data.data;
       }
     } catch (e) {
-      console.warn('[analyticsService] API hospital dashboard failed. Using computed local analytics:', e.message);
+      throw e;
     }
 
     await delay(300);
@@ -44,7 +44,7 @@ export const analyticsService = {
         return res.data.data;
       }
     } catch (e) {
-      console.warn('[analyticsService] API research data failed. Using local anonymized cohort generator:', e.message);
+      throw e;
     }
 
     await delay(300);

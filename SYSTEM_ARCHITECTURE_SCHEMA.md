@@ -221,7 +221,7 @@ Security, compliance, and clinical change audit trails.
 * `GET    /:id` — Retrieve full patient clinical record, vitals, insights, and history.
 * `POST   /` — Register new patient record with clinical insights scaffolding.
 * `PUT    /:id` — Update patient clinical notes, treatment status, and recommendations.
-* `DELETE /:id` — Delete patient record (Admin only).
+* `DELETE /:id` — Delete patient record (Hospital Admin or System Admin).
 * `GET    /doctor/:doctorName` — List patients assigned to a specific physician.
 
 ### 📊 Analytics (`/api/v1/analytics`)
@@ -237,3 +237,5 @@ Security, compliance, and clinical change audit trails.
 * `GET  /audit-logs` — Retrieve security and activity audit trails.
 * `GET  /datasets` — List research datasets.
 * `POST /datasets` — Upload and register new dataset metadata.
+
+The Diabetes 130-US Hospitals source file is intentionally not committed. Download and import it with the reproducible process in [DATASET_IMPORT.md](DATASET_IMPORT.md).

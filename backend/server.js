@@ -11,9 +11,6 @@ const patientRoutes = require('./routes/patientRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 
-// Connect Database
-connectDB();
-
 const app = express();
 
 // Middleware
@@ -53,11 +50,17 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 8000;
 
-if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => {
+const startServer = async () => {
+  await connectDB();
+  return app.listen(PORT, () => {
     console.log(`[HealthForecast AI Backend] Server running in ${process.env.NODE_ENV || 'development'} mode on http://localhost:${PORT}`);
     console.log(`[HealthForecast AI Backend] Health check: http://localhost:${PORT}/api/v1/health`);
   });
+};
+
+if (require.main === module) {
+  startServer();
 }
 
 module.exports = app;
+module.exports.startServer = startServer;

@@ -25,7 +25,7 @@ export const adminService = {
         return res.data.data;
       }
     } catch (e) {
-      console.warn('[adminService] API system dashboard failed. Using local storage:', e.message);
+      throw e;
     }
 
     await delay(250);
@@ -58,7 +58,7 @@ export const adminService = {
         return res.data.data;
       }
     } catch (e) {
-      console.warn('[adminService] API getUsers failed. Using local storage:', e.message);
+      throw e;
     }
 
     await delay(250);
@@ -78,7 +78,7 @@ export const adminService = {
         return res.data.data;
       }
     } catch (e) {
-      console.warn('[adminService] API toggleUserStatus failed. Modifying local storage fallback:', e.message);
+      throw e;
     }
 
     await delay(250);
@@ -114,7 +114,7 @@ export const adminService = {
         return adminService.getUsers();
       }
     } catch (e) {
-      console.warn('[adminService] API updateUserRole failed. Modifying local storage fallback:', e.message);
+      throw e;
     }
 
     await delay(300);
@@ -145,7 +145,7 @@ export const adminService = {
         return res.data.data;
       }
     } catch (e) {
-      console.warn('[adminService] API createUser failed. Modifying local storage fallback:', e.message);
+      throw e;
     }
 
     await delay(350);
@@ -180,7 +180,7 @@ export const adminService = {
         return res.data.data;
       }
     } catch (e) {
-      console.warn('[adminService] API getAuditLogs failed. Using local storage:', e.message);
+      throw e;
     }
 
     await delay(250);
@@ -209,7 +209,7 @@ export const adminService = {
         return res.data.data;
       }
     } catch (e) {
-      console.warn('[adminService] API getDatasets failed. Using local storage:', e.message);
+      throw e;
     }
 
     await delay(250);
@@ -227,7 +227,7 @@ export const adminService = {
         return res.data.data;
       }
     } catch (e) {
-      console.warn('[adminService] API uploadDataset failed. Using local storage:', e.message);
+      throw e;
     }
 
     await delay(800);
