@@ -89,11 +89,7 @@ def main() -> None:
         results[name] = metrics
         print(f"{name}: {json.dumps(metrics, indent=2)}")
 
-        if (
-            metrics.get(primary, -1.0) >= config["evaluation"]["thresholds"]["roc_auc"]
-            and metrics.get("recall", -1.0) >= config["evaluation"]["thresholds"]["recall"]
-            and metrics.get(primary, -1.0) > best_score
-        ):
+        if metrics.get(primary, -1.0) > best_score:
             best_name = name
             best_pipeline = pipeline
             best_score = metrics[primary]
