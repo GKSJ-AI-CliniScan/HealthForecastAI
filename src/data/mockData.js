@@ -5,7 +5,7 @@ export const mockUsers = [
     id: "U-101",
     email: "doctor@healthforecast.ai",
     password: "password123",
-    name: "Dr. Sarah Jenkins",
+    name: "S.Saumya",
     role: "doctor",
     avatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=150",
     specialty: "Cardiology & Endocrinology",
@@ -15,7 +15,7 @@ export const mockUsers = [
     id: "U-102",
     email: "admin@healthforecast.ai",
     password: "password123",
-    name: "Eleanor Vance",
+    name: "Rambilas Sah",
     role: "hospital-admin",
     avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=150",
     department: "Hospital Administration",
@@ -25,7 +25,7 @@ export const mockUsers = [
     id: "U-103",
     email: "researcher@healthforecast.ai",
     password: "password123",
-    name: "Dr. Alan Turing",
+    name: "K.Deepak Raja",
     role: "researcher",
     avatar: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=150",
     institution: "Health Analytics Institute & Research Labs"
@@ -53,7 +53,7 @@ export const mockPatients = [
     riskLevel: "High",
     readmissionProbability: 82,
     treatmentStatus: "Stable",
-    assignedDoctor: "Dr. Sarah Jenkins",
+    assignedDoctor: "S.Saumya",
     contact: {
       phone: "+1 (555) 234-5678",
       email: "marcus.vance@email.com",
@@ -98,7 +98,7 @@ export const mockPatients = [
     riskLevel: "High",
     readmissionProbability: 76,
     treatmentStatus: "Improving",
-    assignedDoctor: "Dr. Sarah Jenkins",
+    assignedDoctor: "S.Saumya",
     contact: {
       phone: "+1 (555) 765-4321",
       email: "clara.o@telecom.net",
@@ -186,7 +186,7 @@ export const mockPatients = [
     riskLevel: "Low",
     readmissionProbability: 23,
     treatmentStatus: "Recovered",
-    assignedDoctor: "Dr. Sarah Jenkins",
+    assignedDoctor: "S.Saumya",
     contact: {
       phone: "+1 (555) 300-8888",
       email: "diana.prince@temyscira.org",
@@ -263,7 +263,7 @@ export const mockPatients = [
     riskLevel: "Low",
     readmissionProbability: 18,
     treatmentStatus: "Recovered",
-    assignedDoctor: "Dr. Sarah Jenkins",
+    assignedDoctor: "S.Saumya",
     contact: {
       phone: "+1 (555) 888-9999",
       email: "eleanor.s@goodplace.org",
@@ -390,7 +390,7 @@ export const mockPatients = [
     riskLevel: "Medium",
     readmissionProbability: 45,
     treatmentStatus: "Stable",
-    assignedDoctor: "Dr. Sarah Jenkins",
+    assignedDoctor: "S.Saumya",
     contact: {
       phone: "+1 (800) Stark-Ind",
       email: "tony@stark.com",
@@ -527,13 +527,13 @@ export const mockResearchAnalytics = {
 };
 
 export const mockAuditLogs = [
-  { id: "AL-5801", user: "Eleanor Vance (Admin)", action: "Exported Readmission Report", module: "Healthcare Analytics", timestamp: "2026-08-26 13:12:04", status: "Success" },
-  { id: "AL-5802", user: "Dr. Sarah Jenkins", action: "Discharged Patient HFC-001 (Marcus)", module: "Patient Management", timestamp: "2026-08-26 12:45:10", status: "Success" },
+  { id: "AL-5801", user: "Rambilas Sah (Admin)", action: "Exported Readmission Report", module: "Healthcare Analytics", timestamp: "2026-08-26 13:12:04", status: "Success" },
+  { id: "AL-5802", user: "S.Saumya", action: "Discharged Patient HFC-001 (Marcus)", module: "Patient Management", timestamp: "2026-08-26 12:45:10", status: "Success" },
   { id: "AL-5803", user: "Devon Miller (SysAdmin)", action: "Trained Random Forest V2.4", module: "AI Model Management", timestamp: "2026-08-26 10:20:00", status: "Success" },
-  { id: "AL-5804", user: "Dr. Alan Turing", action: "Downloaded Anonymized Population Dataset", module: "Research Dashboard", timestamp: "2026-08-26 09:15:33", status: "Success" },
+  { id: "AL-5804", user: "K.Deepak Raja", action: "Downloaded Anonymized Population Dataset", module: "Research Dashboard", timestamp: "2026-08-26 09:15:33", status: "Success" },
   { id: "AL-5805", user: "Devon Miller (SysAdmin)", action: "Deactivated Mock User Accounts", module: "User Management", timestamp: "2026-08-25 18:04:12", status: "Success" },
   { id: "AL-5806", user: "Dr. Robert Chen", action: "Prescribed Beta-Blockers (Arthur Dent)", module: "Clinical Insights", timestamp: "2026-08-25 14:35:48", status: "Success" },
-  { id: "AL-5807", user: "Eleanor Vance (Admin)", action: "Generated Billing Performance Report", module: "Hospital Reports", timestamp: "2026-08-25 11:10:02", status: "Success" }
+  { id: "AL-5807", user: "Rambilas Sah (Admin)", action: "Generated Billing Performance Report", module: "Hospital Reports", timestamp: "2026-08-25 11:10:02", status: "Success" }
 ];
 
 export const mockAiModels = [

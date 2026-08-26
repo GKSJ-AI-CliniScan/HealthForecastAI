@@ -5,7 +5,7 @@ import { Upload, Database, Check, Clock, CheckCircle } from 'lucide-react';
 const DatasetManagementPage = () => {
   const [datasets, setDatasets] = useState([
     { name: 'Admissions_Record_2026_Q1.csv', size: '14.2 MB', uploadedBy: 'System Admin', date: '2026-08-20', status: 'Verified' },
-    { name: 'Pulmonology_COPD_Cohort_2025.csv', size: '8.4 MB', uploadedBy: 'Dr. Sarah Jenkins', date: '2026-08-15', status: 'Verified' }
+    { name: 'Pulmonology_COPD_Cohort_2025.csv', size: '8.4 MB', uploadedBy: 'S.Saumya', date: '2026-08-15', status: 'Verified' }
   ]);
 
   const [uploading, setUploading] = useState(false);
@@ -38,8 +38,8 @@ const DatasetManagementPage = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Predictive Source Datasets Registry" 
+      <PageHeader
+        title="Predictive Source Datasets Registry"
         description="Upload clinic CSV tables to feed and train prediction weights."
       />
 
@@ -99,9 +99,8 @@ const DatasetManagementPage = () => {
                   <td className="py-3.5 px-4 text-slate-500">{d.uploadedBy}</td>
                   <td className="py-3.5 px-4">{d.date}</td>
                   <td className="py-3.5 px-4">
-                    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
-                      d.status === 'Verified' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-amber-50 text-amber-705 border border-amber-100'
-                    }`}>
+                    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${d.status === 'Verified' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-amber-50 text-amber-705 border border-amber-100'
+                      }`}>
                       {d.status === 'Verified' ? <CheckCircle className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5 animate-spin" />}
                       {d.status === 'Verified' ? 'Verification Passed' : 'Parsing Features...'}
                     </span>

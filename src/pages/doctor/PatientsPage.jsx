@@ -25,7 +25,7 @@ const PatientsPage = () => {
   const [diagnosisFilter, setDiagnosisFilter] = useState('All');
   const [doctorFilter, setDoctorFilter] = useState(user?.role === 'doctor' ? user.name : 'All');
   const [sortBy, setSortBy] = useState('name-asc');
-  
+
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
@@ -40,7 +40,7 @@ const PatientsPage = () => {
     riskLevel: 'Medium',
     readmissionProbability: 50,
     treatmentStatus: 'Stable',
-    assignedDoctor: user?.role === 'doctor' ? user.name : 'Dr. Sarah Jenkins'
+    assignedDoctor: user?.role === 'doctor' ? user.name : 'S.Saumya'
   });
 
   const loadPatients = async () => {
@@ -77,7 +77,7 @@ const PatientsPage = () => {
         riskLevel: 'Medium',
         readmissionProbability: 50,
         treatmentStatus: 'Stable',
-        assignedDoctor: user?.role === 'doctor' ? user.name : 'Dr. Sarah Jenkins'
+        assignedDoctor: user?.role === 'doctor' ? user.name : 'S.Saumya'
       });
       loadPatients(); // Reload
     } catch (err) {
@@ -94,10 +94,10 @@ const PatientsPage = () => {
 
   // Filtering Logic
   const filteredPatients = patients.filter((p) => {
-    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          p.diagnosis.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          p.id.toLowerCase().includes(searchTerm.toLowerCase());
-    
+    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.diagnosis.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.id.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesRisk = riskFilter === 'All' || p.riskLevel === riskFilter;
     const matchesDiag = diagnosisFilter === 'All' || p.diagnosis === diagnosisFilter;
     const matchesDoc = doctorFilter === 'All' || p.assignedDoctor === doctorFilter;
@@ -139,8 +139,8 @@ const PatientsPage = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title="Patient Management Registry" 
+      <PageHeader
+        title="Patient Management Registry"
         description="Search, classify, and track readmission probabilities of your patients."
         actions={
           <button
@@ -252,9 +252,9 @@ const PatientsPage = () => {
 
       {/* Main Table view */}
       {currentItems.length === 0 ? (
-        <EmptyState 
-          title="No patients match search parameters" 
-          description="Try broadening your diagnostic criteria, searching another spelling, or clearing your active filters." 
+        <EmptyState
+          title="No patients match search parameters"
+          description="Try broadening your diagnostic criteria, searching another spelling, or clearing your active filters."
           action={
             <button
               onClick={() => {
@@ -287,9 +287,9 @@ const PatientsPage = () => {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {currentItems.map((p) => (
-                  <tr 
-                    key={p.id} 
-                    onClick={() => navigate(`/doctor/patients/${p.id}`)} 
+                  <tr
+                    key={p.id}
+                    onClick={() => navigate(`/doctor/patients/${p.id}`)}
                     className="hover:bg-slate-50/60 transition-colors cursor-pointer"
                   >
                     <td className="py-4 px-6 font-semibold text-slate-450">{p.id}</td>
@@ -300,8 +300,8 @@ const PatientsPage = () => {
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-2">
                         <div className="w-16 bg-slate-100 rounded-full h-2 overflow-hidden">
-                          <div 
-                            className={`h-full rounded-full ${p.readmissionProbability > 70 ? 'bg-red-500' : p.readmissionProbability > 40 ? 'bg-amber-500' : 'bg-emerald-500'}`} 
+                          <div
+                            className={`h-full rounded-full ${p.readmissionProbability > 70 ? 'bg-red-500' : p.readmissionProbability > 40 ? 'bg-amber-500' : 'bg-emerald-500'}`}
                             style={{ width: `${p.readmissionProbability}%` }}
                           />
                         </div>
@@ -329,7 +329,7 @@ const PatientsPage = () => {
               <span className="text-xs text-slate-400 font-medium">
                 Paging <span className="font-semibold text-slate-600">{indexOfFirstItem + 1}</span> to <span className="font-semibold text-slate-600">{Math.min(indexOfLastItem, sortedPatients.length)}</span> of <span className="font-semibold text-slate-600">{sortedPatients.length}</span> patients
               </span>
-              
+
               <div className="flex gap-2">
                 <button
                   onClick={() => paginate(currentPage - 1)}
@@ -342,11 +342,10 @@ const PatientsPage = () => {
                   <button
                     key={number}
                     onClick={() => paginate(number)}
-                    className={`rounded-lg px-3 py-1 text-xs font-bold border transition ${
-                      currentPage === number 
-                        ? 'bg-emerald-50 text-emerald-700 border-emerald-600/20' 
+                    className={`rounded-lg px-3 py-1 text-xs font-bold border transition ${currentPage === number
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-600/20'
                         : 'border-slate-200 hover:bg-slate-50 text-slate-600'
-                    }`}
+                      }`}
                   >
                     {number}
                   </button>
@@ -365,9 +364,9 @@ const PatientsPage = () => {
       )}
 
       {/* Patient Creation Modal */}
-      <Modal 
-        isOpen={createModalOpen} 
-        onClose={() => setCreateModalOpen(false)} 
+      <Modal
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
         title="Add New Clinical Patient Record"
       >
         <form onSubmit={handleCreatePatientSubmit} className="space-y-4">
@@ -450,7 +449,7 @@ const PatientsPage = () => {
                 onChange={(e) => setNewPatient({ ...newPatient, assignedDoctor: e.target.value })}
                 className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs font-bold focus:border-emerald-500 focus:bg-white focus:outline-hidden cursor-pointer"
               >
-                <option value="Dr. Sarah Jenkins">Dr. Sarah Jenkins</option>
+                <option value="S.Saumya">S.Saumya</option>
                 <option value="Dr. Robert Chen">Dr. Robert Chen</option>
                 <option value="Dr. Richard Webber">Dr. Richard Webber</option>
               </select>

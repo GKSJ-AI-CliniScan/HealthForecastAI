@@ -14,7 +14,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 const DoctorDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  
+
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,7 +24,7 @@ const DoctorDashboard = () => {
       try {
         setLoading(true);
         // Doctor can only see assigned patients
-        const data = await patientService.getDoctorPatients(user?.name || 'Dr. Sarah Jenkins');
+        const data = await patientService.getDoctorPatients(user?.name || 'S.Saumya');
         setPatients(data);
       } catch (err) {
         setError(err);
@@ -42,18 +42,18 @@ const DoctorDashboard = () => {
   // Calculate doctor's patient summaries
   const totalAssigned = patients.length;
   const highRiskCount = patients.filter(p => p.riskLevel === 'High').length;
-  const avgProb = totalAssigned > 0 
+  const avgProb = totalAssigned > 0
     ? Math.round(patients.reduce((acc, curr) => acc + curr.readmissionProbability, 0) / totalAssigned)
     : 0;
 
   return (
     <div className="space-y-6">
-      <PageHeader 
-        title={`Welcome Back, ${user?.name || 'Doctor'}`} 
+      <PageHeader
+        title={`Welcome Back, ${user?.name || 'Doctor'}`}
         description={`Clinical Risk Intelligence Overview — ${user?.specialty || 'General Practitioner'}`}
         actions={
-          <Link 
-            to="/doctor/patients" 
+          <Link
+            to="/doctor/patients"
             className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-emerald-700 transition"
           >
             <Users className="h-4 w-4" /> View Patient List
@@ -63,23 +63,23 @@ const DoctorDashboard = () => {
 
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        <DashboardCard 
-          title="Assigned Patients" 
-          value={totalAssigned} 
+        <DashboardCard
+          title="Assigned Patients"
+          value={totalAssigned}
           icon={Users}
           color="blue"
           subtitle="Patients currently under your care"
         />
-        <DashboardCard 
-          title="High Risk Patients" 
-          value={highRiskCount} 
+        <DashboardCard
+          title="High Risk Patients"
+          value={highRiskCount}
           icon={ShieldAlert}
           color="red"
           subtitle="Require urgent intervention review"
         />
-        <DashboardCard 
-          title="Avg Readmission Risk" 
-          value={`${avgProb}%`} 
+        <DashboardCard
+          title="Avg Readmission Risk"
+          value={`${avgProb}%`}
           icon={Activity}
           color="amber"
           subtitle="Model forecasted readmission threshold"
@@ -130,8 +130,8 @@ const DoctorDashboard = () => {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {patients.slice(0, 5).map((p) => (
-                  <tr 
-                    key={p.id} 
+                  <tr
+                    key={p.id}
                     onClick={() => navigate(`/doctor/patients/${p.id}`)}
                     className="hover:bg-slate-50 transition-colors cursor-pointer"
                   >
@@ -142,8 +142,8 @@ const DoctorDashboard = () => {
                     <td className="py-3 px-2">
                       <div className="flex items-center gap-1.5">
                         <div className="w-12 bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                          <div 
-                            className={`h-full rounded-full ${p.readmissionProbability > 70 ? 'bg-red-500' : p.readmissionProbability > 40 ? 'bg-amber-500' : 'bg-emerald-500'}`} 
+                          <div
+                            className={`h-full rounded-full ${p.readmissionProbability > 70 ? 'bg-red-500' : p.readmissionProbability > 40 ? 'bg-amber-500' : 'bg-emerald-500'}`}
                             style={{ width: `${p.readmissionProbability}%` }}
                           />
                         </div>
@@ -174,7 +174,7 @@ const DoctorDashboard = () => {
               <Brain className="h-5 w-5 text-emerald-600" />
               <h3 className="text-base font-bold text-slate-800 font-heading">AI Clinical Insights</h3>
             </div>
-            
+
             <div className="space-y-3.5">
               <div className="rounded-xl border border-slate-150 p-3 text-xs space-y-1.5 hover:border-emerald-200 transition-colors">
                 <div className="flex items-center justify-between">
