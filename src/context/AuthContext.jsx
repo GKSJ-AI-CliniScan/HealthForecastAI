@@ -21,9 +21,45 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    // Initialize user mock database if not exists
-    if (!localStorage.getItem('hf_users')) {
+    // Initialize or migrate user mock database to local images
+    const stored = localStorage.getItem('hf_users');
+    if (!stored) {
       localStorage.setItem('hf_users', JSON.stringify(mockUsers));
+    } else {
+      try {
+        const users = JSON.parse(stored);
+        let migrated = false;
+        const updatedUsers = users.map(u => {
+          if (u.avatar && u.avatar.includes('unsplash.com')) {
+            migrated = true;
+            if (u.role === 'doctor') return { ...u, avatar: '/images/1.png' };
+            if (u.role === 'hospital-admin') return { ...u, avatar: '/images/2.png' };
+            if (u.role === 'researcher') return { ...u, avatar: '/images/3.png' };
+            if (u.role === 'system-admin') return { ...u, avatar: '/images/pp.jpg' };
+          }
+          return u;
+        });
+        if (migrated) {
+          localStorage.setItem('hf_users', JSON.stringify(updatedUsers));
+        }
+      } catch (e) {
+        localStorage.setItem('hf_users', JSON.stringify(mockUsers));
+      }
+    }
+
+    // Migrate active user session if it contains unsplash urls
+    const activeUser = localStorage.getItem('user');
+    if (activeUser) {
+      try {
+        const parsed = JSON.parse(activeUser);
+        if (parsed.avatar && parsed.avatar.includes('unsplash.com')) {
+          if (parsed.role === 'doctor') parsed.avatar = '/images/1.png';
+          if (parsed.role === 'hospital-admin') parsed.avatar = '/images/2.png';
+          if (parsed.role === 'researcher') parsed.avatar = '/images/3.png';
+          if (parsed.role === 'system-admin') parsed.avatar = '/images/pp.jpg';
+          localStorage.setItem('user', JSON.stringify(parsed));
+        }
+      } catch (e) {}
     }
 
     // Initial session load

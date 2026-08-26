@@ -25,10 +25,10 @@ const SystemSettingsPage = () => {
 
   // Predefined avatar selections
   const avatarList = [
-    { label: "SysAdmin", src: "https://images.unsplash.com/photo-1628157582853-a796fa650a6a?auto=format&fit=crop&q=80&w=150" },
-    { label: "Eleanor Admin", src: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=150" },
-    { label: "Dr Jenkins", src: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=150" },
-    { label: "Generic Blue", src: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150" }
+    { label: "SysAdmin Status", src: "/images/pp.jpg" },
+    { label: "Hospital Admin", src: "/images/2.png" },
+    { label: "Doctor Clinic", src: "/images/1.png" },
+    { label: "Researcher Labs", src: "/images/3.png" }
   ];
 
   const handleFileChange = (e) => {

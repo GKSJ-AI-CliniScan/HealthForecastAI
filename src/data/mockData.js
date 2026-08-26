@@ -7,7 +7,7 @@ export const mockUsers = [
     password: "password123",
     name: "S.Saumya",
     role: "doctor",
-    avatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=150",
+    avatar: "/images/1.png",
     specialty: "Cardiology & Endocrinology",
     assignedPatientsCount: 8
   },
@@ -17,7 +17,7 @@ export const mockUsers = [
     password: "password123",
     name: "Rambilas Sah",
     role: "hospital-admin",
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=150",
+    avatar: "/images/2.png",
     department: "Hospital Administration",
     hospitalBranch: "St. Jude Medical Center"
   },
@@ -27,7 +27,7 @@ export const mockUsers = [
     password: "password123",
     name: "K.Deepak Raja",
     role: "researcher",
-    avatar: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=150",
+    avatar: "/images/3.png",
     institution: "Health Analytics Institute & Research Labs"
   },
   {
@@ -36,7 +36,7 @@ export const mockUsers = [
     password: "prasad1234",
     name: "Penchala Prasad",
     role: "system-admin",
-    avatar: "https://images.unsplash.com/photo-1628157582853-a796fa650a6a?auto=format&fit=crop&q=80&w=150",
+    avatar: "/images/pp.jpg",
     clearance: "Level 5 (Super Admin)"
   }
 ];
