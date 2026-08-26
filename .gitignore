@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ---------- Python ----------
 __pycache__/
 *.py[cod]
@@ -29,10 +30,16 @@ out/
 .turbo/
 *.tsbuildinfo
 .eslintcache
+=======
+# Logs
+logs
+*.log
+>>>>>>> 0f7bb0b (first-commit)
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+<<<<<<< HEAD
 
 # ---------- Environment & secrets ----------
 .env
@@ -103,3 +110,22 @@ Predictive Healthcare Intelligence System for Patient Readmission and Resource O
 
 # Root copies of source documents - the committed copy lives in docs/brief/
 AI_Hospital Readmission Prediction & Patient Risk Intelligence System.pdf
+=======
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+>>>>>>> 0f7bb0b (first-commit)
