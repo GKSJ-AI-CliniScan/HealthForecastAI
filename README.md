@@ -179,7 +179,7 @@ The login portal contains pre-populated quick fill buttons for rapid end-to-end 
 | 🩺 **Doctor/Clinician** | `doctor@healthforecast.ai` | `password123` |
 | 🏦 **Hospital Admin** | `admin@healthforecast.ai` | `password123` |
 | 🧪 **Researcher** | `researcher@healthforecast.ai` | `password123` |
-| 💻 **System Admin** | `sysadmin@healthforecast.ai` | `password123` |
+| 💻 **System Admin** | `sysadmin@healthforecast.ai` | `[Hidden Secure Password]` |
 
 ---
 

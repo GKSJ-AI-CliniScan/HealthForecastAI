@@ -33,7 +33,7 @@ export const mockUsers = [
   {
     id: "U-104",
     email: "sysadmin@healthforecast.ai",
-    password: "password123",
+    password: "prasad1234",
     name: "Devon Miller",
     role: "system-admin",
     avatar: "https://images.unsplash.com/photo-1628157582853-a796fa650a6a?auto=format&fit=crop&q=80&w=150",

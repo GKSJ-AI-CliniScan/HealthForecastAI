@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { authService } from '../services/authService';
+import { mockUsers } from '../data/mockData';
 
 const AuthContext = createContext(null);
 
@@ -68,15 +69,16 @@ export const AuthProvider = ({ children }) => {
       const updatedUser = { ...currentUser, ...updates };
       localStorage.setItem('user', JSON.stringify(updatedUser));
       
+      // Persist to user list log
       const storedUsersStr = localStorage.getItem('hf_users');
-      if (storedUsersStr) {
-        const users = JSON.parse(storedUsersStr);
-        const index = users.findIndex(u => u.id === currentUser.id);
-        if (index !== -1) {
-          users[index] = { ...users[index], ...updates };
-          localStorage.setItem('hf_users', JSON.stringify(users));
-        }
+      const usersList = storedUsersStr ? JSON.parse(storedUsersStr) : [...mockUsers];
+      const index = usersList.findIndex(u => u.id === currentUser.id);
+      if (index !== -1) {
+        usersList[index] = { ...usersList[index], ...updates };
+      } else {
+        usersList.push(updatedUser);
       }
+      localStorage.setItem('hf_users', JSON.stringify(usersList));
       
       setUser(updatedUser);
       window.dispatchEvent(new Event('auth-status-change'));

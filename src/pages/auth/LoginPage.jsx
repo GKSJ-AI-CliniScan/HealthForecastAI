@@ -96,7 +96,11 @@ const LoginPage = () => {
   const handleRoleSelect = (roleName) => {
     setSelectedRole(roleName);
     setEmail(roleConfigs[roleName].email);
-    setPassword('password123');
+    if (roleName === 'system-admin') {
+      setPassword('');
+    } else {
+      setPassword('password123');
+    }
     setError('');
   };
 
@@ -228,7 +232,7 @@ const LoginPage = () => {
         {/* Demo Guide Footer */}
         <div className="text-center pt-2 border-t border-slate-100">
           <p className="text-[10px] text-slate-400">
-            Selected credentials auto-populate for rapid validation testing.
+            Selected credentials auto-populate for validation testing (System Admin requires manual entry).
           </p>
         </div>
 
