@@ -29,11 +29,7 @@ def split_feature_types(frame: pd.DataFrame) -> tuple[list[str], list[str]]:
         if column not in categorical_id_columns
     ]
 
-    categorical = [
-        column
-        for column in frame.columns
-        if column not in numeric
-    ]
+    categorical = [column for column in frame.columns if column not in numeric]
 
     return numeric, categorical
 
@@ -44,18 +40,13 @@ def basic_clean(frame: pd.DataFrame, config: dict[str, Any]) -> pd.DataFrame:
     preprocessing = config.get("preprocessing", {})
 
     # 1. Drop identifiers and high-missingness columns configured in config.yaml
-    cleaned = drop_unused_columns(
-        frame,
-        preprocessing.get("drop_columns", [])
-    )
+    cleaned = drop_unused_columns(frame, preprocessing.get("drop_columns", []))
 
     # 2. Remove records where the patient could not be readmitted
     expired_dispositions = [11, 13, 14, 19, 20, 21]
 
     if "discharge_disposition_id" in cleaned.columns:
-        cleaned = cleaned[
-            ~cleaned["discharge_disposition_id"].isin(expired_dispositions)
-        ]
+        cleaned = cleaned[~cleaned["discharge_disposition_id"].isin(expired_dispositions)]
 
     # 3. Remove duplicate records
     cleaned = cleaned.drop_duplicates()
