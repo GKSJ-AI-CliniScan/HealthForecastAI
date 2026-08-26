@@ -21,6 +21,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    // Initialize user mock database if not exists
+    if (!localStorage.getItem('hf_users')) {
+      localStorage.setItem('hf_users', JSON.stringify(mockUsers));
+    }
+
     // Initial session load
     fetchSession();
 

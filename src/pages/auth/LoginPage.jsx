@@ -65,6 +65,35 @@ const LoginPage = () => {
 
   const currentTheme = roleConfigs[selectedRole];
 
+  const [usersList, setUsersList] = useState([]);
+
+  useEffect(() => {
+    // Read from persistent hf_users local storage to reflect any updated name / profile photo
+    const stored = localStorage.getItem('hf_users');
+    if (stored) {
+      try {
+        setUsersList(JSON.parse(stored));
+      } catch (e) {
+        console.error('Failed to load customized user database', e);
+      }
+    }
+  }, []);
+
+  const getRoleUser = (roleName) => {
+    const emailMap = {
+      doctor: 'doctor@healthforecast.ai',
+      'hospital-admin': 'admin@healthforecast.ai',
+      researcher: 'researcher@healthforecast.ai',
+      'system-admin': 'sysadmin@healthforecast.ai'
+    };
+    const targetEmail = emailMap[roleName];
+    return usersList.find(u => u.email.toLowerCase() === targetEmail.toLowerCase());
+  };
+
+  const roleUser = getRoleUser(selectedRole);
+  const displayName = roleUser?.name || currentTheme.name;
+  const displayAvatar = roleUser?.avatar;
+
   useEffect(() => {
     // If already logged in, redirect home/intended page immediately
     if (isAuthenticated && role) {
@@ -109,16 +138,24 @@ const LoginPage = () => {
       <div className="w-full max-w-lg space-y-6 bg-white p-8 rounded-3xl border border-slate-205/60 shadow-xl">
         
         {/* Banner Logo & Dynamic Role Description */}
-        <div className="flex flex-col items-center justify-center text-center">
-          <span className={`flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-md transition-colors duration-500 ${
-            selectedRole === 'doctor' ? 'bg-emerald-600' :
-            selectedRole === 'hospital-admin' ? 'bg-indigo-600' :
-            selectedRole === 'researcher' ? 'bg-purple-600' : 'bg-blue-600'
-          }`}>
-            <HeartPulse className="h-7 w-7" />
-          </span>
+        <div className="flex flex-col items-center justify-center text-center animate-fade-in">
+          {displayAvatar ? (
+            <img 
+              src={displayAvatar} 
+              alt={displayName} 
+              className="h-14 w-14 rounded-2xl object-cover shadow-md border-2 border-slate-100 transition-all duration-500 hover:scale-105" 
+            />
+          ) : (
+            <span className={`flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-md transition-all duration-500 ${
+              selectedRole === 'doctor' ? 'bg-emerald-600' :
+              selectedRole === 'hospital-admin' ? 'bg-indigo-600' :
+              selectedRole === 'researcher' ? 'bg-purple-600' : 'bg-blue-600'
+            }`}>
+              <HeartPulse className="h-7 w-7 animate-pulse" />
+            </span>
+          )}
           <h2 className="mt-4 text-2xl font-extrabold tracking-tight text-slate-808 font-heading">
-            {currentTheme.name}
+            {displayName}
           </h2>
           <p className="mt-1.5 text-xs font-semibold text-slate-400 max-w-sm leading-relaxed">
             {currentTheme.description}
