@@ -25,7 +25,8 @@ preprocessing:
     - medical_specialty
   missing_value_token: "?"
   numeric_imputation: median
-  categorical_imputation: most_frequent
+  categorical_imputation: constant
+  categorical_missing_value: "Missing"
   scale_numeric: true
   one_hot_encode: true
 
