@@ -263,6 +263,14 @@ const LoginPage = () => {
                 `Enter ${currentTheme.label} Portal`
               )}
             </button>
+            <div className="mt-4 flex justify-center">
+              <Link
+                to="/signup"
+                className={`relative flex w-full max-w-xs justify-center rounded-xl px-4 py-3.5 text-[11px] font-extrabold uppercase tracking-wider text-white shadow-md transition duration-150 focus:outline-hidden focus:ring-2 focus:ring-offset-2 ${currentTheme.accentBg}`}
+              >
+                Create New Account
+              </Link>
+            </div>
           </div>
         </form>
 

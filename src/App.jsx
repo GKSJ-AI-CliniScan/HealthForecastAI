@@ -10,6 +10,7 @@ import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import UnauthorizedPage from './pages/auth/UnauthorizedPage';
 import NotFoundPage from './pages/auth/NotFoundPage';
+import SignupPage from './pages/SignupPage';
 
 // Doctor Pages
 import DoctorDashboard from './pages/doctor/DoctorDashboard';
@@ -82,6 +83,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
+          <Route path="/signup" element={<SignupPage />} />
 
           {/* Root Redirect handler */}
           <Route path="/" element={<RootRedirect />} />
