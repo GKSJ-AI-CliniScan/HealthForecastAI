@@ -1,27 +1,52 @@
-# Dependencies
+# ==========================================
+# Root .gitignore for HealthForecast AI MERN
+# ==========================================
+
+# Dependencies (Root & Subdirectories)
 node_modules/
+*/node_modules/
 backend/node_modules/
 frontend/node_modules/
 
-# Environment Variables
+# Environment Variables & Secrets
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 backend/.env
+backend/.env.*
+frontend/.env
+frontend/.env.*
 
-# Build outputs
+# Build & Production Artifacts
 dist/
+dist-ssr/
 build/
 frontend/dist/
+frontend/build/
 
-# Logs
+# Logs & Debug
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# IDE & OS
-.vscode/
-.idea/
+# OS & Editor Metadata
 .DS_Store
 Thumbs.db
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary & Large Archive Files
 *.zip
+*.tar.gz
+*.rar
+tmp/
+temp/
