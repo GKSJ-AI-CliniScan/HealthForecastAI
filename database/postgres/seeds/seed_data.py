@@ -1,7 +1,7 @@
 """Database seeding script to populate patients and admissions tables from processed ML data."""
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # Locate repository root
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -9,6 +9,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 import pandas as pd
+
 from ml.src.data.load_data import prepare_milestone1_data
 
 
@@ -19,18 +20,24 @@ def generate_sql_seed(df: pd.DataFrame, output_path: Path):
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     # 1. Deduplicate Patients
-    patients_df = df[['patient_nbr', 'age', 'gender', 'race']].drop_duplicates(subset=['patient_nbr'])
+    patients_df = df[["patient_nbr", "age", "gender", "race"]].drop_duplicates(
+        subset=["patient_nbr"]
+    )
 
-    with open(output_path, 'w', encoding='utf-8') as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write("-- Seed data auto-generated from diabetic_data.csv\n\n")
-        
+
         # Insert Unique Patients
         f.write("-- Populate Patients\n")
         for _, row in patients_df.iterrows():
-            med_rec = str(row['patient_nbr']).replace("'", "''")
-            age = str(row['age']).replace("'", "''")
-            gender = str(row['gender']).replace("'", "''")
-            race_val = f"'{str(row['race']).replace('\'', '\'\'')}'" if pd.notna(row['race']) and str(row['race']).strip() != '' else 'NULL'
+            med_rec = str(row["patient_nbr"]).replace("'", "''")
+            age = str(row["age"]).replace("'", "''")
+            gender = str(row["gender"]).replace("'", "''")
+            race_val = (
+                f"'{str(row['race']).replace('\'', '\'\'')}'"
+                if pd.notna(row["race"]) and str(row["race"]).strip() != ""
+                else "NULL"
+            )
 
             f.write(
                 f"INSERT INTO patients (medical_record_number, age_group, gender, race) "
@@ -41,12 +48,32 @@ def generate_sql_seed(df: pd.DataFrame, output_path: Path):
         # Insert Admissions linked to Patient Medical Record Number
         f.write("\n-- Populate Admissions\n")
         for _, row in df.iterrows():
-            med_rec = str(row['patient_nbr']).replace("'", "''")
-            time_hosp = int(row['time_in_hospital']) if pd.notna(row['time_in_hospital']) else 'NULL'
-            meds = int(row['num_medications']) if pd.notna(row['num_medications']) else 'NULL'
-            labs = int(row['num_lab_procedures']) if pd.notna(row['num_lab_procedures']) else 'NULL'
-            diags = int(row['number_diagnoses']) if pd.notna(row['number_diagnoses']) else 'NULL'
-            readmitted_str = f"'{str(row['readmitted']).replace('\'', '\'\'')}'" if pd.notna(row['readmitted']) else 'NULL'
+            med_rec = str(row["patient_nbr"]).replace("'", "''")
+            time_hosp = (
+                int(row["time_in_hospital"])
+                if pd.notna(row["time_in_hospital"])
+                else "NULL"
+            )
+            meds = (
+                int(row["num_medications"])
+                if pd.notna(row["num_medications"])
+                else "NULL"
+            )
+            labs = (
+                int(row["num_lab_procedures"])
+                if pd.notna(row["num_lab_procedures"])
+                else "NULL"
+            )
+            diags = (
+                int(row["number_diagnoses"])
+                if pd.notna(row["number_diagnoses"])
+                else "NULL"
+            )
+            readmitted_str = (
+                f"'{str(row['readmitted']).replace('\'', '\'\'')}'"
+                if pd.notna(row["readmitted"])
+                else "NULL"
+            )
 
             f.write(
                 f"INSERT INTO admissions (patient_id, time_in_hospital, num_medications, num_lab_procedures, number_diagnoses, readmitted) "

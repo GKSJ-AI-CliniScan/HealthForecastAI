@@ -31,19 +31,29 @@ def binarise_target(series: pd.Series, positive_label: str = "<30") -> pd.Series
     return (series.astype(str).str.strip() == positive_label).astype(int)
 
 
-def prepare_milestone1_data(csv_path: str = "ml/data/raw/diabetic_data.csv") -> pd.DataFrame:
+def prepare_milestone1_data(
+    csv_path: str = "ml/data/raw/diabetic_data.csv",
+) -> pd.DataFrame:
     """Load raw data, select core features, clean, and binarise target."""
     df = load_raw(csv_path)
-    
+
     selected_cols = [
-        'encounter_id', 'patient_nbr', 'race', 'gender', 'age',
-        'time_in_hospital', 'num_lab_procedures', 'num_procedures',
-        'num_medications', 'number_diagnoses', 'readmitted'
+        "encounter_id",
+        "patient_nbr",
+        "race",
+        "gender",
+        "age",
+        "time_in_hospital",
+        "num_lab_procedures",
+        "num_procedures",
+        "num_medications",
+        "number_diagnoses",
+        "readmitted",
     ]
-    
-    clean_df = df[selected_cols].dropna(subset=['gender', 'race']).copy()
-    clean_df['readmitted_binary'] = binarise_target(clean_df['readmitted'])
-    
+
+    clean_df = df[selected_cols].dropna(subset=["gender", "race"]).copy()
+    clean_df["readmitted_binary"] = binarise_target(clean_df["readmitted"])
+
     return clean_df.drop_duplicates()
 
 

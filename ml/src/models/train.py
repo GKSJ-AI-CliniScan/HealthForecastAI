@@ -32,7 +32,9 @@ def build_estimator(name: str, params: dict[str, Any]) -> Any:
     if name == "logistic_regression":
         return LogisticRegression(class_weight="balanced", **options)
     if name == "random_forest":
-        return RandomForestClassifier(class_weight="balanced", random_state=42, **options)
+        return RandomForestClassifier(
+            class_weight="balanced", random_state=42, **options
+        )
     if name == "xgboost":
         from xgboost import XGBClassifier
 

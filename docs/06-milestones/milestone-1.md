@@ -6,24 +6,20 @@
 >    the report is still a blank template.
 > 3. Commit it on your own branch. Do not open a pull request to `main`.
 
-_Not started_
-
-- **Intern name:**
-- **Branch:** `intern/<your-name>`
-- **Submitted on:**
+- **Intern name:** Rachana
+- **Branch:** `intern/rachana`
+- **Submitted on:** 2026-08-27
 
 ---
 
 ## Scope for this milestone
 
 - Define healthcare workflows and project objectives.
-- Design the system architecture and database schema.
-- Create UI wireframes and plan the workflows.
-- Set up the frontend and backend environments.
-- Implement authentication, role-based access control, user permissions and
-  dashboard access for Doctors, Hospital Administrators, Healthcare Researchers
-  and System Administrators.
-- Load the Diabetes 130-US Hospitals dataset.
+- Design system architecture and database schema.
+- Create UI wireframes and workflow planning.
+- Setup frontend and backend environments.
+- Implement authentication, role-based access control, user permissions, and dashboard access management for Doctors, Hospital Administrators, Healthcare Researchers, and System Administrators.
+- Load Diabetes 130-US Hospitals Dataset.
 - Build patient management and healthcare dashboard workflows.
 
 ## Evaluation criteria
@@ -37,33 +33,18 @@ _Not started_
 
 ## What I built
 
-<!-- What works end to end? Name the files you added or changed and why. -->
+- Implemented raw dataset ingestion pipeline (`ml/src/data/load_data.py`) to process 99,493 medical records and binarise the 30-day readmission target.
+- Developed relational SQL seed generation script (`database/postgres/seeds/seed_data.py`) to convert processed ML outputs into `patients` and `admissions` table structures.
+- Generated relational SQL seeds (`database/postgres/seeds/01_seed_data.sql`) containing patient demographics and hospital admission records.
 
 ## How to run it
 
-<!-- Exact commands a reviewer can copy and paste from a clean clone. -->
-
 ```bash
-git clone <repo-url>
-git checkout intern/<your-name>
-# ... your steps
-```
+# Switch to feature branch
+git checkout intern/rachana
 
-## Evidence
+# Install required dependencies
+pip install pandas black ruff
 
-<!--
-Screenshots, API responses or terminal output proving it works.
-Put images in docs/05-wireframes/ or alongside this file and link them.
-Never screenshot real patient data.
--->
-
-## Metrics
-
-<!--
-Record: number of API endpoints implemented, tables created, dataset row count
-after preprocessing, and backend test coverage.
--->
-
-## Known gaps
-
-<!-- What is unfinished, what you would do next, and anything you are stuck on. -->
+# Process dataset and build PostgreSQL database seed file
+python database/postgres/seeds/seed_data.py

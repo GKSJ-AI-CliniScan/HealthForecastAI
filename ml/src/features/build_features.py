@@ -11,7 +11,9 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from src.data.preprocess import split_feature_types
 
 
-def build_preprocessor(frame: pd.DataFrame, config: dict[str, Any]) -> ColumnTransformer:
+def build_preprocessor(
+    frame: pd.DataFrame, config: dict[str, Any]
+) -> ColumnTransformer:
     """Build the fitted-at-train-time preprocessing pipeline.
 
     Returning a ColumnTransformer (rather than transforming in place) keeps
@@ -21,7 +23,10 @@ def build_preprocessor(frame: pd.DataFrame, config: dict[str, Any]) -> ColumnTra
     numeric, categorical = split_feature_types(frame)
 
     numeric_steps: list[tuple[str, Any]] = [
-        ("impute", SimpleImputer(strategy=preprocessing.get("numeric_imputation", "median")))
+        (
+            "impute",
+            SimpleImputer(strategy=preprocessing.get("numeric_imputation", "median")),
+        )
     ]
     if preprocessing.get("scale_numeric", True):
         numeric_steps.append(("scale", StandardScaler()))
@@ -29,7 +34,9 @@ def build_preprocessor(frame: pd.DataFrame, config: dict[str, Any]) -> ColumnTra
     categorical_steps: list[tuple[str, Any]] = [
         (
             "impute",
-            SimpleImputer(strategy=preprocessing.get("categorical_imputation", "most_frequent")),
+            SimpleImputer(
+                strategy=preprocessing.get("categorical_imputation", "most_frequent")
+            ),
         ),
         ("encode", OneHotEncoder(handle_unknown="ignore", min_frequency=0.01)),
     ]
