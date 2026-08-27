@@ -91,7 +91,8 @@ PATTERNS: list[tuple[str, re.Pattern[str], str]] = [
     (
         "AWS secret access key",
         re.compile(
-            r"aws_secret_access_key\s*[:=]\s*['\"]?([A-Za-z0-9/+=]{40})['\"]?", re.IGNORECASE
+            r"aws_secret_access_key\s*[:=]\s*['\"]?([A-Za-z0-9/+=]{40})['\"]?",
+            re.IGNORECASE,
         ),
         "Rotate it in IAM now.",
     ),
