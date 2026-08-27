@@ -21,9 +21,7 @@ class Patient(Base):
     gender: Mapped[str | None] = mapped_column(String(16), nullable=True)
     race: Mapped[str | None] = mapped_column(String(64), nullable=True)
     primary_diagnosis: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    assigned_doctor_id: Mapped[int | None] = mapped_column(
-        Integer, index=True, nullable=True
-    )
+    assigned_doctor_id: Mapped[int | None] = mapped_column(Integer, index=True, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
     )

@@ -42,9 +42,7 @@ def get_current_user(
     try:
         role = Role(claims.get("role", ""))
     except ValueError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Unknown role"
-        ) from exc
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unknown role") from exc
 
     return CurrentUser(subject=str(claims["sub"]), role=role)
 

@@ -14,12 +14,8 @@ class RiskPrediction(Base):
     __tablename__ = "risk_predictions"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    patient_id: Mapped[int] = mapped_column(
-        ForeignKey("patients.id"), index=True, nullable=False
-    )
-    admission_id: Mapped[int | None] = mapped_column(
-        ForeignKey("admissions.id"), nullable=True
-    )
+    patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id"), index=True, nullable=False)
+    admission_id: Mapped[int | None] = mapped_column(ForeignKey("admissions.id"), nullable=True)
     readmission_probability: Mapped[float] = mapped_column(Float, nullable=False)
     risk_category: Mapped[str] = mapped_column(String(16), nullable=False)
     model_name: Mapped[str] = mapped_column(String(128), nullable=False)

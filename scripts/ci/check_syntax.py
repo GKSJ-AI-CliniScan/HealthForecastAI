@@ -19,10 +19,10 @@ import configparser
 import json
 import subprocess
 import sys
+import tomllib
 from collections import Counter
 from pathlib import Path
 
-import tomllib
 from _report import Report
 from _walk import rel, tracked_files
 

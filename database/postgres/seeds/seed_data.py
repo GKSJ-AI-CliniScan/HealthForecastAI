@@ -33,8 +33,9 @@ def generate_sql_seed(df: pd.DataFrame, output_path: Path):
             med_rec = str(row["patient_nbr"]).replace("'", "''")
             age = str(row["age"]).replace("'", "''")
             gender = str(row["gender"]).replace("'", "''")
+            race_str = str(row["race"]).replace("'", "''")
             race_val = (
-                f"'{str(row['race']).replace('\'', '\'\'')}'"
+                f"'{race_str}'"
                 if pd.notna(row["race"]) and str(row["race"]).strip() != ""
                 else "NULL"
             )
@@ -69,8 +70,9 @@ def generate_sql_seed(df: pd.DataFrame, output_path: Path):
                 if pd.notna(row["number_diagnoses"])
                 else "NULL"
             )
+            readmitted_val = str(row["readmitted"]).replace("'", "''")
             readmitted_str = (
-                f"'{str(row['readmitted']).replace('\'', '\'\'')}'"
+                f"'{readmitted_val}'"
                 if pd.notna(row["readmitted"])
                 else "NULL"
             )

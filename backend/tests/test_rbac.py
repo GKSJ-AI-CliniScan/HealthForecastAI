@@ -76,17 +76,13 @@ def test_system_admin_can_list_users(client: TestClient, auth_header) -> None:
     assert response.status_code == 200
 
 
-def test_researcher_is_pushed_to_the_anonymised_endpoint(
-    client: TestClient, auth_header
-) -> None:
+def test_researcher_is_pushed_to_the_anonymised_endpoint(client: TestClient, auth_header) -> None:
     """Researchers must not reach the identifiable patient list."""
     response = client.get("/api/v1/patients", headers=auth_header(Role.RESEARCHER))
     assert response.status_code == 403
 
 
-def test_me_endpoint_reports_effective_permissions(
-    client: TestClient, auth_header
-) -> None:
+def test_me_endpoint_reports_effective_permissions(client: TestClient, auth_header) -> None:
     """/auth/me returns the caller's role and permission list."""
     response = client.get("/api/v1/auth/me", headers=auth_header(Role.HOSPITAL_ADMIN))
     assert response.status_code == 200

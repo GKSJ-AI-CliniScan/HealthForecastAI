@@ -9,9 +9,7 @@ from app.schemas.patient import PatientCreate, PatientRead
 router = APIRouter()
 
 
-@router.get(
-    "", response_model=list[PatientRead], summary="List patients visible to the caller"
-)
+@router.get("", response_model=list[PatientRead], summary="List patients visible to the caller")
 def list_patients(user: CurrentUser = Depends(get_current_user)) -> list[PatientRead]:
     """Return the patients the caller is allowed to see.
 
