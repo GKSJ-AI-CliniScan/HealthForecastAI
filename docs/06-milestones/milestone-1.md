@@ -1,3 +1,4 @@
+$content = @"
 # Milestone 1 report - Week 1 & 2 - Project Initialization, Design Process & Core Setup
 
 > **How to use this file**
@@ -39,7 +40,7 @@
 
 ## How to run it
 
-```bash
+\`\`\`bash
 # Switch to feature branch
 git checkout intern/rachana
 
@@ -48,25 +49,30 @@ pip install pandas black ruff
 
 # Process dataset and build PostgreSQL database seed file
 python database/postgres/seeds/seed_data.py
+\`\`\`
 
-Evidence
+## Evidence
+
 Executed database seed pipeline output:
+
+\`\`\`text
 Successfully executed database/postgres/seeds/seed_data.py:
 ✅ Generated complete seed file at: database/postgres/seeds/01_seed_data.sql
 ✅ Unique Patients SQL statements: 69668
 ✅ Admissions SQL statements: 99493
+\`\`\`
 
-Metrics
-Dataset records processed: 99,493 rows
+## Metrics
 
-Unique Patients created: 69,668 records
+- **Dataset records processed:** 99,493 rows
+- **Unique Patients created:** 69,668 records
+- **Admission records created:** 99,493 records
+- **Database schemas seeded:** 2 (`patients`, `admissions`)
 
-Admission records created: 99,493 records
+## Known gaps
 
-Database schemas seeded: 2 (patients, admissions)
+- Backend API endpoints (FastAPI / SQLAlchemy models) and authentication/RBAC workflows scheduled for upcoming implementation steps.
+- Frontend UI dashboard integration with database models pending.
+"@
 
-
-Known gaps
-Backend API endpoints (FastAPI / SQLAlchemy models) and authentication/RBAC workflows scheduled for upcoming implementation steps.
-
-Frontend UI dashboard integration with database models pending.
+Set-Content -Path "docs/06-milestones/milestone-1.md" -Value $content -Encoding utf8
