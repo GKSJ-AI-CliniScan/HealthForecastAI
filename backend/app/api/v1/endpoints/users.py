@@ -21,7 +21,9 @@ def list_users(user: CurrentUser = Depends(_manage_users)) -> list[UserRead]:
 
 
 @router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
-def create_user(payload: UserCreate, user: CurrentUser = Depends(_manage_users)) -> UserRead:
+def create_user(
+    payload: UserCreate, user: CurrentUser = Depends(_manage_users)
+) -> UserRead:
     """Create a new platform user.
 
     TODO(milestone-1): hash the password, persist the row, write an audit log entry.

@@ -15,7 +15,9 @@ from app.services.risk_service import categorise_risk
 router = APIRouter()
 
 
-@router.post("/predict", response_model=RiskPredictionRead, summary="Score one admission")
+@router.post(
+    "/predict", response_model=RiskPredictionRead, summary="Score one admission"
+)
 def predict_risk(
     payload: RiskPredictionRequest,
     user: CurrentUser = Depends(require_permission(Permission.RISK_REPORT_READ)),
@@ -46,10 +48,14 @@ def list_high_risk_patients(
     return []
 
 
-@router.get("/forecast", response_model=ReadmissionForecast, summary="Readmission forecast")
+@router.get(
+    "/forecast", response_model=ReadmissionForecast, summary="Readmission forecast"
+)
 def readmission_forecast(
     horizon_days: int = 30,
-    user: CurrentUser = Depends(require_permission(Permission.READMISSION_FORECAST_READ)),
+    user: CurrentUser = Depends(
+        require_permission(Permission.READMISSION_FORECAST_READ)
+    ),
 ) -> ReadmissionForecast:
     """Return an aggregated readmission forecast over the requested horizon.
 

@@ -6,9 +6,22 @@ import subprocess
 from pathlib import Path
 
 SKIP_DIRS = {
-    ".git", "node_modules", ".next", "out", "dist", "build", "__pycache__",
-    ".venv", "venv", ".mypy_cache", ".ruff_cache", ".pytest_cache",
-    ".ipynb_checkpoints", "htmlcov", ".turbo", "wheels",
+    ".git",
+    "node_modules",
+    ".next",
+    "out",
+    "dist",
+    "build",
+    "__pycache__",
+    ".venv",
+    "venv",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".pytest_cache",
+    ".ipynb_checkpoints",
+    "htmlcov",
+    ".turbo",
+    "wheels",
 }
 
 
@@ -23,7 +36,11 @@ def tracked_files() -> list[Path]:
     try:
         output = subprocess.run(
             ["git", "ls-files", "-z"],
-            cwd=root, capture_output=True, text=True, check=True, timeout=60,
+            cwd=root,
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=60,
         ).stdout
         names = [name for name in output.split("\0") if name]
         if names:

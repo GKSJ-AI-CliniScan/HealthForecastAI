@@ -32,13 +32,23 @@ class Report:
     warnings: list[Problem] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
 
-    def fail(self, message: str, path: str | None = None, line: int | None = None,
-             hint: str | None = None) -> None:
+    def fail(
+        self,
+        message: str,
+        path: str | None = None,
+        line: int | None = None,
+        hint: str | None = None,
+    ) -> None:
         """Record a blocking problem."""
         self.problems.append(Problem(message, path, line, hint))
 
-    def warn(self, message: str, path: str | None = None, line: int | None = None,
-             hint: str | None = None) -> None:
+    def warn(
+        self,
+        message: str,
+        path: str | None = None,
+        line: int | None = None,
+        hint: str | None = None,
+    ) -> None:
         """Record a non-blocking warning."""
         self.warnings.append(Problem(message, path, line, hint))
 
@@ -98,7 +108,10 @@ class Report:
                 handle.write("\n".join(self._summary_lines()) + "\n")
 
         if self.problems:
-            print(f"\n{self.check}: {len(self.problems)} problem(s) found.", file=sys.stderr)
+            print(
+                f"\n{self.check}: {len(self.problems)} problem(s) found.",
+                file=sys.stderr,
+            )
             return 1
         print(f"{self.check}: OK ({len(self.warnings)} warning(s)).")
         return 0

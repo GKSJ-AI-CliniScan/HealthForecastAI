@@ -51,7 +51,9 @@ def main() -> int:
                         hint="Fix the path, or link to the file's location on the branch.",
                     )
 
-    report.note(f"Checked {len(markdown)} markdown file(s), found {broken} broken link(s).")
+    report.note(
+        f"Checked {len(markdown)} markdown file(s), found {broken} broken link(s)."
+    )
     return report.finish()
 
 

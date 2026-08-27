@@ -1,7 +1,12 @@
 """Tests for password hashing and JWT handling."""
 
 from app.core.rbac import Role
-from app.core.security import create_access_token, decode_token, hash_password, verify_password
+from app.core.security import (
+    create_access_token,
+    decode_token,
+    hash_password,
+    verify_password,
+)
 
 
 def test_password_hash_roundtrip() -> None:

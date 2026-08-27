@@ -19,10 +19,10 @@ import configparser
 import json
 import subprocess
 import sys
-import tomllib
 from collections import Counter
 from pathlib import Path
 
+import tomllib
 from _report import Report
 from _walk import rel, tracked_files
 
@@ -37,15 +37,43 @@ except ImportError:  # pragma: no cover - depends on the environment
 # Types that carry no parseable syntax. They are covered by the file policy and
 # secret scans instead, so they are not a coverage gap.
 POLICY_ONLY_SUFFIXES = {
-    ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".webp", ".pdf",
-    ".woff", ".woff2", ".ttf", ".otf", ".eot",
-    ".txt", ".csv", ".mako", ".gitkeep", ".dockerignore", ".gitignore",
-    ".gitattributes", ".editorconfig", ".env", ".example", ".lock", ".css",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".svg",
+    ".ico",
+    ".webp",
+    ".pdf",
+    ".woff",
+    ".woff2",
+    ".ttf",
+    ".otf",
+    ".eot",
+    ".txt",
+    ".csv",
+    ".mako",
+    ".gitkeep",
+    ".dockerignore",
+    ".gitignore",
+    ".gitattributes",
+    ".editorconfig",
+    ".env",
+    ".example",
+    ".lock",
+    ".css",
 }
 
 POLICY_ONLY_NAMES = {
-    "LICENSE", "Dockerfile", ".gitkeep", ".gitignore", ".dockerignore",
-    ".gitattributes", ".editorconfig", ".env.example", "py.typed",
+    "LICENSE",
+    "Dockerfile",
+    ".gitkeep",
+    ".gitignore",
+    ".dockerignore",
+    ".gitattributes",
+    ".editorconfig",
+    ".env.example",
+    "py.typed",
     "script.py.mako",
 }
 
@@ -81,7 +109,9 @@ def check_notebook(path: Path, text: str, relative: str, report: Report) -> None
     try:
         document = json.loads(text)
     except json.JSONDecodeError as exc:
-        report.fail(f"Notebook is not valid JSON: {exc.msg}", path=relative, line=exc.lineno)
+        report.fail(
+            f"Notebook is not valid JSON: {exc.msg}", path=relative, line=exc.lineno
+        )
         return
 
     for index, cell in enumerate(document.get("cells", []), start=1):
@@ -198,9 +228,7 @@ def check_nginx_conf(path: Path, text: str, relative: str, report: Report) -> No
 
 def check_sql(path: Path, text: str, relative: str, report: Report) -> None:
     """Sanity check a SQL file: balanced parentheses and terminated statements."""
-    without_comments = "\n".join(
-        line.split("--", 1)[0] for line in text.splitlines()
-    )
+    without_comments = "\n".join(line.split("--", 1)[0] for line in text.splitlines())
     if without_comments.count("(") != without_comments.count(")"):
         report.fail(
             "Unbalanced parentheses in SQL",

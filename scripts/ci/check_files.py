@@ -15,12 +15,34 @@ from pathlib import Path
 from _report import Report
 from _walk import rel, tracked_files
 
-MAX_FILE_BYTES = 5 * 1024 * 1024        # 5 MB - blocks the push
-WARN_FILE_BYTES = 1 * 1024 * 1024       # 1 MB - flagged for review
+MAX_FILE_BYTES = 5 * 1024 * 1024  # 5 MB - blocks the push
+WARN_FILE_BYTES = 1 * 1024 * 1024  # 1 MB - flagged for review
 
-DATA_SUFFIXES = {".csv", ".tsv", ".parquet", ".feather", ".xlsx", ".xls", ".sav", ".dta"}
-ARTIFACT_SUFFIXES = {".pkl", ".pickle", ".joblib", ".h5", ".hdf5", ".keras", ".pt", ".pth",
-                     ".onnx", ".pb", ".ckpt", ".model", ".bin"}
+DATA_SUFFIXES = {
+    ".csv",
+    ".tsv",
+    ".parquet",
+    ".feather",
+    ".xlsx",
+    ".xls",
+    ".sav",
+    ".dta",
+}
+ARTIFACT_SUFFIXES = {
+    ".pkl",
+    ".pickle",
+    ".joblib",
+    ".h5",
+    ".hdf5",
+    ".keras",
+    ".pt",
+    ".pth",
+    ".onnx",
+    ".pb",
+    ".ckpt",
+    ".model",
+    ".bin",
+}
 CREDENTIAL_SUFFIXES = {".pem", ".key", ".p12", ".pfx", ".jks", ".keystore", ".ppk"}
 DB_SUFFIXES = {".db", ".sqlite", ".sqlite3", ".mdb", ".accdb"}
 
@@ -36,8 +58,16 @@ DATA_ALLOWLIST = {
     "database/mongodb/seeds/",
 }
 
-PHI_NAME_HINTS = ("patient_data", "patients_real", "phi_", "_phi", "mrn_", "ssn",
-                  "identifiable", "real_patient")
+PHI_NAME_HINTS = (
+    "patient_data",
+    "patients_real",
+    "phi_",
+    "_phi",
+    "mrn_",
+    "ssn",
+    "identifiable",
+    "real_patient",
+)
 
 
 def is_allowlisted(path: str) -> bool:
@@ -83,7 +113,7 @@ def main() -> int:
                 f"Model artifact committed ({suffix})",
                 path=relative,
                 hint="Artifacts belong in ml/artifacts/, which is gitignored. "
-                     "Put the metrics in your milestone report instead.",
+                "Put the metrics in your milestone report instead.",
             )
 
         if suffix in CREDENTIAL_SUFFIXES:
