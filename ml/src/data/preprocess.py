@@ -2,6 +2,7 @@
 
 from typing import Any
 
+import numpy as np
 import pandas as pd
 
 
@@ -18,13 +19,64 @@ def split_feature_types(frame: pd.DataFrame) -> tuple[list[str], list[str]]:
     return numeric, categorical
 
 
-def basic_clean(frame: pd.DataFrame, config: dict[str, Any]) -> pd.DataFrame:
-    """Apply the configured cleaning steps.
+def collapse_icd9_diagnosis(code: Any) -> str:
+    """Group ICD-9 diagnosis codes into clinical category buckets."""
+    if pd.isna(code) or code == "?" or str(code).strip() == "":
+        return "Other"
 
-    TODO(milestone-1): add domain specific cleaning - collapse rare diagnosis
-    codes, bucket age ranges, and remove expired-patient discharge dispositions
-    which cannot be readmitted and would otherwise leak into the target.
+    code_str = str(code).strip()
+
+    if code_str.startswith("V") or code_str.startswith("E"):
+        return "Other"
+
+    try:
+        val = float(code_str)
+    except ValueError:
+        return "Other"
+
+    if 390 <= val <= 459 or val == 785:
+        return "Circulatory"
+    if 460 <= val <= 519 or val == 786:
+        return "Respiratory"
+    if 520 <= val <= 579 or val == 787:
+        return "Digestive"
+    if 250 <= val < 251:
+        return "Diabetes"
+    if 800 <= val <= 999:
+        return "Injury"
+    if 710 <= val <= 739:
+        return "Musculoskeletal"
+    if 580 <= val <= 629 or val == 788:
+        return "Genitourinary"
+    if 140 <= val <= 239:
+        return "Neoplasms"
+    return "Other"
+
+
+def basic_clean(frame: pd.DataFrame, config: dict[str, Any]) -> pd.DataFrame:
+    """Apply domain specific cleaning steps:
+    1. Filter out expired / hospice patients (prevent target leakage).
+    2. Drop configured unused columns.
+    3. Collapse ICD-9 diagnosis codes.
+    4. Remove duplicate entries.
     """
+    cleaned = frame.copy()
+
+    # 1. Filter out expired / hospice discharge dispositions
+    if "discharge_disposition_id" in cleaned.columns:
+        expired_ids = [11, 19, 20, 21]
+        cleaned = cleaned[~cleaned["discharge_disposition_id"].isin(expired_ids)]
+
+    # 2. Drop unused columns
     preprocessing = config.get("preprocessing", {})
-    cleaned = drop_unused_columns(frame, preprocessing.get("drop_columns", []))
+    drop_cols = preprocessing.get("drop_columns", [])
+    cleaned = drop_unused_columns(cleaned, drop_cols)
+
+    # 3. Collapse diagnosis codes into broad categories
+    for diag_col in ["diag_1", "diag_2", "diag_3"]:
+        if diag_col in cleaned.columns:
+            cleaned[diag_col] = cleaned[diag_col].apply(collapse_icd9_diagnosis)
+
+    # 4. Standardize null values and remove duplicates
+    cleaned = cleaned.replace("?", np.nan)
     return cleaned.drop_duplicates()

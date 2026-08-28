@@ -1,29 +1,22 @@
-"""Authentication endpoints - Module 1 (User Management).
+"""Authentication endpoints - Module 1 (User Management)."""
 
-Milestone 1 owner: wire these to the users table via app/services/auth_service.py.
-"""
-
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentUser, get_current_user
 from app.core.rbac import Role, permissions_for
+from app.db.session import get_db
 from app.schemas.token import Token
 from app.schemas.user import UserLogin
+from app.services.auth_service import authenticate_user
 
 router = APIRouter()
 
 
 @router.post("/login", response_model=Token, summary="Exchange credentials for a JWT")
-def login(payload: UserLogin) -> Token:
-    """Authenticate a user and issue an access token.
-
-    TODO(milestone-1): look the user up in PostgreSQL, verify the bcrypt hash
-    with app.core.security.verify_password and record the attempt in audit_logs.
-    """
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Login is not implemented yet - see TODO(milestone-1) in auth.py",
-    )
+def login(payload: UserLogin, db: Session = Depends(get_db)) -> Token:
+    """Authenticate a user and issue an access token."""
+    return authenticate_user(db=db, payload=payload)
 
 
 @router.get("/me", summary="Return the authenticated caller and their permissions")
