@@ -31,9 +31,17 @@ def active_model(user: CurrentUser = Depends(_manage_models)) -> dict[str, str]:
 
 
 @router.get("/metrics", summary="Evaluation metrics for the active model")
-def model_metrics(user: CurrentUser = Depends(_manage_models)) -> dict[str, float | None]:
+def model_metrics(
+    user: CurrentUser = Depends(_manage_models),
+) -> dict[str, float | None]:
     """Return accuracy, precision, recall, F1 and ROC-AUC for the active model.
 
     TODO(milestone-2): populate from ml/src/evaluation/metrics.py output.
     """
-    return {"accuracy": None, "precision": None, "recall": None, "f1": None, "roc_auc": None}
+    return {
+        "accuracy": None,
+        "precision": None,
+        "recall": None,
+        "f1": None,
+        "roc_auc": None,
+    }

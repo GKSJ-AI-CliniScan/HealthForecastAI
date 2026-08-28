@@ -21,9 +21,13 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(subject: str, role: str, expires_minutes: int | None = None) -> str:
+def create_access_token(
+    subject: str, role: str, expires_minutes: int | None = None
+) -> str:
     """Create a signed JWT access token carrying the subject and role claims."""
-    expire_delta = timedelta(minutes=expires_minutes or settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire_delta = timedelta(
+        minutes=expires_minutes or settings.ACCESS_TOKEN_EXPIRE_MINUTES
+    )
     now = datetime.now(UTC)
     payload: dict[str, Any] = {
         "sub": subject,
@@ -38,6 +42,8 @@ def create_access_token(subject: str, role: str, expires_minutes: int | None = N
 def decode_token(token: str) -> dict[str, Any] | None:
     """Decode a JWT and return its claims, or None when the token is invalid."""
     try:
-        return jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+        return jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
+        )
     except JWTError:
         return None

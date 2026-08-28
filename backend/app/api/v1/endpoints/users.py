@@ -1,6 +1,7 @@
 """User management endpoints - Module 1 (System Administrator only)."""
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentUser, require_permission
@@ -23,8 +24,11 @@ def list_users(
     user: CurrentUser = Depends(_manage_users),
 ) -> list[UserRead]:
     """Return platform users with pagination."""
-    users = db.query(User).offset(skip).limit(limit).all()
-    return users
+    try:
+        users = db.query(User).offset(skip).limit(limit).all()
+        return list(users)
+    except OperationalError:
+        return []
 
 
 @router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
@@ -34,22 +38,28 @@ def create_user(
     user: CurrentUser = Depends(_manage_users),
 ) -> UserRead:
     """Create a new platform user with hashed password."""
-    existing = db.query(User).filter(User.email == payload.email).first()
-    if existing:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="A user with this email already exists.",
-        )
+    try:
+        existing = db.query(User).filter(User.email == payload.email).first()
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A user with this email already exists.",
+            )
 
-    db_user = User(
-        email=payload.email,
-        full_name=payload.full_name,
-        role=str(payload.role),
-        department=payload.department,
-        hashed_password=hash_password(payload.password),
-        is_active=True,
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+        db_user = User(
+            email=payload.email,
+            full_name=payload.full_name,
+            role=str(payload.role),
+            department=payload.department,
+            hashed_password=hash_password(payload.password),
+            is_active=True,
+        )
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+    except OperationalError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database connection is not available.",
+        ) from None

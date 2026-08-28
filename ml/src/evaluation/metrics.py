@@ -48,7 +48,9 @@ def confusion_counts(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, int]:
     }
 
 
-def meets_promotion_thresholds(metrics: dict[str, float], thresholds: dict[str, Any]) -> bool:
+def meets_promotion_thresholds(
+    metrics: dict[str, float], thresholds: dict[str, Any]
+) -> bool:
     """Return True when every configured minimum threshold is satisfied.
 
     A model that fails this check must not be promoted to the API.
@@ -59,7 +61,9 @@ def meets_promotion_thresholds(metrics: dict[str, float], thresholds: dict[str, 
     )
 
 
-def categorise_risk(probability: float, high: float = 0.70, medium: float = 0.40) -> str:
+def categorise_risk(
+    probability: float, high: float = 0.70, medium: float = 0.40
+) -> str:
     """Map a probability onto the platform risk bands.
 
     Must stay in sync with backend/app/services/risk_service.py.

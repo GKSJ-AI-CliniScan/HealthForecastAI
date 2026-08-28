@@ -47,7 +47,11 @@ app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 @app.get("/health", tags=["System"], summary="Liveness probe")
 def health() -> dict[str, str]:
     """Return the service status. Used by Docker, CI and the load balancer."""
-    return {"status": "ok", "service": settings.APP_NAME, "environment": settings.ENVIRONMENT}
+    return {
+        "status": "ok",
+        "service": settings.APP_NAME,
+        "environment": settings.ENVIRONMENT,
+    }
 
 
 @app.get("/", tags=["System"], summary="Service banner")

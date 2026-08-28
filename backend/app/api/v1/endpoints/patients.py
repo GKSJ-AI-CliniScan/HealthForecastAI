@@ -12,7 +12,9 @@ from app.services.patient_service import create_patient_record, get_scoped_patie
 router = APIRouter()
 
 
-@router.get("", response_model=list[PatientRead], summary="List patients visible to the caller")
+@router.get(
+    "", response_model=list[PatientRead], summary="List patients visible to the caller"
+)
 def list_patients(
     db: Session = Depends(get_db),
     user: CurrentUser = Depends(get_current_user),

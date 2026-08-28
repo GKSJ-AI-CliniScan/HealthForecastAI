@@ -54,29 +54,20 @@ def collapse_icd9_diagnosis(code: Any) -> str:
 
 
 def basic_clean(frame: pd.DataFrame, config: dict[str, Any]) -> pd.DataFrame:
-    """Apply domain specific cleaning steps:
-    1. Filter out expired / hospice patients (prevent target leakage).
-    2. Drop configured unused columns.
-    3. Collapse ICD-9 diagnosis codes.
-    4. Remove duplicate entries.
-    """
+    """Apply domain specific cleaning steps."""
     cleaned = frame.copy()
 
-    # 1. Filter out expired / hospice discharge dispositions
     if "discharge_disposition_id" in cleaned.columns:
         expired_ids = [11, 19, 20, 21]
         cleaned = cleaned[~cleaned["discharge_disposition_id"].isin(expired_ids)]
 
-    # 2. Drop unused columns
     preprocessing = config.get("preprocessing", {})
     drop_cols = preprocessing.get("drop_columns", [])
     cleaned = drop_unused_columns(cleaned, drop_cols)
 
-    # 3. Collapse diagnosis codes into broad categories
     for diag_col in ["diag_1", "diag_2", "diag_3"]:
         if diag_col in cleaned.columns:
             cleaned[diag_col] = cleaned[diag_col].apply(collapse_icd9_diagnosis)
 
-    # 4. Standardize null values and remove duplicates
     cleaned = cleaned.replace("?", np.nan)
     return cleaned.drop_duplicates()
