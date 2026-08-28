@@ -2,29 +2,87 @@
 
 from typing import Any
 
+import numpy as np
 import pandas as pd
 
 
-def drop_unused_columns(frame: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
+# Discharge dispositions representing death or hospice care.
+# These encounters cannot represent a normal future readmission.
+NON_READMITTABLE_DISPOSITIONS = {
+    "11",
+    "13",
+    "14",
+    "19",
+    "20",
+    "21",
+}
+
+
+def drop_unused_columns(
+    frame: pd.DataFrame, columns: list[str]
+) -> pd.DataFrame:
     """Drop identifier and high-missingness columns listed in the config."""
     present = [column for column in columns if column in frame.columns]
     return frame.drop(columns=present)
 
 
-def split_feature_types(frame: pd.DataFrame) -> tuple[list[str], list[str]]:
+def split_feature_types(
+    frame: pd.DataFrame,
+) -> tuple[list[str], list[str]]:
     """Return the numeric and categorical column names of a dataframe."""
     numeric = frame.select_dtypes(include=["number"]).columns.tolist()
-    categorical = [column for column in frame.columns if column not in numeric]
+    categorical = [
+        column for column in frame.columns if column not in numeric
+    ]
     return numeric, categorical
 
 
-def basic_clean(frame: pd.DataFrame, config: dict[str, Any]) -> pd.DataFrame:
-    """Apply the configured cleaning steps.
+def remove_non_readmittable(
+    frame: pd.DataFrame,
+) -> pd.DataFrame:
+    """Remove encounters where a normal future readmission is not possible."""
+    column = "discharge_disposition_id"
 
-    TODO(milestone-1): add domain specific cleaning - collapse rare diagnosis
-    codes, bucket age ranges, and remove expired-patient discharge dispositions
-    which cannot be readmitted and would otherwise leak into the target.
-    """
+    if column not in frame.columns:
+        return frame
+
+    disposition = frame[column].astype(str).str.strip()
+
+    return frame.loc[
+        ~disposition.isin(NON_READMITTABLE_DISPOSITIONS)
+    ].copy()
+
+
+def clean_diagnosis_columns(frame: pd.DataFrame) -> pd.DataFrame:
+    """Normalize diagnosis values for consistent categorical processing."""
+    result = frame.copy()
+
+    diagnosis_columns = ["diag_1", "diag_2", "diag_3"]
+
+    for column in diagnosis_columns:
+        if column in result.columns:
+            result[column] = (
+                result[column]
+                .replace({"?": np.nan, "nan": np.nan})
+                .astype(object)
+            )
+
+    return result
+
+
+def basic_clean(
+    frame: pd.DataFrame,
+    config: dict[str, Any],
+) -> pd.DataFrame:
+    """Apply the configured cleaning steps."""
     preprocessing = config.get("preprocessing", {})
-    cleaned = drop_unused_columns(frame, preprocessing.get("drop_columns", []))
+
+    cleaned = drop_unused_columns(
+        frame,
+        preprocessing.get("drop_columns", []),
+    )
+
+    cleaned = remove_non_readmittable(cleaned)
+    cleaned = clean_diagnosis_columns(cleaned)
+
     return cleaned.drop_duplicates()

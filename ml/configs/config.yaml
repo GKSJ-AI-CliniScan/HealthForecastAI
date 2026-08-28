@@ -4,7 +4,7 @@
 dataset:
   name: diabetes_130_us_hospitals
   source_url: https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008
-  raw_path: ml/data/raw/diabetic_data.csv
+  raw_path: data/raw/diabetic_data.csv
   processed_path: ml/data/processed/admissions_features.parquet
   target_column: readmitted
   # The brief targets 30-day readmission: map "<30" -> 1, {">30", "NO"} -> 0
