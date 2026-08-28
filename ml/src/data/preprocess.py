@@ -18,9 +18,7 @@ NON_READMITTABLE_DISPOSITIONS = {
 }
 
 
-def drop_unused_columns(
-    frame: pd.DataFrame, columns: list[str]
-) -> pd.DataFrame:
+def drop_unused_columns(frame: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     """Drop identifier and high-missingness columns listed in the config."""
     present = [column for column in columns if column in frame.columns]
     return frame.drop(columns=present)
@@ -31,9 +29,7 @@ def split_feature_types(
 ) -> tuple[list[str], list[str]]:
     """Return the numeric and categorical column names of a dataframe."""
     numeric = frame.select_dtypes(include=["number"]).columns.tolist()
-    categorical = [
-        column for column in frame.columns if column not in numeric
-    ]
+    categorical = [column for column in frame.columns if column not in numeric]
     return numeric, categorical
 
 
@@ -48,9 +44,7 @@ def remove_non_readmittable(
 
     disposition = frame[column].astype(str).str.strip()
 
-    return frame.loc[
-        ~disposition.isin(NON_READMITTABLE_DISPOSITIONS)
-    ].copy()
+    return frame.loc[~disposition.isin(NON_READMITTABLE_DISPOSITIONS)].copy()
 
 
 def clean_diagnosis_columns(frame: pd.DataFrame) -> pd.DataFrame:
@@ -61,11 +55,7 @@ def clean_diagnosis_columns(frame: pd.DataFrame) -> pd.DataFrame:
 
     for column in diagnosis_columns:
         if column in result.columns:
-            result[column] = (
-                result[column]
-                .replace({"?": np.nan, "nan": np.nan})
-                .astype(object)
-            )
+            result[column] = result[column].replace({"?": np.nan, "nan": np.nan}).astype(object)
 
     return result
 
