@@ -1,7 +1,7 @@
 """User management endpoints - Module 1 (System Administrator only)."""
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import DBAPIError, OperationalError
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentUser, require_permission
@@ -27,7 +27,7 @@ def list_users(
     try:
         users = db.query(User).offset(skip).limit(limit).all()
         return list(users)
-    except OperationalError:
+    except (OperationalError, DBAPIError):
         return []
 
 
@@ -58,7 +58,7 @@ def create_user(
         db.commit()
         db.refresh(db_user)
         return db_user
-    except OperationalError:
+    except (OperationalError, DBAPIError):
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Database connection is not available.",
