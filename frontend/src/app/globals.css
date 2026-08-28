@@ -3,23 +3,34 @@
 @tailwind utilities;
 
 :root {
-  --background: #f7f9fc;
-  --foreground: #0f1c2e;
+  --background: #f8fafc;
+  --foreground: #0f172a;
   --surface: #ffffff;
-  --border: #dde3ec;
+  --surface-subtle: #f1f5f9;
+  --border: #e2e8f0;
+  --border-subtle: #cbd5e1;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0b1220;
-    --foreground: #e6ecf5;
-    --surface: #131c2b;
-    --border: #23304a;
+    --background: #0a0f1d;
+    --foreground: #f1f5f9;
+    --surface: #111827;
+    --surface-subtle: #1a2234;
+    --border: #1e293b;
+    --border-subtle: #334155;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth transitions for interactive elements */
+a, button {
+  transition: all 0.15s ease-in-out;
 }
