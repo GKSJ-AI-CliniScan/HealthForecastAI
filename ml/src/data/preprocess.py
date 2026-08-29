@@ -73,11 +73,18 @@ def drop_constant_columns(frame: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]
 
 
 def fill_missing_as_category(frame: pd.DataFrame) -> pd.DataFrame:
-    """Replace missing values with an explicit category where absence is meaningful."""
+    """Replace missing values with an explicit category where absence is meaningful.
+
+    The result is cast to string. ICD-9 diagnosis codes mix numeric values like
+    250.83 with alphanumeric ones like V57, so pandas reads the column as object
+    holding both floats and strings. Filling the gaps without casting leaves that
+    mix in place, and scikit-learn's OneHotEncoder rejects a column that is not
+    uniformly strings or numbers.
+    """
     filled = frame.copy()
     for column in MISSING_AS_CATEGORY:
         if column in filled.columns:
-            filled[column] = filled[column].fillna(MISSING_LABEL)
+            filled[column] = filled[column].fillna(MISSING_LABEL).astype(str)
     return filled
 
 

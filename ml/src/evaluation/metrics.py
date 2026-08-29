@@ -12,6 +12,7 @@ from sklearn.metrics import (
     accuracy_score,
     confusion_matrix,
     f1_score,
+    precision_recall_curve,
     precision_score,
     recall_score,
     roc_auc_score,
@@ -46,6 +47,32 @@ def confusion_counts(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, int]:
         "false_negative": int(fn),
         "true_positive": int(tp),
     }
+
+
+def select_decision_threshold(
+    y_true: np.ndarray, y_proba: np.ndarray, min_recall: float = 0.50
+) -> tuple[float, float, float]:
+    """Pick the highest-precision cutoff whose recall is at least ``min_recall``.
+
+    The default 0.5 cutoff from ``predict()`` is arbitrary - it is not tuned to
+    the recall the platform actually needs. ``precision_recall_curve`` returns
+    thresholds in increasing order, paired with precision/recall that
+    (generically) rises/falls as the threshold rises, so the candidate with the
+    best precision among those that still clear the recall floor is the
+    tightest cutoff before recall would drop below it.
+
+    Returns ``(threshold, precision_at_threshold, recall_at_threshold)``. Falls
+    back to the lowest threshold (maximum achievable recall) if no cutoff
+    reaches ``min_recall``.
+    """
+    precision, recall, thresholds = precision_recall_curve(y_true, y_proba)
+    candidates = [
+        (float(t), float(precision[i]), float(recall[i])) for i, t in enumerate(thresholds)
+    ]
+    reachable = [c for c in candidates if c[2] >= min_recall]
+    if not reachable:
+        return min(candidates, key=lambda c: c[0])
+    return max(reachable, key=lambda c: (c[1], c[0]))
 
 
 def meets_promotion_thresholds(metrics: dict[str, float], thresholds: dict[str, Any]) -> bool:

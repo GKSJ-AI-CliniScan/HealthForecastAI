@@ -38,3 +38,4 @@ class ReadmissionForecast(BaseModel):
     horizon_days: int
     predicted_readmissions: int
     predicted_rate: float = Field(ge=0.0, le=1.0)
+    patients_scored: int = 0
