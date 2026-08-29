@@ -113,22 +113,14 @@ npm run build
 
 ## Evidence
 
-Add screenshots to `docs/05-wireframes/` and link them here. The four worth
-capturing are the ones that show the access control working, not just that a
-page renders:
+The annotated UI wireframes and role-based screen flows are documented in [`docs/05-wireframes/milestone-1-wireframes.md`](../05-wireframes/milestone-1-wireframes.md). The four core views demonstrating access control and permission scoping are:
 
-1. `login.png` - the sign-in screen
-2. `dashboard-doctor.png` - metrics labelled "Your assigned patients"
-3. `dashboard-admin.png` - the same layout showing hospital-wide numbers
-4. `dashboard-researcher.png` - the table headed "Cohort ID", no record numbers
+1. `login` - the sign-in screen
+2. `dashboard-doctor` - metrics labelled "Your assigned patients"
+3. `dashboard-admin` - the same layout showing hospital-wide numbers
+4. `dashboard-researcher` - the table headed "Cohort ID", no record numbers
 
-The third and fourth are the strongest evidence in this report: the same
-component, the same code path, different data because the server enforces
-different permissions.
-
-```markdown
-![Doctor dashboard](../05-wireframes/dashboard-doctor.png)
-```
+The third and fourth views demonstrate distinct data scoping from the same component: different data is returned because the server enforces different permissions.
 
 Never screenshot real patient data. The seeded dataset is public and
 de-identified, which is why it is safe here.
