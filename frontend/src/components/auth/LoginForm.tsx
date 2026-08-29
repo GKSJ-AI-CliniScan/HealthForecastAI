@@ -9,34 +9,39 @@ import { Alert } from '@/components/ui/Alert';
 import { MailIcon, LockIcon, EyeIcon, EyeOffIcon, ArrowRightIcon, PulseIcon } from '@/components/ui/Icons';
 import { Role } from '@/types';
 
+import { useAuth } from '@/lib/auth-context';
+import { useRouter } from 'next/navigation';
+
 const DEMO_ACCOUNTS: { role: Role; label: string; email: string; desc: string }[] = [
   {
     role: 'doctor',
     label: 'Doctor',
-    email: 'dr.sarah@hospital.org',
+    email: 'doctor@hospital.example',
     desc: 'Clinical risk prediction & patient care',
   },
   {
     role: 'hospital_admin',
     label: 'Hospital Admin',
-    email: 'admin.director@hospital.org',
+    email: 'admin@hospital.example',
     desc: 'Bed capacity & readmission rates',
   },
   {
     role: 'researcher',
     label: 'Researcher',
-    email: 'researcher.chen@health.edu',
+    email: 'researcher@hospital.example',
     desc: 'Cohort analysis & treatment outcomes',
   },
   {
     role: 'system_admin',
     label: 'System Admin',
-    email: 'sysadmin@healthforecast.ai',
+    email: 'sysadmin@hospital.example',
     desc: 'User management & ML model deployment',
   },
 ];
 
 export function LoginForm() {
+  const router = useRouter();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -68,7 +73,7 @@ export function LoginForm() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginSuccess(null);
 
@@ -77,11 +82,18 @@ export function LoginForm() {
     }
 
     setIsLoading(true);
-    // Simulate frontend validation & authentication response
-    setTimeout(() => {
+    try {
+      await login(email, password);
+      setLoginSuccess(`Signed in successfully as ${email}.`);
+      router.push('/dashboard');
+    } catch (err) {
+      setErrors((prev) => ({
+        ...prev,
+        form: err instanceof Error ? err.message : 'Authentication failed. Please check your credentials.',
+      }));
+    } finally {
       setIsLoading(false);
-      setLoginSuccess(`Signed in successfully as ${email}. (Frontend demo mode)`);
-    }, 800);
+    }
   };
 
   const handleQuickFill = (demoEmail: string) => {
