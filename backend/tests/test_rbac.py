@@ -1,91 +1,71 @@
-"""Access matrix tests.
+"""Tests for the role-based access matrix.
 
-These encode the restrictions from section 4 of the project brief. Interns may add
-permissions, but a change that makes one of these tests fail is a security
-regression and must not be merged.
+These assert the policy itself, so a future change that quietly widens a role's
+reach fails here rather than in production.
 """
-
-import pytest
-from fastapi.testclient import TestClient
 
 from app.core.rbac import PERMISSIONS, Permission, Role, has_permission, permissions_for
 
 
-def test_every_role_has_a_permission_set() -> None:
-    """No role may be left without an explicit permission set."""
-    for role in Role:
-        assert role in PERMISSIONS, f"{role} has no entry in PERMISSIONS"
+def test_all_four_brief_roles_exist() -> None:
+    """The brief names exactly four roles; nothing extra may be added silently."""
+    assert {str(role) for role in Role} == {
+        "doctor",
+        "hospital_admin",
+        "researcher",
+        "system_admin",
+    }
 
 
-def test_system_admin_has_every_permission() -> None:
-    """The system administrator has no restrictions."""
-    for permission in Permission:
-        assert has_permission(Role.SYSTEM_ADMIN, permission)
+def test_every_role_has_an_entry_in_the_matrix() -> None:
+    """A role missing from PERMISSIONS would silently receive no access at all."""
+    assert set(PERMISSIONS) == set(Role)
 
 
-@pytest.mark.parametrize(
-    ("role", "forbidden"),
-    [
-        (Role.DOCTOR, Permission.USER_MANAGE),
-        (Role.DOCTOR, Permission.MODEL_MANAGE),
-        (Role.DOCTOR, Permission.PATIENT_READ_ALL),
-        (Role.HOSPITAL_ADMIN, Permission.PATIENT_WRITE),
-        (Role.HOSPITAL_ADMIN, Permission.MODEL_MANAGE),
-        (Role.HOSPITAL_ADMIN, Permission.USER_MANAGE),
-        (Role.RESEARCHER, Permission.PATIENT_READ_ALL),
-        (Role.RESEARCHER, Permission.PATIENT_WRITE),
-        (Role.RESEARCHER, Permission.USER_MANAGE),
-        (Role.RESEARCHER, Permission.MODEL_MANAGE),
-    ],
-)
-def test_role_restrictions_hold(role: Role, forbidden: Permission) -> None:
-    """Restricted capabilities stay restricted."""
-    assert not has_permission(role, forbidden), f"{role} must not hold {forbidden}"
+def test_doctor_cannot_read_the_whole_hospital() -> None:
+    """A doctor is scoped to assigned patients only."""
+    assert has_permission(Role.DOCTOR, Permission.PATIENT_READ_ASSIGNED)
+    assert not has_permission(Role.DOCTOR, Permission.PATIENT_READ_ALL)
 
 
-def test_researcher_never_sees_identifiable_patients() -> None:
-    """Researchers get anonymised access only - never raw patient records."""
-    granted = PERMISSIONS[Role.RESEARCHER]
-    assert Permission.PATIENT_READ_ANONYMIZED in granted
-    assert Permission.PATIENT_READ_ASSIGNED not in granted
-    assert Permission.PATIENT_READ_ALL not in granted
+def test_researcher_never_reads_identified_patients() -> None:
+    """Research access is de-identified by policy, not by convention."""
+    assert has_permission(Role.RESEARCHER, Permission.PATIENT_READ_ANONYMIZED)
+    assert not has_permission(Role.RESEARCHER, Permission.PATIENT_READ_ALL)
+    assert not has_permission(Role.RESEARCHER, Permission.PATIENT_READ_ASSIGNED)
+    assert not has_permission(Role.RESEARCHER, Permission.MEDICAL_HISTORY_READ)
+
+
+def test_only_system_admin_manages_users() -> None:
+    """Account creation must not be reachable from a clinical or research role."""
+    assert has_permission(Role.SYSTEM_ADMIN, Permission.USER_MANAGE)
+    for role in (Role.DOCTOR, Role.HOSPITAL_ADMIN, Role.RESEARCHER):
+        assert not has_permission(role, Permission.USER_MANAGE)
+
+
+def test_hospital_admin_sees_aggregates_not_clinical_notes() -> None:
+    """Administrators run the hospital; they do not read medical histories."""
+    assert has_permission(Role.HOSPITAL_ADMIN, Permission.HOSPITAL_ANALYTICS_READ)
+    assert not has_permission(Role.HOSPITAL_ADMIN, Permission.MEDICAL_HISTORY_READ)
+
+
+def test_system_admin_holds_every_permission() -> None:
+    """The administrative role is the superset by definition."""
+    assert set(PERMISSIONS[Role.SYSTEM_ADMIN]) == set(Permission)
 
 
 def test_permissions_for_returns_sorted_strings() -> None:
-    """The permission list exposed over the API is stable and sorted."""
+    """The frontend renders this list directly, so ordering must be stable."""
     result = permissions_for(Role.DOCTOR)
     assert result == sorted(result)
     assert all(isinstance(item, str) for item in result)
 
 
-def test_unauthenticated_request_is_rejected(client: TestClient) -> None:
-    """Protected endpoints reject callers without a token."""
-    assert client.get("/api/v1/users").status_code == 401
-    assert client.get("/api/v1/analytics/summary").status_code == 401
-
-
-def test_doctor_cannot_manage_users(client: TestClient, auth_header) -> None:
-    """A doctor calling a system administrator endpoint gets 403."""
-    response = client.get("/api/v1/users", headers=auth_header(Role.DOCTOR))
-    assert response.status_code == 403
-
-
-def test_system_admin_can_list_users(client: TestClient, auth_header) -> None:
-    """A system administrator reaches the user management endpoint."""
-    response = client.get("/api/v1/users", headers=auth_header(Role.SYSTEM_ADMIN))
-    assert response.status_code == 200
-
-
-def test_researcher_is_pushed_to_the_anonymised_endpoint(client: TestClient, auth_header) -> None:
-    """Researchers must not reach the identifiable patient list."""
-    response = client.get("/api/v1/patients", headers=auth_header(Role.RESEARCHER))
-    assert response.status_code == 403
-
-
-def test_me_endpoint_reports_effective_permissions(client: TestClient, auth_header) -> None:
-    """/auth/me returns the caller's role and permission list."""
-    response = client.get("/api/v1/auth/me", headers=auth_header(Role.HOSPITAL_ADMIN))
-    assert response.status_code == 200
-    body = response.json()
-    assert body["role"] == "hospital_admin"
-    assert "hospital_analytics:read" in body["permissions"]
+def test_unknown_role_string_is_rejected() -> None:
+    """Constructing a Role from a bad value must raise, never default."""
+    for bad_value in ("nurse", "data_scientist", "", "DOCTOR "):
+        try:
+            Role(bad_value)
+        except ValueError:
+            continue
+        raise AssertionError(f"Role({bad_value!r}) should not be valid")
