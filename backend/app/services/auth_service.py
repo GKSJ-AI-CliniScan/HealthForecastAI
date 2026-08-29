@@ -23,8 +23,10 @@ def authenticate_user(db: Session, payload: UserLogin) -> Token | None:
     stmt = select(User).where(User.email == payload.email)
     user = db.execute(stmt).scalar_one_or_none()
 
-    if user is None or not user.is_active or not verify_password(
-        payload.password, user.hashed_password
+    if (
+        user is None
+        or not user.is_active
+        or not verify_password(payload.password, user.hashed_password)
     ):
         db.add(
             AuditLog(
