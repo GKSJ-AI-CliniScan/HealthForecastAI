@@ -1,7 +1,7 @@
 # Milestone 1 report - Week 1 & 2 - Project Initialization, Design Process & Core Setup
 
 - **Intern name:** Kanak Prabhakar
-- **Branch:** `intern/Kanak-prabakar`
+- **Branch:** `intern/kanak-prabhakar`
 - **Submitted on:** 29 August 2026
 
 ---
@@ -132,7 +132,7 @@ system Python is `uv`:
 ```bash
 git clone <repo-url>
 cd HealthForecastAI
-git checkout intern/Kanak-prabakar
+git checkout intern/kanak-prabhakar
 
 # --- Backend ---
 cd backend
