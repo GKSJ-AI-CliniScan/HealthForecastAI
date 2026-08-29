@@ -29,6 +29,16 @@ preprocessing:
   scale_numeric: true
   one_hot_encode: true
 
+cleaning:
+  # Applied by src/data/preprocess.basic_clean
+  drop_columns:
+    - encounter_id
+    - weight
+    - payer_code
+  remove_death_and_hospice: true
+  first_encounter_only: true
+  apply_legacy_drop: false
+
 imbalance:
   strategy: class_weight   # one of: none | class_weight | smote
 
