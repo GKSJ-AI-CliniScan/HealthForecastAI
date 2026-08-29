@@ -1,0 +1,453 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================
+   HEALTHFORECAST AI
+   COMMON APPLICATION THEME
+   Used by Doctor / Hospital Admin /
+   System Admin / Researcher
+========================================================= */
+
+:root {
+  /* Main application */
+  --background: #f5f8f8;
+  --foreground: #092f35;
+
+  /* Cards / surfaces */
+  --surface: #ffffff;
+  --surface-hover: #f8fbfb;
+
+  /* Borders */
+  --border: #d8e4e4;
+
+  /* Brand */
+  --primary: #117f78;
+  --primary-dark: #0d706a;
+  --primary-light: #e7f3f2;
+
+  /* Text */
+  --text-primary: #092f35;
+  --text-secondary: #71898d;
+  --text-muted: #819799;
+
+  /* Sidebar */
+  --sidebar: #073b3a;
+  --sidebar-text: #8fb7b4;
+  --sidebar-muted: #6fa5a1;
+  --sidebar-active: #117f78;
+
+  /* Status */
+  --success: #15926d;
+  --success-bg: #e7f6ef;
+
+  --danger: #d84d57;
+  --danger-bg: #fff0f1;
+
+  --warning: #c9781d;
+  --warning-bg: #fff1e2;
+
+  --info: #3479ca;
+  --info-bg: #e9f2ff;
+}
+
+/* =========================================================
+   BASE
+========================================================= */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+
+  background: var(--background);
+  color: var(--foreground);
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+/* =========================================================
+   DOCTOR DASHBOARD
+   Existing page.tsx can remain unchanged
+========================================================= */
+
+/* Main page */
+
+.min-h-screen {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+header {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+}
+
+/* Header title */
+
+header h1 {
+  color: var(--text-primary);
+}
+
+/* Header subtitle */
+
+header p {
+  color: var(--text-secondary);
+}
+
+/* Notification */
+
+header button {
+  color: var(--text-secondary);
+}
+
+header button:hover {
+  color: var(--primary);
+}
+
+/* Doctor avatar */
+
+header .rounded-full {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+/*
+   Your existing Doctor sidebar uses:
+   bg-[var(--surface)]
+
+   We override it to the common dark teal theme.
+*/
+
+aside {
+  background: var(--sidebar) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Main Menu / System headings */
+
+aside p.text-slate-500 {
+  color: var(--sidebar-muted) !important;
+}
+
+/* Sidebar links */
+
+aside nav a {
+  color: var(--sidebar-text) !important;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Sidebar hover */
+
+aside nav a:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #ffffff !important;
+}
+
+/* Active Dashboard */
+
+aside nav a.bg-slate-900 {
+  background: var(--sidebar-active) !important;
+  color: #ffffff !important;
+}
+
+/* System Settings */
+
+aside a {
+  color: var(--sidebar-text) !important;
+}
+
+aside a:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #ffffff !important;
+}
+
+/* Sidebar divider */
+
+aside .border-\[var\(--border\)\] {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+section {
+  background: var(--background);
+}
+
+/* Page heading */
+
+section h2 {
+  color: var(--text-primary);
+}
+
+section > div > div > p {
+  color: var(--text-secondary);
+}
+
+/* =========================================================
+   ALL CARDS
+========================================================= */
+
+.rounded-xl.border.bg-\[var\(--surface\)\] {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+}
+
+/* Card hover */
+
+.rounded-xl.border.bg-\[var\(--surface\)\]:hover {
+  border-color: #c5d7d7;
+}
+
+/* =========================================================
+   STATISTICS
+========================================================= */
+
+/* Number */
+
+.text-3xl.font-bold {
+  color: var(--text-primary);
+}
+
+/* Labels */
+
+.text-sm.text-slate-500,
+.text-xs.text-slate-500 {
+  color: var(--text-secondary) !important;
+}
+
+/* =========================================================
+   PATIENT TABLE
+========================================================= */
+
+table {
+  background: var(--surface);
+}
+
+/* Table header */
+
+thead {
+  background: #f8fafa;
+}
+
+thead tr {
+  border-color: #e2eaea !important;
+}
+
+thead th {
+  color: #759092 !important;
+}
+
+/* Table rows */
+
+tbody tr {
+  border-color: #e2eaea !important;
+}
+
+tbody tr:hover {
+  background: var(--surface-hover) !important;
+}
+
+/* Patient text */
+
+tbody td {
+  color: #607a7d;
+}
+
+/* Patient ID */
+
+tbody td:first-child {
+  color: var(--primary);
+}
+
+/* =========================================================
+   STATUS BADGES
+========================================================= */
+
+/* Active */
+
+.bg-green-100 {
+  background: var(--success-bg) !important;
+}
+
+.text-green-700 {
+  color: var(--success) !important;
+}
+
+/* High Risk */
+
+.bg-red-100 {
+  background: var(--danger-bg) !important;
+}
+
+.text-red-700 {
+  color: var(--danger) !important;
+}
+
+/* Monitoring */
+
+.bg-yellow-100 {
+  background: var(--warning-bg) !important;
+}
+
+.text-yellow-700 {
+  color: var(--warning) !important;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+button {
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* View All */
+
+button.border-\[var\(--border\)\] {
+  background: var(--surface);
+  border-color: var(--border);
+  color: #557073;
+}
+
+button.border-\[var\(--border\)\]:hover {
+  background: #f1f6f6;
+}
+
+/* =========================================================
+   QUICK ACTION CARDS
+========================================================= */
+
+button.rounded-xl.border {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+button.rounded-xl.border:hover {
+  background: var(--surface-hover);
+  border-color: #c3d6d5;
+}
+
+/* Quick action descriptions */
+
+button.rounded-xl.border p.text-sm {
+  color: var(--text-secondary) !important;
+}
+
+/* =========================================================
+   GENERAL SLATE COLORS
+   Convert existing Doctor page colors into
+   the common application palette.
+========================================================= */
+
+.text-slate-900 {
+  color: var(--text-primary) !important;
+}
+
+.text-slate-600 {
+  color: #607a7d !important;
+}
+
+.text-slate-500 {
+  color: var(--text-secondary) !important;
+}
+
+.text-slate-400 {
+  color: var(--text-muted) !important;
+}
+
+/* Hover slate backgrounds */
+
+.hover\:bg-slate-100:hover {
+  background: #f1f6f6 !important;
+}
+
+.hover\:bg-slate-50:hover {
+  background: var(--surface-hover) !important;
+}
+
+/* =========================================================
+   BORDER COLORS
+========================================================= */
+
+.border-\[var\(--border\)\] {
+  border-color: var(--border) !important;
+}
+
+/* =========================================================
+   COMMON INPUTS / FORMS
+   Useful later when you build Patients,
+   Treatments, Admissions etc.
+========================================================= */
+
+input,
+select,
+textarea {
+  border-color: var(--border);
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(17, 127, 120, 0.1);
+}
+
+/* =========================================================
+   PRIMARY BRAND HELPERS
+========================================================= */
+
+.bg-primary {
+  background: var(--primary);
+}
+
+.text-primary {
+  color: var(--primary);
+}
+
+.border-primary {
+  border-color: var(--primary);
+}
+
+.bg-primary-light {
+  background: var(--primary-light);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+  section {
+    width: 100%;
+  }
+
+  header {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

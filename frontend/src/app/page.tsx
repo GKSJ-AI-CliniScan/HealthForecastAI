@@ -1,254 +1,266 @@
-const patients = [
+
+"use client";
+
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+
+const roles = [
   {
-    id: "P001",
-    name: "Ananya Sharma",
-    age: 45,
-    status: "Active",
+    id: "doctor",
+    title: "Doctor",
+    description: "Patient care & clinical insights",
+    icon: "✚",
   },
   {
-    id: "P002",
-    name: "Rahul Kumar",
-    age: 62,
-    status: "High Risk",
+    id: "admin",
+    title: "Hospital Administrator",
+    description: "Hospital operations & analytics",
+    icon: "▣",
   },
   {
-    id: "P003",
-    name: "Priya Reddy",
-    age: 51,
-    status: "Active",
+    id: "researcher",
+    title: "Healthcare Researcher",
+    description: "Research & population analytics",
+    icon: "⌕",
   },
   {
-    id: "P004",
-    name: "Arjun Rao",
-    age: 69,
-    status: "Monitoring",
+    id: "system-admin",
+    title: "System Administrator",
+    description: "Users, security & platform settings",
+    icon: "⚙",
   },
 ];
 
-const navigation = [
-  "Dashboard",
-  "Patients",
-  "Medical History",
-  "Treatments",
-  "Admissions",
-  "Analytics",
-  "Reports",
-];
+export default function LoginPage() {
+  const router = useRouter();
 
-export default function Home() {
+  const [selectedRole, setSelectedRole] = useState("doctor");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  event.preventDefault();
+
+  if (!email || !password) {
+    alert("Please enter your email and password.");
+    return;
+  }
+
+  if (selectedRole === "doctor") {
+    router.push("/doctor");
+  }
+
+  if (selectedRole === "admin") {
+    router.push("/admin");
+  }
+
+  if (selectedRole === "researcher") {
+    router.push("/researcher");
+  }
+
+  if (selectedRole === "system-admin") {
+    router.push("/system-admin");
+  }
+}
+
   return (
-    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
-      {/* Top navigation */}
-      <header className="flex h-16 items-center justify-between border-b border-[var(--border)] bg-[var(--surface)] px-6">
-        <div>
-          <h1 className="text-lg font-bold">HealthForecast AI</h1>
-          <p className="text-xs text-slate-500">
-            Predictive Healthcare Intelligence
+    <main className="login-page">
+      {/* Left branding panel */}
+      <section className="login-brand-panel">
+        <div className="login-brand-content">
+          <div className="login-logo">
+            <span>+</span>
+          </div>
+
+          <p className="login-eyebrow">
+            PREDICTIVE HEALTHCARE INTELLIGENCE
           </p>
+
+          <h1>
+            HealthForecast
+            <span> AI</span>
+          </h1>
+
+          <p className="login-description">
+            Intelligent healthcare analytics designed to help clinical teams
+            identify patient risks, understand outcomes and make data-driven
+            decisions.
+          </p>
+
+          <div className="login-feature-list">
+            <div className="login-feature">
+              <div>✓</div>
+              <span>Patient risk intelligence</span>
+            </div>
+
+            <div className="login-feature">
+              <div>✓</div>
+              <span>Readmission forecasting</span>
+            </div>
+
+            <div className="login-feature">
+              <div>✓</div>
+              <span>Clinical decision support</span>
+            </div>
+
+            <div className="login-feature">
+              <div>✓</div>
+              <span>Healthcare analytics</span>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <button className="text-slate-500 hover:text-slate-900">
-            🔔
-          </button>
-
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-200 font-semibold">
-              D
-            </div>
-            <div>
-              <p className="text-sm font-medium">Doctor</p>
-              <p className="text-xs text-slate-500">Healthcare Team</p>
-            </div>
-          </div>
+        <div className="login-brand-footer">
+          <span>HealthForecast AI</span>
+          <span>Secure Healthcare Platform</span>
         </div>
-      </header>
+      </section>
 
-      <div className="flex">
-        {/* Sidebar */}
-        <aside className="hidden min-h-[calc(100vh-4rem)] w-64 border-r border-[var(--border)] bg-[var(--surface)] p-4 md:block">
-          <div className="mb-6">
-            <p className="px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Main Menu
+      {/* Right login panel */}
+      <section className="login-form-panel">
+        <div className="login-form-container">
+          <div className="mobile-login-logo">
+            <div className="login-logo">
+              <span>+</span>
+            </div>
+
+            <span>HealthForecast AI</span>
+          </div>
+
+          <div className="login-heading">
+            <p className="login-small-label">WELCOME BACK</p>
+
+            <h2>Sign in to your account</h2>
+
+            <p>
+              Access your healthcare intelligence workspace.
             </p>
           </div>
 
-          <nav className="space-y-1">
-            {navigation.map((item, index) => (
-              <a
-                key={item}
-                href="#"
-                className={`block rounded-lg px-3 py-2.5 text-sm font-medium ${
-                  index === 0
-                    ? "bg-slate-900 text-white"
-                    : "text-slate-600 hover:bg-slate-100"
-                }`}
-              >
-                {item}
-              </a>
-            ))}
-          </nav>
+          <form onSubmit={handleSubmit}>
+            {/* Email */}
+            <div className="form-group">
+              <label htmlFor="email">Email address</label>
 
-          <div className="mt-8 border-t border-[var(--border)] pt-6">
-            <p className="px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-              System
-            </p>
+              <div className="input-wrapper">
+                <span className="input-icon">@</span>
 
-            <a
-              href="#"
-              className="mt-2 block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100"
-            >
-              Settings
-            </a>
-          </div>
-        </aside>
-
-        {/* Main content */}
-        <section className="flex-1 p-6 md:p-8">
-          {/* Page heading */}
-          <div className="mb-8">
-            <p className="text-sm font-medium text-slate-500">
-              Healthcare Dashboard
-            </p>
-
-            <h2 className="mt-1 text-2xl font-bold tracking-tight">
-              Welcome back, Doctor
-            </h2>
-
-            <p className="mt-2 text-sm text-slate-500">
-              Monitor patient health, risks, treatments and admissions.
-            </p>
-          </div>
-
-          {/* Statistics */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5">
-              <p className="text-sm text-slate-500">Total Patients</p>
-              <p className="mt-2 text-3xl font-bold">120</p>
-              <p className="mt-1 text-xs text-slate-500">
-                Patients under care
-              </p>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="doctor@healthforecast.ai"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                />
+              </div>
             </div>
 
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5">
-              <p className="text-sm text-slate-500">High Risk Patients</p>
-              <p className="mt-2 text-3xl font-bold">18</p>
-              <p className="mt-1 text-xs text-slate-500">
-                Require attention
-              </p>
-            </div>
+            {/* Password */}
+            <div className="form-group">
+              <div className="password-label-row">
+                <label htmlFor="password">Password</label>
 
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5">
-              <p className="text-sm text-slate-500">Readmissions</p>
-              <p className="mt-2 text-3xl font-bold">12</p>
-              <p className="mt-1 text-xs text-slate-500">
-                Recent readmissions
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5">
-              <p className="text-sm text-slate-500">Active Treatments</p>
-              <p className="mt-2 text-3xl font-bold">34</p>
-              <p className="mt-1 text-xs text-slate-500">
-                Currently monitored
-              </p>
-            </div>
-          </div>
-
-          {/* Patient section */}
-          <div className="mt-8 rounded-xl border border-[var(--border)] bg-[var(--surface)]">
-            <div className="flex items-center justify-between border-b border-[var(--border)] p-5">
-              <div>
-                <h3 className="font-semibold">Recent Patients</h3>
-                <p className="mt-1 text-sm text-slate-500">
-                  Recently accessed patient records
-                </p>
+                <button
+                  type="button"
+                  className="forgot-button"
+                  onClick={() =>
+                    alert("Password reset will be connected to the backend.")
+                  }
+                >
+                  Forgot password?
+                </button>
               </div>
 
-              <button className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm font-medium hover:bg-slate-100">
-                View All
-              </button>
+              <div className="input-wrapper">
+                <span className="input-icon">●</span>
+
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                />
+
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label="Toggle password visibility"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b border-[var(--border)] text-xs uppercase tracking-wide text-slate-500">
-                    <th className="px-5 py-4">Patient ID</th>
-                    <th className="px-5 py-4">Name</th>
-                    <th className="px-5 py-4">Age</th>
-                    <th className="px-5 py-4">Status</th>
-                  </tr>
-                </thead>
+            {/* Role */}
+            <div className="form-group">
+              <label>Sign in as</label>
 
-                <tbody>
-                  {patients.map((patient) => (
-                    <tr
-                      key={patient.id}
-                      className="border-b border-[var(--border)] last:border-0 hover:bg-slate-50"
-                    >
-                      <td className="px-5 py-4 font-medium">{patient.id}</td>
+              <div className="role-grid">
+                {roles.map((role) => (
+                  <button
+                    type="button"
+                    key={role.id}
+                    onClick={() => setSelectedRole(role.id)}
+                    className={`role-card ${
+                      selectedRole === role.id
+                        ? "role-card-selected"
+                        : ""
+                    }`}
+                  >
+                    <div className="role-icon">{role.icon}</div>
 
-                      <td className="px-5 py-4">{patient.name}</td>
+                    <div className="role-content">
+                      <p>{role.title}</p>
 
-                      <td className="px-5 py-4">{patient.age}</td>
+                      <span>{role.description}</span>
+                    </div>
 
-                      <td className="px-5 py-4">
-                        <span
-                          className={`rounded-full px-3 py-1 text-xs font-medium ${
-                            patient.status === "High Risk"
-                              ? "bg-red-100 text-red-700"
-                              : patient.status === "Monitoring"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-green-100 text-green-700"
-                          }`}
-                        >
-                          {patient.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                    <div className="role-radio">
+                      {selectedRole === role.id && <span />}
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {/* Remember */}
+            <div className="remember-row">
+              <label className="remember-label">
+                <input type="checkbox" />
+                <span>Remember me</span>
+              </label>
+
+              <span className="secure-label">
+                🔒 Secure login
+              </span>
+            </div>
+
+            {/* Submit */}
+            <button type="submit" className="login-submit">
+              Sign in
+              <span>→</span>
+            </button>
+          </form>
+
+          <div className="login-divider">
+            <span />
+            <p>Healthcare Intelligence Platform</p>
+            <span />
           </div>
 
-          {/* Quick actions */}
-          <div className="mt-8">
-            <h3 className="mb-4 font-semibold">Quick Actions</h3>
+          <p className="login-security-note">
+            Your healthcare workspace is protected with secure
+            authentication and role-based access controls.
+          </p>
 
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <button className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 text-left hover:bg-slate-50">
-                <p className="font-medium">Add Patient</p>
-                <p className="mt-1 text-sm text-slate-500">
-                  Create a patient record
-                </p>
-              </button>
-
-              <button className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 text-left hover:bg-slate-50">
-                <p className="font-medium">Patient Search</p>
-                <p className="mt-1 text-sm text-slate-500">
-                  Find patient records
-                </p>
-              </button>
-
-              <button className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 text-left hover:bg-slate-50">
-                <p className="font-medium">View Admissions</p>
-                <p className="mt-1 text-sm text-slate-500">
-                  Review admission history
-                </p>
-              </button>
-
-              <button className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 text-left hover:bg-slate-50">
-                <p className="font-medium">Analytics</p>
-                <p className="mt-1 text-sm text-slate-500">
-                  View healthcare analytics
-                </p>
-              </button>
-            </div>
-          </div>
-        </section>
-      </div>
+          <p className="login-version">
+            HealthForecast AI · Version 1.0
+          </p>
+        </div>
+      </section>
     </main>
   );
 }
