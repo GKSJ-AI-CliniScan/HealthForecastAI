@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 
-import { auth } from '@/lib/api';
+import { auth, ApiError } from '@/lib/api';
 import type { SessionUser } from '@/types';
 
 interface AuthState {
@@ -51,10 +51,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         permissions: identity.permissions,
       });
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Login failed');
+      let message = 'Login failed';
+      if (caught instanceof ApiError && (caught.status === 401 || caught.status === 501)) {
+        message = 'Invalid email or password';
+      } else if (caught instanceof TypeError) {
+        message = 'Unable to reach server. Please check your network connection.';
+      } else if (caught instanceof Error) {
+        message = caught.message;
+      }
+      setError(message);
       setToken(null);
       setUser(null);
-      throw caught;
+      throw new Error(message);
     } finally {
       setLoading(false);
     }
