@@ -1,8 +1,9 @@
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src"))
 
-from data.preprocess import load_raw_tables, merge_admission_features, basic_clean
+from data.preprocess import basic_clean, load_raw_tables, merge_admission_features
 
 tables = load_raw_tables("data/raw_india")
 print("Loaded tables:")

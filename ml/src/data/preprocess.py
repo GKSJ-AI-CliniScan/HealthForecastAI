@@ -28,9 +28,8 @@ def merge_admission_features(tables: dict[str, pd.DataFrame]) -> pd.DataFrame:
     hospitals = tables["hospitals"]
     diagnoses = tables["diagnoses"]
 
-    primary_diag = (
-        diagnoses[diagnoses["diag_rank"] == 1][["admission_id", "diag_category"]]
-        .rename(columns={"diag_category": "primary_diag_category"})
+    primary_diag = diagnoses[diagnoses["diag_rank"] == 1][["admission_id", "diag_category"]].rename(
+        columns={"diag_category": "primary_diag_category"}
     )
     diag_count = diagnoses.groupby("admission_id").size().rename("diagnosis_count")
 
