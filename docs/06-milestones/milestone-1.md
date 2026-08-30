@@ -11,25 +11,27 @@
 1. Start database containers:
 ```bash
 docker compose up -d
+```
+2. Run backend test suite:
+```bash
+cd backend
+pytest
+```
+3. Run code quality checks:
+```bash
+ruff check backend ml
+black --check backend ml
+```
 
-Save the file (**`Ctrl + S`**).
+## Evidence
+- All Pytest unit and RBAC integration tests pass cleanly.
+- Code quality checks (`ruff`, `black`) pass with zero errors across backend and ML directories.
+- GitHub Actions CI pipeline is completely green on branch `intern/v-naga-phanendra`.
 
----
+## Metrics
+- 35 test cases passing across backend authentication, RBAC, and patient endpoints.
+- Preprocessing pipeline successfully buckets ICD-9 diagnostic codes into standard clinical categories and filters out non-readmission target leakage cases.
 
-### Step 2: Remove `.env` from Git & Install Frontend Dependencies
-
-Run these commands in your PowerShell terminal:
-
-```powershell
-# 1. Untrack .env so CI stops failing the structure check
-cd 'C:\PROJECTS\Infosys Springboard\HealthForecastAI'
-git rm --cached .env
-
-# 2. Install frontend dependencies and verify build
-cd frontend
-npm install
-npm run lint
-npm run build
-npm run typecheck
-cd ..
-
+## Known gaps
+- Local end-to-end integration tests require active Docker Desktop engine.
+- Advanced ML predictive modeling and readmission forecasting will be built in Milestone 
