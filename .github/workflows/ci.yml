@@ -136,7 +136,7 @@ jobs:
   # --------------------------------------------------------------------------
   # Backend: lint, format, type check, test.
   # --------------------------------------------------------------------------
-  backend:
+    backend:
     name: Backend (FastAPI)
     needs: detect
     if: needs.detect.outputs.backend == 'true'
@@ -144,6 +144,20 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: healthforecast
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
     steps:
       - uses: actions/checkout@v4
 
@@ -169,6 +183,10 @@ jobs:
         if: always()
         continue-on-error: true
         run: mypy app
+
+      - name: Create database tables
+        if: always()
+        run: python -c "from app.db.base import Base; from app.db.session import engine; import app.models.user, app.models.patient, app.models.admission, app.models.prediction, app.models.treatment, app.models.audit_log; Base.metadata.create_all(engine)"
 
       - name: Tests (pytest)
         if: always()
