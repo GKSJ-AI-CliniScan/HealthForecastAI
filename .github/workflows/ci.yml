@@ -136,7 +136,7 @@ jobs:
   # --------------------------------------------------------------------------
   # Backend: lint, format, type check, test.
   # --------------------------------------------------------------------------
-    backend:
+  backend:
     name: Backend (FastAPI)
     needs: detect
     if: needs.detect.outputs.backend == 'true'
