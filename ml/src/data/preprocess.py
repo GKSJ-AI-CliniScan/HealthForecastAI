@@ -17,14 +17,26 @@ def split_feature_types(frame: pd.DataFrame) -> tuple[list[str], list[str]]:
     categorical = [column for column in frame.columns if column not in numeric]
     return numeric, categorical
 
+def remove_expired_patients(frame: pd.DataFrame) -> pd.DataFrame:
+    """Remove encounters where the patient expired and cannot be readmitted."""
+    expired_disposition_ids = [11, 19, 20, 21]
+
+    if "discharge_disposition_id" not in frame.columns:
+        return frame
+
+    return frame[
+        ~frame["discharge_disposition_id"].isin(expired_disposition_ids)
+    ].copy()
 
 def basic_clean(frame: pd.DataFrame, config: dict[str, Any]) -> pd.DataFrame:
-    """Apply the configured cleaning steps.
-
-    TODO(milestone-1): add domain specific cleaning - collapse rare diagnosis
-    codes, bucket age ranges, and remove expired-patient discharge dispositions
-    which cannot be readmitted and would otherwise leak into the target.
-    """
+    """Apply the configured cleaning steps."""
     preprocessing = config.get("preprocessing", {})
-    cleaned = drop_unused_columns(frame, preprocessing.get("drop_columns", []))
+
+    cleaned = remove_expired_patients(frame)
+
+    cleaned = drop_unused_columns(
+        cleaned,
+        preprocessing.get("drop_columns", [])
+    )
+
     return cleaned.drop_duplicates()
