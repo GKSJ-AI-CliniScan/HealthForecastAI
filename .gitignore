@@ -103,3 +103,4 @@ Predictive Healthcare Intelligence System for Patient Readmission and Resource O
 
 # Root copies of source documents - the committed copy lives in docs/brief/
 AI_Hospital Readmission Prediction & Patient Risk Intelligence System.pdf
+database/postgres/seeds/01_seed_data.sql

@@ -21,7 +21,9 @@ api_router.include_router(patients.router, prefix="/patients", tags=["Patient Da
 api_router.include_router(risk.router, prefix="/risk", tags=["Risk Prediction"])
 api_router.include_router(treatment.router, prefix="/treatment", tags=["Treatment Effectiveness"])
 api_router.include_router(
-    clinical_support.router, prefix="/clinical-support", tags=["Clinical Decision Support"]
+    clinical_support.router,
+    prefix="/clinical-support",
+    tags=["Clinical Decision Support"],
 )
 api_router.include_router(analytics.router, prefix="/analytics", tags=["Healthcare Analytics"])
 api_router.include_router(ml_models.router, prefix="/models", tags=["AI Model Management"])

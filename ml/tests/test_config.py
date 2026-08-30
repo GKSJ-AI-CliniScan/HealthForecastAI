@@ -12,7 +12,14 @@ def test_default_config_loads() -> None:
 def test_required_sections_are_present() -> None:
     """The pipeline reads these sections - none may be removed."""
     config = load_config()
-    for section in ("dataset", "split", "preprocessing", "models", "evaluation", "artifacts"):
+    for section in (
+        "dataset",
+        "split",
+        "preprocessing",
+        "models",
+        "evaluation",
+        "artifacts",
+    ):
         assert section in config, f"config.yaml is missing the '{section}' section"
 
 

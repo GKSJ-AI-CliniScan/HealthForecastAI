@@ -30,4 +30,8 @@ def discharge_plan(
 
     TODO(milestone-3): combine risk band, length of stay and treatment response.
     """
-    return {"patient_id": patient_id, "risk_mitigation": [], "ready_for_discharge": None}
+    return {
+        "patient_id": patient_id,
+        "risk_mitigation": [],
+        "ready_for_discharge": None,
+    }

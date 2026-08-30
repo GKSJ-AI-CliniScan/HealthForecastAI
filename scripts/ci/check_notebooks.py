@@ -31,8 +31,11 @@ def main() -> int:
         try:
             document = json.loads(path.read_text(encoding="utf-8", errors="ignore"))
         except (OSError, json.JSONDecodeError) as exc:
-            report.fail(f"Notebook is not valid JSON: {exc}", path=relative,
-                        hint="Re-save it from Jupyter, or restore the previous version.")
+            report.fail(
+                f"Notebook is not valid JSON: {exc}",
+                path=relative,
+                hint="Re-save it from Jupyter, or restore the previous version.",
+            )
             continue
 
         cells = document.get("cells", [])

@@ -21,7 +21,10 @@ def build_preprocessor(frame: pd.DataFrame, config: dict[str, Any]) -> ColumnTra
     numeric, categorical = split_feature_types(frame)
 
     numeric_steps: list[tuple[str, Any]] = [
-        ("impute", SimpleImputer(strategy=preprocessing.get("numeric_imputation", "median")))
+        (
+            "impute",
+            SimpleImputer(strategy=preprocessing.get("numeric_imputation", "median")),
+        )
     ]
     if preprocessing.get("scale_numeric", True):
         numeric_steps.append(("scale", StandardScaler()))
