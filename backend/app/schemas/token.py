@@ -1,6 +1,6 @@
 """Auth token schemas."""
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Token(BaseModel):
@@ -9,7 +9,7 @@ class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
     role: str
-    permissions: list[str] = []
+    permissions: list[str] = Field(default_factory=list)
 
 
 class TokenPayload(BaseModel):

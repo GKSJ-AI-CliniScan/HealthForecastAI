@@ -89,6 +89,7 @@ PERMISSIONS: dict[Role, frozenset[Permission]] = {
 
 def has_permission(role: Role, permission: Permission) -> bool:
     """Return True when the given role is granted the permission."""
+    
     return permission in PERMISSIONS.get(role, frozenset())
 
 
