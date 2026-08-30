@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Healthcare Researcher's Analytics Dashboard - HealthForecastAI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f0f3ff",
+                        "on-primary-fixed": "#001848",
+                        "surface-dim": "#cadbfc",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#dae2ff",
+                        "secondary-container": "#709bfe",
+                        "secondary-fixed-dim": "#b1c6ff",
+                        "secondary": "#285ab9",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "surface-container-highest": "#d6e3ff",
+                        "surface-variant": "#d6e3ff",
+                        "inverse-on-surface": "#ecf0ff",
+                        "surface-bright": "#f9f9ff",
+                        "surface-tint": "#0c56d0",
+                        "inverse-primary": "#b2c5ff",
+                        "on-tertiary-container": "#d2d3d5",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#d9e2ff",
+                        "on-secondary-fixed": "#001946",
+                        "outline": "#737685",
+                        "tertiary-fixed-dim": "#c5c6c8",
+                        "on-secondary-fixed-variant": "#00419d",
+                        "tertiary-fixed": "#e1e2e4",
+                        "surface-container": "#e7eeff",
+                        "on-surface-variant": "#434654",
+                        "on-surface": "#091c35",
+                        "primary-container": "#0052cc",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "inverse-surface": "#20314b",
+                        "surface-container-high": "#dfe8ff",
+                        "on-primary-container": "#c4d2ff",
+                        "surface": "#f9f9ff",
+                        "error": "#ba1a1a",
+                        "tertiary": "#414446",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "on-error-container": "#93000a",
+                        "on-background": "#091c35",
+                        "background": "#f9f9ff",
+                        "tertiary-container": "#595b5d",
+                        "on-tertiary-fixed": "#191c1e",
+                        "primary": "#003d9b",
+                        "outline-variant": "#c3c6d6",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#003179"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "16px",
+                        "xs": "4px",
+                        "unit": "4px",
+                        "gutter": "24px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom styles for precise clinical layout */
+        body { background-color: #F4F5F7; }
+        .clinical-shadow { box-shadow: 0px 4px 8px rgba(9, 30, 66, 0.08); }
+        .clinical-border { border: 1px solid #DFE1E6; }
+        .clinical-input:focus { border: 2px solid #0052CC; outline: none; }
+        
+        /* Checkbox styling */
+        .clinical-checkbox {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 1px solid #DFE1E6;
+            border-radius: 4px;
+            background-color: white;
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+        }
+        .clinical-checkbox:checked {
+            background-color: #0052CC;
+            border-color: #0052CC;
+        }
+        .clinical-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 2px;
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased overflow-hidden h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface border-b border-outline-variant flex items-center justify-between px-margin-desktop h-16 w-full shrink-0 z-50 fixed top-0">
+<div class="flex items-center gap-md">
+<span class="font-headline-sm text-headline-sm text-primary">HealthForecastAI</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-high transition-colors p-sm rounded-full">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:bg-surface-container-high transition-colors p-sm rounded-full">account_circle</span>
+</div>
+</header>
+<div class="flex flex-1 pt-16 overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-surface-container-low border-r border-outline-variant h-full w-64 shrink-0 flex flex-col p-md gap-sm hidden md:flex">
+<div class="mb-lg px-sm">
+<div class="flex items-center gap-md">
+<img alt="Doctor Portrait" class="w-10 h-10 rounded-full object-cover clinical-border" data-alt="A professional headshot of a female doctor in a white clinical setting, clean modern lighting, highly detailed." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDB8g0tmUnBej-cnffGS7dL8OwbZg4wJOi5l9-b6oma-GKCdhkyUa9ALgz2Gh97T8xdx4yXODWIsqeweqyM463aZNIGze4i6SxNZ9taji31z6AS7SW82MMXcJ5oONB5X1Qgco72YB2xvn3tbNqke74kyZ-nyWlmyI6saQg28ID5WNd_jICpMJp29TijIK4a4p2KxIQhCKM09OZACf1894D5sQB_OtFeKH3GN7FhHN5porod5z21jNu5DQ"/>
+<div>
+<div class="font-headline-sm text-headline-sm text-primary">Dr. Smith</div>
+<div class="font-label-md text-label-md text-on-surface-variant">Clinical Lead</div>
+</div>
+</div>
+</div>
+<a class="flex items-center gap-md px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Patient Directory</span>
+</a>
+<a class="flex items-center gap-md px-sm py-sm rounded-lg text-primary font-bold bg-secondary-container transition-all duration-200 ease-in-out cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-label-md text-label-md">Predictive Analytics</span>
+</a>
+<a class="flex items-center gap-md px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<a class="flex items-center gap-md px-sm py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:opacity-80 mt-auto" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex overflow-hidden bg-[#F4F5F7]">
+<!-- Cohort Builder (Left Filter Panel) -->
+<aside class="w-80 bg-surface-container-lowest clinical-border flex flex-col shrink-0 overflow-y-auto m-md rounded-lg clinical-shadow">
+<div class="p-md border-b border-outline-variant sticky top-0 bg-surface-container-lowest z-10 flex justify-between items-center">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Cohort Builder</h2>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">filter_list</span>
+</div>
+<div class="p-md flex flex-col gap-xl">
+<!-- Demographics Section -->
+<section>
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider">Demographics</h3>
+<div class="space-y-md">
+<div>
+<label class="font-body-sm text-body-sm text-on-surface block mb-xs">Age Range</label>
+<div class="flex gap-sm items-center">
+<input class="w-full bg-surface-container-lowest clinical-border rounded p-xs font-data-mono text-data-mono text-on-surface clinical-input h-8 px-2" placeholder="Min" type="number" value="18"/>
+<span class="text-outline-variant">-</span>
+<input class="w-full bg-surface-container-lowest clinical-border rounded p-xs font-data-mono text-data-mono text-on-surface clinical-input h-8 px-2" placeholder="Max" type="number" value="85"/>
+</div>
+</div>
+<div>
+<label class="font-body-sm text-body-sm text-on-surface block mb-xs">Gender</label>
+<select class="w-full bg-surface-container-lowest clinical-border rounded p-xs font-body-sm text-body-sm text-on-surface clinical-input h-8 px-2">
+<option>All</option>
+<option>Male</option>
+<option>Female</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Diagnosis Section -->
+<section>
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider">Diagnosis</h3>
+<div class="space-y-sm">
+<div>
+<label class="font-body-sm text-body-sm text-on-surface block mb-xs">ICD-10 Codes</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2 top-1.5 text-outline text-sm">search</span>
+<input class="w-full pl-8 bg-surface-container-lowest clinical-border rounded p-xs font-body-sm text-body-sm text-on-surface clinical-input h-8" placeholder="Search codes..." type="text"/>
+</div>
+<div class="mt-sm flex flex-wrap gap-xs">
+<span class="inline-flex items-center gap-xs px-2 py-0.5 rounded-full bg-primary-container text-on-primary font-label-md text-[10px]">
+                                        E11.9 <span class="material-symbols-outlined text-[12px] cursor-pointer">close</span>
+</span>
+<span class="inline-flex items-center gap-xs px-2 py-0.5 rounded-full bg-primary-container text-on-primary font-label-md text-[10px]">
+                                        I10 <span class="material-symbols-outlined text-[12px] cursor-pointer">close</span>
+</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Medication Section -->
+<section>
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-sm uppercase tracking-wider">Medication History</h3>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2 top-1.5 text-outline text-sm">search</span>
+<input class="w-full pl-8 bg-surface-container-lowest clinical-border rounded p-xs font-body-sm text-body-sm text-on-surface clinical-input h-8" placeholder="Drug classes..." type="text"/>
+</div>
+</section>
+</div>
+<div class="mt-auto p-md border-t border-outline-variant bg-surface-container-lowest sticky bottom-0">
+<button class="w-full bg-primary-container text-on-primary rounded-lg py-sm font-label-md text-label-md hover:opacity-90 transition-opacity">Apply Cohort Filters</button>
+</div>
+</aside>
+<!-- Main Canvas (Analytics Views) -->
+<section class="flex-1 flex flex-col m-md ml-0 overflow-hidden">
+<!-- Tab Navigation -->
+<div class="flex border-b border-outline-variant mb-lg shrink-0">
+<button class="px-lg py-sm font-label-md text-label-md text-primary border-b-2 border-primary bg-surface-container-lowest flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">bar_chart</span>
+                        Readmission Distribution
+                    </button>
+<button class="px-lg py-sm font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-lowest transition-colors flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">grid_view</span>
+                        Feature Correlation
+                    </button>
+<button class="px-lg py-sm font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-lowest transition-colors flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">table_chart</span>
+                        Cohort Raw Data
+                    </button>
+</div>
+<!-- Tab Content: Readmission Distribution (Active) -->
+<div class="flex-1 bg-surface-container-lowest clinical-border clinical-shadow rounded-lg p-lg overflow-y-auto flex flex-col">
+<div class="flex justify-between items-center mb-lg">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">30-Day Readmission Risk Distribution</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Cohort Size: 1,245 Patients | Baseline Risk: 14.2%</p>
+</div>
+<div class="flex gap-sm">
+<button class="px-md py-sm border border-primary text-primary font-label-md text-label-md rounded flex items-center gap-xs hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[16px]">download</span> Export Report
+                            </button>
+</div>
+</div>
+<!-- Placeholder for High-Density Histogram -->
+<div class="flex-1 clinical-border rounded bg-surface-bright flex items-center justify-center relative min-h-[400px]">
+<div class="absolute top-4 left-4 font-label-md text-label-md text-outline">Frequency</div>
+<div class="absolute bottom-4 right-4 font-label-md text-label-md text-outline">Risk Score (0-1)</div>
+<!-- Decorative simplified histogram bars -->
+<div class="flex items-end h-3/4 w-3/4 gap-1 border-b border-l border-outline px-2 pb-0 pt-4">
+<div class="w-full bg-secondary-container rounded-t" style="height: 10%"></div>
+<div class="w-full bg-secondary-container rounded-t" style="height: 25%"></div>
+<div class="w-full bg-secondary-container rounded-t" style="height: 45%"></div>
+<div class="w-full bg-secondary-container rounded-t" style="height: 70%"></div>
+<div class="w-full bg-primary-container rounded-t" style="height: 95%"></div>
+<div class="w-full bg-primary-container rounded-t" style="height: 85%"></div>
+<div class="w-full bg-secondary-container rounded-t" style="height: 60%"></div>
+<div class="w-full bg-error-container rounded-t" style="height: 40%"></div>
+<div class="w-full bg-error-container rounded-t" style="height: 20%"></div>
+<div class="w-full bg-error-container rounded-t" style="height: 5%"></div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

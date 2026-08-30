@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HealthForecastAI - System Administration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-error": "#ffffff",
+                      "surface-container-high": "#dfe8ff",
+                      "on-surface-variant": "#434654",
+                      "surface-container": "#e7eeff",
+                      "surface-bright": "#f9f9ff",
+                      "tertiary-fixed": "#e1e2e4",
+                      "surface-container-low": "#f0f3ff",
+                      "on-secondary-fixed": "#001946",
+                      "secondary": "#285ab9",
+                      "on-primary": "#ffffff",
+                      "on-tertiary-container": "#d2d3d5",
+                      "tertiary-fixed-dim": "#c5c6c8",
+                      "secondary-container": "#709bfe",
+                      "secondary-fixed": "#d9e2ff",
+                      "on-tertiary-fixed-variant": "#444749",
+                      "primary-fixed-dim": "#b2c5ff",
+                      "error-container": "#ffdad6",
+                      "outline-variant": "#c3c6d6",
+                      "surface-tint": "#0c56d0",
+                      "surface-container-highest": "#d6e3ff",
+                      "tertiary": "#414446",
+                      "error": "#ba1a1a",
+                      "primary-container": "#0052cc",
+                      "tertiary-container": "#595b5d",
+                      "surface-container-lowest": "#ffffff",
+                      "background": "#f9f9ff",
+                      "on-primary-fixed": "#001848",
+                      "on-secondary": "#ffffff",
+                      "surface": "#f9f9ff",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-container": "#003179",
+                      "on-background": "#091c35",
+                      "on-error-container": "#93000a",
+                      "on-surface": "#091c35",
+                      "on-tertiary-fixed": "#191c1e",
+                      "primary": "#003d9b",
+                      "surface-variant": "#d6e3ff",
+                      "secondary-fixed-dim": "#b1c6ff",
+                      "surface-dim": "#cadbfc",
+                      "on-primary-container": "#c4d2ff",
+                      "inverse-surface": "#20314b",
+                      "on-secondary-fixed-variant": "#00419d",
+                      "on-primary-fixed-variant": "#0040a2",
+                      "outline": "#737685",
+                      "primary-fixed": "#dae2ff",
+                      "inverse-primary": "#b2c5ff",
+                      "inverse-on-surface": "#ecf0ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "xs": "4px",
+                      "margin-mobile": "16px",
+                      "unit": "4px",
+                      "margin-desktop": "40px",
+                      "xl": "32px",
+                      "sm": "8px",
+                      "gutter": "24px",
+                      "lg": "24px"
+              },
+              "fontFamily": {
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "data-mono": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-sm": [
+                              "Inter"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "data-mono": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for data tables and logs to maintain clean aesthetic */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f0f3ff;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c3c6d6;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #737685;
+        }
+        
+        .shadow-level-1 {
+            box-shadow: none;
+            border: 1px solid #DFE1E6;
+        }
+        .shadow-level-2 {
+            box-shadow: 0px 4px 8px rgba(9, 30, 66, 0.08);
+            border: 1px solid #DFE1E6;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md text-body-md antialiased h-screen overflow-hidden flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-surface dark:bg-on-surface border-b border-outline-variant dark:border-outline fixed top-0 w-full z-50 flex items-center justify-between px-margin-desktop h-16">
+<div class="flex items-center gap-md">
+<span class="text-headline-sm font-headline-sm text-primary dark:text-primary-fixed">HealthForecastAI</span>
+</div>
+<div class="flex items-center gap-sm">
+<button aria-label="notifications" class="p-xs text-primary dark:text-primary-fixed font-body-md text-body-md cursor-pointer active:opacity-80 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-full" data-icon="notifications">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button aria-label="account_circle" class="p-xs text-primary dark:text-primary-fixed font-body-md text-body-md cursor-pointer active:opacity-80 hover:bg-surface-container-high dark:hover:bg-surface-variant transition-colors rounded-full" data-icon="account_circle">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</nav>
+<div class="flex flex-1 pt-16 overflow-hidden">
+<!-- SideNavBar -->
+<aside class="bg-surface-container-low dark:bg-inverse-surface border-r border-outline-variant dark:border-outline h-full w-64 hidden md:flex flex-col p-md gap-sm shrink-0">
+<div class="flex items-center gap-sm mb-md px-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden border border-outline-variant">
+<img alt="Doctor Portrait" class="w-full h-full object-cover" data-alt="A professional headshot of a doctor in a modern clinical setting, soft lighting, clean background, conveying trust and medical expertise in a sophisticated style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzYcb8AkCTg9yyu_VqQcchWNLarizWzzic3QJhqkpDWn5LMLrcvhLjboRnaUao17nTe8kjRrLylibchtUbFrsXiS3SUIkdXZCbdVZi28wZbqijVYKZzocuQ2l5W7vUQDk8R7wsQL2dUND9LEXo7-76OX6frQA7yXQ3LYCb2q4hV-GuxRUrooefZ0zdy4xm-fBsCESzYGeTLe5Aky8nAZ2P6Kkd8tnnNk3F4NDX12V_CxE0mTcufUXt5Q"/>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-bold">Dr. Smith</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Clinical Lead</div>
+</div>
+</div>
+<nav class="flex flex-col gap-xs flex-1">
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-highest dark:hover:bg-on-tertiary-container transition-all duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+                    Dashboard
+                </a>
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-highest dark:hover:bg-on-tertiary-container transition-all duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">group</span>
+                    Patient Directory
+                </a>
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-highest dark:hover:bg-on-tertiary-container transition-all duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">analytics</span>
+                    Predictive Analytics
+                </a>
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-highest dark:hover:bg-on-tertiary-container transition-all duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">description</span>
+                    Reports
+                </a>
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-primary dark:text-primary-fixed font-bold bg-secondary-container dark:bg-secondary-fixed-variant transition-all duration-200 ease-in-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+                    Settings
+                </a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto p-margin-desktop md:px-margin-desktop px-margin-mobile pb-xl">
+<div class="max-w-[1400px] mx-auto space-y-xl">
+<!-- Header -->
+<header>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">System Administration</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Manage users, permissions, and system health.</p>
+</header>
+<!-- System Health Monitoring (Top Row) -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- CPU Usage -->
+<div class="bg-surface-container-lowest rounded-lg p-md shadow-level-1 flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase">CPU Usage</span>
+<span class="material-symbols-outlined text-outline">memory</span>
+</div>
+<div>
+<div class="flex items-baseline gap-sm">
+<span class="font-headline-md text-headline-md text-on-surface">42%</span>
+<span class="text-[10px] text-green-700 bg-green-100 px-1 py-0.5 rounded-sm font-data-mono">Normal</span>
+</div>
+<div class="w-full h-1 bg-surface-container-high mt-sm rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[42%] rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Memory Allocation -->
+<div class="bg-surface-container-lowest rounded-lg p-md shadow-level-1 flex flex-col justify-between h-32">
+<div class="flex justify-between items-start">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase">Memory Allocation</span>
+<span class="material-symbols-outlined text-outline">storage</span>
+</div>
+<div>
+<div class="flex items-baseline gap-sm">
+<span class="font-headline-md text-headline-md text-on-surface">68%</span>
+<span class="text-[10px] text-amber-700 bg-amber-100 px-1 py-0.5 rounded-sm font-data-mono">Elevated</span>
+</div>
+<div class="w-full h-1 bg-surface-container-high mt-sm rounded-full overflow-hidden">
+<div class="bg-amber-500 h-full w-[68%] rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Database Latency -->
+<div class="bg-surface-container-lowest rounded-lg p-md shadow-level-1 flex flex-col justify-between h-32 border-l-4 border-l-green-500">
+<div class="flex justify-between items-start">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase">Database Latency</span>
+<span class="material-symbols-outlined text-outline">database</span>
+</div>
+<div>
+<div class="flex items-baseline gap-sm">
+<span class="font-headline-md text-headline-md text-on-surface font-data-mono">14ms</span>
+<span class="text-[10px] text-green-700 bg-green-100 px-1 py-0.5 rounded-sm font-data-mono">Optimal</span>
+</div>
+<div class="mt-sm font-body-sm text-body-sm text-on-surface-variant">
+                                All clusters responsive.
+                            </div>
+</div>
+</div>
+</section>
+<!-- Middle Section: User Management & Permissions -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- User Management Table -->
+<div class="lg:col-span-2 bg-surface-container-lowest rounded-lg shadow-level-1 flex flex-col overflow-hidden">
+<div class="p-md border-b border-outline-variant bg-surface-bright flex justify-between items-center">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">User Management</h2>
+<button class="bg-primary-container text-on-primary px-md py-xs rounded-lg font-label-md text-label-md hover:opacity-90 transition-opacity">Add User</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low font-label-md text-label-md text-on-surface-variant">
+<tr>
+<th class="p-sm font-semibold border-b border-outline-variant pl-md">User Name</th>
+<th class="p-sm font-semibold border-b border-outline-variant">Role</th>
+<th class="p-sm font-semibold border-b border-outline-variant">Last Active</th>
+<th class="p-sm font-semibold border-b border-outline-variant pr-md">Status</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm text-on-surface">
+<tr class="hover:bg-surface-container transition-colors border-b border-outline-variant">
+<td class="p-sm pl-md">Dr. Sarah Jenkins</td>
+<td class="p-sm">
+<select class="bg-surface-container-lowest border border-outline-variant rounded text-on-surface py-1 px-2 text-sm focus:border-primary focus:ring-0">
+<option>Administrator</option>
+<option>Clinical Staff</option>
+<option>Researcher</option>
+</select>
+</td>
+<td class="p-sm font-data-mono text-on-surface-variant">2 mins ago</td>
+<td class="p-sm pr-md">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</td>
+</tr>
+<tr class="bg-surface-bright hover:bg-surface-container transition-colors border-b border-outline-variant">
+<td class="p-sm pl-md">Michael Chen</td>
+<td class="p-sm">
+<select class="bg-surface-container-lowest border border-outline-variant rounded text-on-surface py-1 px-2 text-sm focus:border-primary focus:ring-0">
+<option>IT Support</option>
+<option>Administrator</option>
+</select>
+</td>
+<td class="p-sm font-data-mono text-on-surface-variant">1 hr ago</td>
+<td class="p-sm pr-md">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors">
+<td class="p-sm pl-md">Elena Rodriguez</td>
+<td class="p-sm">
+<select class="bg-surface-container-lowest border border-outline-variant rounded text-on-surface py-1 px-2 text-sm focus:border-primary focus:ring-0">
+<option>Researcher</option>
+<option>Clinical Staff</option>
+</select>
+</td>
+<td class="p-sm font-data-mono text-on-surface-variant">Yesterday</td>
+<td class="p-sm pr-md">
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Permission Access Control -->
+<div class="bg-surface-container-lowest rounded-lg shadow-level-1 flex flex-col overflow-hidden">
+<div class="p-md border-b border-outline-variant bg-surface-bright">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Permission Access Control</h2>
+</div>
+<div class="p-md flex flex-col gap-md">
+<div class="flex justify-between items-center">
+<div>
+<div class="font-body-sm font-semibold text-on-surface">Two-Factor Auth Required</div>
+<div class="font-label-md text-on-surface-variant text-[10px]">Enforce for all admins</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<hr class="border-outline-variant opacity-50"/>
+<div class="flex justify-between items-center">
+<div>
+<div class="font-body-sm font-semibold text-on-surface">API Write Access</div>
+<div class="font-label-md text-on-surface-variant text-[10px]">Allow system modifications via API</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<hr class="border-outline-variant opacity-50"/>
+<div class="flex justify-between items-center">
+<div>
+<div class="font-body-sm font-semibold text-on-surface">External Data Export</div>
+<div class="font-label-md text-on-surface-variant text-[10px]">Permit bulk patient data download</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Section: Security & Audit Logging -->
+<section class="bg-surface-container-lowest rounded-lg shadow-level-1 overflow-hidden flex flex-col h-[400px]">
+<div class="p-md border-b border-outline-variant bg-surface-bright flex justify-between items-center sticky top-0 z-10">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Audit Log Feed</h2>
+<button class="flex items-center gap-xs text-secondary font-label-md text-label-md hover:underline">
+<span class="material-symbols-outlined text-[16px]">filter_list</span>
+                            Filter Logs
+                        </button>
+</div>
+<div class="p-md overflow-y-auto flex-1 font-data-mono text-sm">
+<ul class="space-y-sm">
+<li class="flex gap-md py-xs border-b border-outline-variant border-opacity-30">
+<span class="text-on-surface-variant min-w-[140px]">2023-10-27 14:32:01</span>
+<span class="text-green-600 min-w-[120px]">[SUCCESS]</span>
+<span class="text-on-surface flex-1">Successful Login - Dr. S. Jenkins (IP: 192.168.1.45)</span>
+</li>
+<li class="flex gap-md py-xs border-b border-outline-variant border-opacity-30">
+<span class="text-on-surface-variant min-w-[140px]">2023-10-27 14:30:15</span>
+<span class="text-amber-600 min-w-[120px]">[MODIFIED]</span>
+<span class="text-on-surface flex-1">Permission Changed - 'External Data Export' disabled by System Admin</span>
+</li>
+<li class="flex gap-md py-xs border-b border-outline-variant border-opacity-30 bg-error-container bg-opacity-20">
+<span class="text-on-surface-variant min-w-[140px]">2023-10-27 14:15:22</span>
+<span class="text-error min-w-[120px]">[FAILED]</span>
+<span class="text-on-surface flex-1">Failed Login Attempt - Unknown User (IP: 104.28.19.12)</span>
+</li>
+<li class="flex gap-md py-xs border-b border-outline-variant border-opacity-30">
+<span class="text-on-surface-variant min-w-[140px]">2023-10-27 13:45:00</span>
+<span class="text-primary-container min-w-[120px]">[SYSTEM]</span>
+<span class="text-on-surface flex-1">Automated Database Backup Completed Successfully</span>
+</li>
+<li class="flex gap-md py-xs border-b border-outline-variant border-opacity-30">
+<span class="text-on-surface-variant min-w-[140px]">2023-10-27 11:20:10</span>
+<span class="text-secondary-container min-w-[120px]">[API_KEY]</span>
+<span class="text-on-surface flex-1">API Key Generated - User: E. Rodriguez</span>
+</li>
+<li class="flex gap-md py-xs border-b border-outline-variant border-opacity-30">
+<span class="text-on-surface-variant min-w-[140px]">2023-10-27 09:05:01</span>
+<span class="text-green-600 min-w-[120px]">[SUCCESS]</span>
+<span class="text-on-surface flex-1">Successful Login - M. Chen (IP: 192.168.1.102)</span>
+</li>
+</ul>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>

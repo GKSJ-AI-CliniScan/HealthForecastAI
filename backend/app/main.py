@@ -2,9 +2,11 @@
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api.v1.router import api_router
 from app.core.config import settings
@@ -43,6 +45,15 @@ app.add_middleware(
 
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
+# Mount static dashboards if available
+_static_dashboards_dir = Path(__file__).resolve().parents[2] / "static" / "dashboards"
+if _static_dashboards_dir.is_dir():
+    app.mount(
+        "/dashboards",
+        StaticFiles(directory=str(_static_dashboards_dir), html=True),
+        name="dashboards",
+    )
+
 
 @app.get("/health", tags=["System"], summary="Liveness probe")
 def health() -> dict[str, str]:
@@ -56,5 +67,10 @@ def health() -> dict[str, str]:
 
 @app.get("/", tags=["System"], summary="Service banner")
 def root() -> dict[str, str]:
-    """Return a short banner pointing callers at the interactive docs."""
-    return {"service": "HealthForecast AI", "version": app.version, "docs": "/docs"}
+    """Return a short banner pointing callers at the interactive docs and dashboards."""
+    return {
+        "service": "HealthForecast AI",
+        "version": app.version,
+        "docs": "/docs",
+        "dashboards": "/dashboards/",
+    }

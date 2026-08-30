@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Institutional Performance Overview - HealthForecastAI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-variant": "#d6e3ff",
+                        "surface-container-low": "#f0f3ff",
+                        "on-primary-container": "#c4d2ff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#dfe8ff",
+                        "inverse-surface": "#20314b",
+                        "secondary-fixed": "#d9e2ff",
+                        "inverse-on-surface": "#ecf0ff",
+                        "primary-fixed": "#dae2ff",
+                        "on-primary-fixed": "#001848",
+                        "background": "#f9f9ff",
+                        "surface-dim": "#cadbfc",
+                        "secondary-fixed-dim": "#b1c6ff",
+                        "on-tertiary-container": "#d2d3d5",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#e1e2e4",
+                        "on-surface": "#091c35",
+                        "surface-tint": "#0c56d0",
+                        "outline-variant": "#c3c6d6",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#434654",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#595b5d",
+                        "surface-container-highest": "#d6e3ff",
+                        "on-primary-fixed-variant": "#0040a2",
+                        "primary-container": "#0052cc",
+                        "on-secondary-container": "#003179",
+                        "on-tertiary-fixed": "#191c1e",
+                        "tertiary-fixed-dim": "#c5c6c8",
+                        "inverse-primary": "#b2c5ff",
+                        "on-secondary-fixed": "#001946",
+                        "surface": "#f9f9ff",
+                        "tertiary": "#414446",
+                        "surface-container": "#e7eeff",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#b2c5ff",
+                        "on-background": "#091c35",
+                        "secondary-container": "#709bfe",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "primary": "#003d9b",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f9f9ff",
+                        "outline": "#737685",
+                        "secondary": "#285ab9",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed-variant": "#00419d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "unit": "4px",
+                        "margin-mobile": "16px",
+                        "xl": "32px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "gutter": "24px",
+                        "xs": "4px",
+                        "margin-desktop": "40px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "headline-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #F4F5F7; color: #091c35; }
+        .clinical-shadow { box-shadow: 0px 4px 8px rgba(9, 30, 66, 0.08); }
+        .clinical-card { background-color: #FFFFFF; border: 1px solid #DFE1E6; border-radius: 0.5rem; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface h-screen flex flex-col overflow-hidden">
+<!-- TopNavBar -->
+<header class="bg-surface text-primary border-b border-outline-variant fixed top-0 w-full z-50 flex items-center justify-between px-margin-desktop h-16 w-full hidden md:flex">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-[28px]" data-icon="monitor_heart">monitor_heart</span>
+<span class="font-headline-sm text-headline-sm text-primary font-bold tracking-tight">HealthForecastAI</span>
+</div>
+<div class="flex-1 max-w-md mx-md">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-full text-body-sm font-body-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" placeholder="Search patients, metrics..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:bg-surface-container-high transition-colors p-2 rounded-full cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-high transition-colors p-2 rounded-full cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<div class="flex flex-1 pt-16 overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-surface-container-low text-primary h-full w-64 fixed left-0 top-16 border-r border-outline-variant flex flex-col p-md gap-sm hidden md:flex z-40 overflow-y-auto">
+<div class="flex items-center gap-3 p-3 mb-4 border-b border-outline-variant pb-6">
+<img class="w-10 h-10 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a clinical lead doctor in a modern, well-lit hospital setting. High-key lighting, clean medical aesthetic, trustworthy and approachable expression, sharp focus, 8k resolution, photorealistic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGEyQbCVAMMTOXjkqqCNwCyNYeqBAEGQ6Bcklfb7_8XrDB0NH55Slp9ccL7fmXvlIuYu4sFCgYutyU5ZQL8GYM3v9JnN3LgyraqlX6-KgqFgz8K3Xe5KFS20kSFvFxFt1rpyC5TbvEUbWedi7w7DiFH1xNIFY6wEKTTiFjpVeQuLKJL6v2hjAHyPLPkTfUu25FqzvPFhkcGPD9ftkx48yAZci_z1bJcuRsdbTBAxvPj1NCTesebUl1Vg"/>
+<div>
+<div class="font-label-md text-label-md text-on-surface font-bold">Dr. Smith</div>
+<div class="font-label-md text-label-md text-on-surface-variant opacity-80">Clinical Lead</div>
+</div>
+</div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-primary font-bold bg-secondary-container hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Patient Directory</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">Predictive Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<div class="mt-auto">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-1 md:ml-64 p-margin-mobile md:p-margin-desktop overflow-y-auto bg-[#F4F5F7]">
+<div class="max-w-7xl mx-auto space-y-xl pb-24">
+<!-- Header -->
+<div>
+<h1 class="font-headline-lg md:font-headline-lg text-headline-lg md:text-headline-lg text-on-surface mb-2">Institutional Performance Overview</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Real-time macro-level clinical and operational metrics.</p>
+</div>
+<!-- Top Row KPI Widgets -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+<!-- Bed Occupancy -->
+<div class="clinical-card p-lg clinical-shadow flex flex-col justify-between hover:-translate-y-1 transition-transform duration-300">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Bed Occupancy Rate</h3>
+<p class="font-body-sm text-body-sm text-outline mt-1">Current total capacity</p>
+</div>
+<span class="material-symbols-outlined text-outline" data-icon="bed">bed</span>
+</div>
+<div class="flex items-end gap-md">
+<div class="relative w-24 h-24">
+<canvas id="occupancyChart"></canvas>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="font-headline-md text-headline-md text-on-surface">84%</span>
+</div>
+</div>
+<div class="mb-2">
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-[#E3FCEF] text-[#006644] font-label-md text-label-md gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="arrow_downward">arrow_downward</span> 2% vs last wk
+                                </span>
+</div>
+</div>
+</div>
+<!-- Cost Avoidance -->
+<div class="clinical-card p-lg clinical-shadow flex flex-col justify-between hover:-translate-y-1 transition-transform duration-300">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Total Cost Avoidance</h3>
+<p class="font-body-sm text-body-sm text-outline mt-1">YTD from predictive alerts</p>
+</div>
+<span class="material-symbols-outlined text-outline" data-icon="savings">savings</span>
+</div>
+<div>
+<div class="font-display-lg text-display-lg text-primary mb-2">$1.2M</div>
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-[#E3FCEF] text-[#006644] font-label-md text-label-md gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="trending_up">trending_up</span> 15% above target
+                            </span>
+</div>
+</div>
+<!-- Critical Alerts -->
+<div class="clinical-card p-lg clinical-shadow flex flex-col justify-between border-l-4 border-l-[#FF8B00] hover:-translate-y-1 transition-transform duration-300">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Active Critical Alerts</h3>
+<p class="font-body-sm text-body-sm text-outline mt-1">Requiring immediate review</p>
+</div>
+<span class="material-symbols-outlined text-[#FF8B00]" data-icon="warning">warning</span>
+</div>
+<div>
+<div class="font-display-lg text-display-lg text-[#FF8B00] mb-2">14</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Across 3 departments</div>
+</div>
+</div>
+</div>
+<!-- Middle Section: Financial Performance -->
+<div class="clinical-card p-lg clinical-shadow">
+<div class="mb-6 flex justify-between items-end">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Financial Performance</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Projected Readmission Costs vs. Actual Cost Savings (Last 60 Days)</p>
+</div>
+<button class="px-4 py-2 border border-outline-variant rounded-md text-body-sm font-body-sm text-on-surface hover:bg-surface-container-low transition-colors flex items-center gap-2">
+                            Export Data <span class="material-symbols-outlined text-[18px]" data-icon="download">download</span>
+</button>
+</div>
+<div class="w-full h-[300px]">
+<canvas id="financialChart"></canvas>
+</div>
+</div>
+<!-- Bottom Section: Operational Efficiency -->
+<div class="clinical-card p-lg clinical-shadow">
+<div class="mb-6">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Operational Efficiency</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Patient Discharge Volume by Medical Ward (Last 30 Days)</p>
+</div>
+<div class="w-full h-[300px]">
+<canvas id="dischargeChart"></canvas>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Mobile Bottom Nav -->
+<nav class="bg-surface border-t border-outline-variant fixed bottom-0 w-full flex justify-around py-3 md:hidden z-50">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard" data-weight="fill">dashboard</span>
+<span class="font-label-md text-[10px]">Dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-[10px]">Patients</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-[10px]">Analytics</span>
+</a>
+</nav>
+<script>
+        // Chart.js Configuration
+        Chart.defaults.font.family = 'Inter';
+        Chart.defaults.color = '#737685';
+        
+        // Bed Occupancy Doughnut
+        const ctxOcc = document.getElementById('occupancyChart').getContext('2d');
+        new Chart(ctxOcc, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [84, 16],
+                    backgroundColor: ['#0052CC', '#DFE1E6'],
+                    borderWidth: 0,
+                    cutout: '80%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { tooltip: { enabled: false }, legend: { display: false } },
+                animation: { duration: 1500, easing: 'easeOutQuart' }
+            }
+        });
+
+        // Financial Line Chart
+        const ctxFin = document.getElementById('financialChart').getContext('2d');
+        new Chart(ctxFin, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8'],
+                datasets: [
+                    {
+                        label: 'Actual Savings',
+                        data: [45000, 52000, 48000, 61000, 59000, 68000, 72000, 85000],
+                        borderColor: '#0052CC',
+                        backgroundColor: 'rgba(0, 82, 204, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Projected Costs',
+                        data: [60000, 58000, 62000, 55000, 52000, 50000, 48000, 45000],
+                        borderColor: '#C3C6D6',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 8 } }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#F0F3FF', drawBorder: false }, ticks: { callback: function(value) { return '$' + value/1000 + 'k'; } } },
+                    x: { grid: { display: false, drawBorder: false } }
+                }
+            }
+        });
+
+        // Discharge Bar Chart
+        const ctxDis = document.getElementById('dischargeChart').getContext('2d');
+        new Chart(ctxDis, {
+            type: 'bar',
+            data: {
+                labels: ['Cardiology', 'Oncology', 'Neurology', 'Gen Surgery', 'Pediatrics'],
+                datasets: [{
+                    label: 'Discharges',
+                    data: [120, 85, 65, 140, 95],
+                    backgroundColor: '#0052CC',
+                    borderRadius: 4,
+                    barThickness: 32
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#F0F3FF', drawBorder: false } },
+                    x: { grid: { display: false, drawBorder: false } }
+                }
+            }
+        });
+    </script>
+</body></html>

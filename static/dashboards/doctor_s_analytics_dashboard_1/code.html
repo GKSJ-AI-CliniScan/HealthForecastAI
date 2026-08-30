@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Doctor's Analytics Dashboard - HealthForecastAI</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-container": "#0052cc",
+                      "surface-variant": "#d6e3ff",
+                      "on-tertiary-fixed": "#191c1e",
+                      "inverse-on-surface": "#ecf0ff",
+                      "surface-container-high": "#dfe8ff",
+                      "inverse-surface": "#20314b",
+                      "surface-bright": "#f9f9ff",
+                      "on-background": "#091c35",
+                      "secondary-fixed": "#d9e2ff",
+                      "surface": "#f9f9ff",
+                      "surface-container": "#e7eeff",
+                      "primary-fixed-dim": "#b2c5ff",
+                      "background": "#f9f9ff",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed-variant": "#00419d",
+                      "surface-tint": "#0c56d0",
+                      "surface-container-highest": "#d6e3ff",
+                      "on-surface": "#091c35",
+                      "on-surface-variant": "#434654",
+                      "outline-variant": "#c3c6d6",
+                      "tertiary-container": "#595b5d",
+                      "error-container": "#ffdad6",
+                      "secondary-container": "#709bfe",
+                      "on-primary-fixed-variant": "#0040a2",
+                      "primary": "#003d9b",
+                      "outline": "#737685",
+                      "tertiary-fixed-dim": "#c5c6c8",
+                      "on-primary-fixed": "#001848",
+                      "on-secondary-fixed": "#001946",
+                      "tertiary": "#414446",
+                      "tertiary-fixed": "#e1e2e4",
+                      "on-error": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "on-tertiary-fixed-variant": "#444749",
+                      "on-tertiary-container": "#d2d3d5",
+                      "inverse-primary": "#b2c5ff",
+                      "on-secondary-container": "#003179",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-dim": "#cadbfc",
+                      "surface-container-low": "#f0f3ff",
+                      "secondary-fixed-dim": "#b1c6ff",
+                      "primary-fixed": "#dae2ff",
+                      "on-primary-container": "#c4d2ff",
+                      "secondary": "#285ab9",
+                      "on-primary": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "error": "#ba1a1a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "lg": "24px",
+                      "xl": "32px",
+                      "md": "16px",
+                      "sm": "8px",
+                      "margin-desktop": "40px",
+                      "xs": "4px",
+                      "unit": "4px",
+                      "margin-mobile": "16px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Inter"
+                      ],
+                      "data-mono": [
+                              "JetBrains Mono"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "data-mono": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .table-zebra tr:nth-child(even) {
+                background-color: #F4F5F7;
+            }
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md font-sans antialiased">
+<!-- TopNavBar -->
+<header class="bg-surface border-b border-outline-variant fixed top-0 w-full z-50 flat no shadows flex flex-col md:flex-row items-center justify-between px-margin-desktop h-16 w-full">
+<div class="flex items-center">
+<span class="text-headline-sm font-headline-sm text-primary">HealthForecastAI</span>
+</div>
+<!-- Web Nav (Hidden on Mobile) -->
+<nav class="hidden md:flex flex-row items-center gap-md">
+<div class="flex items-center gap-sm bg-surface-container-low border border-outline-variant rounded-full px-sm py-xs">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm text-on-surface w-64 placeholder-outline" placeholder="Search patients, records..." type="text"/>
+</div>
+<a class="text-primary font-bold border-b-2 border-primary hover:bg-surface-container-high transition-colors px-sm py-xs flex flex-col items-center justify-center h-full" href="#">
+<span class="text-body-md font-body-md">Dashboard</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-container-high transition-colors px-sm py-xs flex flex-col items-center justify-center h-full" href="#">
+<span class="text-body-md font-body-md">Patients</span>
+</a>
+</nav>
+<div class="flex items-center gap-sm">
+<button class="p-xs text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-full cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-xs text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-full cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Layout Container -->
+<div class="flex pt-16 h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-surface-container-low hidden md:flex h-full w-64 fixed left-0 top-16 border-r border-outline-variant flat no shadows flex flex-col p-md gap-sm transition-all duration-200 ease-in-out">
+<div class="flex items-center gap-sm mb-lg">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="A professional studio portrait of a doctor, modern lighting, clear background, high quality, suitable for a medical app profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmT-ZcMB5r7fmL5-FMnL1Yumcj86Vup_bfOu4mDIJEVCYWDQRaDiLZ6z0_THNdv9vdg1oEgbePRgQP1I7PMvLUrxNrGNFPtZknmW-N5rQeO1NkvTRZRLsxOCZ_QF0mkMCis8ks-um71OWFUggOfUmICO7x1rDXRQAOTgQCtxS4Zfu8cPlFij7Mu435mIAM3Y817Fu4BLoB4IstapEzF_PrE7dK1CeWnrAzoxTYQ62s1VtSy6qVc3t-TA"/>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface">Dr. Smith</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Clinical Lead</p>
+</div>
+</div>
+<a class="flex items-center gap-sm p-sm text-primary font-bold bg-secondary-container rounded-lg transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined text-primary" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Patient Directory</span>
+</a>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">Predictive Analytics</span>
+</a>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out rounded-lg mt-auto" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 p-margin-desktop overflow-y-auto bg-surface">
+<div class="mb-xl">
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Predictive Dashboard</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Overview of patient risk and clinical operations.</p>
+</div>
+<!-- KPI Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md mb-xl">
+<!-- Card 1: High Readmission Risk -->
+<div class="bg-surface-container-lowest border-l-4 border-error border-t border-r border-b border-outline-variant p-lg flex flex-col gap-sm rounded-lg shadow-sm">
+<div class="flex items-center justify-between">
+<h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Patients at High Readmission Risk (Next 72h)</h2>
+<span class="material-symbols-outlined text-error">warning</span>
+</div>
+<div class="flex items-baseline gap-sm">
+<span class="font-display-lg text-display-lg text-on-surface">24</span>
+<span class="flex items-center text-error font-body-sm text-body-sm bg-error-container px-xs py-[2px] rounded-full">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span> 5%
+                        </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Compared to last week</p>
+</div>
+<!-- Card 2: Average Probability -->
+<div class="bg-surface-container-lowest border border-outline-variant p-lg flex flex-col gap-sm rounded-lg shadow-sm">
+<div class="flex items-center justify-between">
+<h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Average Readmission Probability</h2>
+<span class="material-symbols-outlined text-primary">percent</span>
+</div>
+<div class="flex items-center gap-md">
+<div class="w-16 h-16 rounded-full border-4 border-surface-container-highest relative flex items-center justify-center">
+<div class="absolute inset-0 rounded-full border-4 border-secondary-container" style="clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); transform: rotate(45deg);"></div>
+<span class="font-headline-sm text-headline-sm text-on-surface z-10">12.4</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface-variant">Overall cohort risk level</span>
+<span class="font-label-md text-label-md text-secondary-container mt-xs">Moderate Trend</span>
+</div>
+</div>
+</div>
+<!-- Card 3: Active Care Plans -->
+<div class="bg-surface-container-lowest border border-outline-variant p-lg flex flex-col gap-sm rounded-lg shadow-sm">
+<div class="flex items-center justify-between">
+<h2 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Active Care Plans</h2>
+<span class="material-symbols-outlined text-primary">assignment</span>
+</div>
+<div class="flex items-baseline gap-sm">
+<span class="font-display-lg text-display-lg text-on-surface">158</span>
+</div>
+<div class="flex gap-sm mt-auto">
+<div class="flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+<span class="font-label-md text-label-md text-on-surface-variant">In Progress (120)</span>
+</div>
+<div class="flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-surface-variant"></div>
+<span class="font-label-md text-label-md text-on-surface-variant">Pending Review (38)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Data Table Section -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-lg shadow-sm overflow-hidden">
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface-bright">
+<h2 class="font-headline-md text-headline-md text-on-surface">Clinical Risk Watchlist</h2>
+<button class="flex items-center gap-xs px-sm py-xs border border-outline-variant rounded-md text-body-sm font-label-md hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[16px]">filter_list</span> Filter
+                    </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse table-zebra">
+<thead>
+<tr class="border-b border-outline-variant bg-surface text-on-surface-variant font-label-md text-label-md">
+<th class="p-sm font-semibold sticky top-0 bg-surface">Patient Name</th>
+<th class="p-sm font-semibold sticky top-0 bg-surface">Admission ID</th>
+<th class="p-sm font-semibold sticky top-0 bg-surface">Readmission Risk Score</th>
+<th class="p-sm font-semibold sticky top-0 bg-surface">Predicted Length of Stay</th>
+<th class="p-sm font-semibold sticky top-0 bg-surface">Last HbA1c Result</th>
+<th class="p-sm font-semibold sticky top-0 bg-surface text-right">Quick Actions</th>
+</tr>
+</thead>
+<tbody class="font-data-mono text-data-mono text-on-surface">
+<!-- Row 1 -->
+<tr class="border-b border-outline-variant hover:bg-surface-container-lowest transition-colors">
+<td class="p-sm flex items-center gap-sm font-body-md text-body-md font-medium">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-bold text-sm">JM</div>
+                                    James Miller
+                                </td>
+<td class="p-sm">ADM-9824</td>
+<td class="p-sm">
+<span class="inline-flex items-center px-xs py-[2px] rounded-full bg-error-container text-on-error-container font-label-md text-[10px] uppercase font-bold tracking-wider">
+                                        High (89%)
+                                    </span>
+</td>
+<td class="p-sm">14 Days</td>
+<td class="p-sm text-error font-semibold">8.4% (Elevated)</td>
+<td class="p-sm text-right flex gap-xs justify-end">
+<button class="px-sm py-xs bg-surface border border-primary text-primary rounded-md font-label-md hover:bg-surface-container-low transition-colors whitespace-nowrap">View Timeline</button>
+<button class="px-sm py-xs bg-primary-container text-on-primary rounded-md font-label-md hover:bg-primary transition-colors whitespace-nowrap">Assign</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="border-b border-outline-variant hover:bg-surface-container-lowest transition-colors">
+<td class="p-sm flex items-center gap-sm font-body-md text-body-md font-medium">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-sm">SC</div>
+                                    Sarah Chen
+                                </td>
+<td class="p-sm">ADM-8192</td>
+<td class="p-sm">
+<span class="inline-flex items-center px-xs py-[2px] rounded-full bg-[#FEF08A] text-[#854D0E] font-label-md text-[10px] uppercase font-bold tracking-wider">
+                                        Moderate (45%)
+                                    </span>
+</td>
+<td class="p-sm">5 Days</td>
+<td class="p-sm">6.1% (Normal)</td>
+<td class="p-sm text-right flex gap-xs justify-end">
+<button class="px-sm py-xs bg-surface border border-primary text-primary rounded-md font-label-md hover:bg-surface-container-low transition-colors whitespace-nowrap">View Timeline</button>
+<button class="px-sm py-xs bg-primary-container text-on-primary rounded-md font-label-md hover:bg-primary transition-colors whitespace-nowrap">Assign</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="border-b border-outline-variant hover:bg-surface-container-lowest transition-colors">
+<td class="p-sm flex items-center gap-sm font-body-md text-body-md font-medium">
+<div class="w-8 h-8 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center font-bold text-sm">RO</div>
+                                    Robert O'Connor
+                                </td>
+<td class="p-sm">ADM-7341</td>
+<td class="p-sm">
+<span class="inline-flex items-center px-xs py-[2px] rounded-full bg-[#DCFCE7] text-[#166534] font-label-md text-[10px] uppercase font-bold tracking-wider">
+                                        Low (12%)
+                                    </span>
+</td>
+<td class="p-sm">2 Days</td>
+<td class="p-sm">5.8% (Normal)</td>
+<td class="p-sm text-right flex gap-xs justify-end">
+<button class="px-sm py-xs bg-surface border border-primary text-primary rounded-md font-label-md hover:bg-surface-container-low transition-colors whitespace-nowrap">View Timeline</button>
+<button class="px-sm py-xs bg-primary-container text-on-primary rounded-md font-label-md hover:bg-primary transition-colors whitespace-nowrap">Assign</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+</div>
+</body></html>
