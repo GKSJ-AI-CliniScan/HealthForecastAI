@@ -1,24 +1,30 @@
-"""Audit log ORM model - every privileged action must be recorded."""
+"""Audit Log ORM model."""
 
+import uuid
 from datetime import UTC, datetime
+from sqlalchemy import DateTime, ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from sqlalchemy import DateTime, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
-
-from app.db.base import Base
+from app.db.base import Base, GUID
 
 
 class AuditLog(Base):
-    """An immutable record of a security relevant action."""
+    """Audit log model tracking privileged actions across the platform."""
 
     __tablename__ = "audit_logs"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    actor_id: Mapped[int | None] = mapped_column(Integer, index=True, nullable=True)
-    actor_role: Mapped[str | None] = mapped_column(String(32), nullable=True)
-    action: Mapped[str] = mapped_column(String(128), nullable=False)
-    resource: Mapped[str | None] = mapped_column(String(128), nullable=True)
-    outcome: Mapped[str] = mapped_column(String(16), default="success", nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    id: Mapped[uuid.UUID] = mapped_column(
+        GUID(), primary_key=True, default=uuid.uuid4, index=True
     )
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        GUID(), ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    action: Mapped[str] = mapped_column(String(128), nullable=False, index=True)
+    resource: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    resource_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False, index=True
+    )
+
+    # Relationships
+    user: Mapped["User | None"] = relationship("User", back_populates="audit_logs")  # type: ignore[name-defined]

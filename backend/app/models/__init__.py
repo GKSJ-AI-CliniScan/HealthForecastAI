@@ -1,17 +1,21 @@
-"""ORM models. Import every model here so Alembic autogenerate can see them."""
+"""HealthForecast AI ORM Models."""
 
-from app.models.admission import Admission
-from app.models.audit_log import AuditLog
-from app.models.patient import Patient
-from app.models.prediction import RiskPrediction
-from app.models.treatment import TreatmentOutcome
+from app.models.role import Role
 from app.models.user import User
+from app.models.patient import Patient
+from app.models.doctor_patient_assignment import DoctorPatientAssignment
+from app.models.medical_history import MedicalHistory
+from app.models.admission import Admission
+from app.models.treatment import Treatment
+from app.models.audit_log import AuditLog
 
 __all__ = [
-    "Admission",
-    "AuditLog",
-    "Patient",
-    "RiskPrediction",
-    "TreatmentOutcome",
+    "Role",
     "User",
+    "Patient",
+    "DoctorPatientAssignment",
+    "MedicalHistory",
+    "Admission",
+    "Treatment",
+    "AuditLog",
 ]

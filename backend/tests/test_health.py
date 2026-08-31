@@ -22,5 +22,8 @@ def test_openapi_schema_is_generated(client: TestClient) -> None:
     response = client.get("/api/v1/openapi.json")
     assert response.status_code == 200
     paths = response.json()["paths"]
-    assert "/api/v1/auth/roles" in paths
-    assert "/api/v1/risk/predict" in paths
+    assert "/api/v1/auth/login" in paths
+    assert "/api/v1/patients" in paths
+    assert "/api/v1/admin/roles" in paths
+    assert "/api/v1/admin/dataset/summary" in paths
+

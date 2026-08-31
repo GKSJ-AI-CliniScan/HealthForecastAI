@@ -1,8 +1,7 @@
-"""Password hashing and JWT helpers."""
+"""Password hashing and JWT helpers for HealthForecast AI."""
 
 from datetime import UTC, datetime, timedelta
 from typing import Any
-
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
@@ -26,7 +25,7 @@ def create_access_token(subject: str, role: str, expires_minutes: int | None = N
     expire_delta = timedelta(minutes=expires_minutes or settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     now = datetime.now(UTC)
     payload: dict[str, Any] = {
-        "sub": subject,
+        "sub": str(subject),
         "role": role,
         "iat": int(now.timestamp()),
         "exp": int((now + expire_delta).timestamp()),
@@ -35,8 +34,22 @@ def create_access_token(subject: str, role: str, expires_minutes: int | None = N
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
 
+def create_refresh_token(subject: str, role: str, expires_minutes: int | None = None) -> str:
+    """Create a signed JWT refresh token carrying the subject and role claims."""
+    expire_delta = timedelta(minutes=expires_minutes or settings.REFRESH_TOKEN_EXPIRE_MINUTES)
+    now = datetime.now(UTC)
+    payload: dict[str, Any] = {
+        "sub": str(subject),
+        "role": role,
+        "iat": int(now.timestamp()),
+        "exp": int((now + expire_delta).timestamp()),
+        "type": "refresh",
+    }
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+
+
 def decode_token(token: str) -> dict[str, Any] | None:
-    """Decode a JWT and return its claims, or None when the token is invalid."""
+    """Decode a JWT and return its claims, or None when the token is invalid or expired."""
     try:
         return jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
     except JWTError:

@@ -1,36 +1,27 @@
-# syntax=docker/dockerfile:1
-
-# ---------- Stage 1: dependencies ----------
-FROM node:22-alpine AS deps
+# ---------- Stage 1: Build ----------
+FROM node:20-alpine AS builder
 WORKDIR /app
+
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm install
 
-# ---------- Stage 2: build ----------
-FROM node:22-alpine AS builder
-WORKDIR /app
-ENV NEXT_TELEMETRY_DISABLED=1
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
-# ---------- Stage 3: runtime ----------
-FROM node:22-alpine AS runner
-WORKDIR /app
+# ---------- Stage 2: Serve ----------
+FROM nginx:alpine AS runner
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-ENV NODE_ENV=production \
-    NEXT_TELEMETRY_DISABLED=1 \
-    PORT=3000
-
-RUN addgroup -g 1001 -S nodejs \
-    && adduser -S nextjs -u 1001
-
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
+# Custom nginx config to support SPA client-side routing
+RUN echo 'server { \
+    listen 3000; \
+    location / { \
+        root /usr/share/nginx/html; \
+        index index.html index.htm; \
+        try_files $uri $uri/ /index.html; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["nginx", "-g", "daemon off;"]
