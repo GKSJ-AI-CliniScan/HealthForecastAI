@@ -12,7 +12,6 @@ from app.models.audit_log import AuditLog
 from app.models.user import User
 from app.schemas.user import UserCreate, UserRead
 
-
 router = APIRouter()
 
 _manage_users = require_permission(Permission.USER_MANAGE)
@@ -39,16 +38,9 @@ def list_users(
         stmt = stmt.where(User.role == role)
 
     if email:
-        stmt = stmt.where(
-            User.email.ilike(f"%{email}%")
-        )
+        stmt = stmt.where(User.email.ilike(f"%{email}%"))
 
-    stmt = (
-        stmt
-        .order_by(User.id)
-        .limit(limit)
-        .offset(offset)
-    )
+    stmt = stmt.order_by(User.id).limit(limit).offset(offset)
 
     return list(db.scalars(stmt).all())
 
@@ -66,11 +58,7 @@ def create_user(
 ) -> UserRead:
     """Create a new platform user."""
 
-    existing = db.scalar(
-        select(User).where(
-            User.email == str(payload.email)
-        )
-    )
+    existing = db.scalar(select(User).where(User.email == str(payload.email)))
 
     if existing is not None:
         raise HTTPException(

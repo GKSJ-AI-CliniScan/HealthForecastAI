@@ -94,7 +94,4 @@ def read_me(
 def list_roles() -> dict[str, list[str]]:
     """Expose the role catalogue and attached permissions."""
 
-    return {
-        str(role): permissions_for(role)
-        for role in Role
-    }
+    return {str(role): permissions_for(role) for role in Role}

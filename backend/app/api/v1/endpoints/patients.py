@@ -48,9 +48,7 @@ def list_patients(
 )
 def create_patient_endpoint(
     payload: PatientCreate,
-    user: CurrentUser = Depends(
-        require_permission(Permission.PATIENT_WRITE)
-    ),
+    user: CurrentUser = Depends(require_permission(Permission.PATIENT_WRITE)),
     db: Session = Depends(get_db),
 ) -> PatientRead:
     """Create a patient record."""
@@ -74,10 +72,7 @@ def create_patient_endpoint(
 
     # Prevent duplicate medical record numbers.
     existing = db.scalar(
-        select(Patient).where(
-            Patient.medical_record_number
-            == payload.medical_record_number
-        )
+        select(Patient).where(Patient.medical_record_number == payload.medical_record_number)
     )
 
     if existing is not None:
@@ -104,18 +99,12 @@ def create_patient_endpoint(
     summary="Anonymised patient cohort for researchers",
 )
 def list_anonymised_patients(
-    user: CurrentUser = Depends(
-        require_permission(Permission.PATIENT_READ_ANONYMIZED)
-    ),
+    user: CurrentUser = Depends(require_permission(Permission.PATIENT_READ_ANONYMIZED)),
     db: Session = Depends(get_db),
 ) -> list[dict[str, str | None]]:
     """Return a researcher-safe patient view."""
 
-    patients = list(
-        db.scalars(
-            select(Patient).order_by(Patient.id)
-        ).all()
-    )
+    patients = list(db.scalars(select(Patient).order_by(Patient.id)).all())
 
     return [
         {

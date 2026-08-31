@@ -15,9 +15,7 @@ def authenticate_user(
 ) -> User | None:
     """Find an active user and verify their password."""
 
-    user = db.scalar(
-        select(User).where(User.email == email)
-    )
+    user = db.scalar(select(User).where(User.email == email))
 
     if user is None:
         return None

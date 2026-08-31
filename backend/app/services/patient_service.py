@@ -18,24 +18,15 @@ def list_patients_for_user(
     stmt = select(Patient)
 
     if role is Role.DOCTOR:
-        stmt = stmt.where(
-            Patient.assigned_doctor_id == user_id
-        )
+        stmt = stmt.where(Patient.assigned_doctor_id == user_id)
 
-    elif role is Role.HOSPITAL_ADMIN:
-        pass
-
-    elif role is Role.SYSTEM_ADMIN:
+    elif role is Role.HOSPITAL_ADMIN or role is Role.SYSTEM_ADMIN:
         pass
 
     else:
         return []
 
-    return list(
-        db.scalars(
-            stmt.order_by(Patient.id)
-        ).all()
-    )
+    return list(db.scalars(stmt.order_by(Patient.id)).all())
 
 
 def create_patient(
