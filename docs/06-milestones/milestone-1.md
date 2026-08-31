@@ -45,7 +45,10 @@ The following milestone objectives were targeted:
 
 ---
 
-# 3. System Architecture & Project Initialization
+# What I built
+
+## System Architecture & Project Initialization
+
 
 Implemented the core Docker-based development environment for the HealthForecast AI platform.
 
@@ -341,7 +344,8 @@ ml/configs/config.yaml
 
 ---
 
-# 13. How to Run the Project
+
+# How to run it
 
 ## Prerequisites
 
@@ -426,7 +430,7 @@ ml/data/processed/admissions_features.parquet
 
 ---
 
-# 15. Evidence & Validation
+# Evidence
 
 ## 15.1 Authentication & API Evidence
 
@@ -599,7 +603,7 @@ docs/05-wireframes/
 
 ---
 
-# 18. Metrics
+# Metrics
 
 | Metric                                 |  Result |
 | -------------------------------------- | ------: |
@@ -622,7 +626,7 @@ docs/05-wireframes/
 
 ---
 
-# 19. Known Gaps & Future Work
+# Known gaps
 
 The following items are intentionally planned for subsequent milestones:
 
@@ -652,11 +656,6 @@ The following items are intentionally planned for subsequent milestones:
 * Improved dashboard UX
 * Expanded role-specific dashboard functionality
 
-### Code Quality
-
-Some Black formatting differences remain in several backend files. These do not prevent the completed functional tests, type checking, or Ruff validation.
-
----
 
 # 20. Milestone 1 Completion Summary
 
