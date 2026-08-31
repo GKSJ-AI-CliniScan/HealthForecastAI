@@ -36,21 +36,21 @@ def map_icd9_to_category(icd9_code: Any) -> str:
 
     if 390 <= numeric_val <= 459 or numeric_val == 785:
         return "Circulatory (Cardiac/Vascular)"
-    elif 460 <= numeric_val <= 519 or numeric_val == 786:
+    if 460 <= numeric_val <= 519 or numeric_val == 786:
         return "Respiratory (Pulmonary)"
-    elif 520 <= numeric_val <= 579 or numeric_val == 787:
+    if 520 <= numeric_val <= 579 or numeric_val == 787:
         return "Digestive (Gastrointestinal)"
-    elif 250 <= numeric_val < 251:
+    if 250 <= numeric_val < 251:
         return "Diabetes Mellitus"
-    elif 800 <= numeric_val <= 999:
+    if 800 <= numeric_val <= 999:
         return "Injury & Poisoning"
-    elif 710 <= numeric_val <= 739:
+    if 710 <= numeric_val <= 739:
         return "Musculoskeletal System"
-    elif 580 <= numeric_val <= 629 or numeric_val == 788:
+    if 580 <= numeric_val <= 629 or numeric_val == 788:
         return "Genitourinary (Renal/Kidney)"
-    elif 140 <= numeric_val <= 239:
+    if 140 <= numeric_val <= 239:
         return "Neoplasms (Oncology)"
-    elif 240 <= numeric_val <= 279:
+    if 240 <= numeric_val <= 279:
         return "Endocrine / Nutritional / Metabolic"
     return "Other Diagnoses"
 
