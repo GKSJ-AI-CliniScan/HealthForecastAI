@@ -20,7 +20,9 @@ ignore = ["B008", "E501"]
 [tool.black]
 line-length = 100
 target-version = ["py311"]
-exclude = "/(alembic)/"
+# extend-exclude, not exclude: setting `exclude` replaces black's defaults, which
+# would make `black .` walk into the .venv that INTERN_GUIDE.md tells you to create.
+extend-exclude = "/(alembic)/"
 
 [tool.mypy]
 python_version = "3.11"
