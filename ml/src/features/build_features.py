@@ -44,12 +44,15 @@ def build_preprocessor(frame: pd.DataFrame, config: dict[str, Any]) -> ColumnTra
 
 
 def add_utilisation_features(frame: pd.DataFrame) -> pd.DataFrame:
-    """Derive prior-utilisation features, the strongest readmission signal.
-
-    TODO(milestone-2): add comorbidity counts and medication-change indicators.
-    """
+    """Derive prior-utilisation and clinical indicator features."""
     result = frame.copy()
     utilisation_columns = ["number_outpatient", "number_emergency", "number_inpatient"]
     if all(column in result.columns for column in utilisation_columns):
         result["prior_visits_total"] = result[utilisation_columns].sum(axis=1)
+
+    if "change" in result.columns:
+        result["medication_changed"] = (result["change"] == "Ch").astype(int)
+    if "diabetesMed" in result.columns:
+        result["diabetes_med_prescribed"] = (result["diabetesMed"] == "Yes").astype(int)
+
     return result
