@@ -11,25 +11,40 @@ export class ApiError extends Error {
   }
 }
 
-/**
- * Thin fetch wrapper for the FastAPI backend.
- * Never store the access token in localStorage - use an httpOnly cookie.
- */
 export async function apiFetch<T>(
   path: string,
   options: RequestInit = {},
   token?: string,
 ): Promise<T> {
   const headers = new Headers(options.headers);
-  headers.set('Content-Type', 'application/json');
+
+  if (options.body) {
+    headers.set('Content-Type', 'application/json');
+  }
+
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers,
+  });
 
   if (!response.ok) {
-    throw new ApiError(response.status, `Request to ${path} failed`);
+    let message = `Request to ${path} failed`;
+
+    try {
+      const body = await response.json();
+
+      if (typeof body.detail === 'string') {
+        message = body.detail;
+      }
+    } catch {
+      // Keep the default error message.
+    }
+
+    throw new ApiError(response.status, message);
   }
 
   return (await response.json()) as T;

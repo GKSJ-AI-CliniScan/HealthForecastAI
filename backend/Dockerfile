@@ -14,7 +14,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN pip wheel --wheel-dir /wheels -r requirements.txt
+RUN pip wheel --wheel-dir /wheels -r requirements.txt \
+    --default-timeout=120 \
+    --retries 5
 
 # ---------- Stage 2: runtime ----------
 FROM python:3.11-slim AS runtime
@@ -34,6 +36,8 @@ RUN apt-get update \
 COPY --from=builder /wheels /wheels
 COPY requirements.txt .
 RUN pip install --no-index --find-links=/wheels -r requirements.txt \
+    --default-timeout=120 \
+    --retries 5 \
     && rm -rf /wheels
 
 COPY --chown=appuser:appuser . .

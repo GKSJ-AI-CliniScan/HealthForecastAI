@@ -9,7 +9,6 @@ from app.db.session import get_db
 from app.schemas.token import Token
 from app.schemas.user import UserLogin
 from app.services.auth_service import login_user
-from app.models.audit_log import AuditLog
 
 router = APIRouter()
 
@@ -49,10 +48,4 @@ def list_roles() -> dict[str, list[str]]:
 
     return {str(role): permissions_for(role) for role in Role}
 
-@router.get("/audit-logs", summary="List all audit logs")
-def list_audit_logs(user: CurrentUser = Depends(get_current_user)) -> list[str]:
-    """List all audit logs"""
-    return [str(log) for log in AuditLog.select_all(db)]
 
-
-    

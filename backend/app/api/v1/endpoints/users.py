@@ -25,13 +25,14 @@ def list_users(
 ) -> list[UserRead]:
     """Return platform users with pagination and optional role filtering."""
 
-    return list_users_service(
+    users = list_users_service(
         db,
         skip=skip,
         limit=limit,
         role=role,
     )
 
+    return [UserRead.model_validate(item) for item in users]
 
 @router.post(
     "",
@@ -46,12 +47,15 @@ def create_user(
     """Create a new platform user."""
 
     try:
-        return create_user_service(
+        created_user = create_user_service(
             db,
             payload,
             actor_id=int(user.subject),
             actor_role=str(user.role),
         )
+
+        return UserRead.model_validate(created_user)
+
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,

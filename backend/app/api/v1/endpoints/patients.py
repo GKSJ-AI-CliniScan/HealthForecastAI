@@ -34,11 +34,13 @@ def list_patients(
             detail="Researchers must use /patients/anonymised",
         )
 
-    return list_patients_service(
+    patients = list_patients_service(
         db,
         user_id=int(user.subject),
         role=user.role,
     )
+
+    return [PatientRead.model_validate(item) for item in patients]
 
 
 @router.post(
@@ -56,12 +58,14 @@ def create_patient(
     """Create a patient record."""
 
     try:
-        return create_patient_service(
+        created_patient = create_patient_service(
             db,
             payload,
             actor_id=int(user.subject),
             actor_role=user.role,
         )
+
+        return PatientRead.model_validate(created_patient)
 
     except ValueError as exc:
         raise HTTPException(
