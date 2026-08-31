@@ -37,9 +37,15 @@ def seed_database():
         print("[*] Seeding Roles...")
         roles_data = [
             ("DOCTOR", "Clinical doctor providing patient diagnosis and medical treatment"),
-            ("HOSPITAL_ADMIN", "Hospital administrator overseeing admissions, departments and operations"),
+            (
+                "HOSPITAL_ADMIN",
+                "Hospital administrator overseeing admissions, departments and operations",
+            ),
             ("RESEARCHER", "Healthcare researcher analyzing anonymized patient cohorts"),
-            ("SYSTEM_ADMIN", "System administrator managing users, roles, security and system health"),
+            (
+                "SYSTEM_ADMIN",
+                "System administrator managing users, roles, security and system health",
+            ),
         ]
 
         roles_by_name = {}
@@ -90,12 +96,66 @@ def seed_database():
 
         print("[*] Seeding Patients...")
         patients_data = [
-            ("PAT-1001", "John", "Doe", date(1968, 5, 12), "Male", "+1-555-0101", "john.doe@example.com", "124 Oak Street, Boston, MA"),
-            ("PAT-1002", "Jane", "Miller", date(1975, 11, 23), "Female", "+1-555-0102", "jane.miller@example.com", "456 Elm Avenue, Chicago, IL"),
-            ("PAT-1003", "David", "Wilson", date(1952, 3, 15), "Male", "+1-555-0103", "david.w@example.com", "789 Pine Road, Seattle, WA"),
-            ("PAT-1004", "Emily", "Davis", date(1983, 8, 30), "Female", "+1-555-0104", "emily.davis@example.com", "321 Cedar Blvd, Austin, TX"),
-            ("PAT-1005", "Michael", "Brown", date(1947, 1, 9), "Male", "+1-555-0105", "mbrown@example.com", "654 Birch Court, Denver, CO"),
-            ("PAT-1006", "Alice", "Taylor", date(1990, 7, 18), "Female", "+1-555-0106", "alice.t@example.com", "987 Maple Way, Miami, FL"),
+            (
+                "PAT-1001",
+                "John",
+                "Doe",
+                date(1968, 5, 12),
+                "Male",
+                "+1-555-0101",
+                "john.doe@example.com",
+                "124 Oak Street, Boston, MA",
+            ),
+            (
+                "PAT-1002",
+                "Jane",
+                "Miller",
+                date(1975, 11, 23),
+                "Female",
+                "+1-555-0102",
+                "jane.miller@example.com",
+                "456 Elm Avenue, Chicago, IL",
+            ),
+            (
+                "PAT-1003",
+                "David",
+                "Wilson",
+                date(1952, 3, 15),
+                "Male",
+                "+1-555-0103",
+                "david.w@example.com",
+                "789 Pine Road, Seattle, WA",
+            ),
+            (
+                "PAT-1004",
+                "Emily",
+                "Davis",
+                date(1983, 8, 30),
+                "Female",
+                "+1-555-0104",
+                "emily.davis@example.com",
+                "321 Cedar Blvd, Austin, TX",
+            ),
+            (
+                "PAT-1005",
+                "Michael",
+                "Brown",
+                date(1947, 1, 9),
+                "Male",
+                "+1-555-0105",
+                "mbrown@example.com",
+                "654 Birch Court, Denver, CO",
+            ),
+            (
+                "PAT-1006",
+                "Alice",
+                "Taylor",
+                date(1990, 7, 18),
+                "Female",
+                "+1-555-0106",
+                "alice.t@example.com",
+                "987 Maple Way, Miami, FL",
+            ),
         ]
 
         patients_by_identifier = {}
@@ -133,12 +193,18 @@ def seed_database():
         ]
 
         for doc_id, pat_id in assignments_to_create:
-            existing_assign = db.query(DoctorPatientAssignment).filter(
-                DoctorPatientAssignment.doctor_id == doc_id,
-                DoctorPatientAssignment.patient_id == pat_id,
-            ).first()
+            existing_assign = (
+                db.query(DoctorPatientAssignment)
+                .filter(
+                    DoctorPatientAssignment.doctor_id == doc_id,
+                    DoctorPatientAssignment.patient_id == pat_id,
+                )
+                .first()
+            )
             if not existing_assign:
-                db.add(DoctorPatientAssignment(id=uuid.uuid4(), doctor_id=doc_id, patient_id=pat_id))
+                db.add(
+                    DoctorPatientAssignment(id=uuid.uuid4(), doctor_id=doc_id, patient_id=pat_id)
+                )
                 print(f"  + Assigned doctor {doc_id} to patient {pat_id}")
 
         print("[*] Seeding Medical Histories, Admissions & Treatments...")
@@ -146,56 +212,76 @@ def seed_database():
         for identifier, p in patients_by_identifier.items():
             existing_mh = db.query(MedicalHistory).filter(MedicalHistory.patient_id == p.id).first()
             if not existing_mh:
-                db.add(MedicalHistory(
-                    id=uuid.uuid4(),
-                    patient_id=p.id,
-                    diagnosis="Type 2 Diabetes Mellitus with Hyperglycemia" if identifier in ["PAT-1001", "PAT-1003"] else "Hypertension & Cardiovascular Episode",
-                    chronic_conditions="Diabetes Type 2, Chronic Kidney Disease Stage 2",
-                    allergies="Penicillin, Sulfa drugs" if identifier == "PAT-1001" else "None known",
-                    medical_notes="Patient responds well to glycemic management protocols. Monitoring HbA1c levels regularly.",
-                ))
+                db.add(
+                    MedicalHistory(
+                        id=uuid.uuid4(),
+                        patient_id=p.id,
+                        diagnosis=(
+                            "Type 2 Diabetes Mellitus with Hyperglycemia"
+                            if identifier in ["PAT-1001", "PAT-1003"]
+                            else "Hypertension & Cardiovascular Episode"
+                        ),
+                        chronic_conditions="Diabetes Type 2, Chronic Kidney Disease Stage 2",
+                        allergies=(
+                            "Penicillin, Sulfa drugs" if identifier == "PAT-1001" else "None known"
+                        ),
+                        medical_notes="Patient responds well to glycemic management protocols. Monitoring HbA1c levels regularly.",
+                    )
+                )
 
             # Sample Admissions
             existing_adm = db.query(Admission).filter(Admission.patient_id == p.id).first()
             if not existing_adm:
-                db.add(Admission(
-                    id=uuid.uuid4(),
-                    patient_id=p.id,
-                    admission_date=date.today() - timedelta(days=14),
-                    discharge_date=date.today() - timedelta(days=9),
-                    admission_type="Emergency" if identifier in ["PAT-1001", "PAT-1005"] else "Elective",
-                    department="Endocrinology" if identifier in ["PAT-1001", "PAT-1003"] else "Cardiology",
-                    primary_diagnosis="Diabetes with acute complications (ICD-9 250.02)",
-                    length_of_stay=5,
-                    discharge_disposition="Discharged to Home with Home Health Service",
-                ))
+                db.add(
+                    Admission(
+                        id=uuid.uuid4(),
+                        patient_id=p.id,
+                        admission_date=date.today() - timedelta(days=14),
+                        discharge_date=date.today() - timedelta(days=9),
+                        admission_type=(
+                            "Emergency" if identifier in ["PAT-1001", "PAT-1005"] else "Elective"
+                        ),
+                        department=(
+                            "Endocrinology"
+                            if identifier in ["PAT-1001", "PAT-1003"]
+                            else "Cardiology"
+                        ),
+                        primary_diagnosis="Diabetes with acute complications (ICD-9 250.02)",
+                        length_of_stay=5,
+                        discharge_disposition="Discharged to Home with Home Health Service",
+                    )
+                )
 
             # Sample Treatments
             existing_tx = db.query(Treatment).filter(Treatment.patient_id == p.id).first()
             if not existing_tx:
-                db.add(Treatment(
-                    id=uuid.uuid4(),
-                    patient_id=p.id,
-                    treatment_name="Metformin 1000mg BID + Insulin Glargine 20u QHS",
-                    treatment_type="Pharmacotherapy",
-                    start_date=date.today() - timedelta(days=12),
-                    end_date=None,
-                    status="ACTIVE",
-                    notes="Titrate insulin dose based on fasting blood glucose logs.",
-                ))
+                db.add(
+                    Treatment(
+                        id=uuid.uuid4(),
+                        patient_id=p.id,
+                        treatment_name="Metformin 1000mg BID + Insulin Glargine 20u QHS",
+                        treatment_type="Pharmacotherapy",
+                        start_date=date.today() - timedelta(days=12),
+                        end_date=None,
+                        status="ACTIVE",
+                        notes="Titrate insulin dose based on fasting blood glucose logs.",
+                    )
+                )
 
         print("[*] Seeding Audit Logs...")
         sysadmin = users_by_username["sysadmin"]
         existing_log = db.query(AuditLog).first()
         if not existing_log:
-            db.add(AuditLog(
-                id=uuid.uuid4(),
-                user_id=sysadmin.id,
-                action="SYSTEM_INIT",
-                resource="SYSTEM",
-                resource_id="INITIAL_SETUP",
-                created_at=datetime.now(timezone.utc),
-            ))
+            db.add(
+                AuditLog(
+                    id=uuid.uuid4(),
+                    user_id=sysadmin.id,
+                    action="SYSTEM_INIT",
+                    resource="SYSTEM",
+                    resource_id="INITIAL_SETUP",
+                    created_at=datetime.now(timezone.utc),
+                )
+            )
 
         db.commit()
         print("[SUCCESS] Database seeding completed successfully!")

@@ -22,7 +22,9 @@ class AdmissionRepository(BaseRepository[Admission]):
             .all()
         )
 
-    def get_recent_admissions(self, limit: int = 10, doctor_id: uuid.UUID | None = None) -> list[Admission]:
+    def get_recent_admissions(
+        self, limit: int = 10, doctor_id: uuid.UUID | None = None
+    ) -> list[Admission]:
         """Get most recent admissions across hospital or scoped by doctor."""
         query = self.db.query(Admission)
         if doctor_id:
@@ -36,6 +38,7 @@ class AdmissionRepository(BaseRepository[Admission]):
     def count_by_department(self) -> dict[str, int]:
         """Aggregate admission count by department."""
         from sqlalchemy import func
+
         rows = (
             self.db.query(Admission.department, func.count(Admission.id))
             .group_by(Admission.department)

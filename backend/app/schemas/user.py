@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 class UserBase(BaseModel):
     """Base user fields."""
+
     email: EmailStr
     username: str = Field(..., min_length=3, max_length=64)
     first_name: str = Field(..., min_length=1, max_length=128)
@@ -15,6 +16,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     """User creation schema with role ID or role name and initial password."""
+
     password: str = Field(..., min_length=8)
     role_id: uuid.UUID | None = None
     role_name: str | None = None
@@ -22,6 +24,7 @@ class UserCreate(UserBase):
 
 class UserUpdate(BaseModel):
     """User update schema."""
+
     first_name: str | None = None
     last_name: str | None = None
     email: EmailStr | None = None
@@ -33,6 +36,7 @@ class UserUpdate(BaseModel):
 
 class UserResponse(UserBase):
     """User profile response."""
+
     id: uuid.UUID
     role_id: uuid.UUID
     role: str
@@ -46,6 +50,7 @@ class UserResponse(UserBase):
 
 class UserListResponse(BaseModel):
     """Paginated list of users."""
+
     items: list[UserResponse]
     total: int
     page: int

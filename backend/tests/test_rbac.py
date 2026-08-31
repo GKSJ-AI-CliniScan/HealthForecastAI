@@ -11,7 +11,9 @@ def test_user_management_restricted_to_sysadmin(client: TestClient, user_tokens:
     assert resp_doc.status_code == 403
 
     # Hospital Admin accessing users -> 403
-    resp_admin = client.get("/api/v1/users", headers={"Authorization": user_tokens["HOSPITAL_ADMIN"]})
+    resp_admin = client.get(
+        "/api/v1/users", headers={"Authorization": user_tokens["HOSPITAL_ADMIN"]}
+    )
     assert resp_admin.status_code == 403
 
     # Researcher accessing users -> 403
@@ -26,10 +28,14 @@ def test_user_management_restricted_to_sysadmin(client: TestClient, user_tokens:
 
 def test_audit_logs_restricted_to_sysadmin(client: TestClient, user_tokens: dict[str, str]):
     """Ensure audit logs are restricted to System Admin."""
-    resp_doc = client.get("/api/v1/admin/audit-logs", headers={"Authorization": user_tokens["DOCTOR"]})
+    resp_doc = client.get(
+        "/api/v1/admin/audit-logs", headers={"Authorization": user_tokens["DOCTOR"]}
+    )
     assert resp_doc.status_code == 403
 
-    resp_sys = client.get("/api/v1/admin/audit-logs", headers={"Authorization": user_tokens["SYSTEM_ADMIN"]})
+    resp_sys = client.get(
+        "/api/v1/admin/audit-logs", headers={"Authorization": user_tokens["SYSTEM_ADMIN"]}
+    )
     assert resp_sys.status_code == 200
 
 

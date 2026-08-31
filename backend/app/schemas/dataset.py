@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 class DatasetSummaryResponse(BaseModel):
     """Dataset summary schema for Milestone 1 foundation."""
+
     dataset_name: str
     total_records: int
     total_columns: int

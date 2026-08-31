@@ -52,12 +52,7 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    user = (
-        db.query(User)
-        .options(joinedload(User.role_rel))
-        .filter(User.id == user_id)
-        .first()
-    )
+    user = db.query(User).options(joinedload(User.role_rel)).filter(User.id == user_id).first()
 
     if not user:
         raise HTTPException(
@@ -90,6 +85,7 @@ def require_roles(*allowed_roles: str) -> Callable[[User], User]:
         def admin_view(current_user: Annotated[User, Depends(require_roles("SYSTEM_ADMIN"))]):
             ...
     """
+
     def role_checker(
         current_user: Annotated[User, Depends(get_current_active_user)],
     ) -> User:

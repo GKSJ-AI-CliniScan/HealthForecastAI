@@ -190,7 +190,7 @@ jobs:
   # Frontend: lint, build, type check, test.
   # --------------------------------------------------------------------------
   frontend:
-    name: Frontend (Next.js)
+    name: Frontend (React / Vite)
     needs: detect
     if: needs.detect.outputs.frontend == 'true'
     runs-on: ubuntu-latest
@@ -215,13 +215,11 @@ jobs:
             npm install
           fi
 
-      - name: Lint (eslint)
+      - name: Lint (tsc)
         run: npm run lint
 
-      - name: Build (next build)
+      - name: Build (vite build)
         if: always()
-        env:
-          NEXT_TELEMETRY_DISABLED: '1'
         run: npm run build
 
       - name: Type check (tsc)
@@ -231,6 +229,7 @@ jobs:
       - name: Tests
         if: always()
         run: npm test --if-present
+
 
   # --------------------------------------------------------------------------
   # ML pipeline: lint, format, test. No dataset needed - these are unit tests.
@@ -331,9 +330,10 @@ jobs:
             echo "|-------|--------|"
             echo "| Repository checks | ${{ needs.repo-checks.result }} |"
             echo "| Backend (FastAPI) | ${{ needs.backend.result }} |"
-            echo "| Frontend (Next.js) | ${{ needs.frontend.result }} |"
+            echo "| Frontend (React / Vite) | ${{ needs.frontend.result }} |"
             echo "| ML pipeline | ${{ needs.ml.result }} |"
             echo "| Docker build | ${{ needs.docker.result }} |"
+
             echo ""
             echo "\`skipped\` means that part of the project does not exist on this branch yet."
             echo ""

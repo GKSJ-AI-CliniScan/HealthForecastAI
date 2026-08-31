@@ -73,4 +73,3 @@ def health() -> dict[str, str]:
 def root() -> dict[str, str]:
     """Root banner pointing to interactive Swagger documentation."""
     return {"service": "HealthForecast AI", "version": app.version, "docs": "/docs"}
-

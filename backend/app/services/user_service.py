@@ -105,7 +105,9 @@ class UserService:
         elif payload.role_name:
             role = self.db.query(Role).filter(Role.name == payload.role_name.upper()).first()
             if not role:
-                raise HTTPException(status_code=400, detail=f"Role '{payload.role_name}' does not exist")
+                raise HTTPException(
+                    status_code=400, detail=f"Role '{payload.role_name}' does not exist"
+                )
             user.role_id = role.id
 
         updated = self.repo.update(user)

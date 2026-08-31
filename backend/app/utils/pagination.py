@@ -9,6 +9,7 @@ T = TypeVar("T")
 
 class PaginatedResult(BaseModel):
     """Generic container for paginated query results."""
+
     items: list[Any]
     total: int
     page: int

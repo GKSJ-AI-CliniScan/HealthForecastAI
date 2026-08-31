@@ -126,7 +126,9 @@ class AuthService:
             # Default to DOCTOR
             default_role = self.db.query(Role).filter(Role.name == "DOCTOR").first()
             if not default_role:
-                raise HTTPException(status_code=500, detail="Default DOCTOR role missing in database")
+                raise HTTPException(
+                    status_code=500, detail="Default DOCTOR role missing in database"
+                )
             role_id = default_role.id
 
         new_user = User(

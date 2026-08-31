@@ -91,11 +91,16 @@ def get_dashboard_stats(
 
     if role == "DOCTOR":
         from app.repositories.patient_repository import PatientRepository
+
         p_repo = PatientRepository(db)
         assigned_count = p_repo.count_by_doctor(current_user.id)
-        recent_admissions = admission_service.get_recent_admissions(limit=5, current_user=current_user)
+        recent_admissions = admission_service.get_recent_admissions(
+            limit=5, current_user=current_user
+        )
         active_treatments = treatment_service.count_active_treatments(current_user=current_user)
-        patients_list, _ = patient_service.list_patients(current_user=current_user, page=1, page_size=5)
+        patients_list, _ = patient_service.list_patients(
+            current_user=current_user, page=1, page_size=5
+        )
 
         return {
             "role": "DOCTOR",
@@ -112,6 +117,7 @@ def get_dashboard_stats(
     elif role == "HOSPITAL_ADMIN":
         from app.repositories.patient_repository import PatientRepository
         from app.repositories.admission_repository import AdmissionRepository
+
         p_repo = PatientRepository(db)
         adm_repo = AdmissionRepository(db)
 
@@ -136,9 +142,12 @@ def get_dashboard_stats(
     elif role == "RESEARCHER":
         ds_summary = dataset_service.get_dataset_summary()
         from app.repositories.patient_repository import PatientRepository
+
         p_repo = PatientRepository(db)
         total_anonymized = p_repo.count()
-        anon_patients, _ = patient_service.list_patients(current_user=current_user, page=1, page_size=6)
+        anon_patients, _ = patient_service.list_patients(
+            current_user=current_user, page=1, page_size=6
+        )
 
         return {
             "role": "RESEARCHER",
@@ -154,6 +163,7 @@ def get_dashboard_stats(
 
     else:  # SYSTEM_ADMIN
         from app.repositories.patient_repository import PatientRepository
+
         p_repo = PatientRepository(db)
         users, total_users = user_service.list_users(page=1, page_size=5)
         audit_logs, total_logs = audit_service.list_logs(page=1, page_size=6)

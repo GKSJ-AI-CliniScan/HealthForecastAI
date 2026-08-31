@@ -30,9 +30,7 @@ def list_users(
     role: str | None = Query(None, description="Filter by role name"),
 ) -> UserListResponse:
     service = UserService(db)
-    items, total = service.list_users(
-        page=page, page_size=page_size, search=search, role_name=role
-    )
+    items, total = service.list_users(page=page, page_size=page_size, search=search, role_name=role)
     total_pages = (total + page_size - 1) // page_size if page_size > 0 else 1
     return UserListResponse(
         items=items,

@@ -51,9 +51,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(SQLAlchemyError)
-    async def sqlalchemy_exception_handler(
-        request: Request, exc: SQLAlchemyError
-    ) -> JSONResponse:
+    async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError) -> JSONResponse:
         logger.error("Database error on %s: %s", request.url.path, str(exc), exc_info=True)
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

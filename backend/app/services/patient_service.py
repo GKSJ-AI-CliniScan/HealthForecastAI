@@ -133,6 +133,7 @@ class PatientService:
         # If created by a DOCTOR, automatically assign doctor to patient
         if current_user.role == "DOCTOR":
             from app.models.doctor_patient_assignment import DoctorPatientAssignment
+
             assignment = DoctorPatientAssignment(
                 id=uuid.uuid4(),
                 doctor_id=current_user.id,

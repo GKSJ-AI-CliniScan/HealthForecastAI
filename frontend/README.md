@@ -1,21 +1,35 @@
-# HealthForecast AI - Frontend (Next.js + Tailwind)
+# HealthForecast AI - Frontend (React + Vite + TypeScript + Tailwind CSS)
 
-Dashboards for doctors, hospital administrators, healthcare researchers and
-system administrators.
+Clinical Risk Intelligence and Operational Platform dashboards for Doctors, Hospital Administrators, Healthcare Researchers, and System Administrators.
 
-## Layout
+## Technology Stack
 
-| Path                     | Responsibility |
-|--------------------------|----------------|
-| `src/app/`               | App Router pages and layouts |
-| `src/components/ui/`     | Reusable primitives (buttons, cards, tables) |
-| `src/components/charts/` | Recharts wrappers for analytics |
-| `src/components/layout/` | Shell, navigation, role-aware menus |
-| `src/lib/api.ts`         | Typed fetch wrapper for the FastAPI backend |
-| `src/hooks/`             | Client-side data hooks |
-| `src/types/`             | Shared TypeScript types mirroring the backend schemas |
+- **Framework**: React 18 + Vite
+- **Language**: TypeScript (Strict mode)
+- **Routing**: React Router DOM v6
+- **Styling**: Tailwind CSS + Glassmorphism Design System
+- **State & Data**: TanStack React Query + Axios (Bearer token injection & 401 refresh queue)
+- **Validation**: React Hook Form + Zod
+- **Icons**: Lucide React
 
-## Run locally
+## Project Structure
+
+| Path | Responsibility |
+|---|---|
+| `src/routes/` | AppRoutes, ProtectedRoute & RoleBasedRoute configurations |
+| `src/pages/landing/` | Healthcare Landing Page (`/`) |
+| `src/pages/auth/` | Login, Registration (`/register`), and Password Recovery |
+| `src/pages/dashboard/` | Role-specific Dashboard views |
+| `src/pages/patients/` | Patient Management Directory & Clinical Detail Tabs |
+| `src/pages/clinical/` | Medical History, Admissions & Treatments |
+| `src/pages/admin/` | User Management, Roles, Doctor-Patient Assignments, Audit Logs & Dataset Pipeline |
+| `src/components/ui/` | Reusable UI primitives (Buttons, Modals, CustomDropdown, Inputs, Tables, Badges) |
+| `src/components/layout/` | AppLayout, Header, Sidebar navigation, ThemeToggle |
+| `src/context/` | AuthContext & ThemeContext |
+| `src/api/` | Typed API clients for FastAPI backend |
+| `src/types/` | Shared TypeScript interfaces mirroring backend schemas |
+
+## Run Locally
 
 ```bash
 cd frontend
@@ -23,10 +37,9 @@ npm install
 npm run dev
 ```
 
-Open <http://localhost:3000>. The backend must be running on port 8000, or set
-`NEXT_PUBLIC_API_BASE_URL` in `.env.local`.
+Open <http://localhost:3000>. The backend must be running on port 8000 (or configure `VITE_API_BASE_URL`).
 
-## Checks that CI runs
+## CI Quality Checks
 
 ```bash
 npm run lint
@@ -34,9 +47,8 @@ npm run build
 npm run typecheck
 ```
 
-## Rules
+## Security & Privacy Rules
 
-- Only variables prefixed `NEXT_PUBLIC_` reach the browser. Never put a secret,
-  a database URL or a JWT signing key behind that prefix.
-- Never render a patient identifier in a researcher-facing view.
-- Keep `src/types/index.ts` in sync with `backend/app/schemas/`.
+- Only variables prefixed with `VITE_` reach the browser. Never expose private credentials.
+- Never render identifying PII in researcher-facing views (Researcher portal is strictly de-identified).
+- Keep `src/types/` synchronized with `backend/app/schemas/`.

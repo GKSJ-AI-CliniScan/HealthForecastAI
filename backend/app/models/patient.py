@@ -13,9 +13,7 @@ class Patient(Base):
 
     __tablename__ = "patients"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        GUID(), primary_key=True, default=uuid.uuid4, index=True
-    )
+    id: Mapped[uuid.UUID] = mapped_column(GUID(), primary_key=True, default=uuid.uuid4, index=True)
     patient_identifier: Mapped[str] = mapped_column(
         String(64), unique=True, index=True, nullable=False
     )

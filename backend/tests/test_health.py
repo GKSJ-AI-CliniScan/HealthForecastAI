@@ -26,4 +26,3 @@ def test_openapi_schema_is_generated(client: TestClient) -> None:
     assert "/api/v1/patients" in paths
     assert "/api/v1/admin/roles" in paths
     assert "/api/v1/admin/dataset/summary" in paths
-

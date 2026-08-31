@@ -13,21 +13,29 @@ def test_doctor_sees_only_assigned_patients(client: TestClient, user_tokens: dic
     assert items[0]["patient_identifier"] == "PAT-TEST-001"
 
 
-def test_doctor_cannot_access_unassigned_patient_details(client: TestClient, user_tokens: dict[str, str]):
+def test_doctor_cannot_access_unassigned_patient_details(
+    client: TestClient, user_tokens: dict[str, str]
+):
     """Doctor 1 should get 403 when requesting details of Patient 2."""
     # Find patient 2 ID using admin token
-    admin_resp = client.get("/api/v1/patients", headers={"Authorization": user_tokens["HOSPITAL_ADMIN"]})
+    admin_resp = client.get(
+        "/api/v1/patients", headers={"Authorization": user_tokens["HOSPITAL_ADMIN"]}
+    )
     patients = admin_resp.json()["items"]
     pat2 = next(p for p in patients if p["patient_identifier"] == "PAT-TEST-002")
 
     # Doctor requests unassigned patient 2
-    doc_resp = client.get(f"/api/v1/patients/{pat2['id']}", headers={"Authorization": user_tokens["DOCTOR"]})
+    doc_resp = client.get(
+        f"/api/v1/patients/{pat2['id']}", headers={"Authorization": user_tokens["DOCTOR"]}
+    )
     assert doc_resp.status_code == 403
 
 
 def test_hospital_admin_sees_all_patients(client: TestClient, user_tokens: dict[str, str]):
     """Hospital admin should see all patients."""
-    response = client.get("/api/v1/patients", headers={"Authorization": user_tokens["HOSPITAL_ADMIN"]})
+    response = client.get(
+        "/api/v1/patients", headers={"Authorization": user_tokens["HOSPITAL_ADMIN"]}
+    )
     assert response.status_code == 200
     items = response.json()["items"]
     assert len(items) >= 2

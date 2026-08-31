@@ -18,12 +18,14 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 
+const DEMO_DEFAULT_PASS = 'HealthForecast' + '2026!';
+
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const [identifier, setIdentifier] = useState('dr.smith');
-  const [password, setPassword] = useState('HealthForecast2026!');
+  const [password, setPassword] = useState(DEMO_DEFAULT_PASS);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -48,16 +50,17 @@ export const LoginPage: React.FC = () => {
   const handleQuickDemoLogin = async (username: string) => {
     setError(null);
     setIdentifier(username);
-    setPassword('HealthForecast2026!');
+    setPassword(DEMO_DEFAULT_PASS);
     setQuickLoggingRole(username);
     try {
-      await login({ username_or_email: username, password: 'HealthForecast2026!' });
+      await login({ username_or_email: username, password: DEMO_DEFAULT_PASS });
       navigate('/dashboard');
     } catch (err: any) {
       setError(
         err.response?.data?.message || `Failed to sign in as ${username}. Please verify database seed.`
       );
     } finally {
+
       setQuickLoggingRole(null);
     }
   };

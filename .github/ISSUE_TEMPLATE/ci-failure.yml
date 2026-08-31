@@ -33,9 +33,10 @@ body:
       options:
         - Repository checks
         - Backend (FastAPI)
-        - Frontend (Next.js)
+        - Frontend (React / Vite)
         - ML pipeline
         - Docker build
+
         - Branch guard
         - Security
         - Not sure

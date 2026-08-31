@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 class PatientBase(BaseModel):
     """Base patient data."""
+
     patient_identifier: str = Field(..., max_length=64)
     first_name: str = Field(..., max_length=128)
     last_name: str = Field(..., max_length=128)
@@ -20,11 +21,13 @@ class PatientBase(BaseModel):
 
 class PatientCreate(PatientBase):
     """Patient creation payload."""
+
     pass
 
 
 class PatientUpdate(BaseModel):
     """Patient update payload."""
+
     first_name: str | None = None
     last_name: str | None = None
     date_of_birth: date | None = None
@@ -36,6 +39,7 @@ class PatientUpdate(BaseModel):
 
 class PatientResponse(PatientBase):
     """Full patient record returned to authorized clinicians & administrators."""
+
     id: uuid.UUID
     full_name: str
     created_at: datetime
@@ -47,6 +51,7 @@ class PatientResponse(PatientBase):
 
 class AnonymizedPatientResponse(BaseModel):
     """Anonymized patient record strictly stripped of PII for RESEARCHER role."""
+
     id: uuid.UUID
     anonymized_patient_id: str
     age_group: str | None = None
@@ -59,6 +64,7 @@ class AnonymizedPatientResponse(BaseModel):
 
 class PatientListResponse(BaseModel):
     """Paginated list of patients (full or anonymized)."""
+
     items: list[Any]
     total: int
     page: int

@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict
 
 class MedicalHistoryBase(BaseModel):
     """Base medical history fields."""
+
     diagnosis: str | None = None
     chronic_conditions: str | None = None
     allergies: str | None = None
@@ -15,16 +16,19 @@ class MedicalHistoryBase(BaseModel):
 
 class MedicalHistoryCreate(MedicalHistoryBase):
     """Payload for creating medical history."""
+
     patient_id: uuid.UUID | None = None
 
 
 class MedicalHistoryUpdate(MedicalHistoryBase):
     """Payload for updating medical history."""
+
     pass
 
 
 class MedicalHistoryResponse(MedicalHistoryBase):
     """Medical history response."""
+
     id: uuid.UUID
     patient_id: uuid.UUID
     created_at: datetime

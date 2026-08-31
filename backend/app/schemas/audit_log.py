@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict
 
 class AuditLogResponse(BaseModel):
     """Audit log entry schema."""
+
     id: uuid.UUID
     user_id: uuid.UUID | None = None
     username: str | None = None
@@ -20,6 +21,7 @@ class AuditLogResponse(BaseModel):
 
 class AuditLogListResponse(BaseModel):
     """Paginated audit logs response."""
+
     items: list[AuditLogResponse]
     total: int
     page: int

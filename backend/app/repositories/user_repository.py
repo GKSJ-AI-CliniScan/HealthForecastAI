@@ -50,12 +50,7 @@ class UserRepository(BaseRepository[User]):
 
     def get_by_id_with_role(self, id_: uuid.UUID) -> User | None:
         """Find user with role preloaded."""
-        return (
-            self.db.query(User)
-            .options(joinedload(User.role_rel))
-            .filter(User.id == id_)
-            .first()
-        )
+        return self.db.query(User).options(joinedload(User.role_rel)).filter(User.id == id_).first()
 
     def list_users(
         self,

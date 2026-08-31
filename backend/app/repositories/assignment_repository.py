@@ -12,7 +12,9 @@ class AssignmentRepository(BaseRepository[DoctorPatientAssignment]):
     def __init__(self, db: Session):
         super().__init__(DoctorPatientAssignment, db)
 
-    def get_assignment(self, doctor_id: uuid.UUID, patient_id: uuid.UUID) -> DoctorPatientAssignment | None:
+    def get_assignment(
+        self, doctor_id: uuid.UUID, patient_id: uuid.UUID
+    ) -> DoctorPatientAssignment | None:
         """Find specific assignment by doctor and patient IDs."""
         return (
             self.db.query(DoctorPatientAssignment)

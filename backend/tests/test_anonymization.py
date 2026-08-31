@@ -4,7 +4,9 @@ import pytest
 from fastapi.testclient import TestClient
 
 
-def test_researcher_receives_anonymized_patient_list(client: TestClient, user_tokens: dict[str, str]):
+def test_researcher_receives_anonymized_patient_list(
+    client: TestClient, user_tokens: dict[str, str]
+):
     """Researcher must receive de-identified records with zero PII."""
     response = client.get("/api/v1/patients", headers={"Authorization": user_tokens["RESEARCHER"]})
     assert response.status_code == 200
@@ -30,12 +32,18 @@ def test_researcher_receives_anonymized_patient_list(client: TestClient, user_to
         assert "age_group" in patient
 
 
-def test_researcher_receives_anonymized_single_patient(client: TestClient, user_tokens: dict[str, str]):
+def test_researcher_receives_anonymized_single_patient(
+    client: TestClient, user_tokens: dict[str, str]
+):
     """Individual patient retrieval by Researcher must also be strictly anonymized."""
-    admin_resp = client.get("/api/v1/patients", headers={"Authorization": user_tokens["HOSPITAL_ADMIN"]})
+    admin_resp = client.get(
+        "/api/v1/patients", headers={"Authorization": user_tokens["HOSPITAL_ADMIN"]}
+    )
     pat_id = admin_resp.json()["items"][0]["id"]
 
-    res_resp = client.get(f"/api/v1/patients/{pat_id}", headers={"Authorization": user_tokens["RESEARCHER"]})
+    res_resp = client.get(
+        f"/api/v1/patients/{pat_id}", headers={"Authorization": user_tokens["RESEARCHER"]}
+    )
     assert res_resp.status_code == 200
     patient = res_resp.json()
 

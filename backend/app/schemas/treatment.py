@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class TreatmentBase(BaseModel):
     """Base clinical treatment fields."""
+
     treatment_name: str = Field(..., max_length=255)
     treatment_type: str | None = Field(None, max_length=128)
     start_date: date
@@ -17,11 +18,13 @@ class TreatmentBase(BaseModel):
 
 class TreatmentCreate(TreatmentBase):
     """Payload for creating treatment record."""
+
     patient_id: uuid.UUID | None = None
 
 
 class TreatmentUpdate(BaseModel):
     """Payload for updating treatment record."""
+
     treatment_name: str | None = None
     treatment_type: str | None = None
     start_date: date | None = None
@@ -32,6 +35,7 @@ class TreatmentUpdate(BaseModel):
 
 class TreatmentResponse(TreatmentBase):
     """Treatment response schema."""
+
     id: uuid.UUID
     patient_id: uuid.UUID
     created_at: datetime
