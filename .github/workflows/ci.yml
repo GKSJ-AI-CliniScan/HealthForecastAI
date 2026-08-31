@@ -136,11 +136,28 @@ jobs:
   # --------------------------------------------------------------------------
   # Backend: lint, format, type check, test.
   # --------------------------------------------------------------------------
+
   backend:
     name: Backend (FastAPI)
     needs: detect
     if: needs.detect.outputs.backend == 'true'
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: healthforecast
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d healthforecast"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     defaults:
       run:
         working-directory: backend
@@ -170,11 +187,22 @@ jobs:
         continue-on-error: true
         run: mypy app
 
+      - name: Initialize database schema
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql \
+            -h localhost \
+            -U postgres \
+            -d healthforecast \
+            -f ../database/postgres/schema/01_schema.sql
+
       - name: Tests (pytest)
         if: always()
         env:
           SECRET_KEY: ci-only-secret-not-used-anywhere-else
           ENVIRONMENT: test
+          DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/healthforecast
         run: pytest --cov=app --cov-report=term-missing --cov-report=xml
 
       - name: Upload coverage

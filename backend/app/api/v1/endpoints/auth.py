@@ -47,5 +47,3 @@ def list_roles() -> dict[str, list[str]]:
     """Expose the role catalogue and the permissions attached to each role."""
 
     return {str(role): permissions_for(role) for role in Role}
-
-

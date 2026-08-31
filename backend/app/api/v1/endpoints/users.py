@@ -34,6 +34,7 @@ def list_users(
 
     return [UserRead.model_validate(item) for item in users]
 
+
 @router.post(
     "",
     response_model=UserRead,

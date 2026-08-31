@@ -21,9 +21,7 @@ def list_patients(
     statement = select(Patient).order_by(Patient.id)
 
     if role is Role.DOCTOR:
-        statement = statement.where(
-            Patient.assigned_doctor_id == user_id
-        )
+        statement = statement.where(Patient.assigned_doctor_id == user_id)
 
     elif role is Role.HOSPITAL_ADMIN:
         # Hospital-wide access in the current schema.
@@ -62,15 +60,11 @@ def create_patient(
             raise ValueError("Assigned doctor is inactive")
 
     existing_patient = db.scalar(
-        select(Patient).where(
-            Patient.medical_record_number == payload.medical_record_number
-        )
+        select(Patient).where(Patient.medical_record_number == payload.medical_record_number)
     )
 
     if existing_patient is not None:
-        raise ValueError(
-            "A patient with this medical record number already exists"
-        )
+        raise ValueError("A patient with this medical record number already exists")
 
     patient = Patient(
         medical_record_number=payload.medical_record_number,

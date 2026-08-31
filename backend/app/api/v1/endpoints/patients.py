@@ -50,9 +50,7 @@ def list_patients(
 )
 def create_patient(
     payload: PatientCreate,
-    user: CurrentUser = Depends(
-        require_permission(Permission.PATIENT_WRITE)
-    ),
+    user: CurrentUser = Depends(require_permission(Permission.PATIENT_WRITE)),
     db: Session = Depends(get_db),
 ) -> PatientRead:
     """Create a patient record."""
@@ -79,9 +77,7 @@ def create_patient(
     summary="Anonymised patient cohort for researchers",
 )
 def list_anonymised_patients(
-    user: CurrentUser = Depends(
-        require_permission(Permission.PATIENT_READ_ANONYMIZED)
-    ),
+    user: CurrentUser = Depends(require_permission(Permission.PATIENT_READ_ANONYMIZED)),
 ) -> list[dict[str, str]]:
     """Return a de-identified cohort.
 

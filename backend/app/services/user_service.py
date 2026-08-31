@@ -38,9 +38,7 @@ def create_user(
 
     email = str(payload.email).lower()
 
-    existing_user = db.scalar(
-        select(User).where(User.email == email)
-    )
+    existing_user = db.scalar(select(User).where(User.email == email))
 
     if existing_user is not None:
         raise ValueError("A user with this email already exists")
