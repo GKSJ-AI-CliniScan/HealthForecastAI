@@ -2,7 +2,7 @@
 
 from datetime import date
 
-from sqlalchemy import Date, ForeignKey, Integer, String
+from sqlalchemy import CheckConstraint, Date, ForeignKey, Index, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -12,9 +12,18 @@ class Admission(Base):
     """A single inpatient encounter used as the unit of readmission prediction."""
 
     __tablename__ = "admissions"
+    __table_args__ = (
+        CheckConstraint(
+            "discharge_date IS NULL OR admission_date IS NULL OR discharge_date >= admission_date",
+            name="admissions_date_order_check",
+        ),
+        Index("idx_admissions_patient", "patient_id"),
+    )
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    patient_id: Mapped[int] = mapped_column(ForeignKey("patients.id"), index=True, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    patient_id: Mapped[int] = mapped_column(
+        ForeignKey("patients.id", ondelete="CASCADE"), nullable=False
+    )
     admission_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     discharge_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     time_in_hospital: Mapped[int | None] = mapped_column(Integer, nullable=True)

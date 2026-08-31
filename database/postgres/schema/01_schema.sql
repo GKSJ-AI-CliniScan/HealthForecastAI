@@ -34,6 +34,20 @@ CREATE TABLE IF NOT EXISTS patients (
 
 CREATE INDEX IF NOT EXISTS idx_patients_assigned_doctor ON patients (assigned_doctor_id);
 
+-- Scopes a doctor to the patients they may access. A patient can be co-managed by
+-- several doctors, so the assignment is a join table rather than a single column.
+CREATE TABLE IF NOT EXISTS doctor_patient_map (
+    id           SERIAL PRIMARY KEY,
+    doctor_id    INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    patient_id   INTEGER NOT NULL REFERENCES patients (id) ON DELETE CASCADE,
+    assigned_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    assigned_by  INTEGER REFERENCES users (id) ON DELETE SET NULL,
+    CONSTRAINT uq_doctor_patient UNIQUE (doctor_id, patient_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_dpm_doctor ON doctor_patient_map (doctor_id);
+CREATE INDEX IF NOT EXISTS idx_dpm_patient ON doctor_patient_map (patient_id);
+
 CREATE TABLE IF NOT EXISTS admissions (
     id                     SERIAL PRIMARY KEY,
     patient_id             INTEGER NOT NULL REFERENCES patients (id) ON DELETE CASCADE,
