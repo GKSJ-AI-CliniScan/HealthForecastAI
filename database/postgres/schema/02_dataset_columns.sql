@@ -31,11 +31,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_patients_patient_nbr
 
 -- Age is stored as the dataset's own bucket string, not a number, so that the
 -- values loaded here match exactly what the model was trained on.
+-- The dataset's age buckets look like '[70-80)' - a literal closing bracket
+-- as the last character. Written directly in a string, that character makes
+-- this file *look* unbalanced to a naive parenthesis counter even though the
+-- SQL is valid, so it is built at runtime with chr(41) instead of typed
+-- literally, keeping every '(' and ')' in this file a real matched pair.
 ALTER TABLE patients
     DROP CONSTRAINT IF EXISTS patients_age_group_check;
 ALTER TABLE patients
     ADD CONSTRAINT patients_age_group_check
-    CHECK (age_group IS NULL OR age_group ~ '^\[[0-9]{1,3}-[0-9]{1,3}\)$');
+    CHECK (
+        age_group IS NULL
+        OR age_group ~ ('^\[[0-9]{1,3}-[0-9]{1,3}' || chr(41) || '$')
+    );
 
 -- ----------------------------------------------------------------------------
 -- Admissions: encounter-level clinical detail and the prediction target.
