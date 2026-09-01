@@ -13,9 +13,7 @@ DIAGNOSIS_COLUMNS = ["diag_1", "diag_2", "diag_3"]
 EXPIRED_DISPOSITION_IDS = [11, 19, 20, 21]
 
 
-def drop_unused_columns(
-    frame: pd.DataFrame, columns: list[str]
-) -> pd.DataFrame:
+def drop_unused_columns(frame: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     """Drop identifier and high-missingness columns listed in the config."""
     present = [column for column in columns if column in frame.columns]
     return frame.drop(columns=present)
@@ -35,14 +33,10 @@ def remove_expired_patients(frame: pd.DataFrame) -> pd.DataFrame:
     if "discharge_disposition_id" not in frame.columns:
         return frame
 
-    return frame[
-        ~frame["discharge_disposition_id"].isin(EXPIRED_DISPOSITION_IDS)
-    ].copy()
+    return frame[~frame["discharge_disposition_id"].isin(EXPIRED_DISPOSITION_IDS)].copy()
 
 
-def collapse_rare_diagnoses(
-    frame: pd.DataFrame, max_frequency: int = 10
-) -> pd.DataFrame:
+def collapse_rare_diagnoses(frame: pd.DataFrame, max_frequency: int = 10) -> pd.DataFrame:
     """Collapse rarely occurring diagnosis codes into 'Other'."""
     cleaned = frame.copy()
 
@@ -58,15 +52,12 @@ def collapse_rare_diagnoses(
     return cleaned
 
 
-def basic_clean(
-    frame: pd.DataFrame, config: dict[str, Any]
-) -> pd.DataFrame:
+def basic_clean(frame: pd.DataFrame, config: dict[str, Any]) -> pd.DataFrame:
     """Apply the configured cleaning steps."""
     preprocessing = config.get("preprocessing", {})
 
     cleaned = frame.copy()
 
-    
     # Treat the configured token as a missing value.
     missing_token = preprocessing.get("missing_value_token", "?")
     cleaned = cleaned.replace(missing_token, float("nan"))
@@ -101,9 +92,7 @@ def build_preprocessor(
     numeric = [column for column in numeric if column != target_column]
     categorical = [column for column in categorical if column != target_column]
 
-    numeric_imputer = SimpleImputer(
-        strategy=preprocessing.get("numeric_imputation", "median")
-    )
+    numeric_imputer = SimpleImputer(strategy=preprocessing.get("numeric_imputation", "median"))
 
     numeric_steps = [("imputer", numeric_imputer)]
 
