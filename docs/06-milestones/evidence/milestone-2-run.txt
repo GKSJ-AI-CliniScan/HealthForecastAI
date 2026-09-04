@@ -1,0 +1,48 @@
+Dropped from features: ['readmitted', 'patient_nbr']
+Resolved feature columns (51): ['race', 'gender', 'age', 'admission_type_id', 'discharge_disposition_id', 'admission_source_id', 'time_in_hospital', 'medical_specialty', 'num_lab_procedures', 'num_procedures', 'num_medications', 'number_outpatient', 'number_emergency', 'number_inpatient', 'diag_1', 'diag_2', 'diag_3', 'number_diagnoses', 'max_glu_serum', 'A1Cresult', 'metformin', 'repaglinide', 'nateglinide', 'chlorpropamide', 'glimepiride', 'acetohexamide', 'glipizide', 'glyburide', 'tolbutamide', 'pioglitazone', 'rosiglitazone', 'acarbose', 'miglitol', 'troglitazone', 'tolazamide', 'insulin', 'glyburide-metformin', 'glipizide-metformin', 'glimepiride-pioglitazone', 'metformin-rosiglitazone', 'metformin-pioglitazone', 'change', 'diabetesMed', 'diag_1_group', 'diag_2_group', 'diag_3_group', 'age_numeric', 'age_group', 'total_prior_visits', 'num_med_changes', 'num_meds_prescribed']
+Leakage check passed: readmitted, readmitted_30d, encounter_id, patient_nbr all absent.
+Training set positive rate: 0.0898 (4399/48990)
+scale_pos_weight for XGBoost (negatives/positives): 10.1366
+logistic_regression: {
+  "accuracy": 0.660665809401343,
+  "precision": 0.13192834562697575,
+  "recall": 0.49801113762927607,
+  "f1": 0.20859713428857046,
+  "roc_auc": 0.6294541947247521,
+  "decision_threshold": 0.5153078582862499,
+  "validation_recall": 0.5007949125596184,
+  "validation_precision": 0.13108614232209737,
+  "true_negative": 8622,
+  "false_positive": 4119,
+  "false_negative": 631,
+  "true_positive": 626
+}
+random_forest: {
+  "accuracy": 0.6820260037148164,
+  "precision": 0.14224910394265233,
+  "recall": 0.5051710421638823,
+  "f1": 0.2219891627337878,
+  "roc_auc": 0.6485197375507143,
+  "decision_threshold": 0.5103968826509192,
+  "validation_recall": 0.5007949125596184,
+  "validation_precision": 0.1394422310756972,
+  "true_negative": 8912,
+  "false_positive": 3829,
+  "false_negative": 622,
+  "true_positive": 635
+}
+xgboost: {
+  "accuracy": 0.6868124017716817,
+  "precision": 0.14538444091630756,
+  "recall": 0.5099443118536198,
+  "f1": 0.22626191316625485,
+  "roc_auc": 0.6534365250227016,
+  "decision_threshold": 0.5096316933631897,
+  "validation_recall": 0.5071542130365659,
+  "validation_precision": 0.14253798033958892,
+  "true_negative": 8973,
+  "false_positive": 3768,
+  "false_negative": 616,
+  "true_positive": 641
+}
+Best model: xgboost (roc_auc=0.6534), promoted=True
