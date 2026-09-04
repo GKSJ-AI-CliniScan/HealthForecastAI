@@ -96,6 +96,21 @@ def record(
 # COST      : a second UPDATE + COMMIT on the same row, so a guarded request
 #             now does two audit writes instead of one; the row briefly
 #             exists with a transient outcome ("authorized") between the two.
+#             KNOWN GAP (A11, judged acceptable - see the N9 report's Known
+#             gaps): if the worker process dies in that window - between
+#             record()'s commit and this function's - the row is never
+#             corrected and stays "authorized" forever. Bounded by how many
+#             requests were in flight at the instant of a crash, not
+#             unbounded growth under normal operation. Read such a row as
+#             "authorized, outcome unknown - the process did not survive to
+#             record it", never as an implicit success or an implicit
+#             denial. No timeout-based sweep is implemented: a guessed
+#             "abandoned" state after N minutes could misclassify a
+#             legitimately slow request as badly as the crash it is meant to
+#             clean up, and this project has no scheduled-task
+#             infrastructure anywhere else to justify adding for a rare,
+#             already-honestly-labelled edge case (Section 8: no new
+#             dependencies without saying why first).
 # ALTERNATIVES : (1) write a second, separate row from the scoping layer
 #             (patient_service, risk_service) instead of correcting the
 #             first one; (2) leave the guard-level row as the only source of
