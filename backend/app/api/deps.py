@@ -11,7 +11,7 @@ because a token stays valid until it expires: without the reload, revoking
 someone's access would not take effect until then.
 """
 
-from collections.abc import Callable
+from collections.abc import Callable, Generator
 from dataclasses import dataclass
 
 from fastapi import Depends, HTTPException, Request, status
@@ -192,6 +192,56 @@ def _audit_denied(
     )
 
 
+# WHAT      : classify the exception a guarded request ended with into the
+#             audit table's terminal outcome - "denied" or "error" - rather
+#             than the guard-level record() call staying "success" just
+#             because the permission and account checks both passed.
+# WHY       : the permission check happens before row-level scoping (a
+#             doctor's own patient vs. someone else's) and before the
+#             endpoint's own business logic run at all. A doctor requesting
+#             a patient outside their assignment clears the permission and
+#             account checks, then patient_service/risk_service reject them
+#             with a 404 - by design, the same code as "does not exist" (see
+#             risk_service.assert_patient_in_scope's docstring). Both 404
+#             reasons are, from an audit standpoint, a denial: the caller
+#             did not get the record. A 503 or 409 is a different kind of
+#             failure - the caller was allowed to try, the system could not
+#             comply - and calling that "denied" would blur the one signal
+#             this table exists to give a compliance reviewer: was this
+#             person allowed to see this thing or not.
+# FOR WHOM  : the except-branch of both guards below, once per guarded
+#             request that raises after being authorized.
+# BENEFIT   : "denied" in this table means exactly one thing - the caller
+#             did not get access to what they asked for, whether that was
+#             caught at the permission layer or the row-scoping layer - and
+#             "error" means something else broke after access was granted.
+# COST      : a fixed status-code list to maintain; a future endpoint that
+#             introduces a new denial-shaped status code (e.g. 410 Gone for
+#             a deleted-but-remembered record) will silently classify as
+#             "error" unless this set is updated too.
+# ALTERNATIVES : (1) treat every non-2xx as "denied", collapsing a 503 model
+#             outage into the same bucket as a rejected access attempt; (2)
+#             treat every non-2xx as "error", which is what A6 exists to
+#             fix - a scoping 404 is unambiguously a denial, not a generic
+#             error.
+# CHOSEN BECAUSE : (1) would make "denied" noisy with pure outages, which is
+#             exactly the false signal a compliance query cannot afford; (2)
+#             is the defect A6 reports. A short, explicit status-code set
+#             tied to the actual codes this codebase's guarded endpoints
+#             raise for authorization/scope reasons (401, 403, 404) is more
+#             honest than guessing from the exception's class alone.
+_DENIAL_STATUS_CODES = frozenset(
+    {status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN, status.HTTP_404_NOT_FOUND}
+)
+
+
+def _outcome_for_exception(exc: BaseException) -> str:
+    """Classify a request-ending exception as a compliance "denied" or a plain "error"."""
+    if isinstance(exc, HTTPException) and exc.status_code in _DENIAL_STATUS_CODES:
+        return "denied"
+    return "error"
+
+
 def require_permission(permission: Permission) -> Callable[..., CurrentUser]:
     """Build a dependency that rejects callers lacking the given permission."""
 
@@ -222,7 +272,9 @@ def require_role(*roles: Role) -> Callable[..., CurrentUser]:
     return guard
 
 
-def require_verified_permission(permission: Permission) -> Callable[..., VerifiedUser]:
+def require_verified_permission(
+    permission: Permission,
+) -> Callable[..., Generator[VerifiedUser, None, None]]:
     """Guard on a permission, then confirm the account is still active.
 
     The permission is checked from the token claims first and the account is
@@ -231,32 +283,43 @@ def require_verified_permission(permission: Permission) -> Callable[..., Verifie
     cannot reach cannot be used to probe whether the database is up.
     """
 
-    # WHAT      : audit both ways this guard can end - permission missing,
-    #             account invalid, or fully verified - not just the success path.
+    # WHAT      : audit every way this guard can end - permission missing,
+    #             account invalid, authorized-then-denied-by-row-scope, or
+    #             actually completed - not just "the permission check passed".
     # WHY       : this factory backs every risk and patient-access endpoint, so
     #             it is the one place N1's "an entry on both success and denial"
     #             requirement can be satisfied once instead of once per route.
+    #             It runs before the endpoint body, so a permission+account
+    #             pass here does not yet mean the request will succeed: a
+    #             doctor requesting a patient outside their assignment clears
+    #             both checks and is only stopped afterwards, by row-level
+    #             scoping - the case A6 reported this guard was misreporting
+    #             as outcome="success".
     # FOR WHOM  : every endpoint built on require_verified_permission -
     #             currently all of risk.py and most of patients.py.
-    # BENEFIT   : a new endpoint that reuses this guard is audited automatically;
-    #             there is nothing extra for the next intern to remember to add.
-    # COST      : the guard now does up to two database round trips (the actor
-    #             lookup in _audit_denied, then verify_account's own lookup)
-    #             on a denied request, where before it did at most one.
-    # ALTERNATIVES : (1) log only successes, since a denial is already visible
-    #             as a 403 in the access logs; (2) log from inside each
-    #             endpoint body instead of the shared guard.
-    # CHOSEN BECAUSE : (1) is exactly what a compliance reviewer would reject -
-    #             "who tried and failed to read this patient" is the question
-    #             an audit trail exists to answer; (2) would mean patients.py
-    #             and risk.py both grow logging calls this guard already has
-    #             every fact needed to make, duplicating the same decision in
-    #             several places (against C10's spirit of one choke point).
+    # BENEFIT   : a new endpoint that reuses this guard is audited automatically,
+    #             and its final outcome reflects what actually happened to the
+    #             request, not just whether it was let past the door.
+    # COST      : the guard now does up to two database round trips on a
+    #             pre-endpoint denial (the actor lookup in _audit_denied, then
+    #             verify_account's own lookup), and two audit writes on a
+    #             request that clears both checks (one "authorized" row, then
+    #             one UPDATE once the outcome is known) instead of one.
+    # ALTERNATIVES : (1) log only the permission decision, since that used to
+    #             be the whole guard's job; (2) log from inside each endpoint
+    #             body once its own business logic concludes, instead of a
+    #             shared `yield`-based correction here.
+    # CHOSEN BECAUSE : (1) is the defect A6/A7 report - the permission
+    #             decision is not the same thing as what happened to the
+    #             request; (2) would mean patients.py and risk.py both grow
+    #             logging calls this guard already has every fact needed to
+    #             make (C10: extend the one choke point, do not duplicate the
+    #             decision across every route that uses it).
     def guard(
         request: Request,
         caller: CurrentUser = Depends(get_current_user),
         db: Session = Depends(get_db),
-    ) -> VerifiedUser:
+    ) -> Generator[VerifiedUser, None, None]:
         resource_type, resource_id = _resource_from_permission(permission, request)
         action = str(permission)
 
@@ -273,21 +336,34 @@ def require_verified_permission(permission: Permission) -> Callable[..., Verifie
             _audit_denied(db, caller, action, resource_type, resource_id)
             raise
 
-        audit_service.record(
+        entry = audit_service.record(
             db,
             actor_id=verified.id,
             actor_role=str(verified.role),
             action=action,
             resource_type=resource_type,
             resource_id=resource_id,
-            outcome="success",
+            outcome="authorized",
         )
-        return verified
+        # Exposed so an endpoint whose specific resource only becomes known
+        # after the request body is parsed (POST /risk/predict - see A8) can
+        # attach it via audit_service.attach_resource() without a second row.
+        request.state.audit_entry = entry
+
+        try:
+            yield verified
+        except Exception as exc:
+            audit_service.finalize(db, entry, _outcome_for_exception(exc))
+            raise
+        else:
+            audit_service.finalize(db, entry, "success")
 
     return guard
 
 
-def require_any_verified_permission(*permissions: Permission) -> Callable[..., VerifiedUser]:
+def require_any_verified_permission(
+    *permissions: Permission,
+) -> Callable[..., Generator[VerifiedUser, None, None]]:
     """Allow a verified caller holding at least one of the given permissions.
 
     Several roles reach the same endpoint through different rights: a doctor
@@ -295,7 +371,7 @@ def require_any_verified_permission(*permissions: Permission) -> Callable[..., V
     permission is checked before the account is reloaded.
     """
 
-    # WHAT      : audit both outcomes here too, same as require_verified_permission
+    # WHAT      : audit every outcome here too, same as require_verified_permission
     #             above - see that function's comment block for the full
     #             WHY/COST/ALTERNATIVES; this repeats only what differs.
     # WHY       : this factory guards the rest of patients.py (list, stats,
@@ -303,7 +379,10 @@ def require_any_verified_permission(*permissions: Permission) -> Callable[..., V
     #             needs its own audit call rather than inheriting the other
     #             factory's.
     # FOR WHOM  : every endpoint using require_any_verified_permission.
-    # BENEFIT   : same as above - centralised, automatic for future routes.
+    # BENEFIT   : same as above - centralised, automatic for future routes,
+    #             and the recorded outcome reflects the request's real ending
+    #             (e.g. a doctor's out-of-scope GET /patients/{id} is "denied",
+    #             not "success").
     # COST      : same as above, plus one nuance - on success the *granted*
     #             permission is logged (e.g. "patient:read_all" for an admin),
     #             not the full list offered to the route, so two roles hitting
@@ -318,7 +397,7 @@ def require_any_verified_permission(*permissions: Permission) -> Callable[..., V
         request: Request,
         caller: CurrentUser = Depends(get_current_user),
         db: Session = Depends(get_db),
-    ) -> VerifiedUser:
+    ) -> Generator[VerifiedUser, None, None]:
         resource_type, resource_id = (
             _resource_from_permission(permissions[0], request) if permissions else ("unknown", None)
         )
@@ -338,15 +417,23 @@ def require_any_verified_permission(*permissions: Permission) -> Callable[..., V
             _audit_denied(db, caller, str(granted), resource_type, resource_id)
             raise
 
-        audit_service.record(
+        entry = audit_service.record(
             db,
             actor_id=verified.id,
             actor_role=str(verified.role),
             action=str(granted),
             resource_type=resource_type,
             resource_id=resource_id,
-            outcome="success",
+            outcome="authorized",
         )
-        return verified
+        request.state.audit_entry = entry
+
+        try:
+            yield verified
+        except Exception as exc:
+            audit_service.finalize(db, entry, _outcome_for_exception(exc))
+            raise
+        else:
+            audit_service.finalize(db, entry, "success")
 
     return guard
