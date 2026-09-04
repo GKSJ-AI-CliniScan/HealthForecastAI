@@ -69,7 +69,12 @@ cd ml && python -m src.models.train    # the real run, not just import
 module from the brief) → `services/*.py` (business logic) → `repositories/`
 (DB access) → `models/*.py` (SQLAlchemy ORM). Request/response shapes live in
 `schemas/`. Two databases: PostgreSQL via `db/session.py`/SQLAlchemy for
-structured records, MongoDB via `db/mongodb.py` for notes/audit/model-run logs.
+structured records, MongoDB via `db/mongodb.py` for notes and model-run logs.
+Audit logs live in PostgreSQL (`models/audit_log.py`), not MongoDB: `actor_id`
+must stay a valid reference into the same relational `users` table under
+soft-delete (accounts are disabled, never deleted, precisely so audit history
+survives) - a referential-integrity guarantee Mongo's document model does not
+give for free.
 
 RBAC is central and is enforced server-side, never in the frontend:
 - `core/rbac.py` defines the four `Role`s, the `Permission` enum, and the
