@@ -33,6 +33,46 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 # the model can memorise, inflating scores on a dataset this size.
 IDENTIFIER_COLUMNS = ("encounter_id", "patient_nbr")
 
+# WHAT      : the four columns that must never appear in the resolved
+#             feature matrix, checked by name after every column-dropping
+#             step in main() has already run.
+# WHY       : "readmitted" is the target itself; "readmitted_30d" is the
+#             same target materialised as a column by
+#             src/data/build_dataset.py (a separate Milestone 1 script that
+#             writes ml/data/processed/admissions_features.csv for the
+#             backend seed - this training entrypoint never reads that file,
+#             but the column name is a real, named risk if that ever
+#             changes). "encounter_id"/"patient_nbr" are identifiers a model
+#             this size can memorise per-row, which would inflate every
+#             metric without generalising to an unseen patient.
+# FOR WHOM  : assert_no_leaked_columns(), called once in main() right after
+#             `features` is built and before any model is fit.
+# BENEFIT   : a leak is caught as a loud AssertionError before a single
+#             model trains, not discovered later as a suspiciously high
+#             ROC-AUC that has to be diagnosed after the fact.
+# COST      : a fixed list that has to be updated by hand if a fifth
+#             leak-shaped column is ever introduced - this check only knows
+#             about the four columns named in the M2 contract's C4.
+# ALTERNATIVES : (1) rely on IDENTIFIER_COLUMNS and dataset["target_column"]
+#             already being dropped from `features` and trust that without
+#             a runtime check; (2) diff the feature columns against the raw
+#             dataset's columns and flag anything that looks target-derived
+#             by a heuristic (e.g. name containing "readmit").
+# CHOSEN BECAUSE : (1) is exactly the "trust it worked" gap N2 exists to
+#             close - C4 requires the assertion to run, not just the drop to
+#             happen to be correct today; (2) is a heuristic that could
+#             either miss a genuine leak with an unrelated name or flag a
+#             legitimate feature, where an explicit named list is
+#             unambiguous and matches the four columns C4 names specifically.
+FORBIDDEN_FEATURE_COLUMNS = ("readmitted", "readmitted_30d", "encounter_id", "patient_nbr")
+
+
+def assert_no_leaked_columns(columns: list[str]) -> None:
+    """Raise if any of the four forbidden columns reached the feature matrix."""
+    leaked = [column for column in FORBIDDEN_FEATURE_COLUMNS if column in columns]
+    if leaked:
+        raise AssertionError(f"Leakage: forbidden column(s) reached the feature matrix: {leaked}")
+
 
 def resolve_path(value: str) -> Path:
     """Resolve a config path against the repository root.
@@ -101,6 +141,14 @@ def main() -> None:
     features = frame.drop(columns=drop_from_features)
     print(f"Dropped from features: {drop_from_features}")
 
+    # N2 (leakage proof): print the resolved feature-column list and assert
+    # none of the four forbidden columns reached it (C4), before any model
+    # sees a single row.
+    feature_columns = list(features.columns)
+    print(f"Resolved feature columns ({len(feature_columns)}): {feature_columns}")
+    assert_no_leaked_columns(feature_columns)
+    print("Leakage check passed: readmitted, readmitted_30d, encounter_id, patient_nbr all absent.")
+
     stratify = split.get("stratify", True)
     x_trainval, x_test, y_trainval, y_test = train_test_split(
         features,
@@ -120,6 +168,16 @@ def main() -> None:
         random_state=split["random_state"],
         stratify=y_trainval if stratify else None,
     )
+
+    # N2 (leakage proof): confirm the class-imbalance ratio XGBoost will use
+    # for scale_pos_weight, computed on the training split only.
+    train_positive_rate = float(sum(y_train)) / len(y_train)
+    train_scale_pos_weight = positive_class_weight(y_train)
+    print(
+        f"Training set positive rate: {train_positive_rate:.4f} "
+        f"({int(sum(y_train))}/{len(y_train)})"
+    )
+    print(f"scale_pos_weight for XGBoost (negatives/positives): {train_scale_pos_weight:.4f}")
 
     results: dict[str, dict[str, float]] = {}
     best_name: str | None = None
