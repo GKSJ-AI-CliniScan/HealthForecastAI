@@ -46,18 +46,24 @@ models:
   logistic_regression:
     enabled: true
     max_iter: 1000
+  # N3 lever 5 (RandomizedSearchCV, train-only CV, see
+  # ml/artifacts/n3_ledger.json): these five values replace the M1
+  # defaults with what the search found. Not the protected
+  # evaluation.thresholds bar (C1) - these are ordinary hyperparameters,
+  # which this file exists to hold.
   random_forest:
     enabled: true
-    n_estimators: 300
-    max_depth: 12
-    min_samples_leaf: 5
+    n_estimators: 200
+    max_depth: 8
+    min_samples_leaf: 10
+    max_features: 0.5
   xgboost:
     enabled: true
-    n_estimators: 400
+    n_estimators: 300
     max_depth: 6
-    learning_rate: 0.05
-    subsample: 0.8
-    colsample_bytree: 0.8
+    learning_rate: 0.01
+    subsample: 0.6
+    colsample_bytree: 0.6
 
 evaluation:
   primary_metric: roc_auc
