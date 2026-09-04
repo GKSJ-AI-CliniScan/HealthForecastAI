@@ -262,6 +262,20 @@ def bin_number_diagnoses(frame: pd.DataFrame) -> pd.DataFrame:
 #             work already done in preprocess.py without evidence either
 #             signal is more useful. Row-level only, no target or aggregate
 #             involved (B3).
+# RESULT (A14) : screened at -0.0058 CV ROC-AUC, REVERTED - see
+#             ml/artifacts/n3_ledger.json. The honest read is not "the raw
+#             codes carry no useful signal": build_preprocessor's
+#             OneHotEncoder already runs with min_frequency=0.01, so most of
+#             what this lever would remove - rare individual ICD-9 codes -
+#             was already being collapsed into an "infrequent" bucket by the
+#             encoder before this function ever ran. The screen (50 trees,
+#             3-fold) was also too weak to separate a delta this small from
+#             fold-to-fold noise (see cv_roc_auc_after_std in the ledger).
+#             The correct conclusion is "no improvement under a deliberately
+#             lightweight screen, likely because the encoder was already
+#             doing similar work, and the screen lacked the power to rule
+#             out a small real effect either way" - not "this lever does
+#             not help".
 def drop_raw_diagnosis_codes(frame: pd.DataFrame) -> pd.DataFrame:
     """Drop diag_1/diag_2/diag_3, keeping only their pre-computed clinical groups."""
     raw_diagnosis_columns = [c for c in ("diag_1", "diag_2", "diag_3") if c in frame.columns]

@@ -10,6 +10,18 @@ own split, same random_state, same test_size) and discards the test portion
 immediately with a leading underscore - there is no variable holding it that
 a later line could accidentally score against. Every lever's ROC-AUC comes
 from StratifiedKFold cross-validation over the training portion only.
+
+RESULT AND ITS LIMITS (A14, read before citing this ledger): levers 1-4
+were screened with SCREENING_RF_PARAMS (50 trees, 3-fold CV) after this
+machine was observed running 15-20x slower than expected under real desktop
+contention - see that constant's own comment block. All four deltas were
+between -0.002 and -0.006. The correct conclusion is "no lever showed an
+improvement under a deliberately lightweight screen, and the screen lacked
+the power to reliably separate an effect this small from fold-to-fold
+noise" - NOT "feature engineering does not help on this dataset". Lever 5
+(hyperparameter search) is not subject to this caveat: it was compared
+against config.yaml's actual, full-strength defaults, not the screening
+proxy (see the comment above rf_config_default_model in run()).
 """
 
 from __future__ import annotations
