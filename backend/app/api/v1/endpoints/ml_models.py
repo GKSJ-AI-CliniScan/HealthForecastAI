@@ -1,10 +1,11 @@
 """AI model management endpoints - Module 7 (System Administrator only)."""
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.deps import CurrentUser, require_permission
 from app.core.config import settings
 from app.core.rbac import Permission
+from app.services import model_service
 
 router = APIRouter()
 
@@ -31,9 +32,16 @@ def active_model(user: CurrentUser = Depends(_manage_models)) -> dict[str, str]:
 
 
 @router.get("/metrics", summary="Evaluation metrics for the active model")
-def model_metrics(user: CurrentUser = Depends(_manage_models)) -> dict[str, float | None]:
-    """Return accuracy, precision, recall, F1 and ROC-AUC for the active model.
+def model_metrics(user: CurrentUser = Depends(_manage_models)) -> dict[str, float]:
+    """Return accuracy, precision, recall, F1 and ROC-AUC for the best trained model.
 
-    TODO(milestone-2): populate from ml/src/evaluation/metrics.py output.
+    A missing or unreadable metrics.json is a 503, never a 200 with nulls
+    (C3): a null accuracy is indistinguishable from a real zero, and a
+    system administrator reading this needs to know which one it is.
     """
-    return {"accuracy": None, "precision": None, "recall": None, "f1": None, "roc_auc": None}
+    try:
+        return model_service.read_best_model_metrics()
+    except model_service.ModelUnavailableError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)
+        ) from exc
