@@ -93,7 +93,7 @@ Running each service directly, without Docker, is covered in
 | Milestone | Weeks | Theme | Status on `main` |
 |-----------|-------|-------|------------------|
 | 1 | 1-2 | Project initialization, design process and core setup | **Complete** |
-| 2 | 3-4 | Risk prediction and readmission forecasting | Not started |
+| 2 | 3-4 | Risk prediction and readmission forecasting | **Complete** |
 | 3 | 5-6 | Treatment effectiveness analysis and healthcare analytics | Not started |
 | 4 | 7-8 | Testing, deployment and documentation | Not started |
 
@@ -101,22 +101,26 @@ Report templates and evaluation criteria: [`docs/06-milestones/`](docs/06-milest
 
 ### What works today
 
-`main` carries a working Milestone 1 reference implementation:
+`main` carries a working reference implementation of Milestones 1 and 2:
 
 - JWT authentication with bcrypt hashing, audited logins, and immediate session
   revocation when an account is deactivated
 - The full access matrix enforced in code and pinned by tests, with scoping
   applied inside the SQL query rather than after it
 - Patient management with search, pagination and admission history
-- Role-aware dashboards for all four roles, built with real aggregates
+- Role-aware dashboards for all four roles, built from real aggregates
 - The Diabetes 130-US Hospitals dataset loaded: 101,766 raw encounters cleaned
   to 69,990, an 8.98% 30-day readmission rate
+- 30-day readmission risk scoring: a calibrated model serving real-time and
+  batch predictions, risk banding, forecasting and global risk drivers.
+  ROC-AUC 0.65; the high band runs **2.86x** the baseline readmission rate, and
+  the forecast lands within **1.6%** of the observed count
 
-Risk prediction, treatment effectiveness and clinical decision support endpoints
-are routed and authorised but return placeholder data, tagged
-`TODO(milestone-2)` and `TODO(milestone-3)`.
+Treatment effectiveness and clinical decision support endpoints are routed and
+authorised but return placeholder data, tagged `TODO(milestone-3)`.
 
-Full write-up: [`docs/06-milestones/milestone-1.md`](docs/06-milestones/milestone-1.md).
+Full write-ups: [milestone-1](docs/06-milestones/milestone-1.md) ·
+[milestone-2](docs/06-milestones/milestone-2.md).
 
 ## Continuous integration
 

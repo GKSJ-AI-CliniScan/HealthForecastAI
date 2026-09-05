@@ -75,6 +75,7 @@ export interface DashboardSummary {
   readmissions_within_30_days: number;
   readmission_rate: number;
   average_length_of_stay: number;
+  risk_distribution?: Record<RiskCategory, number>;
 }
 
 export interface AgeBandStat {
@@ -101,4 +102,61 @@ export interface PopulationHealth {
   by_gender: { gender: string; patients: number }[];
   by_race: { race: string; patients: number }[];
   by_age_group: AgeBandStat[];
+}
+
+// ---------- Milestone 2: risk prediction ----------
+
+export interface RiskDriver {
+  feature: string;
+  weight: number;
+  direction: string;
+}
+
+export interface ScoredPatient {
+  patient_id: number;
+  medical_record_number: string;
+  age_group: string | null;
+  gender: string | null;
+  primary_diagnosis: string | null;
+  readmission_probability: number;
+  risk_category: RiskCategory;
+  model_version: string;
+}
+
+export type ScoredPatientPage = Page<ScoredPatient>;
+
+export interface ReadmissionForecast {
+  scope: 'caseload' | 'hospital';
+  horizon_days: number;
+  patients_scored: number;
+  expected_readmissions: number;
+  expected_rate: number;
+  risk_distribution: Record<RiskCategory, number>;
+  model_version: string | null;
+  basis: string;
+}
+
+export interface CalibrationBand {
+  risk_category: RiskCategory;
+  patients: number;
+  predicted_rate: number;
+  observed_readmissions: number;
+  observed_rate: number;
+}
+
+export interface CalibrationReport {
+  bands: CalibrationBand[];
+}
+
+export interface PatientRiskScore {
+  patient_id: number;
+  readmission_probability: number;
+  risk_category: RiskCategory;
+  flagged: boolean;
+  decision_threshold: number;
+  model_name: string;
+  model_version: string;
+  features_supplied?: number | null;
+  features_expected?: number | null;
+  created_at?: string | null;
 }

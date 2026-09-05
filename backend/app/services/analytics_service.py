@@ -55,6 +55,11 @@ def dashboard_summary(db: Session, actor: User) -> dict[str, object]:
     readmitted = readmitted or 0
     readmission_rate = (readmitted / total_admissions) if total_admissions else 0.0
 
+    # Risk banding arrived in Milestone 2. Import here rather than at module
+    # scope: risk_service imports the analytics models, and a top-level import
+    # in both directions would be circular.
+    from app.services import risk_service
+
     return {
         "scope": "caseload" if actor.role == Role.DOCTOR else "hospital",
         "total_patients": total_patients,
@@ -62,6 +67,7 @@ def dashboard_summary(db: Session, actor: User) -> dict[str, object]:
         "readmissions_within_30_days": int(readmitted),
         "readmission_rate": round(readmission_rate, 4),
         "average_length_of_stay": round(float(avg_stay or 0.0), 2),
+        "risk_distribution": risk_service.risk_distribution(db, actor),
     }
 
 

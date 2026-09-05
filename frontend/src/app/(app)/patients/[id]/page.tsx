@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { KpiCard } from '@/components/ui/KpiCard';
+import { RiskBadge, RiskMeter } from '@/components/ui/RiskBadge';
 import { EmptyBlock, ErrorBlock, Loading } from '@/components/ui/StateBlock';
 import { useApi } from '@/hooks/useApi';
-import type { PatientDetail } from '@/types';
+import type { PatientDetail, PatientRiskScore } from '@/types';
 
 const READMISSION_LABEL: Record<string, string> = {
   '<30': 'Readmitted within 30 days',
@@ -16,6 +17,9 @@ const READMISSION_LABEL: Record<string, string> = {
 export default function PatientDetailPage() {
   const params = useParams<{ id: string }>();
   const { data, error, loading } = useApi<PatientDetail>(`/patients/${params.id}`);
+  // A 404 here just means this patient has not been scored yet, which is a
+  // normal state - the page renders without the risk panel.
+  const risk = useApi<PatientRiskScore>(`/risk/patients/${params.id}`);
 
   if (loading) return <Loading />;
   if (error) {
@@ -69,6 +73,53 @@ export default function PatientDetailPage() {
         />
         <KpiCard label="Average stay" value={`${averageStay} days`} />
       </section>
+
+      {risk.data ? (
+        <section className="card">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold">30-day readmission risk</h2>
+              <p className="muted mt-1 text-sm">
+                {risk.data.model_name} v{risk.data.model_version}
+                {risk.data.flagged ? ' · flagged for review' : ' · below the review threshold'}
+              </p>
+            </div>
+            <RiskBadge category={risk.data.risk_category} />
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-6">
+            <div>
+              <p className="muted text-xs font-semibold uppercase tracking-wide">
+                Probability
+              </p>
+              <p className="mt-1 text-3xl font-semibold">
+                {(risk.data.readmission_probability * 100).toFixed(1)}%
+              </p>
+            </div>
+            <div className="min-w-40">
+              <p className="muted text-xs font-semibold uppercase tracking-wide">
+                Against the cohort
+              </p>
+              <div className="mt-2">
+                <RiskMeter probability={risk.data.readmission_probability} />
+              </div>
+            </div>
+            <div>
+              <p className="muted text-xs font-semibold uppercase tracking-wide">
+                Review threshold
+              </p>
+              <p className="mt-1 text-sm tabular-nums">
+                {(risk.data.decision_threshold * 100).toFixed(1)}%
+              </p>
+            </div>
+          </div>
+
+          <p className="muted mt-4 text-xs">
+            The baseline 30-day readmission rate across this record is 9.0%. A high-risk
+            patient runs roughly three times that.
+          </p>
+        </section>
+      ) : null}
 
       <section className="card">
         <h2 className="text-lg font-semibold">Clinical summary</h2>
@@ -139,7 +190,8 @@ export default function PatientDetailPage() {
       </section>
 
       <p className="muted text-xs">
-        Risk scoring and care recommendations for this patient arrive in Milestone 2.
+        Care recommendations and discharge planning for this patient arrive in
+        Milestone 3.
       </p>
     </div>
   );

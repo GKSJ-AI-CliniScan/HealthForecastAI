@@ -16,6 +16,7 @@ interface NavItem {
 const NAV: NavItem[] = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/patients', label: 'Patients', permission: 'patient:read_assigned' },
+  { href: '/risk', label: 'Risk', permission: 'risk_report:read' },
   { href: '/analytics', label: 'Analytics', permission: 'hospital_analytics:read' },
   { href: '/research', label: 'Research', permission: 'population_health:read' },
   { href: '/users', label: 'Users', permission: 'user:manage' },
