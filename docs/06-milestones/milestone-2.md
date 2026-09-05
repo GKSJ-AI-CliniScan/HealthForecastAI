@@ -34,10 +34,9 @@ throughout this document, never the offline pair alone. The reason is
 structural, not a training defect: `RiskPredictionRequest` collects 7
 fields; the model was trained on 51. Every real request fills the other 44
 with population-typical defaults. `evidence/a16-serving-fidelity.md` is the
-full measurement and root-cause writeup; `evidence/a20`'s ranked remedy
-(inside that same file, section (d)) names exactly which additional fields
-would close most of the gap and what each would cost to collect. This was
-not fixed this milestone - see Known gaps.
+full measurement and root-cause writeup; its section (d) ranks exactly
+which additional fields would close most of the gap and what each would
+cost to collect. This was not fixed this milestone - see Known gaps.
 
 **Risk prediction (`POST /risk/predict`, `backend/app/api/v1/endpoints/risk.py`).**
 Scores one admission through `risk_service.score_admission`, which enforces
@@ -98,7 +97,10 @@ set; asserts the four forbidden columns (`readmitted`, `readmitted_30d`,
 `encounter_id`, `patient_nbr`) are absent before any model is fit
 (`assert_no_leaked_columns`, exercised on every real run and unit-tested in
 `ml/tests/test_train.py`); tunes a decision threshold per model against a
-validation split, never the test set; and, this milestone, calibrates the
+validation split, never the test set - a code-structure guarantee (`main()`
+calls `select_decision_threshold` on `x_val`/`y_val` and only then scores
+`x_test`/`y_test`), not something a dedicated unit test asserts; and, this
+milestone, calibrates the
 promoted estimator's `predict_proba` output to match observed prevalence
 (`evidence/a28-calibration-fix.md`) after that defect was found by
 comparing this branch's own promoted artefact against the reference

@@ -56,6 +56,34 @@ _FACTOR_DESCRIPTIONS: dict[str, str] = {
 }
 
 
+# WHAT      : split a ColumnTransformer output name on its transformer
+#             prefix, then match the remainder against the transformer's
+#             known input columns by longest prefix, to recover which
+#             original column produced it.
+# WHY       : "categorical__age_group_60+" must resolve to "age_group", not
+#             to a shorter column name that also happens to prefix the
+#             string - this dataset has exactly that shape of collision
+#             ("diag_1" is a prefix of "diag_1_group"), so a naive
+#             first-match or shortest-match search would silently
+#             misattribute importance from one column onto a different one.
+# FOR WHOM  : _aggregate_importance_by_column(), once per output name in the
+#             fitted ColumnTransformer's get_feature_names_out().
+# BENEFIT   : correct attribution even when one candidate column name is a
+#             literal substring of another - the only case this project's
+#             own 51-column feature set actually presents.
+# COST      : sorting candidates by length on every call is O(n log n) in
+#             the number of columns feeding that transformer, recomputed per
+#             output name rather than once per pipeline - negligible at 51
+#             columns, but not free at a much larger feature count.
+# ALTERNATIVES : (1) match the first candidate found, in whatever order
+#             columns_by_transformer happens to iterate; (2) require exact
+#             equality only, treating any one-hot suffix as unresolvable.
+# CHOSEN BECAUSE : (1) is exactly what breaks on "diag_1" vs "diag_1_group" -
+#             whichever happens to come first in the dict wins, silently,
+#             for every affected column; (2) would make every categorical
+#             column's one-hot outputs unattributable, defeating the whole
+#             point of this function for the categorical half of the
+#             feature set.
 def _original_column(transformed_name: str, columns_by_transformer: dict[str, list[str]]) -> str:
     """Map one ColumnTransformer output name back to its original input column.
 
