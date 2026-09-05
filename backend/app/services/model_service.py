@@ -165,15 +165,62 @@ def model_version() -> str:
     return version
 
 
+# WHAT      : unwrap the cached artefact down to the sklearn Pipeline
+#             underneath, if the artefact is not a bare Pipeline itself.
+# WHY       : A28 - ml/src/models/train.py now wraps the fitted pipeline in
+#             a CalibratedClassifierCV (over a FrozenEstimator) to correct
+#             predict_proba's scale. CalibratedClassifierCV does not expose
+#             `.named_steps` itself; the two callers below need it for
+#             feature-importance introspection (predict_proba, the only
+#             thing predict_probability() needs, works identically on
+#             either shape and needs no unwrapping).
+# FOR WHOM  : loaded_pipeline() and _expected_columns(), the two places that
+#             read `.named_steps`/`.transformers_` rather than just scoring.
+# BENEFIT   : one place decides how to reach the underlying pipeline; an
+#             artefact that is already a bare Pipeline (no calibration
+#             configured, or an older artefact from before this fix) still
+#             works unchanged.
+# COST      : reaches into CalibratedClassifierCV's private-by-convention
+#             `.calibrated_classifiers_[0].estimator` structure. FrozenEstimator
+#             delegates attribute access to what it wraps (confirmed against
+#             the installed scikit-learn, not assumed), so one level of
+#             unwrapping is enough for the shape this project's train.py
+#             actually produces - it is not a generic unwrapper for
+#             arbitrarily nested estimators.
+# ALTERNATIVES : (1) have train.py persist the original Pipeline and the
+#             CalibratedClassifierCV as two separate artefacts; (2) store
+#             the feature columns/importances at training time instead of
+#             re-deriving them from the loaded object at request time.
+# CHOSEN BECAUSE : (1) reintroduces the two-files-that-must-stay-in-sync
+#             problem the reference comparison flagged as one of its own
+#             strengths over a single self-describing artefact - one file
+#             stays simpler than two; (2) would work but changes what
+#             predict_probability()/loaded_pipeline() are responsible for
+#             (serving vs. persisting derived metadata) for a saving that
+#             only matters if introspection turns out to be a hot path,
+#             which it is not (once per prediction request, at most).
+def _underlying_pipeline(estimator: Any) -> Any:
+    """Return the sklearn Pipeline inside estimator, unwrapping calibration if present."""
+    if hasattr(estimator, "named_steps"):
+        return estimator
+    calibrated_classifiers = getattr(estimator, "calibrated_classifiers_", None)
+    if calibrated_classifiers:
+        candidate = calibrated_classifiers[0].estimator
+        if hasattr(candidate, "named_steps"):
+            return candidate
+    return None
+
+
 def loaded_pipeline() -> Any:
-    """Return the cached pipeline object, loading it on first use.
+    """Return the cached artefact's underlying Pipeline, loading it on first use.
 
     Exposed so cds_service can introspect the fitted model's feature
     importances without reaching into _cache directly - same single-load
-    path predict_probability uses, not a second loader.
+    path predict_probability uses, not a second loader. Returns the Pipeline
+    itself even when the cached artefact is a calibrated wrapper around it.
     """
     pipeline, _ = _cache.load()
-    return pipeline
+    return _underlying_pipeline(pipeline)
 
 
 # WHAT      : return every column name the pipeline's fitted ColumnTransformer
@@ -220,8 +267,11 @@ def loaded_pipeline() -> Any:
 #             made unilaterally (see this phase's checkpoint).
 def _expected_columns(pipeline: Any) -> set[str]:
     """Return the full set of column names the pipeline's preprocessor needs."""
-    preprocess = pipeline.named_steps.get("preprocess")
+    inner = _underlying_pipeline(pipeline)
     columns: set[str] = set()
+    if inner is None:
+        return columns
+    preprocess = inner.named_steps.get("preprocess")
     if preprocess is not None and hasattr(preprocess, "transformers_"):
         for _, _, selected in preprocess.transformers_:
             if isinstance(selected, list | tuple):

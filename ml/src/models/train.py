@@ -10,7 +10,9 @@ from pathlib import Path
 from typing import Any
 
 import joblib
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.frozen import FrozenEstimator
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -118,6 +120,73 @@ def build_estimator(name: str, params: dict[str, Any], y_train: Any = None) -> A
     raise ValueError(f"Unknown model: {name}")
 
 
+# WHAT      : wrap an already-fitted pipeline so its predict_proba output is
+#             rescaled to match observed prevalence, fit on a split disjoint
+#             from both training and test.
+# WHY       : found while comparing this project's own promoted artifact
+#             against a second, independently-built implementation of this
+#             same brief (see docs/06-milestones/evidence/reference-comparison.md):
+#             class_weight="balanced" (logistic_regression, random_forest)
+#             and scale_pos_weight (xgboost) both train the estimator as if
+#             the classes were roughly 50/50, which is exactly what ranking
+#             (ROC-AUC) wants, but leaves predict_proba centred on that
+#             fictional 50/50 prior instead of the real ~9% prevalence.
+#             Measured directly on this project's promoted xgboost artifact
+#             before this fix: mean predicted probability 0.4564 against a
+#             true prevalence of 0.0898 - about 5x too high. Every fixed
+#             absolute cutoff downstream (the 0.40/0.70 risk bands) and every
+#             sum-of-probabilities aggregate (/risk/forecast) inherits that
+#             distortion; a threshold tuned per-model on this same
+#             mis-scaled output does not.
+# FOR WHOM  : main(), once per enabled model, between fitting on x_train and
+#             selecting a decision threshold on x_val - so both the
+#             threshold search and the final test-set scoring run on
+#             probabilities that mean what they say.
+# BENEFIT   : predict_proba's output becomes interpretable on its own terms -
+#             "this patient's probability" stops requiring a silent mental
+#             correction for the training-time class weighting - without
+#             retraining the underlying estimator or discarding its ranking.
+# COST      : one more fitted object between the raw estimator and its
+#             output, one more validation-split use (calibration and
+#             threshold selection now share x_val - legitimate, since
+#             neither ever touches test, but a smaller val split would make
+#             both noisier), and a second wrapper class to keep compatible
+#             with any code that expects a bare Pipeline
+#             (backend/app/services/model_service.py's `.named_steps` access
+#             for feature-importance introspection - handled there by
+#             unwrapping the fitted calibrator back to the pipeline it wraps).
+# ALTERNATIVES : (1) drop class_weight="balanced"/scale_pos_weight entirely
+#             and let the estimators train on the true ~9% prior directly;
+#             (2) Platt scaling (method="sigmoid") instead of isotonic.
+# CHOSEN BECAUSE : (1) would very likely cost real recall - published work
+#             on imbalanced clinical outcomes consistently finds
+#             class-weighted training finds the minority class better than
+#             training on the raw prior, and undoing that here risks
+#             reversing N3/P4's tuning work rather than just rescaling its
+#             output; the M2 contract also treats class_weight as the
+#             chosen imbalance strategy (config.yaml's `imbalance.strategy`),
+#             not something to remove mid-milestone. (2) assumes the
+#             distortion is sigmoid-shaped; the calibration split here has
+#             several thousand rows (comfortably above the "isotonic
+#             overfits under roughly 1000 samples" caution in scikit-learn's
+#             own calibration guidance), so a non-parametric fit can follow
+#             whatever shape the class-weighting actually produced instead
+#             of assuming one in advance.
+def calibrate_probabilities(
+    fitted_pipeline: Pipeline, x_calibration: Any, y_calibration: Any
+) -> Any:
+    """Return a calibrated wrapper around an already-fitted pipeline.
+
+    The pipeline is frozen (never refit) and calibrated once against the
+    given data - the caller is responsible for that data being disjoint from
+    whatever fit the pipeline. Isotonic regression is monotonic, so ranking
+    (and therefore ROC-AUC) is unaffected; only the probability scale moves.
+    """
+    calibrated = CalibratedClassifierCV(FrozenEstimator(fitted_pipeline), method="isotonic")
+    calibrated.fit(x_calibration, y_calibration)
+    return calibrated
+
+
 def main() -> None:
     """Train every enabled model, keep the best one and persist it."""
     parser = argparse.ArgumentParser(description="Train readmission risk models")
@@ -181,7 +250,10 @@ def main() -> None:
 
     results: dict[str, dict[str, float]] = {}
     best_name: str | None = None
-    best_pipeline: Pipeline | None = None
+    # Not typed as Pipeline: this is calibrate_probabilities()'s output, a
+    # CalibratedClassifierCV wrapping the fitted pipeline, not the pipeline
+    # itself.
+    best_pipeline: Any | None = None
     best_score = -1.0
     primary = config["evaluation"]["primary_metric"]
     thresholds = config["evaluation"]["thresholds"]
@@ -198,30 +270,47 @@ def main() -> None:
         )
         pipeline.fit(x_train, y_train)
 
+        # Uncalibrated mean probability on the test set, purely to report the
+        # before/after gap this fixes - not used for anything downstream.
+        uncalibrated_test_mean = float(pipeline.predict_proba(x_test)[:, 1].mean())
+
+        # Calibrated against x_val/y_val - disjoint from x_train (what fit
+        # the pipeline) and from x_test (touched once, below, for final
+        # numbers only). See calibrate_probabilities()'s comment block for
+        # why this is needed at all.
+        calibrated = calibrate_probabilities(pipeline, x_val, y_val)
+
         # The default 0.5 cutoff from predict() is not tuned to the recall the
         # platform needs, so pick the operating point off the precision-recall
         # curve instead. It is selected on the validation split and only then
         # applied to the test split - choosing it on the test set itself would
         # bias the reported test recall/precision upward.
-        y_proba_val = pipeline.predict_proba(x_val)[:, 1]
+        y_proba_val = calibrated.predict_proba(x_val)[:, 1]
         decision_threshold, val_precision, val_recall = select_decision_threshold(
             y_val, y_proba_val, min_recall
         )
 
-        y_proba_test = pipeline.predict_proba(x_test)[:, 1]
+        y_proba_test = calibrated.predict_proba(x_test)[:, 1]
         y_pred_test = (y_proba_test >= decision_threshold).astype(int)
+        calibrated_test_mean = float(y_proba_test.mean())
 
         metrics = classification_metrics(y_test, y_pred_test, y_proba_test)
         metrics["decision_threshold"] = decision_threshold
         metrics["validation_recall"] = val_recall
         metrics["validation_precision"] = val_precision
+        metrics["mean_predicted_probability_uncalibrated"] = uncalibrated_test_mean
+        metrics["mean_predicted_probability_calibrated"] = calibrated_test_mean
         metrics.update(confusion_counts(y_test, y_pred_test))
         results[name] = metrics
         print(f"{name}: {json.dumps(metrics, indent=2)}")
+        print(
+            f"{name}: mean predicted probability - uncalibrated={uncalibrated_test_mean:.4f}, "
+            f"calibrated={calibrated_test_mean:.4f}, true prevalence={float(y_test.mean()):.4f}"
+        )
 
         if metrics.get(primary, -1.0) > best_score:
             best_name = name
-            best_pipeline = pipeline
+            best_pipeline = calibrated
             best_score = metrics[primary]
 
     if best_pipeline is None or best_name is None:

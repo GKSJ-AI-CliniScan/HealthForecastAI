@@ -6,6 +6,25 @@ request through the current API, not the **0.6534 / 0.5099** its offline
 evaluation reported. Both numbers are true. They answer different
 questions. Neither should be quoted alone.
 
+**Update after A28's calibration fix (A30):** re-measured on the calibrated
+artefact. The as-served figures barely move and the picture is unchanged:
+
+| | Offline | As served (7 supplied, 44 imputed) |
+|---|---|---|
+| Uncalibrated ROC-AUC / recall | 0.6534 / 0.5099 | 0.5991 / 0.0994 |
+| Calibrated ROC-AUC / recall | 0.6518 / 0.5099 | 0.5881 / **0.0994** |
+
+Recall as-served is **bit-for-bit identical** before and after calibration
+(0.09944311853619729 both times) — same accuracy, same precision, same F1
+too. Calibration is a monotonic rescaling of the probability axis; it
+cannot change which side of a threshold a row falls on when the threshold
+was re-selected on the same (also rescaled) validation data, and it does
+nothing at all about the actual cause of this gap - 44 of 51 features
+arriving as imputed defaults. **Calibration and the serving-contract gap
+are two separate defects.** Fixing the first (A28) did not, and could not,
+fix the second. A caller of `/risk/predict` today still gets a model that
+catches roughly 1 readmission in 10, not 1 in 2, regardless of calibration.
+
 ---
 
 ## (a) The mechanism
