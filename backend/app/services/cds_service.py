@@ -109,7 +109,15 @@ def _original_column(transformed_name: str, columns_by_transformer: dict[str, li
 #             docstring - association from global importance, not a
 #             per-patient causal decomposition).
 def _aggregate_importance_by_column(pipeline: Any) -> dict[str, float]:
-    """Return {original_column: summed_importance} for a fitted pipeline."""
+    """Return {original_column: summed_importance} for a fitted pipeline.
+
+    pipeline may be None - model_service.loaded_pipeline() returns that when
+    the cached artefact's shape is not one it can unwrap to a Pipeline (see
+    model_service._underlying_pipeline) - treated the same as "no importance
+    mechanism available": an empty dict, not a crash.
+    """
+    if pipeline is None:
+        return {}
     preprocess = pipeline.named_steps.get("preprocess")
     model = pipeline.named_steps.get("model")
     if preprocess is None or model is None:
