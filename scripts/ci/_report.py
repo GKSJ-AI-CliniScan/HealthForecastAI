@@ -102,3 +102,26 @@ class Report:
             return 1
         print(f"{self.check}: OK ({len(self.warnings)} warning(s)).")
         return 0
+
+
+def write_summary(markdown: str) -> None:
+    """Append free-form markdown to the GitHub Actions job summary.
+
+    The Report class above is for pass/fail checks. Some scripts - the cohort
+    report, for one - produce a document rather than a verdict, and this is how
+    they get it onto the run summary page.
+    """
+    path = os.environ.get("GITHUB_STEP_SUMMARY")
+    if path:
+        with open(path, "a", encoding="utf-8") as handle:
+            handle.write(markdown.rstrip() + "\n")
+    else:
+        print(markdown)
+
+
+def warn_annotation(message: str) -> None:
+    """Emit a standalone workflow warning."""
+    if IS_GITHUB:
+        print(f"::warning::{message}")
+    else:
+        print(f"[warning] {message}")

@@ -1,0 +1,45 @@
+# HealthForecast AI internship roster — 26 interns, AI domain.
+# Source: "Predictive Healthcare Intelligence System for Patient Readmission and
+# Resource Optimization.xlsx"
+#
+# This file is the single source of truth for branch naming. CI reads it to verify
+# that every pushed branch belongs to a known intern.
+#
+# Keep the one-line-per-intern format below — the CI parser depends on it.
+# Mentors: to add or correct an entry, edit this file on `main` only.
+#
+# Email addresses are deliberately NOT stored here. The roster needs a name and a
+# branch; putting 26 people's personal addresses in a repository does not.
+
+project: "HealthForecast AI: Hospital Readmission Prediction & Patient Risk Intelligence System"
+domain: "AI"
+protected_branch: "main"
+branch_prefix: "intern/"
+
+interns:
+  - { id: "01", name: "Mamidi Srija Reddy", branch: "intern/01-mamidi-srija-reddy" }
+  - { id: "02", name: "Padarthi Dhana Lakshmi", branch: "intern/02-padarthi-dhana-lakshmi" }
+  - { id: "03", name: "Kanchan Anamika Maheshwari", branch: "intern/03-kanchan-anamika-maheshwari" }
+  - { id: "04", name: "Nandini Varshney", branch: "intern/04-nandini-varshney" }
+  - { id: "05", name: "Suravarapu Durga Prasad", branch: "intern/05-suravarapu-durga-prasad" }
+  - { id: "06", name: "G Chandrasekhar Reddy", branch: "intern/06-g-chandrasekhar-reddy" }
+  - { id: "07", name: "Mujahad Ahmed", branch: "intern/07-mujahad-ahmed" }
+  - { id: "08", name: "Vaishnavi Agrahari", branch: "intern/08-vaishnavi-agrahari" }
+  - { id: "09", name: "Pasam Sai Divyasri", branch: "intern/09-pasam-sai-divyasri" }
+  - { id: "10", name: "Saumya S", branch: "intern/10-saumya-s" }
+  - { id: "11", name: "Kanak Prabhakar", branch: "intern/11-kanak-prabhakar" }
+  - { id: "12", name: "Chilukuri Venugopal", branch: "intern/12-chilukuri-venugopal" }
+  - { id: "13", name: "Rambilas Sah", branch: "intern/13-rambilas-sah" }
+  - { id: "14", name: "Samarth A C", branch: "intern/14-samarth-a-c" }
+  - { id: "15", name: "Sattu Penchala Prasad", branch: "intern/15-sattu-penchala-prasad" }
+  - { id: "16", name: "Deepak Rajak", branch: "intern/16-deepak-rajak" }
+  - { id: "17", name: "Komakula Mahesh", branch: "intern/17-komakula-mahesh" }
+  - { id: "18", name: "Raniya Raseen M M", branch: "intern/18-raniya-raseen-m-m" }
+  - { id: "19", name: "Niyati R", branch: "intern/19-niyati-r" }
+  - { id: "20", name: "Kiruthika B", branch: "intern/20-kiruthika-b" }
+  - { id: "21", name: "Rachana M N", branch: "intern/21-rachana-m-n" }
+  - { id: "22", name: "Liya Babu", branch: "intern/22-liya-babu" }
+  - { id: "23", name: "Nishakar T", branch: "intern/23-nishakar-t" }
+  - { id: "24", name: "Parimala M", branch: "intern/24-parimala-m" }
+  - { id: "25", name: "V Naga Phanendra", branch: "intern/25-v-naga-phanendra" }
+  - { id: "26", name: "Kaaluru Manjunath", branch: "intern/26-kaaluru-manjunath" }

@@ -31,6 +31,7 @@ REQUIRED_DIRS = [
 
 # Files that must exist on every branch.
 REQUIRED_FILES = [
+    ".github/interns.yml",
     ".gitignore",
     ".env.example",
     "README.md",
