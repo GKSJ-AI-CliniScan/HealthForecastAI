@@ -109,7 +109,7 @@ so an early branch is not failed for work that has not started.
 | [CI](.github/workflows/ci.yml) | Every push and pull request | Repository checks, backend, frontend, ML, Docker |
 | [Branch guard](.github/workflows/branch-guard.yml) | Pull requests | Blocks pull requests into `main` |
 | [Security](.github/workflows/security.yml) | Every push, weekly | `pip-audit`, `npm audit`, CodeQL |
-| [Intern progress report](.github/workflows/intern-progress.yml) | Weekly, on demand | One table of every intern branch and its CI status |
+| [Cohort report](.github/workflows/cohort-report.yml) | Weekly, on demand | One table of every intern branch and its CI status |
 | [Deploy](.github/workflows/deploy.yml) | Manual only | Milestone 4: verify, build images, release to your environment |
 
 The full list of checks and how to run them locally is in
