@@ -43,10 +43,17 @@ def test_confusion_counts_are_labelled_correctly() -> None:
 
 
 def test_promotion_requires_every_threshold() -> None:
-    """A model must clear every threshold, not just the primary metric."""
+    """A model must clear every threshold, not just the primary metric.
+
+    Checked in both directions: clearing ROC-AUC while missing recall is not
+    enough (a model that is discriminative but underpowered on the minority
+    class must not ship), and neither is the reverse (high recall alone,
+    without genuine separation between the classes, is just as ungradeable).
+    """
     thresholds = {"roc_auc": 0.65, "recall": 0.50}
     assert meets_promotion_thresholds({"roc_auc": 0.70, "recall": 0.55}, thresholds)
     assert not meets_promotion_thresholds({"roc_auc": 0.70, "recall": 0.40}, thresholds)
+    assert not meets_promotion_thresholds({"roc_auc": 0.60, "recall": 0.80}, thresholds)
     assert not meets_promotion_thresholds({"roc_auc": 0.70}, thresholds)
 
 

@@ -52,5 +52,15 @@ def test_risk_predict_works_against_the_real_trained_artifact(
         assert 0.0 <= body["readmission_probability"] <= 1.0
         assert body["risk_category"] in ("low", "medium", "high")
         assert body["model_version"] != "0.0.0-placeholder"
+
+        # N7/A18 finding: predict_risk always calls cds_service.generate_insights
+        # against the real loaded pipeline too, but no test asserted anything
+        # about the result - this path was exercised, not verified. All seven
+        # REQUEST_FEATURES have non-zero importance in the real promoted
+        # model (see the A20 evidence file's ranked table), so this must be
+        # non-empty, not just "didn't crash".
+        assert len(body["insights"]) > 0
+        for item in body["insights"]:
+            assert "associated with" in item["association"]
     finally:
         model_service.reset_cache()

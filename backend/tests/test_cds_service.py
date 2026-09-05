@@ -15,6 +15,7 @@ from fastapi.testclient import TestClient
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
@@ -193,6 +194,53 @@ def test_insights_raise_when_no_model_is_available(tmp_path: Path, monkeypatch) 
     monkeypatch.setattr(settings, "MODEL_ARTIFACT_DIR", str(tmp_path))
     with pytest.raises(model_service.ModelUnavailableError):
         cds_service.generate_insights({"time_in_hospital": 3})
+
+
+def test_insights_are_empty_not_an_error_for_a_model_with_no_importance_mechanism(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """KNeighborsClassifier has neither feature_importances_ nor coef_ - a
+    real model type, not a stub - so insights must degrade to an empty list,
+    never raise. The prediction itself still works for this model type;
+    only the secondary insights enrichment is unavailable.
+    """
+    frame = pd.DataFrame(
+        {
+            "time_in_hospital": [1, 5, 3, 8, 2, 6, 4, 7],
+            "num_medications": [2, 10, 5, 15, 3, 9, 6, 12],
+            "age_group": ["<30", "60+", "30-60", "60+", "<30", "30-60", "60+", "<30"],
+        }
+    )
+    target = [0, 1, 0, 1, 0, 1, 0, 1]
+    preprocess = ColumnTransformer(
+        transformers=[
+            ("numeric", SimpleImputer(strategy="median"), ["time_in_hospital", "num_medications"]),
+            (
+                "categorical",
+                Pipeline(
+                    [
+                        ("impute", SimpleImputer(strategy="most_frequent")),
+                        ("encode", OneHotEncoder(handle_unknown="ignore")),
+                    ]
+                ),
+                ["age_group"],
+            ),
+        ]
+    )
+    pipeline = Pipeline(
+        [("preprocess", preprocess), ("model", KNeighborsClassifier(n_neighbors=3))]
+    )
+    pipeline.fit(frame, target)
+    assert not hasattr(pipeline.named_steps["model"], "feature_importances_")
+    assert not hasattr(pipeline.named_steps["model"], "coef_")
+
+    monkeypatch.setattr(settings, "MODEL_ARTIFACT_DIR", str(tmp_path))
+    joblib.dump(pipeline, tmp_path / model_service.MODEL_FILENAME)
+
+    insights = cds_service.generate_insights(
+        {"time_in_hospital": 4, "num_medications": 7, "age_group": "30-60"}
+    )
+    assert insights == []
 
 
 # --- end-to-end via the real endpoint -----------------------------------------
