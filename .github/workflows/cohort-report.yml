@@ -1,0 +1,40 @@
+name: Cohort report
+
+# A mentor-facing snapshot of all 26 intern branches in one place. Because
+# nothing is merged into main, this is the only view of the cohort as a whole.
+#
+# It walks the roster rather than the list of branches that happen to exist, so
+# an intern who never created a branch shows up as a gap instead of as silence.
+#
+# Read the result under Actions -> Cohort report -> the latest run summary.
+on:
+  schedule:
+    # 04:00 UTC every Monday (09:30 IST).
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: cohort-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    name: Progress across all intern branches
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build the report
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/ci/cohort_report.py
