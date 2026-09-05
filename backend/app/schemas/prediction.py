@@ -1,6 +1,7 @@
 """Risk prediction and readmission forecasting schemas."""
 
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -18,6 +19,18 @@ class RiskPredictionRequest(BaseModel):
     age_group: str | None = None
 
 
+class InsightItem(BaseModel):
+    """One association-only, plain-language factor behind a risk score.
+
+    "associated with", never a causal verb - see app.services.cds_service's
+    module docstring for why.
+    """
+
+    feature: str
+    patient_value: Any
+    association: str
+
+
 class RiskPredictionRead(BaseModel):
     """A readmission risk result."""
 
@@ -29,6 +42,7 @@ class RiskPredictionRead(BaseModel):
     model_name: str
     model_version: str
     created_at: datetime | None = None
+    insights: list[InsightItem] = Field(default_factory=list)
 
 
 class ReadmissionForecast(BaseModel):

@@ -15,11 +15,12 @@ from app.api.deps import (
 )
 from app.core.rbac import Permission
 from app.schemas.prediction import (
+    InsightItem,
     ReadmissionForecast,
     RiskPredictionRead,
     RiskPredictionRequest,
 )
-from app.services import audit_service, model_service, risk_service
+from app.services import audit_service, cds_service, model_service, risk_service
 
 router = APIRouter()
 
@@ -74,7 +75,44 @@ def predict_risk(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
     except model_service.ModelUnavailableError as exc:
         raise _model_unavailable(exc) from exc
-    return RiskPredictionRead.model_validate(prediction)
+
+    result = RiskPredictionRead.model_validate(prediction)
+
+    # WHAT      : attach N6's clinical insights to an otherwise-complete
+    #             response, catching only the one error this can raise.
+    # WHY       : score_admission already succeeded above, which normally
+    #             means a pipeline is loaded and cached - the same one
+    #             generate_insights() introspects via model_service.
+    #             loaded_pipeline(). The one place this still legitimately
+    #             fails is a test (or a caller) that replaced
+    #             predict_probability itself rather than going through the
+    #             real cache, so no real pipeline was ever loaded to explain.
+    # FOR WHOM  : every caller of POST /risk/predict.
+    # BENEFIT   : an insight-generation problem never turns a successful
+    #             prediction into a failed request - the probability and
+    #             band a clinician needs are already computed and correct.
+    # COST      : a caller sees an empty insights list with no explanation
+    #             of why, indistinguishable from "the model's top factors
+    #             were not among the fields you supplied" - both are
+    #             legitimate empty-list cases and this does not try to tell
+    #             them apart in the response body.
+    # ALTERNATIVES : (1) let ModelUnavailableError propagate here too,
+    #             turning a successful prediction into a 503; (2) catch
+    #             every exception broadly, not just ModelUnavailableError.
+    # CHOSEN BECAUSE : (1) would fail requests the platform can already
+    #             answer correctly, over a secondary enrichment feature;
+    #             (2) would hide a genuine bug in cds_service behind a
+    #             silent empty list, which is exactly the C3 anti-pattern
+    #             this project exists to avoid - only the one anticipated,
+    #             named failure mode is caught.
+    try:
+        result.insights = [
+            InsightItem(**item) for item in cds_service.generate_insights(payload.model_dump())
+        ]
+    except model_service.ModelUnavailableError:
+        result.insights = []
+
+    return result
 
 
 @router.get(

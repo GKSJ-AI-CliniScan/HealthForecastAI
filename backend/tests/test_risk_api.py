@@ -266,6 +266,46 @@ def test_forecast_sums_probabilities_rather_than_counting_high_risk(
     assert body["scope"] == "assigned"
 
 
+def test_doctor_forecast_is_row_scoped(
+    client: TestClient, auth_header: Any, patients: list[Patient], db_session: Session
+) -> None:
+    """N7: a doctor's forecast must not include another ward's predictions.
+
+    Same discipline as /risk/high-risk's row scoping (test_doctor_high_risk_list_is_row_scoped) -
+    forecast() applies scope_patient_ids the same way latest_predictions() does.
+    """
+    db_session.add(
+        RiskPrediction(
+            patient_id=patients[0].id,  # assigned to the test doctor
+            readmission_probability=0.5,
+            risk_category="medium",
+            model_name="test",
+            model_version="test-1",
+        )
+    )
+    db_session.add(
+        RiskPrediction(
+            patient_id=patients[1].id,  # unassigned - outside the doctor's scope
+            readmission_probability=0.9,
+            risk_category="high",
+            model_name="test",
+            model_version="test-1",
+        )
+    )
+    db_session.commit()
+
+    doctor_view = client.get("/api/v1/risk/forecast", headers=auth_header(Role.DOCTOR)).json()
+    assert doctor_view["patients_scored"] == 1
+    assert doctor_view["predicted_rate"] == pytest.approx(0.5)
+    assert doctor_view["scope"] == "assigned"
+
+    admin_view = client.get(
+        "/api/v1/risk/forecast", headers=auth_header(Role.HOSPITAL_ADMIN)
+    ).json()
+    assert admin_view["patients_scored"] == 2
+    assert admin_view["scope"] == "hospital"
+
+
 def test_researcher_cannot_read_the_forecast(
     client: TestClient, auth_header: Any, patients: list[Patient]
 ) -> None:
