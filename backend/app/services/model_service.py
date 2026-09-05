@@ -126,6 +126,70 @@ def model_version() -> str:
     return version
 
 
+def loaded_pipeline() -> Any:
+    """Return the cached pipeline object, loading it on first use.
+
+    Exposed so cds_service can introspect the fitted model's feature
+    importances without reaching into _cache directly - same single-load
+    path predict_probability uses, not a second loader.
+    """
+    pipeline, _ = _cache.load()
+    return pipeline
+
+
+# WHAT      : return every column name the pipeline's fitted ColumnTransformer
+#             was trained on, by reading it back off the transformer itself
+#             rather than trusting a separately-maintained list to be complete.
+# WHY       : N5 (verify and prove) wrote a test using the real trained
+#             artefact - not the stubbed pipeline every other test uses -
+#             and it failed: REQUEST_FEATURES only lists 7 columns, but
+#             ml/src/models/train.py fits the ColumnTransformer on the full
+#             51-column engineered feature set (see the P3/P4 checkpoints).
+#             Calling predict_proba() with only 7 columns present raised
+#             "columns are missing" for the other 44, every single time -
+#             every prior test mocked predict_probability itself, so this
+#             was never exercised end-to-end against the real artefact.
+# FOR WHOM  : predict_probability(), to build a frame the loaded pipeline
+#             can actually score instead of one shaped for a model that was
+#             never trained.
+# BENEFIT   : /risk/predict works against the real trained model without
+#             retraining it on a smaller feature set (which would discard
+#             all of P3's leakage proof and P4's tuning) and without asking
+#             the API's caller to supply 51 raw fields, most of which
+#             (individual drug dosages, ICD-9 codes) a request body has no
+#             reasonable way to carry.
+# COST      : the 44 columns the caller never supplies reach the pipeline as
+#             None/NaN, so the trained SimpleImputer fills them with the
+#             training set's median/most-frequent value rather than this
+#             patient's real data - the probability is real, but it is
+#             computed as if this patient were population-typical on
+#             everything the API does not ask for. That is a materially
+#             weaker prediction than one from the full feature set, not
+#             just a formality.
+# ALTERNATIVES : (1) retrain the model on only the 7 REQUEST_FEATURES
+#             columns; (2) expand RiskPredictionRequest to accept all 51
+#             raw columns the current model needs.
+# CHOSEN BECAUSE : (1) is exactly the "invent a sixth model" scope creep N5
+#             rules out here - this node is "verify and prove", not
+#             "retrain"; C10 also applies (do not rewrite what P3/P4 already
+#             built and gated). (2) would turn a clinical risk-scoring
+#             endpoint into a form demanding two dozen drug dosages, which
+#             no realistic caller has ready at the point of asking "what is
+#             this admission's risk" - a materially worse API for a
+#             materially small gain over median-imputed defaults, and it is
+#             explicitly a schema/product decision I flagged rather than
+#             made unilaterally (see this phase's checkpoint).
+def _expected_columns(pipeline: Any) -> set[str]:
+    """Return the full set of column names the pipeline's preprocessor needs."""
+    preprocess = pipeline.named_steps.get("preprocess")
+    columns: set[str] = set()
+    if preprocess is not None and hasattr(preprocess, "transformers_"):
+        for _, _, selected in preprocess.transformers_:
+            if isinstance(selected, list | tuple):
+                columns.update(selected)
+    return columns
+
+
 def predict_probability(features: dict[str, Any]) -> float:
     """Return the 30-day readmission probability for one admission.
 
@@ -134,7 +198,8 @@ def predict_probability(features: dict[str, Any]) -> float:
     import pandas as pd
 
     pipeline, _ = _cache.load()
-    row = {name: features.get(name) for name in REQUEST_FEATURES}
+    all_columns = _expected_columns(pipeline) | set(REQUEST_FEATURES)
+    row = {name: features.get(name) for name in all_columns}
     frame = pd.DataFrame([row])
 
     try:
