@@ -16,6 +16,39 @@ from typing import Any
 
 from app.core.config import settings
 
+# WHAT      : anchor a relative MODEL_ARTIFACT_DIR against the repository
+#             root, not the server process's working directory.
+# WHY       : A17. INTERN_GUIDE.md documents starting the API with
+#             `cd backend && uvicorn app.main:app --reload`, so the process's
+#             cwd is backend/. The default "ml/artifacts" is written relative
+#             to the repo root (mirroring ml/src/models/train.py's own
+#             REPO_ROOT/resolve_path pattern) - resolved against backend/
+#             instead, it points at the non-existent backend/ml/artifacts,
+#             and both /risk/predict and /models/metrics 503 every time,
+#             exactly as a mentor following the guide would see. Reproduced
+#             and confirmed before this fix (see the P6 checkpoint).
+# FOR WHOM  : _ModelCache.artifact_path(), the one place MODEL_ARTIFACT_DIR
+#             is resolved to a real path; read_best_model_metrics() inherits
+#             the fix through it automatically.
+# BENEFIT   : the documented way to start this API actually finds the model
+#             a real training run produced, regardless of which directory
+#             the process happened to be launched from.
+# COST      : an operator who deliberately wants MODEL_ARTIFACT_DIR resolved
+#             relative to some OTHER working directory (not the repo root)
+#             loses that option - an absolute path in the env var still
+#             works unchanged, only a relative one is now repo-root-anchored.
+# ALTERNATIVES : (1) leave MODEL_ARTIFACT_DIR's default as an absolute path
+#             baked into .env.example instead of fixing resolution in code;
+#             (2) resolve relative to the current file's location without an
+#             is_absolute() check, so an operator's absolute override would
+#             be silently prefixed and broken.
+# CHOSEN BECAUSE : (1) only fixes the documented default, not any relative
+#             value an operator sets afterward, and duplicates a path the
+#             repo already has one source of truth for (this constant); (2)
+#             would break the one escape hatch - an absolute path - that
+#             should keep working unchanged.
+REPO_ROOT = Path(__file__).resolve().parents[3]
+
 MODEL_FILENAME = "readmission_model.joblib"
 METRICS_FILENAME = "metrics.json"
 
@@ -46,8 +79,14 @@ class _ModelCache:
         self._version: str | None = None
 
     def artifact_path(self) -> Path:
-        """Return the path the trained pipeline is expected at."""
-        return Path(settings.MODEL_ARTIFACT_DIR) / MODEL_FILENAME
+        """Return the path the trained pipeline is expected at.
+
+        A relative MODEL_ARTIFACT_DIR is resolved against REPO_ROOT, not the
+        process's working directory (A17) - an absolute value is used as-is.
+        """
+        configured = Path(settings.MODEL_ARTIFACT_DIR)
+        base = configured if configured.is_absolute() else REPO_ROOT / configured
+        return base / MODEL_FILENAME
 
     def load(self) -> tuple[Any, str]:
         """Return the cached pipeline and version, loading it on first use."""
