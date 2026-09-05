@@ -1,38 +1,62 @@
-"""Authentication endpoints - Module 1 (User Management).
+"""Authentication endpoints - Module 1 (User Management)."""
 
-Milestone 1 owner: wire these to the users table via app/services/auth_service.py.
-"""
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
-from app.api.deps import CurrentUser, get_current_user
+from app.api.deps import CurrentUser
 from app.core.rbac import Role, permissions_for
+from app.core.security import create_access_token
+from app.db.session import get_db
 from app.schemas.token import Token
-from app.schemas.user import UserLogin
+from app.schemas.user import UserLogin, UserRead
+from app.services import auth_service
 
 router = APIRouter()
 
 
 @router.post("/login", response_model=Token, summary="Exchange credentials for a JWT")
-def login(payload: UserLogin) -> Token:
+def login(payload: UserLogin, db: Annotated[Session, Depends(get_db)]) -> Token:
     """Authenticate a user and issue an access token.
 
-    TODO(milestone-1): look the user up in PostgreSQL, verify the bcrypt hash
-    with app.core.security.verify_password and record the attempt in audit_logs.
+    Returns the same message for an unknown email and a wrong password, so the
+    endpoint cannot be used to enumerate who has an account.
     """
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Login is not implemented yet - see TODO(milestone-1) in auth.py",
+    user = auth_service.authenticate(db, payload.email, payload.password)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    role = Role(user.role)
+    return Token(
+        access_token=create_access_token(subject=str(user.id), role=str(role)),
+        role=str(role),
+        permissions=permissions_for(role),
     )
 
 
-@router.get("/me", summary="Return the authenticated caller and their permissions")
-def read_me(user: CurrentUser = Depends(get_current_user)) -> dict[str, object]:
-    """Return the caller's identity, role and effective permission list."""
+@router.get("/me", response_model=UserRead, summary="Return the authenticated caller")
+def read_me(user: CurrentUser) -> UserRead:
+    """Return the caller's own record."""
+    return UserRead.model_validate(user)
+
+
+@router.get("/permissions", summary="Effective permissions for the caller")
+def read_my_permissions(user: CurrentUser) -> dict[str, object]:
+    """Return the caller's role and the permissions it grants.
+
+    The frontend uses this to decide which navigation items to render. It is a
+    convenience, not a security boundary - every endpoint authorises on its own.
+    """
+    role = Role(user.role)
     return {
-        "subject": user.subject,
-        "role": str(user.role),
-        "permissions": permissions_for(user.role),
+        "user_id": user.id,
+        "role": str(role),
+        "permissions": permissions_for(role),
     }
 
 

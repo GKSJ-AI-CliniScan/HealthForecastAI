@@ -3,18 +3,26 @@
 @tailwind utilities;
 
 :root {
-  --background: #f7f9fc;
-  --foreground: #0f1c2e;
+  --background: #f4f7fb;
   --surface: #ffffff;
-  --border: #dde3ec;
+  --surface-muted: #eef2f8;
+  --foreground: #0e1a2b;
+  --muted: #5b6b82;
+  --border: #d9e1ed;
+  --accent: #1d4ed8;
+  --accent-soft: #e6edfd;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0b1220;
-    --foreground: #e6ecf5;
-    --surface: #131c2b;
-    --border: #23304a;
+    --background: #0a1120;
+    --surface: #121c2e;
+    --surface-muted: #18243a;
+    --foreground: #e8eefa;
+    --muted: #93a4bd;
+    --border: #24334d;
+    --accent: #6f97ff;
+    --accent-soft: #1b2947;
   }
 }
 
@@ -22,4 +30,41 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border p-5;
+    background: var(--surface);
+    border-color: var(--border);
+  }
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition;
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn:hover { opacity: 0.9; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-ghost {
+    @apply inline-flex items-center rounded-lg px-3 py-1.5 text-sm font-medium transition;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--foreground);
+  }
+  .input {
+    @apply w-full rounded-lg px-3 py-2 text-sm outline-none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--foreground);
+  }
+  .input:focus { border-color: var(--accent); }
+  .label { @apply mb-1 block text-sm font-medium; color: var(--muted); }
+  .muted { color: var(--muted); }
+  .table-wrap { @apply overflow-x-auto rounded-xl border; border-color: var(--border); }
+  .th {
+    @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide;
+    color: var(--muted);
+    background: var(--surface-muted);
+  }
+  .td { @apply px-4 py-3 text-sm; border-top: 1px solid var(--border); }
 }

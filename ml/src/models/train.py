@@ -6,7 +6,6 @@ Usage:
 
 import argparse
 import json
-from pathlib import Path
 from typing import Any
 
 import joblib
@@ -23,7 +22,7 @@ from src.evaluation.metrics import (
     meets_promotion_thresholds,
 )
 from src.features.build_features import add_utilisation_features, build_preprocessor
-from src.utils.config import load_config
+from src.utils.config import load_config, resolve_path
 
 
 def build_estimator(name: str, params: dict[str, Any]) -> Any:
@@ -50,12 +49,16 @@ def main() -> None:
     dataset = config["dataset"]
     split = config["split"]
 
-    frame = load_raw(dataset["raw_path"])
+    frame = load_raw(resolve_path(dataset["raw_path"]))
     frame = basic_clean(frame, config)
     frame = add_utilisation_features(frame)
 
     target = binarise_target(frame[dataset["target_column"]], dataset["positive_label"])
-    features = frame.drop(columns=[dataset["target_column"]])
+
+    # Both the raw label and the engineered flag encode the outcome. Leaving
+    # either in the feature matrix leaks the target straight into the model.
+    leakage_columns = [dataset["target_column"], "readmitted_within_30_days"]
+    features = frame.drop(columns=[c for c in leakage_columns if c in frame.columns])
 
     x_train, x_test, y_train, y_test = train_test_split(
         features,
@@ -101,7 +104,7 @@ def main() -> None:
     promoted = meets_promotion_thresholds(results[best_name], thresholds)
     summary = {"best_model": best_name, "promoted": promoted, "results": results}
 
-    output_dir = Path(config["artifacts"]["output_dir"])
+    output_dir = resolve_path(config["artifacts"]["output_dir"])
     output_dir.mkdir(parents=True, exist_ok=True)
     joblib.dump(best_pipeline, output_dir / config["artifacts"]["model_filename"])
     metrics_path = output_dir / config["artifacts"]["metrics_filename"]

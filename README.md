@@ -90,14 +90,33 @@ Running each service directly, without Docker, is covered in
 
 ## Milestones
 
-| Milestone | Weeks | Theme |
-|-----------|-------|-------|
-| 1 | 1-2 | Project initialization, design process and core setup |
-| 2 | 3-4 | Risk prediction and readmission forecasting |
-| 3 | 5-6 | Treatment effectiveness analysis and healthcare analytics |
-| 4 | 7-8 | Testing, deployment and documentation |
+| Milestone | Weeks | Theme | Status on `main` |
+|-----------|-------|-------|------------------|
+| 1 | 1-2 | Project initialization, design process and core setup | **Complete** |
+| 2 | 3-4 | Risk prediction and readmission forecasting | Not started |
+| 3 | 5-6 | Treatment effectiveness analysis and healthcare analytics | Not started |
+| 4 | 7-8 | Testing, deployment and documentation | Not started |
 
 Report templates and evaluation criteria: [`docs/06-milestones/`](docs/06-milestones/).
+
+### What works today
+
+`main` carries a working Milestone 1 reference implementation:
+
+- JWT authentication with bcrypt hashing, audited logins, and immediate session
+  revocation when an account is deactivated
+- The full access matrix enforced in code and pinned by tests, with scoping
+  applied inside the SQL query rather than after it
+- Patient management with search, pagination and admission history
+- Role-aware dashboards for all four roles, built with real aggregates
+- The Diabetes 130-US Hospitals dataset loaded: 101,766 raw encounters cleaned
+  to 69,990, an 8.98% 30-day readmission rate
+
+Risk prediction, treatment effectiveness and clinical decision support endpoints
+are routed and authorised but return placeholder data, tagged
+`TODO(milestone-2)` and `TODO(milestone-3)`.
+
+Full write-up: [`docs/06-milestones/milestone-1.md`](docs/06-milestones/milestone-1.md).
 
 ## Continuous integration
 

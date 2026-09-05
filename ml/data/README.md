@@ -16,12 +16,26 @@ The dataset named in the project brief.
 
 ```bash
 mkdir -p ml/data/raw
-curl -L -o /tmp/diabetes.zip \
-  "https://archive.ics.uci.edu/static/public/296/diabetes+130+us+hospitals+for+years+1999+2008.zip"
-unzip -o /tmp/diabetes.zip -d ml/data/raw
+curl -L -o ml/data/raw/diabetic_data.csv \
+  "https://archive.ics.uci.edu/static/public/296/data.csv"
 ```
 
-You should end up with `ml/data/raw/diabetic_data.csv`.
+You should end up with `ml/data/raw/diabetic_data.csv` - 101,766 rows plus a
+header, 50 columns, about 19 MB.
+
+UCI serves this as a plain CSV; the older `.zip` link that appears in some
+tutorials now returns 404.
+
+The admission type, discharge disposition and admission source lookups that the
+dataset ships as `IDS_mapping.csv` are reproduced in
+[`../src/data/mappings.py`](../src/data/mappings.py), so the ETL is reproducible
+from the repository alone.
+
+Then load it into PostgreSQL:
+
+```bash
+cd ml && python -m src.data.etl --truncate
+```
 
 ## Directory contract
 

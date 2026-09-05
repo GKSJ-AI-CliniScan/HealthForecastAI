@@ -1,18 +1,21 @@
-"""AI model management endpoints - Module 7 (System Administrator only)."""
+"""AI model management endpoints - Module 7 (Milestone 4)."""
+
+from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.api.deps import CurrentUser, require_permission
+from app.api.deps import require_permission
 from app.core.config import settings
 from app.core.rbac import Permission
+from app.models.user import User
 
 router = APIRouter()
 
-_manage_models = require_permission(Permission.MODEL_MANAGE)
+CanManageModels = Annotated[User, Depends(require_permission(Permission.MODEL_MANAGE))]
 
 
 @router.get("", summary="List registered models")
-def list_models(user: CurrentUser = Depends(_manage_models)) -> list[dict[str, str]]:
+def list_models(user: CanManageModels) -> list[dict[str, str]]:
     """Return the model registry.
 
     TODO(milestone-4): read the registry from MongoDB (collection: model_runs).
@@ -21,7 +24,7 @@ def list_models(user: CurrentUser = Depends(_manage_models)) -> list[dict[str, s
 
 
 @router.get("/active", summary="Return the model currently serving predictions")
-def active_model(user: CurrentUser = Depends(_manage_models)) -> dict[str, str]:
+def active_model(user: CanManageModels) -> dict[str, str]:
     """Return the active model name and artefact directory."""
     return {
         "name": settings.ACTIVE_RISK_MODEL,
@@ -31,7 +34,7 @@ def active_model(user: CurrentUser = Depends(_manage_models)) -> dict[str, str]:
 
 
 @router.get("/metrics", summary="Evaluation metrics for the active model")
-def model_metrics(user: CurrentUser = Depends(_manage_models)) -> dict[str, float | None]:
+def model_metrics(user: CanManageModels) -> dict[str, float | None]:
     """Return accuracy, precision, recall, F1 and ROC-AUC for the active model.
 
     TODO(milestone-2): populate from ml/src/evaluation/metrics.py output.
