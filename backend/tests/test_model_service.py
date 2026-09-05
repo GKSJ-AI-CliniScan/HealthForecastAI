@@ -178,3 +178,28 @@ def test_predict_probability_handles_a_model_trained_on_more_columns_than_the_ap
         {"time_in_hospital": 4, "num_medications": 7, "age_group": "30-60"}
     )
     assert 0.0 <= probability <= 1.0
+
+
+# --- A17: MODEL_ARTIFACT_DIR must not depend on the process's cwd -----------
+
+
+def test_artifact_path_does_not_depend_on_the_process_working_directory(
+    monkeypatch, tmp_path
+) -> None:
+    """INTERN_GUIDE.md documents starting uvicorn from backend/ - before the
+    A17 fix, resolving the default "ml/artifacts" from there pointed at a
+    directory that does not exist, and /risk/predict + /models/metrics both
+    503'd every time. A relative MODEL_ARTIFACT_DIR must resolve to the same
+    real path regardless of which directory the process happened to start in.
+    """
+    from_here = model_service._cache.artifact_path()
+    monkeypatch.chdir(tmp_path)  # simulate a process started somewhere else entirely
+    from_elsewhere = model_service._cache.artifact_path()
+    assert from_here == from_elsewhere
+    assert from_here.is_absolute()
+
+
+def test_an_absolute_model_artifact_dir_is_still_used_as_is(tmp_path: Path, monkeypatch) -> None:
+    """The REPO_ROOT anchor must not hijack an operator's absolute override."""
+    monkeypatch.setattr(settings, "MODEL_ARTIFACT_DIR", str(tmp_path))
+    assert model_service._cache.artifact_path() == tmp_path / model_service.MODEL_FILENAME
