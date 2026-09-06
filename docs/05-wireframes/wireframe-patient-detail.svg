@@ -1,0 +1,162 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" width="100%" height="100%" style="background:#FAF8F5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <style>
+      .text-title { font-size: 18px; font-weight: 700; fill: #1E293B; }
+      .text-subtitle { font-size: 12px; font-weight: 500; fill: #64748B; }
+      .text-heading { font-size: 14px; font-weight: 700; fill: #1E293B; }
+      .text-body { font-size: 12px; font-weight: 500; fill: #334155; }
+      .text-caption { font-size: 11px; font-weight: 500; fill: #64748B; }
+      .card { fill: #FFFFFF; stroke: #E2E8F0; stroke-width: 1; rx: 10px; }
+      .card-header { fill: #F8FAFC; stroke: #E2E8F0; stroke-width: 1; }
+      .badge-doc { fill: #ECFDF5; stroke: #A7F3D0; stroke-width: 1; rx: 6px; }
+      .badge-doc-text { font-size: 11px; font-weight: 700; fill: #047857; }
+      .badge-high { fill: #FEF2F2; stroke: #FECACA; stroke-width: 1; rx: 6px; }
+      .badge-high-text { font-size: 11px; font-weight: 700; fill: #DC2626; }
+      .tab-active { fill: #FFFFFF; stroke: #E2E8F0; stroke-width: 1; rx: 6px 6px 0 0; }
+      .tab-active-text { font-size: 12px; font-weight: 700; fill: #2563EB; }
+      .tab-inactive-text { font-size: 12px; font-weight: 500; fill: #64748B; }
+      .btn-primary { fill: #2563EB; rx: 6px; }
+      .btn-primary-text { font-size: 11px; font-weight: 600; fill: #FFFFFF; }
+      .btn-outline { fill: #FFFFFF; stroke: #CBD5E1; stroke-width: 1; rx: 6px; }
+      .btn-outline-text { font-size: 11px; font-weight: 600; fill: #475569; }
+      .sidebar-bg { fill: #FFFFFF; stroke: #E2E8F0; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <!-- Top Header -->
+  <rect x="0" y="0" width="1000" height="56" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1" />
+  <rect x="20" y="12" width="32" height="32" rx="8" fill="#2563EB" />
+  <path d="M 28 28 L 33 28 L 36 20 L 39 34 L 42 28 L 46 28" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="62" y="32" class="text-title" style="font-size: 15px;">HealthForecast <tspan fill="#2563EB">AI</tspan></text>
+  <text x="180" y="32" class="text-subtitle" style="font-size: 11px;">/ Patient Dossier</text>
+
+  <!-- Right Header -->
+  <rect x="700" y="14" width="90" height="26" class="badge-doc" />
+  <text x="745" y="31" text-anchor="middle" class="badge-doc-text">Doctor View</text>
+  <circle cx="810" cy="28" r="14" fill="#E2E8F0" />
+  <text x="810" y="32" text-anchor="middle" font-size="11px" font-weight="700" fill="#475569">SJ</text>
+  <text x="832" y="32" font-size="12px" font-weight="700" fill="#1E293B">Dr. Sarah Jenkins</text>
+  <rect x="930" y="16" width="50" height="24" class="btn-outline" />
+  <text x="955" y="32" text-anchor="middle" class="btn-outline-text" style="font-size: 10px;">Exit</text>
+
+  <!-- Left Sidebar Navigation -->
+  <rect x="0" y="56" width="200" height="624" class="sidebar-bg" />
+  <text x="20" y="85" font-size="10px" font-weight="700" fill="#94A3B8" letter-spacing="1">NAVIGATION</text>
+  <g transform="translate(12, 98)">
+    <rect x="0" y="0" width="176" height="34" fill="transparent" />
+    <text x="32" y="21" font-size="12px" font-weight="500" fill="#475569">Dashboard</text>
+  </g>
+  <g transform="translate(12, 138)">
+    <rect x="0" y="0" width="176" height="34" fill="#EFF6FF" rx="6" />
+    <circle cx="18" cy="17" r="4" fill="#2563EB" />
+    <text x="32" y="21" font-size="12px" font-weight="700" fill="#1D4ED8">Patients Directory</text>
+  </g>
+
+  <!-- Main Content Area -->
+  <g transform="translate(220, 70)">
+    <!-- Back Button & Actions Bar -->
+    <rect x="0" y="0" width="150" height="28" class="btn-outline" />
+    <text x="75" y="18" text-anchor="middle" class="btn-outline-text">← Back to Patient List</text>
+    <rect x="640" y="0" width="120" height="28" class="btn-outline" />
+    <text x="700" y="18" text-anchor="middle" class="btn-outline-text">🖨️ Print Summary</text>
+
+    <!-- Patient Header Card -->
+    <g transform="translate(0, 38)">
+      <rect x="0" y="0" width="760" height="96" class="card" />
+      <rect x="18" y="18" width="60" height="60" rx="14" fill="#2563EB" />
+      <text x="48" y="54" text-anchor="middle" font-size="20px" font-weight="800" fill="#FFFFFF">AP</text>
+
+      <text x="94" y="38" class="text-title">Arthur Pendleton</text>
+      <rect x="255" y="22" width="115" height="22" class="badge-high" />
+      <text x="312" y="37" text-anchor="middle" class="badge-high-text">HIGH RISK (84%)</text>
+
+      <text x="94" y="58" class="text-caption">
+        MRN: <tspan font-weight="700" fill="#1E293B">MRN-104928</tspan> • Gender: Male • Age: [70-80) • Department: Cardiology • Room 402
+      </text>
+
+      <line x1="500" y1="16" x2="500" y2="80" stroke="#E2E8F0" stroke-width="1" />
+      
+      <text x="516" y="34" class="text-caption">Primary Diagnosis</text>
+      <text x="516" y="50" font-size="12px" font-weight="700" fill="#1E293B">Type 2 Diabetes (Severe)</text>
+      
+      <text x="516" y="68" class="text-caption">Assigned Physician: <tspan font-weight="600" fill="#1E293B">Dr. Sarah Jenkins, MD</tspan></text>
+    </g>
+
+    <!-- 4 Clinical Navigation Tabs -->
+    <g transform="translate(0, 146)">
+      <!-- Tab 1 Active -->
+      <rect x="0" y="0" width="150" height="34" class="tab-active" />
+      <text x="75" y="22" text-anchor="middle" class="tab-active-text">Basic Information</text>
+
+      <!-- Tab 2 -->
+      <text x="235" y="22" text-anchor="middle" class="tab-inactive-text">Medical History</text>
+
+      <!-- Tab 3 -->
+      <text x="395" y="22" text-anchor="middle" class="tab-inactive-text">Admission History</text>
+
+      <!-- Tab 4 -->
+      <text x="555" y="22" text-anchor="middle" class="tab-inactive-text">Treatment &amp; Care</text>
+
+      <!-- Tab 5 -->
+      <text x="695" y="22" text-anchor="middle" class="tab-inactive-text">All Sections</text>
+
+      <!-- Tab Baseline Separator -->
+      <line x1="0" y1="34" x2="760" y2="34" stroke="#E2E8F0" stroke-width="1" />
+    </g>
+
+    <!-- Tab Content Panel (Basic Information) -->
+    <g transform="translate(0, 180)">
+      <rect x="0" y="0" width="760" height="360" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1" rx="0 0 10 10" />
+
+      <!-- Section 1: Demographics -->
+      <g transform="translate(20, 20)">
+        <text x="0" y="15" class="text-heading">1. Patient Demographics &amp; Identifiers</text>
+        <line x1="0" y1="26" x2="720" y2="26" stroke="#F1F5F9" stroke-width="1" />
+
+        <g transform="translate(0, 36)">
+          <rect x="0" y="0" width="225" height="55" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" />
+          <text x="12" y="18" class="text-caption">Full Legal Name</text>
+          <text x="12" y="38" font-size="12px" font-weight="700" fill="#1E293B">Arthur Pendleton</text>
+
+          <rect x="245" y="0" width="225" height="55" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" />
+          <text x="257" y="18" class="text-caption">Date of Birth &amp; Age Group</text>
+          <text x="257" y="38" font-size="12px" font-weight="700" fill="#1E293B">1948-06-12 ([70-80) Years)</text>
+
+          <rect x="490" y="0" width="230" height="55" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" />
+          <text x="502" y="18" class="text-caption">Gender &amp; Race</text>
+          <text x="502" y="38" font-size="12px" font-weight="700" fill="#1E293B">Male • Caucasian</text>
+        </g>
+      </g>
+
+      <!-- Section 2: Contact & Emergency -->
+      <g transform="translate(20, 135)">
+        <text x="0" y="15" class="text-heading">2. Emergency Contact &amp; Next of Kin</text>
+        <line x1="0" y1="26" x2="720" y2="26" stroke="#F1F5F9" stroke-width="1" />
+
+        <g transform="translate(0, 36)">
+          <rect x="0" y="0" width="350" height="60" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" />
+          <text x="12" y="18" class="text-caption">Primary Emergency Contact</text>
+          <text x="12" y="36" font-size="12px" font-weight="700" fill="#1E293B">Eleanor Pendleton (Spouse)</text>
+          <text x="12" y="50" class="text-caption">Phone: +1 (555) 019-2834</text>
+
+          <rect x="370" y="0" width="350" height="60" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" />
+          <text x="382" y="18" class="text-caption">Residential Address</text>
+          <text x="382" y="36" font-size="12px" font-weight="700" fill="#1E293B">742 Evergreen Terrace, Springfield</text>
+          <text x="382" y="50" class="text-caption">State / Zip: OR 97477</text>
+        </g>
+      </g>
+
+      <!-- Section 3: Insurance -->
+      <g transform="translate(20, 255)">
+        <text x="0" y="15" class="text-heading">3. Primary Healthcare Coverage</text>
+        <line x1="0" y1="26" x2="720" y2="26" stroke="#F1F5F9" stroke-width="1" />
+
+        <g transform="translate(0, 36)">
+          <rect x="0" y="0" width="720" height="48" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" />
+          <text x="12" y="18" class="text-caption">Payer / Insurance Provider</text>
+          <text x="12" y="34" font-size="12px" font-weight="700" fill="#1E293B">Medicare Traditional (Part A &amp; B) • Policy Number: <tspan font-family="monospace">MC-104928-A</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

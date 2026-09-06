@@ -137,7 +137,18 @@ The patient filtering implementation in [`src/services/patientService.ts`](../..
 
 ### 4. Wireframes Documentation
 
-The UI wireframes and initial design specifications are documented in [`docs/05-wireframes/milestone-1-wireframes.md`](../05-wireframes/milestone-1-wireframes.md).
+The UI wireframes, screen layouts, and application state workflows are documented and exported in SVG format in [`docs/05-wireframes/`](../05-wireframes/):
+
+| Screen / View | Wireframe File | Description |
+|---|---|---|
+| **Doctor Dashboard** | [`wireframe-doctor-dashboard.svg`](../05-wireframes/wireframe-doctor-dashboard.svg) | Assigned patient list, caseload metrics, and high-risk monitoring |
+| **Hospital Administrator** | [`wireframe-admin-dashboard.svg`](../05-wireframes/wireframe-admin-dashboard.svg) | Facility KPI overview, 86.4% bed occupancy, and department capacity |
+| **Healthcare Researcher** | [`wireframe-researcher-dashboard.svg`](../05-wireframes/wireframe-researcher-dashboard.svg) | 101,766 de-identified cohort records and masked identifiers |
+| **System Administrator** | [`wireframe-system-admin-dashboard.svg`](../05-wireframes/wireframe-system-admin-dashboard.svg) | Global system telemetry, RBAC matrix, and security audit log |
+| **Patient Details Dossier** | [`wireframe-patient-detail.svg`](../05-wireframes/wireframe-patient-detail.svg) | Patient header, risk score badge, and 4 clinical tab panels |
+| **Error & Loading States** | [`wireframe-states.svg`](../05-wireframes/wireframe-states.svg) | Error alert with retry action and animated skeleton loading state |
+
+Full screen-by-screen ASCII specifications and state workflows are documented in [`docs/05-wireframes/milestone-1-wireframes.md`](../05-wireframes/milestone-1-wireframes.md).
 
 Never screenshot real patient data. The seeded dataset is public and de-identified.
 

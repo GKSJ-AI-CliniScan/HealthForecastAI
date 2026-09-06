@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" width="100%" height="100%" style="background:#FAF8F5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <style>
+      .text-title { font-size: 18px; font-weight: 700; fill: #1E293B; }
+      .text-subtitle { font-size: 12px; font-weight: 500; fill: #64748B; }
+      .text-heading { font-size: 14px; font-weight: 700; fill: #1E293B; }
+      .text-body { font-size: 12px; font-weight: 500; fill: #334155; }
+      .text-caption { font-size: 11px; font-weight: 500; fill: #64748B; }
+      .card { fill: #FFFFFF; stroke: #E2E8F0; stroke-width: 1; rx: 10px; }
+      .card-header { fill: #F8FAFC; stroke: #E2E8F0; stroke-width: 1; }
+      .badge-admin { fill: #EFF6FF; stroke: #BFDBFE; stroke-width: 1; rx: 6px; }
+      .badge-admin-text { font-size: 11px; font-weight: 700; fill: #1D4ED8; }
+      .badge-high { fill: #FEF2F2; stroke: #FECACA; stroke-width: 1; rx: 4px; }
+      .badge-high-text { font-size: 10px; font-weight: 700; fill: #DC2626; }
+      .btn-primary { fill: #2563EB; rx: 6px; }
+      .btn-primary-text { font-size: 11px; font-weight: 600; fill: #FFFFFF; }
+      .btn-outline { fill: #FFFFFF; stroke: #CBD5E1; stroke-width: 1; rx: 6px; }
+      .btn-outline-text { font-size: 11px; font-weight: 600; fill: #475569; }
+      .sidebar-bg { fill: #FFFFFF; stroke: #E2E8F0; stroke-width: 1; }
+      .nav-item-active { fill: #EFF6FF; rx: 6px; }
+      .nav-item-active-text { font-size: 12px; font-weight: 700; fill: #1D4ED8; }
+      .nav-item-text { font-size: 12px; font-weight: 500; fill: #475569; }
+    </style>
+  </defs>
+
+  <!-- Top Header -->
+  <rect x="0" y="0" width="1000" height="56" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1" />
+  <rect x="20" y="12" width="32" height="32" rx="8" fill="#2563EB" />
+  <path d="M 28 28 L 33 28 L 36 20 L 39 34 L 42 28 L 46 28" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="62" y="32" class="text-title" style="font-size: 15px;">HealthForecast <tspan fill="#2563EB">AI</tspan></text>
+  <text x="180" y="32" class="text-subtitle" style="font-size: 11px;">/ Hospital Operations &amp; Executive Analytics</text>
+
+  <!-- Right Header: Admin User -->
+  <rect x="640" y="14" width="130" height="26" class="badge-admin" />
+  <text x="705" y="31" text-anchor="middle" class="badge-admin-text">Hospital Admin View</text>
+  <circle cx="795" cy="28" r="14" fill="#DBEAFE" />
+  <text x="795" y="32" text-anchor="middle" font-size="11px" font-weight="700" fill="#1D4ED8">EV</text>
+  <text x="818" y="27" font-size="12px" font-weight="700" fill="#1E293B">Eleanor Vance, MHA</text>
+  <text x="818" y="39" class="text-caption" style="font-size: 10px;">Chief Operating Officer</text>
+  <rect x="925" y="16" width="55" height="24" class="btn-outline" />
+  <text x="952" y="32" text-anchor="middle" class="btn-outline-text" style="font-size: 10px;">Logout</text>
+
+  <!-- Left Sidebar Navigation -->
+  <rect x="0" y="56" width="200" height="624" class="sidebar-bg" />
+  <text x="20" y="85" font-size="10px" font-weight="700" fill="#94A3B8" letter-spacing="1">ADMINISTRATION</text>
+  
+  <g transform="translate(12, 98)">
+    <rect x="0" y="0" width="176" height="34" class="nav-item-active" />
+    <circle cx="18" cy="17" r="4" fill="#2563EB" />
+    <text x="32" y="21" class="nav-item-active-text">Executive Dashboard</text>
+  </g>
+  <g transform="translate(12, 138)">
+    <rect x="0" y="0" width="176" height="34" fill="transparent" />
+    <circle cx="18" cy="17" r="4" fill="#94A3B8" />
+    <text x="32" y="21" class="nav-item-text">Patient Directory</text>
+  </g>
+  <g transform="translate(12, 178)">
+    <rect x="0" y="0" width="176" height="34" fill="transparent" />
+    <circle cx="18" cy="17" r="4" fill="#94A3B8" />
+    <text x="32" y="21" class="nav-item-text">Department Capacity</text>
+  </g>
+  <g transform="translate(12, 218)">
+    <rect x="0" y="0" width="176" height="34" fill="transparent" />
+    <circle cx="18" cy="17" r="4" fill="#94A3B8" />
+    <text x="32" y="21" class="nav-item-text">Regulatory Reports</text>
+  </g>
+
+  <!-- Main Content Area -->
+  <g transform="translate(220, 75)">
+    <text x="0" y="15" class="text-title">Hospital-Wide Executive Dashboard</text>
+    <text x="0" y="32" class="text-subtitle">Facility-level readmission risk metrics, department capacity, and inpatient volume.</text>
+
+    <!-- Admin Scope Context Banner -->
+    <rect x="0" y="44" width="760" height="36" rx="6" fill="#EFF6FF" stroke="#DBEAFE" stroke-width="1" />
+    <text x="12" y="66" font-size="11px" font-weight="600" fill="#1E40AF">Active Facility: St. Jude Metropolitan Medical Center • All 4 Clinical Departments Connected</text>
+
+    <!-- 4 KPI Headline Cards (Admin Specific) -->
+    <g transform="translate(0, 92)">
+      <!-- Card 1 -->
+      <rect x="0" y="0" width="178" height="84" class="card" />
+      <text x="14" y="22" class="text-caption">Total Inpatients</text>
+      <text x="14" y="52" font-size="24px" font-weight="800" fill="#1E293B">1,240</text>
+      <text x="14" y="70" font-size="10px" font-weight="600" fill="#2563EB">Hospital-Wide Census</text>
+
+      <!-- Card 2 -->
+      <rect x="194" y="0" width="178" height="84" class="card" />
+      <text x="208" y="22" class="text-caption">Total Admissions YTD</text>
+      <text x="208" y="52" font-size="24px" font-weight="800" fill="#1E293B">3,842</text>
+      <text x="208" y="70" font-size="10px" font-weight="600" fill="#059669">+4.2% vs Prior Month</text>
+
+      <!-- Card 3 -->
+      <rect x="388" y="0" width="178" height="84" class="card" />
+      <text x="402" y="22" class="text-caption">30-Day Readmissions</text>
+      <text x="402" y="52" font-size="24px" font-weight="800" fill="#D97706">312</text>
+      <text x="402" y="70" font-size="10px" font-weight="600" fill="#D97706">8.1% Readmission Rate</text>
+
+      <!-- Card 4 (Admin Bed Occupancy) -->
+      <rect x="582" y="0" width="178" height="84" class="card" />
+      <text x="596" y="22" class="text-caption">Bed Occupancy Rate</text>
+      <text x="596" y="52" font-size="24px" font-weight="800" fill="#DC2626">86.4%</text>
+      <text x="596" y="70" font-size="10px" font-weight="600" fill="#DC2626">Capacity Alert: High Load</text>
+    </g>
+
+    <!-- Department Performance Breakdown -->
+    <g transform="translate(0, 192)">
+      <rect x="0" y="0" width="760" height="385" class="card" />
+      <rect x="0" y="0" width="760" height="42" class="card-header" rx="10" />
+      <text x="16" y="26" class="text-heading">Department Performance &amp; Capacity Breakdown</text>
+
+      <line x1="0" y1="72" x2="760" y2="72" stroke="#E2E8F0" stroke-width="1" />
+      <text x="16" y="62" font-size="10px" font-weight="700" fill="#64748B">DEPARTMENT</text>
+      <text x="200" y="62" font-size="10px" font-weight="700" fill="#64748B">BED CAPACITY</text>
+      <text x="360" y="62" font-size="10px" font-weight="700" fill="#64748B">OCCUPANCY RATE</text>
+      <text x="520" y="62" font-size="10px" font-weight="700" fill="#64748B">READMISSION RATE</text>
+      <text x="670" y="62" font-size="10px" font-weight="700" fill="#64748B">STATUS</text>
+
+      <!-- Dept 1 -->
+      <g transform="translate(0, 72)">
+        <rect x="0" y="0" width="760" height="56" fill="#FFFFFF" />
+        <line x1="0" y1="56" x2="760" y2="56" stroke="#F1F5F9" stroke-width="1" />
+        <text x="16" y="28" font-size="12px" font-weight="700" fill="#1E293B">Internal Medicine</text>
+        <text x="16" y="42" class="text-caption">Dr. Jenkins • Lead</text>
+        <text x="200" y="32" class="text-body">410 Beds</text>
+        <text x="360" y="32" font-size="12px" font-weight="700" fill="#DC2626">91.2% (Critical)</text>
+        <text x="520" y="32" class="text-body">9.4% (38 patients)</text>
+        <rect x="670" y="19" width="75" height="22" class="badge-high" />
+        <text x="707" y="34" text-anchor="middle" class="badge-high-text">HIGH LOAD</text>
+      </g>
+
+      <!-- Dept 2 -->
+      <g transform="translate(0, 128)">
+        <rect x="0" y="0" width="760" height="56" fill="#FFFFFF" />
+        <line x1="0" y1="56" x2="760" y2="56" stroke="#F1F5F9" stroke-width="1" />
+        <text x="16" y="28" font-size="12px" font-weight="700" fill="#1E293B">Cardiology Division</text>
+        <text x="16" y="42" class="text-caption">Dr. Thorne • Lead</text>
+        <text x="200" y="32" class="text-body">320 Beds</text>
+        <text x="360" y="32" font-size="12px" font-weight="700" fill="#D97706">88.0% (Elevated)</text>
+        <text x="520" y="32" class="text-body">8.2% (26 patients)</text>
+        <rect x="670" y="19" width="75" height="22" rx="4" fill="#FEF3C7" stroke="#FDE68A" stroke-width="1" />
+        <text x="707" y="34" text-anchor="middle" font-size="10px" font-weight="700" fill="#B45309">ELEVATED</text>
+      </g>
+
+      <!-- Dept 3 -->
+      <g transform="translate(0, 184)">
+        <rect x="0" y="0" width="760" height="56" fill="#FFFFFF" />
+        <line x1="0" y1="56" x2="760" y2="56" stroke="#F1F5F9" stroke-width="1" />
+        <text x="16" y="28" font-size="12px" font-weight="700" fill="#1E293B">Pulmonology &amp; Critical Care</text>
+        <text x="16" y="42" class="text-caption">Dr. Morrison • Lead</text>
+        <text x="200" y="32" class="text-body">180 Beds</text>
+        <text x="360" y="32" font-size="12px" font-weight="700" fill="#059669">79.1% (Optimal)</text>
+        <text x="520" y="32" class="text-body">7.1% (13 patients)</text>
+        <rect x="670" y="19" width="75" height="22" rx="4" fill="#DCFCE7" stroke="#BBF7D0" stroke-width="1" />
+        <text x="707" y="34" text-anchor="middle" font-size="10px" font-weight="700" fill="#15803D">OPTIMAL</text>
+      </g>
+
+      <!-- Dept 4 -->
+      <g transform="translate(0, 240)">
+        <rect x="0" y="0" width="760" height="56" fill="#FFFFFF" />
+        <line x1="0" y1="56" x2="760" y2="56" stroke="#F1F5F9" stroke-width="1" />
+        <text x="16" y="28" font-size="12px" font-weight="700" fill="#1E293B">Emergency &amp; Acute Care</text>
+        <text x="16" y="42" class="text-caption">Dr. Patel • Lead</text>
+        <text x="200" y="32" class="text-body">120 Beds</text>
+        <text x="360" y="32" font-size="12px" font-weight="700" fill="#059669">85.0% (Stable)</text>
+        <text x="520" y="32" class="text-body">6.5% (8 patients)</text>
+        <rect x="670" y="19" width="75" height="22" rx="4" fill="#DCFCE7" stroke="#BBF7D0" stroke-width="1" />
+        <text x="707" y="34" text-anchor="middle" font-size="10px" font-weight="700" fill="#15803D">STABLE</text>
+      </g>
+
+      <g transform="translate(16, 310)">
+        <text x="0" y="16" class="text-caption">All facility performance figures synchronized with clinical EHR database.</text>
+        <rect x="640" y="0" width="95" height="24" class="btn-primary" />
+        <text x="687" y="16" text-anchor="middle" class="btn-primary-text" style="font-size: 10px;">Export Report</text>
+      </g>
+    </g>
+  </g>
+</svg>

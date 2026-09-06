@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" width="100%" height="100%" style="background:#FAF8F5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <style>
+      .text-title { font-size: 18px; font-weight: 700; fill: #1E293B; }
+      .text-subtitle { font-size: 12px; font-weight: 500; fill: #64748B; }
+      .text-heading { font-size: 14px; font-weight: 700; fill: #1E293B; }
+      .text-body { font-size: 12px; font-weight: 500; fill: #334155; }
+      .text-caption { font-size: 11px; font-weight: 500; fill: #64748B; }
+      .card { fill: #FFFFFF; stroke: #E2E8F0; stroke-width: 1; rx: 10px; }
+      .btn-primary { fill: #DC2626; rx: 6px; }
+      .btn-primary-text { font-size: 11px; font-weight: 600; fill: #FFFFFF; }
+      .skeleton-box { fill: #E2E8F0; rx: 4px; }
+    </style>
+  </defs>
+
+  <!-- Top Header -->
+  <rect x="0" y="0" width="1000" height="56" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1" />
+  <rect x="20" y="12" width="32" height="32" rx="8" fill="#2563EB" />
+  <path d="M 28 28 L 33 28 L 36 20 L 39 34 L 42 28 L 46 28" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="62" y="32" class="text-title" style="font-size: 15px;">HealthForecast <tspan fill="#2563EB">AI</tspan></text>
+  <text x="180" y="32" class="text-subtitle" style="font-size: 11px;">/ System UI States: Error Handling &amp; Loading Skeletons</text>
+
+  <!-- Main Content Area -->
+  <g transform="translate(50, 75)">
+    <!-- Section Title -->
+    <text x="0" y="15" class="text-title">Application State Handling Specifications</text>
+    <text x="0" y="32" class="text-subtitle">Demonstrates visual wireframes for error alerts, retry mechanisms, and animated loading states.</text>
+
+    <!-- 1. ERROR STATE COMPONENT -->
+    <g transform="translate(0, 55)">
+      <rect x="0" y="0" width="900" height="230" class="card" />
+      <text x="24" y="30" class="text-heading">State 1: Network &amp; Clinical Data Error (`ErrorMessage.tsx`)</text>
+      <text x="24" y="46" class="text-caption">Rendered when data fetching fails or patient record cannot be located.</text>
+
+      <!-- Error Alert Box -->
+      <g transform="translate(24, 65)">
+        <rect x="0" y="0" width="852" height="135" rx="8" fill="#FEF2F2" stroke="#FECACA" stroke-width="1.5" />
+        
+        <!-- Error Icon -->
+        <circle cx="42" cy="42" r="18" fill="#FEE2E2" />
+        <path d="M 42 32 L 42 44 M 42 50 L 42 52" stroke="#DC2626" stroke-width="2.5" stroke-linecap="round" />
+
+        <!-- Error Content -->
+        <text x="76" y="34" font-size="14px" font-weight="700" fill="#991B1B">Patient Record Unavailable</text>
+        <text x="76" y="54" font-size="12px" font-weight="500" fill="#B91C1C">
+          Failed to retrieve clinical record from data service (Error 503: Service Unavailable). Please verify your connection or click retry below.
+        </text>
+
+        <!-- Retry Action Button -->
+        <rect x="76" y="80" width="110" height="30" class="btn-primary" />
+        <text x="131" y="99" text-anchor="middle" class="btn-primary-text">↻ Try Again</text>
+
+        <rect x="200" y="80" width="130" height="30" rx="6" fill="#FFFFFF" stroke="#FCA5A5" stroke-width="1" />
+        <text x="265" y="99" text-anchor="middle" font-size="11px" font-weight="600" fill="#991B1B">Return to Dashboard</text>
+      </g>
+    </g>
+
+    <!-- 2. LOADING SKELETON STATE -->
+    <g transform="translate(0, 310)">
+      <rect x="0" y="0" width="900" height="260" class="card" />
+      <text x="24" y="30" class="text-heading">State 2: Loading State &amp; Animated Skeletons (`LoadingState.tsx` &amp; `Skeleton.tsx`)</text>
+      <text x="24" y="46" class="text-caption">Displayed during asynchronous session validation and dossier compilation.</text>
+
+      <!-- Loading Spinner & Label -->
+      <g transform="translate(24, 65)">
+        <circle cx="20" cy="18" r="12" fill="none" stroke="#2563EB" stroke-width="3" stroke-dasharray="25 15" />
+        <text x="44" y="16" font-size="13px" font-weight="700" fill="#1E293B">Retrieving patient dossier...</text>
+        <text x="44" y="32" class="text-caption">Assembling clinical history, encounters, and treatment regimens.</text>
+      </g>
+
+      <!-- Skeleton UI Blocks -->
+      <g transform="translate(24, 115)">
+        <!-- Skeleton Header -->
+        <rect x="0" y="0" width="48" height="48" rx="8" class="skeleton-box" opacity="0.6" />
+        <rect x="60" y="6" width="180" height="16" class="skeleton-box" opacity="0.8" />
+        <rect x="60" y="28" width="280" height="12" class="skeleton-box" opacity="0.4" />
+        <rect x="730" y="6" width="120" height="32" rx="6" class="skeleton-box" opacity="0.5" />
+
+        <!-- Skeleton Content Grid -->
+        <g transform="translate(0, 65)">
+          <rect x="0" y="0" width="268" height="55" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" />
+          <rect x="12" y="12" width="80" height="10" class="skeleton-box" opacity="0.4" />
+          <rect x="12" y="28" width="140" height="14" class="skeleton-box" opacity="0.7" />
+
+          <rect x="292" y="0" width="268" height="55" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" />
+          <rect x="304" y="12" width="90" height="10" class="skeleton-box" opacity="0.4" />
+          <rect x="304" y="28" width="160" height="14" class="skeleton-box" opacity="0.7" />
+
+          <rect x="584" y="0" width="268" height="55" rx="6" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1" />
+          <rect x="596" y="12" width="70" height="10" class="skeleton-box" opacity="0.4" />
+          <rect x="596" y="28" width="120" height="14" class="skeleton-box" opacity="0.7" />
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

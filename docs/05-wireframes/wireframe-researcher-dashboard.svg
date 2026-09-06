@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" width="100%" height="100%" style="background:#FAF8F5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <style>
+      .text-title { font-size: 18px; font-weight: 700; fill: #1E293B; }
+      .text-subtitle { font-size: 12px; font-weight: 500; fill: #64748B; }
+      .text-heading { font-size: 14px; font-weight: 700; fill: #1E293B; }
+      .text-body { font-size: 12px; font-weight: 500; fill: #334155; }
+      .text-caption { font-size: 11px; font-weight: 500; fill: #64748B; }
+      .card { fill: #FFFFFF; stroke: #E2E8F0; stroke-width: 1; rx: 10px; }
+      .card-header { fill: #F8FAFC; stroke: #E2E8F0; stroke-width: 1; }
+      .badge-researcher { fill: #FAF5FF; stroke: #E9D5FF; stroke-width: 1; rx: 6px; }
+      .badge-researcher-text { font-size: 11px; font-weight: 700; fill: #7E22CE; }
+      .badge-anonymized { fill: #F3F4F6; stroke: #E5E7EB; stroke-width: 1; rx: 4px; }
+      .badge-anonymized-text { font-size: 10px; font-weight: 700; fill: #4B5563; }
+      .badge-high { fill: #FEF2F2; stroke: #FECACA; stroke-width: 1; rx: 4px; }
+      .badge-high-text { font-size: 10px; font-weight: 700; fill: #DC2626; }
+      .btn-primary { fill: #7E22CE; rx: 6px; }
+      .btn-primary-text { font-size: 11px; font-weight: 600; fill: #FFFFFF; }
+      .btn-outline { fill: #FFFFFF; stroke: #CBD5E1; stroke-width: 1; rx: 6px; }
+      .btn-outline-text { font-size: 11px; font-weight: 600; fill: #475569; }
+      .sidebar-bg { fill: #FFFFFF; stroke: #E2E8F0; stroke-width: 1; }
+      .nav-item-active { fill: #FAF5FF; rx: 6px; }
+      .nav-item-active-text { font-size: 12px; font-weight: 700; fill: #7E22CE; }
+      .nav-item-text { font-size: 12px; font-weight: 500; fill: #475569; }
+    </style>
+  </defs>
+
+  <!-- Top Header -->
+  <rect x="0" y="0" width="1000" height="56" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1" />
+  <rect x="20" y="12" width="32" height="32" rx="8" fill="#7E22CE" />
+  <path d="M 28 28 L 33 28 L 36 20 L 39 34 L 42 28 L 46 28" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <text x="62" y="32" class="text-title" style="font-size: 15px;">HealthForecast <tspan fill="#7E22CE">AI</tspan></text>
+  <text x="180" y="32" class="text-subtitle" style="font-size: 11px;">/ Population Health &amp; Epidemiology Research</text>
+
+  <!-- Right Header: Researcher User -->
+  <rect x="620" y="14" width="150" height="26" class="badge-researcher" />
+  <text x="695" y="31" text-anchor="middle" class="badge-researcher-text">Healthcare Researcher</text>
+  <circle cx="795" cy="28" r="14" fill="#F3E8FF" />
+  <text x="795" y="32" text-anchor="middle" font-size="11px" font-weight="700" fill="#7E22CE">MB</text>
+  <text x="818" y="27" font-size="12px" font-weight="700" fill="#1E293B">Dr. Marcus Brody, PhD</text>
+  <text x="818" y="39" class="text-caption" style="font-size: 10px;">Clinical Data Science Institute</text>
+  <rect x="925" y="16" width="55" height="24" class="btn-outline" />
+  <text x="952" y="32" text-anchor="middle" class="btn-outline-text" style="font-size: 10px;">Logout</text>
+
+  <!-- Left Sidebar Navigation -->
+  <rect x="0" y="56" width="200" height="624" class="sidebar-bg" />
+  <text x="20" y="85" font-size="10px" font-weight="700" fill="#94A3B8" letter-spacing="1">RESEARCH MODULES</text>
+  
+  <g transform="translate(12, 98)">
+    <rect x="0" y="0" width="176" height="34" class="nav-item-active" />
+    <circle cx="18" cy="17" r="4" fill="#7E22CE" />
+    <text x="32" y="21" class="nav-item-active-text">Cohort Analytics</text>
+  </g>
+  <g transform="translate(12, 138)">
+    <rect x="0" y="0" width="176" height="34" fill="transparent" />
+    <circle cx="18" cy="17" r="4" fill="#94A3B8" />
+    <text x="32" y="21" class="nav-item-text">Anonymized Dataset</text>
+  </g>
+  <g transform="translate(12, 178)">
+    <rect x="0" y="0" width="176" height="34" fill="transparent" />
+    <circle cx="18" cy="17" r="4" fill="#94A3B8" />
+    <text x="32" y="21" class="nav-item-text">Readmission Trends</text>
+  </g>
+  <g transform="translate(12, 218)">
+    <rect x="0" y="0" width="176" height="34" fill="transparent" />
+    <circle cx="18" cy="17" r="4" fill="#94A3B8" />
+    <text x="32" y="21" class="nav-item-text">Export Pipeline</text>
+  </g>
+
+  <!-- Main Content Area -->
+  <g transform="translate(220, 75)">
+    <text x="0" y="15" class="text-title">Research Cohort &amp; Epidemiological Overview</text>
+    <text x="0" y="32" class="text-subtitle">De-identified population statistics based on the Diabetes 130-US Hospitals benchmark dataset.</text>
+
+    <!-- Privacy Banner -->
+    <rect x="0" y="44" width="760" height="36" rx="6" fill="#FAF5FF" stroke="#F3E8FF" stroke-width="1" />
+    <text x="12" y="66" font-size="11px" font-weight="600" fill="#6B21A8">HIPAA Compliance Shield Active: Direct identifiers masked • De-identified Cohort IDs enabled</text>
+
+    <!-- 4 KPI Headline Cards (Researcher Specific) -->
+    <g transform="translate(0, 92)">
+      <!-- Card 1 -->
+      <rect x="0" y="0" width="178" height="84" class="card" />
+      <text x="14" y="22" class="text-caption">Total Cohort Records</text>
+      <text x="14" y="52" font-size="22px" font-weight="800" fill="#1E293B">101,766</text>
+      <text x="14" y="70" font-size="10px" font-weight="600" fill="#7E22CE">130 US Hospitals Data</text>
+
+      <!-- Card 2 -->
+      <rect x="194" y="0" width="178" height="84" class="card" />
+      <text x="208" y="22" class="text-caption">Total Clinical Encounters</text>
+      <text x="208" y="52" font-size="22px" font-weight="800" fill="#1E293B">101,766</text>
+      <text x="208" y="70" font-size="10px" font-weight="600" fill="#2563EB">10-Year Study Window</text>
+
+      <!-- Card 3 -->
+      <rect x="388" y="0" width="178" height="84" class="card" />
+      <text x="402" y="22" class="text-caption">30-Day Readmissions</text>
+      <text x="402" y="52" font-size="22px" font-weight="800" fill="#DC2626">11,357</text>
+      <text x="402" y="70" font-size="10px" font-weight="600" fill="#DC2626">11.16% Cohort Baseline</text>
+
+      <!-- Card 4 -->
+      <rect x="582" y="0" width="178" height="84" class="card" />
+      <text x="596" y="22" class="text-caption">Avg Length of Stay</text>
+      <text x="596" y="52" font-size="22px" font-weight="800" fill="#1E293B">4.39 <tspan font-size="13px" font-weight="500" fill="#64748B">Days</tspan></text>
+      <text x="596" y="70" font-size="10px" font-weight="600" fill="#64748B">Std Dev: 2.98 Days</text>
+    </g>
+
+    <!-- De-identified Research Cohort Table -->
+    <g transform="translate(0, 192)">
+      <rect x="0" y="0" width="760" height="385" class="card" />
+      <rect x="0" y="0" width="760" height="42" class="card-header" rx="10" />
+      <text x="16" y="26" class="text-heading">De-identified Research Sample Cohort</text>
+      <text x="500" y="26" class="text-caption">Names obfuscated for privacy compliance</text>
+
+      <line x1="0" y1="72" x2="760" y2="72" stroke="#E2E8F0" stroke-width="1" />
+      <text x="16" y="62" font-size="10px" font-weight="700" fill="#64748B">COHORT ID</text>
+      <text x="180" y="62" font-size="10px" font-weight="700" fill="#64748B">DEMOGRAPHICS</text>
+      <text x="320" y="62" font-size="10px" font-weight="700" fill="#64748B">PRIMARY DIAGNOSIS</text>
+      <text x="520" y="62" font-size="10px" font-weight="700" fill="#64748B">PREDICTED RISK</text>
+      <text x="660" y="62" font-size="10px" font-weight="700" fill="#64748B">DATASET TAG</text>
+
+      <!-- Row 1 -->
+      <g transform="translate(0, 72)">
+        <rect x="0" y="0" width="760" height="56" fill="#FFFFFF" />
+        <line x1="0" y1="56" x2="760" y2="56" stroke="#F1F5F9" stroke-width="1" />
+        <text x="16" y="28" font-size="12px" font-weight="700" fill="#7E22CE">COHORT-104928</text>
+        <text x="16" y="42" class="text-caption">[De-identified Patient]</text>
+        <text x="180" y="32" class="text-body">[70-80) Male • Caucasian</text>
+        <text x="320" y="32" class="text-body">Type 2 Diabetes (ICD-9: 250.00)</text>
+        <rect x="520" y="19" width="90" height="22" class="badge-high" />
+        <text x="565" y="34" text-anchor="middle" class="badge-high-text">HIGH (84%)</text>
+        <rect x="660" y="19" width="85" height="22" class="badge-anonymized" />
+        <text x="702" y="34" text-anchor="middle" class="badge-anonymized-text">TRAINING SET</text>
+      </g>
+
+      <!-- Row 2 -->
+      <g transform="translate(0, 128)">
+        <rect x="0" y="0" width="760" height="56" fill="#FFFFFF" />
+        <line x1="0" y1="56" x2="760" y2="56" stroke="#F1F5F9" stroke-width="1" />
+        <text x="16" y="28" font-size="12px" font-weight="700" fill="#7E22CE">COHORT-209841</text>
+        <text x="16" y="42" class="text-caption">[De-identified Patient]</text>
+        <text x="180" y="32" class="text-body">[50-60) Female • Hispanic</text>
+        <text x="320" y="32" class="text-body">Congestive Heart Failure (428.0)</text>
+        <rect x="520" y="19" width="90" height="22" class="badge-high" />
+        <text x="565" y="34" text-anchor="middle" class="badge-high-text">HIGH (78%)</text>
+        <rect x="660" y="19" width="85" height="22" class="badge-anonymized" />
+        <text x="702" y="34" text-anchor="middle" class="badge-anonymized-text">VALIDATION</text>
+      </g>
+
+      <!-- Row 3 -->
+      <g transform="translate(0, 184)">
+        <rect x="0" y="0" width="760" height="56" fill="#FFFFFF" />
+        <line x1="0" y1="56" x2="760" y2="56" stroke="#F1F5F9" stroke-width="1" />
+        <text x="16" y="28" font-size="12px" font-weight="700" fill="#7E22CE">COHORT-391024</text>
+        <text x="16" y="42" class="text-caption">[De-identified Patient]</text>
+        <text x="180" y="32" class="text-body">[60-70) Male • AfricanAmerican</text>
+        <text x="320" y="32" class="text-body">COPD Exacerbation (491.21)</text>
+        <rect x="520" y="19" width="90" height="22" rx="4" fill="#FFFBEB" stroke="#FDE68A" stroke-width="1" />
+        <text x="565" y="34" text-anchor="middle" font-size="10px" font-weight="700" fill="#D97706">MEDIUM (62%)</text>
+        <rect x="660" y="19" width="85" height="22" class="badge-anonymized" />
+        <text x="702" y="34" text-anchor="middle" class="badge-anonymized-text">TRAINING SET</text>
+      </g>
+
+      <!-- Row 4 -->
+      <g transform="translate(0, 240)">
+        <rect x="0" y="0" width="760" height="56" fill="#FFFFFF" />
+        <line x1="0" y1="56" x2="760" y2="56" stroke="#F1F5F9" stroke-width="1" />
+        <text x="16" y="28" font-size="12px" font-weight="700" fill="#7E22CE">COHORT-410293</text>
+        <text x="16" y="42" class="text-caption">[De-identified Patient]</text>
+        <text x="180" y="32" class="text-body">[40-50) Male • Caucasian</text>
+        <text x="320" y="32" class="text-body">Acute Myocardial Infarction (410.71)</text>
+        <rect x="520" y="19" width="90" height="22" rx="4" fill="#FFFBEB" stroke="#FDE68A" stroke-width="1" />
+        <text x="565" y="34" text-anchor="middle" font-size="10px" font-weight="700" fill="#D97706">MEDIUM (55%)</text>
+        <rect x="660" y="19" width="85" height="22" class="badge-anonymized" />
+        <text x="702" y="34" text-anchor="middle" class="badge-anonymized-text">TEST SET</text>
+      </g>
+
+      <g transform="translate(16, 310)">
+        <text x="0" y="16" class="text-caption">Showing 4 of 101,766 de-identified records</text>
+        <rect x="640" y="0" width="95" height="24" class="btn-primary" />
+        <text x="687" y="16" text-anchor="middle" class="btn-primary-text" style="font-size: 10px;">Export Cohort</text>
+      </g>
+    </g>
+  </g>
+</svg>
