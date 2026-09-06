@@ -47,7 +47,7 @@ export function AppShell({ children }: AppShellProps) {
       {/* Skip to Main Content Link for Keyboard Accessibility */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-brand-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg focus:outline-none"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-brand-500 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg focus:outline-none"
       >
         Skip to main content
       </a>
@@ -68,20 +68,20 @@ export function AppShell({ children }: AppShellProps) {
           >
             {/* Backdrop */}
             <div
-              className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300"
+              className="fixed inset-0 bg-warm-text/60 backdrop-blur-sm transition-opacity duration-300"
               onClick={() => setMobileSidebarOpen(false)}
               aria-hidden="true"
             />
 
             {/* Slide-over Drawer Panel */}
             <div className="fixed inset-y-0 left-0 flex max-w-xs w-full shadow-2xl z-10 animate-in slide-in-from-left duration-300">
-              <div className="relative flex-1 flex flex-col bg-white dark:bg-slate-900">
+              <div className="relative flex-1 flex flex-col bg-white dark:bg-warm-card">
                 {/* Close Button inside Drawer */}
                 <button
                   type="button"
                   onClick={() => setMobileSidebarOpen(false)}
                   aria-label="Close navigation drawer"
-                  className="absolute right-3.5 top-3.5 z-10 flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-brand-500"
+                  className="absolute right-3.5 top-3.5 z-10 flex h-8 w-8 items-center justify-center rounded-lg border border-warm-border text-warm-text-muted hover:bg-warm-neutral/50 hover:text-warm-text dark:border-warm-border dark:text-warm-text-muted dark:hover:bg-warm-neutral/20 focus-visible:ring-2 focus-visible:ring-brand-500"
                 >
                   <CloseIcon className="h-4 w-4" />
                 </button>

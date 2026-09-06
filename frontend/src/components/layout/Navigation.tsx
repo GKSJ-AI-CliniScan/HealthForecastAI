@@ -12,8 +12,13 @@ import {
   StethoscopeIcon,
   BarChartIcon,
   FileTextIcon,
+  LayersIcon,
+  SettingsIcon,
+  ClockIcon,
+  UserIcon,
 } from '@/components/ui/Icons';
 import { Role } from '@/types';
+import { useAuth } from '@/lib/auth-context';
 
 export interface NavItem {
   id: string;
@@ -21,60 +26,165 @@ export interface NavItem {
   href: string;
   icon: React.ComponentType<{ className?: string; size?: number }>;
   isPlaceholder?: boolean;
-  allowedRoles?: Role[];
 }
 
-export const NAVIGATION_ITEMS: NavItem[] = [
-  {
-    id: 'dashboard',
-    name: 'Dashboard',
-    href: '/',
-    icon: ActivityIcon,
-    isPlaceholder: false,
-  },
-  {
-    id: 'patients',
-    name: 'Patients',
-    href: '#',
-    icon: UsersIcon,
-    isPlaceholder: true,
-  },
-  {
-    id: 'risk-prediction',
-    name: 'Risk Prediction',
-    href: '#',
-    icon: ShieldAlertIcon,
-    isPlaceholder: true,
-  },
-  {
-    id: 'readmission',
-    name: 'Readmission',
-    href: '#',
-    icon: HeartPulseIcon,
-    isPlaceholder: true,
-  },
-  {
-    id: 'treatment',
-    name: 'Treatment',
-    href: '#',
-    icon: StethoscopeIcon,
-    isPlaceholder: true,
-  },
-  {
-    id: 'analytics',
-    name: 'Analytics',
-    href: '#',
-    icon: BarChartIcon,
-    isPlaceholder: true,
-  },
-  {
-    id: 'reports',
-    name: 'Reports',
-    href: '#',
-    icon: FileTextIcon,
-    isPlaceholder: true,
-  },
-];
+export const ROLE_NAVIGATION: Record<Role, NavItem[]> = {
+  doctor: [
+    {
+      id: 'doc-dashboard',
+      name: 'Dashboard',
+      href: '/dashboard',
+      icon: ActivityIcon,
+      isPlaceholder: false,
+    },
+    {
+      id: 'doc-patients',
+      name: 'Patients',
+      href: '/patients',
+      icon: UsersIcon,
+      isPlaceholder: false,
+    },
+    {
+      id: 'doc-predictions',
+      name: 'Risk Predictions',
+      href: '#risk-predictions',
+      icon: ShieldAlertIcon,
+      isPlaceholder: true,
+    },
+    {
+      id: 'doc-treatment-reports',
+      name: 'Treatment Reports',
+      href: '#treatment-reports',
+      icon: StethoscopeIcon,
+      isPlaceholder: true,
+    },
+    {
+      id: 'doc-followup',
+      name: 'Follow-up Planning',
+      href: '#follow-up',
+      icon: ClockIcon,
+      isPlaceholder: true,
+    },
+  ],
+  hospital_admin: [
+    {
+      id: 'admin-dashboard',
+      name: 'Dashboard',
+      href: '/dashboard',
+      icon: ActivityIcon,
+      isPlaceholder: false,
+    },
+    {
+      id: 'admin-analytics',
+      name: 'Hospital Analytics',
+      href: '#hospital-analytics',
+      icon: BarChartIcon,
+      isPlaceholder: true,
+    },
+    {
+      id: 'admin-outcomes',
+      name: 'Patient Outcomes',
+      href: '/patients',
+      icon: UsersIcon,
+      isPlaceholder: false,
+    },
+    {
+      id: 'admin-dept-performance',
+      name: 'Department Performance',
+      href: '#department-performance',
+      icon: LayersIcon,
+      isPlaceholder: true,
+    },
+    {
+      id: 'admin-reports',
+      name: 'Reports',
+      href: '#reports',
+      icon: FileTextIcon,
+      isPlaceholder: true,
+    },
+  ],
+  researcher: [
+    {
+      id: 'res-dashboard',
+      name: 'Dashboard',
+      href: '/dashboard',
+      icon: ActivityIcon,
+      isPlaceholder: false,
+    },
+    {
+      id: 'res-analytics',
+      name: 'Healthcare Analytics',
+      href: '#healthcare-analytics',
+      icon: BarChartIcon,
+      isPlaceholder: true,
+    },
+    {
+      id: 'res-readmission-trends',
+      name: 'Readmission Trends',
+      href: '#readmission-trends',
+      icon: HeartPulseIcon,
+      isPlaceholder: true,
+    },
+    {
+      id: 'res-treatment-analysis',
+      name: 'Treatment Analysis',
+      href: '#treatment-analysis',
+      icon: StethoscopeIcon,
+      isPlaceholder: true,
+    },
+    {
+      id: 'res-research-data',
+      name: 'Research Data',
+      href: '/patients',
+      icon: UsersIcon,
+      isPlaceholder: false,
+    },
+  ],
+  system_admin: [
+    {
+      id: 'sys-dashboard',
+      name: 'Dashboard',
+      href: '/dashboard',
+      icon: ActivityIcon,
+      isPlaceholder: false,
+    },
+    {
+      id: 'sys-user-mgmt',
+      name: 'User Management',
+      href: '#user-management',
+      icon: UserIcon,
+      isPlaceholder: true,
+    },
+    {
+      id: 'sys-role-mgmt',
+      name: 'Role Management',
+      href: '#role-management',
+      icon: ShieldAlertIcon,
+      isPlaceholder: true,
+    },
+    {
+      id: 'sys-dataset-mgmt',
+      name: 'Dataset Management',
+      href: '#dataset-management',
+      icon: LayersIcon,
+      isPlaceholder: true,
+    },
+    {
+      id: 'sys-model-mgmt',
+      name: 'Model Management',
+      href: '#model-management',
+      icon: ActivityIcon,
+      isPlaceholder: true,
+    },
+    {
+      id: 'sys-settings',
+      name: 'System Settings',
+      href: '#system-settings',
+      icon: SettingsIcon,
+      isPlaceholder: true,
+    },
+  ],
+};
 
 interface NavigationProps {
   onItemClick?: () => void;
@@ -83,25 +193,30 @@ interface NavigationProps {
 
 export function Navigation({ onItemClick, className }: NavigationProps) {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const role = user?.role ?? 'doctor';
+  const navItems = ROLE_NAVIGATION[role] || ROLE_NAVIGATION.doctor;
 
   return (
     <nav className={cn('space-y-1 px-3 py-2', className)} aria-label="Main Navigation">
-      {NAVIGATION_ITEMS.map((item) => {
+      {navItems.map((item) => {
         const Icon = item.icon;
-        const isActive = !item.isPlaceholder && pathname === item.href;
+        const isActive =
+          !item.isPlaceholder &&
+          (pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href)));
 
         if (item.isPlaceholder) {
           return (
             <div
               key={item.id}
-              className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-medium text-slate-400 dark:text-slate-500 cursor-not-allowed select-none"
+              className="flex items-center justify-between rounded-lg px-3 py-2 text-xs font-medium text-warm-text-light/70 dark:text-warm-text-light/50 cursor-not-allowed select-none"
               title={`${item.name} (Upcoming Module)`}
             >
               <div className="flex items-center gap-3">
-                <Icon className="h-4 w-4 text-slate-300 dark:text-slate-600" />
+                <Icon className="h-4 w-4 text-warm-text-light/50 dark:text-warm-text-light/30" />
                 <span>{item.name}</span>
               </div>
-              <span className="text-[10px] text-slate-400 dark:text-slate-600 uppercase">
+              <span className="text-[10px] text-warm-text-light/60 uppercase">
                 Soon
               </span>
             </div>
@@ -117,8 +232,8 @@ export function Navigation({ onItemClick, className }: NavigationProps) {
             className={cn(
               'group flex items-center justify-between rounded-lg px-3 py-2 text-xs font-medium transition-colors',
               isActive
-                ? 'bg-brand-50 text-brand-700 font-semibold dark:bg-brand-950/60 dark:text-brand-300'
-                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-slate-200',
+                ? 'bg-brand-50 text-brand-700 font-semibold dark:bg-brand-950/60 dark:text-brand-300 shadow-xs'
+                : 'text-warm-text-muted hover:bg-warm-neutral/50 hover:text-warm-text dark:text-warm-text-muted dark:hover:bg-warm-neutral/20 dark:hover:text-warm-text',
             )}
           >
             <div className="flex items-center gap-3">
@@ -126,8 +241,8 @@ export function Navigation({ onItemClick, className }: NavigationProps) {
                 className={cn(
                   'h-4 w-4 transition-colors',
                   isActive
-                    ? 'text-brand-600 dark:text-brand-400'
-                    : 'text-slate-400 group-hover:text-slate-600 dark:text-slate-500',
+                    ? 'text-brand-500 dark:text-brand-400'
+                    : 'text-warm-text-light group-hover:text-warm-text dark:text-warm-text-muted',
                 )}
               />
               <span>{item.name}</span>

@@ -3,22 +3,30 @@
 @tailwind utilities;
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --surface: #ffffff;
-  --surface-subtle: #f1f5f9;
-  --border: #e2e8f0;
-  --border-subtle: #cbd5e1;
+  --background: #FFF9F5;
+  --foreground: #2F2926;
+  --surface: #FFFFFF;
+  --surface-subtle: #F3E8E1;
+  --border: #EADDD5;
+  --border-subtle: #F2E8E2;
+  --primary: #C96B4B;
+  --primary-hover: #B85A3C;
+  --accent: #E8A87C;
+  --text-muted: #6B625E;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0f1d;
-    --foreground: #f1f5f9;
-    --surface: #111827;
-    --surface-subtle: #1a2234;
-    --border: #1e293b;
-    --border-subtle: #334155;
+    --background: #1C1816;
+    --foreground: #F5EBE6;
+    --surface: #26201D;
+    --surface-subtle: #332B27;
+    --border: #3E3530;
+    --border-subtle: #4D423C;
+    --primary: #C96B4B;
+    --primary-hover: #DA8560;
+    --accent: #E8A87C;
+    --text-muted: #B3A8A2;
   }
 }
 
@@ -33,4 +41,25 @@ body {
 /* Smooth transitions for interactive elements */
 a, button {
   transition: all 0.15s ease-in-out;
+}
+
+/* Print styles for clinical charts */
+@media print {
+  aside, header, nav, button, a[href="/patients"], .role-switcher {
+    display: none !important;
+  }
+  
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  .lg\:pl-64 {
+    padding-left: 0 !important;
+  }
+  
+  main {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
 }

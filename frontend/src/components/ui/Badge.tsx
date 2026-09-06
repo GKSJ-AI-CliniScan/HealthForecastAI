@@ -27,31 +27,31 @@ export function Badge({
 }: BadgeProps) {
   const variantStyles = {
     default:
-      'bg-brand-50 text-brand-700 border-brand-200 dark:bg-brand-950/50 dark:text-brand-300 dark:border-brand-800',
+      'bg-brand-50 text-brand-700 border-brand-200 dark:bg-brand-950/60 dark:text-brand-300 dark:border-brand-800',
     outline:
-      'border-slate-300 text-slate-700 dark:border-slate-700 dark:text-slate-300',
+      'border-warm-border text-warm-text dark:border-warm-border dark:text-warm-text',
     secondary:
-      'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700',
+      'bg-warm-neutral text-warm-text border-warm-border dark:bg-warm-neutral/20 dark:text-warm-text dark:border-warm-border',
     success:
-      'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800',
+      'bg-sage-50 text-sage-700 border-sage-200 dark:bg-sage-900/40 dark:text-sage-200 dark:border-sage-800',
     warning:
-      'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-800',
+      'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/40 dark:text-amber-200 dark:border-amber-800',
     danger:
-      'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-800',
+      'bg-coral-50 text-coral-700 border-coral-200 dark:bg-coral-900/40 dark:text-coral-200 dark:border-coral-800',
     info:
-      'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/50 dark:text-sky-300 dark:border-sky-800',
+      'bg-brand-50 text-brand-700 border-brand-200 dark:bg-brand-950/50 dark:text-brand-300 dark:border-brand-800',
     riskLow:
-      'bg-emerald-100/70 text-emerald-800 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300',
+      'bg-sage-100/90 text-sage-800 border-sage-300 dark:bg-sage-900/50 dark:text-sage-200 dark:border-sage-700 font-bold',
     riskMedium:
-      'bg-amber-100/70 text-amber-800 border-amber-300 dark:bg-amber-950 dark:text-amber-300',
+      'bg-amber-100/90 text-amber-900 border-amber-300 dark:bg-amber-900/50 dark:text-amber-200 dark:border-amber-700 font-bold',
     riskHigh:
-      'bg-rose-100/70 text-rose-800 border-rose-300 dark:bg-rose-950 dark:text-rose-300',
+      'bg-coral-100/90 text-coral-900 border-coral-300 dark:bg-coral-900/50 dark:text-coral-200 dark:border-coral-700 font-bold',
     doctor:
-      'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/50 dark:text-teal-300 dark:border-teal-800',
+      'bg-brand-50 text-brand-700 border-brand-200 dark:bg-brand-950/60 dark:text-brand-300 dark:border-brand-800',
     admin:
-      'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-300 dark:border-indigo-800',
+      'bg-warm-neutral text-warm-text border-warm-border dark:bg-warm-neutral/30 dark:text-warm-text dark:border-warm-border',
     researcher:
-      'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800',
+      'bg-sage-50 text-sage-700 border-sage-200 dark:bg-sage-900/50 dark:text-sage-200 dark:border-sage-800',
   };
 
   return (
