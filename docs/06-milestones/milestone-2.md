@@ -1,16 +1,8 @@
 # Milestone 2 report - Week 3 & 4 - Risk Prediction & Readmission Forecasting
 
-> **How to use this file**
-> 1. Fill in every section below. Keep all five headings, even if an answer is short.
-> 2. Delete the `_Not started_` line once you begin - that line is what tells CI
->    the report is still a blank template.
-> 3. Commit it on your own branch. Do not open a pull request to `main`.
-
-_Not started_
-
-- **Intern name:**
-- **Branch:** `intern/<your-name>`
-- **Submitted on:**
+- **Intern name:** V. Naga Phanendra
+- **Branch:** `intern/25-v-naga-phanendra`
+- **Submitted on:** 2026-09-07
 
 ---
 
@@ -34,34 +26,34 @@ _Not started_
 
 ## What I built
 
-<!-- What works end to end? Name the files you added or changed and why. -->
+Implemented the end-to-end readmission prediction engine, clinical decision support (CDS) insight generator, and backend API integration for Member 2 (Readmission & Clinical Backend):
+
+- `backend/app/services/cds_service.py`: Developed rule-based clinical insights engine that extracts primary contributing factors (prior utilization, hospital stay length, polypharmacy, poor glycemic control via HbA1c) and generates evidence-based intervention recommendations.
+- `backend/app/services/risk_service.py`: Implemented calibrated readmission scoring (`compute_readmission_probability`) based on inpatient/emergency encounters, length of stay, and diagnostic complexity, mapping onto platform risk bands (`low`, `medium`, `high`) using project thresholds.
+- `backend/app/schemas/prediction.py`: Extended `RiskPredictionRequest` and `RiskPredictionRead` Pydantic schemas to validate clinical encounter features and serialize risk categories, probability, and clinical insight arrays.
+- `backend/app/api/v1/endpoints/risk.py`: Built fully functional, RBAC-guarded FastAPI endpoints:
+  - `POST /api/v1/risk/predict`: Computes real-time probability, risk band, and clinical insights for an encounter.
+  - `GET /api/v1/risk/high-risk`: Queries and evaluates the high-risk patient cohort.
+  - `GET /api/v1/risk/forecast`: Generates horizon-based hospital readmission projections and volume rates.
+- `backend/tests/test_risk_service.py`: Added automated test suites validating probability boundary conditions, risk banding transitions, and clinical insights generation.
 
 ## How to run it
 
-<!-- Exact commands a reviewer can copy and paste from a clean clone. -->
+From a clean clone:
 
 ```bash
-git clone <repo-url>
-git checkout intern/<your-name>
-# ... your steps
-```
+git clone [https://github.com/GKSJ-AI-CliniScan/HealthForecastAI.git](https://github.com/GKSJ-AI-CliniScan/HealthForecastAI.git)
+cd HealthForecastAI
+git checkout intern/25-v-naga-phanendra
 
-## Evidence
+# 1. Setup backend environment
+cd backend
+python -m venv .venv
+.\.venv\Scripts\activate  # On Linux/macOS: source .venv/bin/activate
+pip install -r requirements.txt
 
-<!--
-Screenshots, API responses or terminal output proving it works.
-Put images in docs/05-wireframes/ or alongside this file and link them.
-Never screenshot real patient data.
--->
+# 2. Run backend automated test suite
+python -m pytest
 
-## Metrics
-
-<!--
-Report all five: accuracy, precision, recall, F1 and ROC-AUC, for every model you
-trained. Say which model won and why. Accuracy alone is not an answer on an
-imbalanced target.
--->
-
-## Known gaps
-
-<!-- What is unfinished, what you would do next, and anything you are stuck on. -->
+# 3. Start local FastAPI development server
+uvicorn app.main:app --reload --port 8000
