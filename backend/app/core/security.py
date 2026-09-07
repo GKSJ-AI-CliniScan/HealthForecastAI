@@ -1,43 +1,41 @@
-"""Password hashing and JWT helpers."""
+import hashlib
+import os
+import jwt
+from datetime import datetime, timedelta, timezone
+from typing import Optional, Any
+from app.config import settings
 
-from datetime import UTC, datetime, timedelta
-from typing import Any
-
-from jose import JWTError, jwt
-from passlib.context import CryptContext
-
-from app.core.config import settings
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-def hash_password(plain_password: str) -> str:
-    """Return a bcrypt hash for the given plaintext password."""
-    return pwd_context.hash(plain_password)
-
+def get_password_hash(password: str) -> str:
+    """Hash a password using PBKDF2-HMAC-SHA256 with a random salt."""
+    salt = os.urandom(16)
+    pwd_hash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
+    return salt.hex() + ":" + pwd_hash.hex()
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Return True when the plaintext password matches the stored hash."""
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def create_access_token(subject: str, role: str, expires_minutes: int | None = None) -> str:
-    """Create a signed JWT access token carrying the subject and role claims."""
-    expire_delta = timedelta(minutes=expires_minutes or settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    now = datetime.now(UTC)
-    payload: dict[str, Any] = {
-        "sub": subject,
-        "role": role,
-        "iat": int(now.timestamp()),
-        "exp": int((now + expire_delta).timestamp()),
-        "type": "access",
-    }
-    return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
-
-
-def decode_token(token: str) -> dict[str, Any] | None:
-    """Decode a JWT and return its claims, or None when the token is invalid."""
+    """Verify plain password against PBKDF2 hashed password string."""
     try:
-        return jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
-    except JWTError:
+        if ":" not in hashed_password:
+            return False
+        salt_hex, hash_hex = hashed_password.split(":", 1)
+        salt = bytes.fromhex(salt_hex)
+        pwd_hash = hashlib.pbkdf2_hmac('sha256', plain_password.encode('utf-8'), salt, 100000)
+        return pwd_hash.hex() == hash_hex
+    except Exception:
+        return False
+
+def create_access_token(data: dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return encoded_jwt
+
+def decode_access_token(token: str) -> Optional[dict[str, Any]]:
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        return payload
+    except jwt.PyJWTError:
         return None

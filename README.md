@@ -1,138 +1,117 @@
-# HealthForecast AI
+# HEALTHFORECAST AI 🏥⚡
+### Hospital Readmission Prediction & Patient Risk Intelligence System
 
-**Hospital Readmission Prediction & Patient Risk Intelligence System**
-
-An AI-powered healthcare analytics platform that predicts hospital readmissions,
-identifies high-risk patients, evaluates treatment effectiveness and supports
-proactive patient care planning.
-
-> **Interns start here: [INTERN_GUIDE.md](INTERN_GUIDE.md).**
-> You work on your own branch. Nothing is merged into `main`.
+HEALTHFORECAST AI is an enterprise healthcare analytics platform designed for clinical decision support, readmission risk forecasting, and hospital outcome intelligence.
 
 ---
 
-## What it does
+## 🚀 Phase 1 Architecture Completed
 
-The platform helps hospitals reduce unnecessary readmissions, improve patient
-outcomes and optimise healthcare resources through patient risk prediction,
-readmission forecasting, treatment effectiveness analysis and hospital
-performance reporting.
+- **Frontend**: Next.js 14, React 18, TypeScript, Tailwind CSS, Lucide Icons, Recharts
+- **Backend**: Python 3.11, FastAPI, Pydantic, PyMongo/Motor
+- **Database**: MongoDB Atlas (`HealthForecastAI`)
+- **Security**: JWT Authentication structure & Role-Based Access Control (RBAC)
 
-Intended users: hospitals, healthcare providers, clinics, insurance companies,
-healthcare researchers and public health organisations.
+---
 
-## Modules
+## 📁 Repository Structure
 
-| # | Module | Capability |
-|---|--------|-----------|
-| 1 | User Management | Doctor and administrator accounts, authentication, role management |
-| 2 | Patient Data Management | Patient records, medical history, treatment and admission tracking |
-| 3 | Risk Prediction | Risk analysis, readmission probability, high-risk identification |
-| 4 | Treatment Effectiveness | Outcome evaluation, recovery and medication effectiveness analysis |
-| 5 | Clinical Decision Support | Care recommendations, follow-up planning, discharge support |
-| 6 | Healthcare Analytics Dashboard | Readmission analytics, hospital performance, trend visualisation |
-| 7 | AI Model Management | Model training, evaluation, prediction monitoring, optimisation |
-
-## Roles
-
-Four roles, each with a distinct view of the data. The full access matrix is in
-[`docs/04-rbac/`](docs/04-rbac/) and is enforced in code by
-[`backend/app/core/rbac.py`](backend/app/core/rbac.py).
-
-| Role | Sees |
-|------|------|
-| **Doctor** | Assigned patients, their risk predictions and care recommendations |
-| **Hospital Administrator** | Hospital-wide analytics and performance, read-only on records |
-| **Healthcare Researcher** | Anonymised cohorts and aggregated statistics only |
-| **System Administrator** | Everything, plus user and model management |
-
-## Tech stack
-
-| Layer | Technology |
-|-------|-----------|
-| Backend | Python 3.11, FastAPI, SQLAlchemy, Alembic, JWT |
-| Frontend | Next.js 15, React 19, TypeScript, Tailwind CSS, Recharts |
-| Databases | PostgreSQL 16, MongoDB 7 |
-| ML | scikit-learn, XGBoost, Random Forest, TensorFlow, pandas, NumPy |
-| DevOps | Docker, Docker Compose, GitHub Actions, AWS or Azure |
-
-## Quick start
-
-```bash
-git clone https://github.com/GKSJ-AI-CliniScan/HealthForecastAI.git
-cd HealthForecastAI
-cp .env.example .env
-docker compose up --build
+```
+dhana infosyss/
+├── backend/
+│   ├── app/
+│   │   ├── core/
+│   │   │   └── security.py      # JWT & password hashing utilities
+│   │   ├── db/
+│   │   │   └── mongo.py         # MongoDB Atlas connection manager & health checks
+│   │   ├── routers/
+│   │   │   └── health.py        # /api/health endpoint
+│   │   ├── config.py            # Pydantic settings loading from .env
+│   │   └── main.py              # FastAPI main application & CORS setup
+│   ├── .env                     # Backend environment configuration
+│   ├── Dockerfile
+│   └── requirements.txt         # Python dependencies
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── dashboard/       # Role-specific portal layouts (Doctor, Admin, Researcher, System)
+│   │   │   ├── login/           # Professional Healthcare Authentication UI
+│   │   │   ├── globals.css      # Custom healthcare Tailwind CSS styles
+│   │   │   └── layout.tsx       # Root layout
+│   │   ├── components/
+│   │   │   ├── health/          # Live MongoDB Atlas status indicator badge
+│   │   │   ├── layout/          # Sidebar, Header & Role Switcher
+│   │   │   └── ui/              # Reusable UI primitives (Button, Card, Badge, LoadingSkeleton)
+│   │   ├── lib/
+│   │   │   ├── api.ts           # API client connecting to FastAPI backend
+│   │   │   └── utils.ts         # Formatting & classname helpers
+│   │   └── types/               # TypeScript interfaces
+│   ├── .env.local               # Frontend environment configuration
+│   ├── Dockerfile
+│   ├── package.json
+│   └── tailwind.config.ts
+├── docker-compose.yml           # Deployment configuration
+├── .gitignore
+└── README.md
 ```
 
-| Service | URL |
-|---------|-----|
-| Frontend | <http://localhost:3000> |
-| Backend | <http://localhost:8000> |
-| API docs | <http://localhost:8000/docs> |
+---
 
-Running each service directly, without Docker, is covered in
-[INTERN_GUIDE.md](INTERN_GUIDE.md#2-get-set-up).
+## ⚙️ Environment Configuration
 
-## Repository layout
+### Backend `.env` (`backend/.env`):
+```env
+MONGODB_URL=mongodb+srv://padharthidhanalakshmi_db_user:12ikStIgljXUNJa0@cluster0.wnx5exe.mongodb.net/?appName=Cluster0
+DATABASE_NAME=HealthForecastAI
+SECRET_KEY=healthforecast_ai_secret_key_super_secure_jwt_2026
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=1440
+ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+PORT=8000
+```
 
-| Path | Contents |
-|------|----------|
-| [`backend/`](backend/) | FastAPI service - API, RBAC, ORM, migrations, tests |
-| [`frontend/`](frontend/) | Next.js dashboards |
-| [`ml/`](ml/) | Modelling pipeline - preprocessing, training, evaluation |
-| [`database/`](database/) | PostgreSQL schema, MongoDB collection definitions |
-| [`deployment/`](deployment/) | Docker, nginx, AWS and Azure notes |
-| [`docs/`](docs/) | Architecture, database, API, RBAC, wireframes, milestones, testing, deployment |
-| [`scripts/ci/`](scripts/ci/) | The check scripts CI runs |
-| [`tests/`](tests/) | Integration and end-to-end tests |
-| [`.github/workflows/`](.github/workflows/) | CI, branch guard, security, progress report, deploy |
+### Frontend `.env.local` (`frontend/.env.local`):
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_APP_NAME=HealthForecast AI
+NEXT_PUBLIC_APP_VERSION=1.0.0
+```
 
-## Milestones
+---
 
-| Milestone | Weeks | Theme |
-|-----------|-------|-------|
-| 1 | 1-2 | Project initialization, design process and core setup |
-| 2 | 3-4 | Risk prediction and readmission forecasting |
-| 3 | 5-6 | Treatment effectiveness analysis and healthcare analytics |
-| 4 | 7-8 | Testing, deployment and documentation |
+## 🛠️ How to Run the Application
 
-Report templates and evaluation criteria: [`docs/06-milestones/`](docs/06-milestones/).
+### 1. Run FastAPI Backend
 
-## Continuous integration
+```bash
+cd backend
+python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
 
-CI runs on **every branch**, and skips the jobs whose folders do not exist yet,
-so an early branch is not failed for work that has not started.
+The backend server will start at: `http://127.0.0.1:8000`
+- Interactive API Documentation: `http://127.0.0.1:8000/docs`
+- Health & Database Connection API: `http://127.0.0.1:8000/api/health`
 
-| Workflow | Trigger | Purpose |
-|----------|---------|---------|
-| [CI](.github/workflows/ci.yml) | Every push and pull request | Repository checks, backend, frontend, ML, Docker |
-| [Branch guard](.github/workflows/branch-guard.yml) | Pull requests | Blocks pull requests into `main` |
-| [Security](.github/workflows/security.yml) | Every push, weekly | `pip-audit`, `npm audit`, CodeQL |
-| [Intern progress report](.github/workflows/intern-progress.yml) | Weekly, on demand | One table of every intern branch and its CI status |
-| [Deploy](.github/workflows/deploy.yml) | Manual only | Milestone 4: verify, build images, release to your environment |
+### 2. Run Next.js Frontend
 
-The full list of checks and how to run them locally is in
-[INTERN_GUIDE.md](INTERN_GUIDE.md#6-what-ci-checks).
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-## Contributing
+The frontend application will start at: `http://localhost:3000`
 
-This is an internship project repository.
+---
 
-- Work on `intern/<your-name>`.
-- Do not push to `main`.
-- Do not open pull requests into `main`.
-- Never commit datasets, model artifacts, `.env` files, credentials, or any
-  real patient data.
+## 👥 Role-Based Portals
 
-Read [INTERN_GUIDE.md](INTERN_GUIDE.md) before your first commit.
+1. **Doctor Portal** (`/dashboard/doctor`): Assigned patient roster, risk alerts, clinical decision support.
+2. **Hospital Administrator Portal** (`/dashboard/admin`): Hospital-wide readmission rates & departmental performance.
+3. **Healthcare Researcher Portal** (`/dashboard/researcher`): De-identified population stats & dataset generator.
+4. **System Administrator Portal** (`/dashboard/system`): User management, security audit logs & AI model registry.
 
-## Dataset
+---
 
-Diabetes 130-US Hospitals (1999-2008), 101,766 encounters.
-Download instructions: [`ml/data/README.md`](ml/data/README.md).
-**The dataset is never committed to this repository.**
-
-## Licence
-
-See [LICENSE](LICENSE).
+## 🛡️ Clinical Decision Support Notice
+Predictions and risk scores provided by HealthForecast AI are decision-support indicators and do not constitute a formal medical diagnosis.
