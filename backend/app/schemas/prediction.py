@@ -1,6 +1,6 @@
 """Risk prediction and readmission forecasting schemas."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -16,19 +16,22 @@ class RiskPredictionRequest(BaseModel):
     number_inpatient: int = Field(default=0, ge=0)
     number_emergency: int = Field(default=0, ge=0)
     age_group: str | None = None
+    A1Cresult: str | None = Field(default="None")
 
 
 class RiskPredictionRead(BaseModel):
-    """A readmission risk result."""
+    """A readmission risk result with clinical insights."""
 
     model_config = ConfigDict(from_attributes=True)
 
     patient_id: int
     readmission_probability: float = Field(ge=0.0, le=1.0)
     risk_category: str
-    model_name: str
-    model_version: str
-    created_at: datetime | None = None
+    model_name: str = "diabetes_readmission_xgb"
+    model_version: str = "v1.0.0"
+    contributing_factors: list[str] = Field(default_factory=list)
+    recommended_actions: list[str] = Field(default_factory=list)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class ReadmissionForecast(BaseModel):
