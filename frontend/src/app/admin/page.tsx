@@ -1,5 +1,8 @@
 "use client";
 
+import { HeartPulse } from "lucide-react";
+
+
 const departments = [
   {
     name: "Cardiology",
@@ -59,16 +62,23 @@ export default function AdminDashboard() {
     <main className="admin-page">
       {/* ================= HEADER ================= */}
       <header className="admin-header">
-        <div className="admin-brand">
-          <div className="admin-logo">+</div>
+         <div className="admin-brand">
 
-          <div>
-            <h1>
-              HealthForecast <span>AI</span>
-            </h1>
-            <p>Predictive Healthcare Intelligence</p>
-          </div>
-        </div>
+    {/* Blue Logo */}
+    <div className="admin-logo">
+      <HeartPulse size={24} strokeWidth={2.5} />
+    </div>
+
+    {/* Brand Name */}
+    <div>
+      <h1>
+        HealthForecast <span>AI</span>
+      </h1>
+
+      <p>HEALTHCARE INTELLIGENCE</p>
+    </div>
+
+  </div>
 
         <div className="admin-header-actions">
           <button className="admin-icon-button">

@@ -1,5 +1,7 @@
 "use client";
 
+import { HeartPulse } from "lucide-react";
+
 const metrics = [
   {
     title: "Total Users",
@@ -127,22 +129,19 @@ export default function SystemAdminDashboard() {
 
       {/* HEADER */}
       <header className="sysadmin-header">
+<div className="sysadmin-brand">
+  <div className="sysadmin-logo">
+    <HeartPulse size={24} strokeWidth={2.5} />
+  </div>
 
-        <div className="sysadmin-brand">
+  <div>
+    <h1>
+      HealthForecast <span>AI</span>
+    </h1>
 
-          <div className="sysadmin-logo">
-            ♥
-          </div>
-
-          <div>
-            <h1>
-              HealthForecast <span>AI</span>
-            </h1>
-
-            <p>Predictive Healthcare Intelligence</p>
-          </div>
-
-        </div>
+    <p>HEALTHCARE INTELLIGENCE</p>
+  </div>
+</div>
 
         <div className="sysadmin-header-right">
 

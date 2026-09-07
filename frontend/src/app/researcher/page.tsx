@@ -1,5 +1,7 @@
 "use client";
 
+import { HeartPulse } from "lucide-react";
+
 const researchMetrics = [
   {
     title: "Patient Records",
@@ -78,16 +80,18 @@ export default function ResearcherDashboard() {
       {/* HEADER */}
       <header className="research-header">
         <div className="research-brand">
-          <div className="research-logo">+</div>
+  <div className="research-logo">
+    <HeartPulse size={24} strokeWidth={2.5} />
+  </div>
 
-          <div>
-            <h1>
-              HealthForecast <span>AI</span>
-            </h1>
+  <div>
+    <h1>
+      HealthForecast <span>AI</span>
+    </h1>
 
-            <p>Predictive Healthcare Intelligence</p>
-          </div>
-        </div>
+    <p>HEALTHCARE INTELLIGENCE</p>
+  </div>
+</div>
 
         <div className="research-header-right">
           <button className="research-icon-button">
