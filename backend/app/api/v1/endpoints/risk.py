@@ -1,7 +1,7 @@
 """Risk prediction and readmission forecasting endpoints - Module 3."""
 
 from fastapi import APIRouter
-from app.core.config import settings
+
 from app.schemas.prediction import (
     ReadmissionForecast,
     RiskPredictionRead,

@@ -2,10 +2,10 @@
 
 from pathlib import Path
 from typing import Any
+
 import joblib
 import pandas as pd
 
-from app.core.config import settings
 from app.schemas.prediction import RiskPredictionRequest
 
 _model_cache: Any = None
@@ -63,7 +63,9 @@ def predict_readmission_probability(payload: RiskPredictionRequest) -> float:
     df = pd.DataFrame(input_dict)
 
     # Derive engineered features
-    df["prior_visits_total"] = df["number_outpatient"] + df["number_emergency"] + df["number_inpatient"]
+    df["prior_visits_total"] = (
+        df["number_outpatient"] + df["number_emergency"] + df["number_inpatient"]
+    )
     df["is_polypharmacy"] = (df["num_medications"] >= 10).astype(int)
     df["has_med_change"] = (df["change"].astype(str).str.strip().str.lower() == "ch").astype(int)
     df["is_long_stay"] = (df["time_in_hospital"] >= 7).astype(int)
@@ -76,5 +78,9 @@ def predict_readmission_probability(payload: RiskPredictionRequest) -> float:
         return float(preds[0])
     except Exception:
         # Fallback if specific column mismatch occurs
-        base = 0.20 + min(payload.time_in_hospital * 0.04, 0.35) + min(payload.num_medications * 0.02, 0.30)
+        base = (
+            0.20
+            + min(payload.time_in_hospital * 0.04, 0.35)
+            + min(payload.num_medications * 0.02, 0.30)
+        )
         return min(max(base, 0.05), 0.98)
