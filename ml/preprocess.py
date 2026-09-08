@@ -5,7 +5,6 @@ Milestone 1: Data Ingestion, Cleaning, ICD-9 Category Mapping & Feature Engineer
 
 import json
 import os
-import sys
 
 
 def map_icd9_to_category(icd9_code):
