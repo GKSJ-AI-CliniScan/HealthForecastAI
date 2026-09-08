@@ -9,16 +9,19 @@ import pandas as pd
 
 
 def load_raw(path: str | Path) -> pd.DataFrame:
-    """Read the raw hospital admissions CSV.
-
-    Missing values in this dataset are encoded as "?" rather than blanks.
-    """
+    """Read the raw hospital admissions CSV, auto-resolving folder path."""
     csv_path = Path(path)
     if not csv_path.exists():
-        raise FileNotFoundError(
-            f"Raw dataset not found at {csv_path}. See ml/data/README.md for the "
-            "download instructions - datasets are never committed to git."
-        )
+        stripped_path = Path(str(path).replace("ml/", "").replace("ml\\", ""))
+        if stripped_path.exists():
+            csv_path = stripped_path
+        elif (Path("..") / path).exists():
+            csv_path = Path("..") / path
+        else:
+            raise FileNotFoundError(
+                f"Raw dataset not found at {csv_path}. See ml/data/README.md for the "
+                "download instructions - datasets are never committed to git."
+            )
     return pd.read_csv(csv_path, na_values=["?"], low_memory=False)
 
 
@@ -58,11 +61,5 @@ def prepare_milestone1_data(
 
 
 if __name__ == "__main__":
-    try:
-        processed_data = prepare_milestone1_data()
-        print("✅ Data successfully loaded using repo utilities!")
-        print(f"Dataset Shape: {processed_data.shape}")
-        print("\nFirst 5 rows:")
-        print(processed_data.head())
-    except FileNotFoundError as e:
-        print(f"❌ {e}")
+    frame = load_raw("ml/data/raw/diabetic_data.csv")
+    print(f"Loaded {len(frame)} rows from raw dataset.")

@@ -47,12 +47,26 @@ def build_preprocessor(frame: pd.DataFrame, config: dict[str, Any]) -> ColumnTra
 
 
 def add_utilisation_features(frame: pd.DataFrame) -> pd.DataFrame:
-    """Derive prior-utilisation features, the strongest readmission signal.
-
-    TODO(milestone-2): add comorbidity counts and medication-change indicators.
-    """
+    """Derive prior-utilisation and clinical risk features for readmission prediction."""
     result = frame.copy()
+
+    # 1. Total healthcare utilization
     utilisation_columns = ["number_outpatient", "number_emergency", "number_inpatient"]
-    if all(column in result.columns for column in utilisation_columns):
+    if all(col in result.columns for col in utilisation_columns):
         result["prior_visits_total"] = result[utilisation_columns].sum(axis=1)
+
+    # 2. Polypharmacy risk indicator (>= 10 medications)
+    if "num_medications" in result.columns:
+        result["is_polypharmacy"] = (result["num_medications"] >= 10).astype(int)
+
+    # 3. Medication change indicator
+    if "change" in result.columns:
+        result["has_med_change"] = (
+            result["change"].astype(str).str.strip().str.lower() == "ch"
+        ).astype(int)
+
+    # 4. Long inpatient stay indicator (>= 7 days)
+    if "time_in_hospital" in result.columns:
+        result["is_long_stay"] = (result["time_in_hospital"] >= 7).astype(int)
+
     return result

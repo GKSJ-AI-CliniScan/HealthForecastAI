@@ -36,7 +36,9 @@ def build_estimator(name: str, params: dict[str, Any]) -> Any:
     if name == "xgboost":
         from xgboost import XGBClassifier
 
-        return XGBClassifier(eval_metric="logloss", random_state=42, **options)
+        return XGBClassifier(
+            eval_metric="logloss", random_state=42, scale_pos_weight=8.0, **options
+        )
     raise ValueError(f"Unknown model: {name}")
 
 

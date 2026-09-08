@@ -96,6 +96,7 @@ logs/
 *.log
 tmp/
 temp/
+scratch/
 
 # ---------- Internal (contains intern PII - do not publish) ----------
 Predictive Healthcare Intelligence System for Patient Readmission and Resource Optimization.xlsx
