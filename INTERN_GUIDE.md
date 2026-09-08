@@ -24,6 +24,7 @@ and Resource Optimization
 10. [Hard rules](#10-hard-rules)
 11. [When CI fails](#11-when-ci-fails)
 12. [Getting help](#12-getting-help)
+13. [Branch roster](#13-branch-roster)
 
 ---
 
@@ -131,44 +132,51 @@ docker compose up --build
 
 ## 3. Create your branch
 
-Branch off `main`, once, at the start:
+Find your branch name in the [roster](#13-branch-roster) at the end of this guide
+and use it **exactly**. CI rejects any branch it does not recognise, and a
+rejected branch means your work is not attributed to you.
 
 ```bash
-git checkout main
-git pull origin main
-git checkout -b intern/firstname-lastname
-git push -u origin intern/firstname-lastname
+git clone https://github.com/GKSJ-AI-CliniScan/HealthForecastAI.git
+cd HealthForecastAI
+
+# Replace with YOUR row from the roster.
+git checkout -b intern/01-mamidi-srija-reddy origin/main
+git push -u origin intern/01-mamidi-srija-reddy
 ```
+
+Branching from `origin/main` matters: the CI workflows live on `main`, and GitHub
+only runs the workflows that exist on the branch you push. Branch from anywhere
+else and you get no pipeline at all.
+
+Confirm it worked: open the **Actions** tab. You should see a CI run against your
+branch with a **Branch policy** step that names you.
 
 ### Naming rules
 
-The pattern CI enforces is:
-
 ```
-intern/<your-name>
-intern/<your-name>/<feature>        # optional, for a side branch
+intern/NN-firstname-lastname
 ```
 
-- Lowercase only.
-- Words separated by hyphens.
+- The number is your roster ID, zero-padded: `01`, not `1`.
+- Lower case only, words separated by hyphens.
 - No spaces, no underscores, no capitals, no dots.
 
-| Your name | Branch |
-|-----------|--------|
-| Mamidi Srija Reddy | `intern/mamidi-srija-reddy` |
-| G Chandrasekhar Reddy | `intern/g-chandrasekhar-reddy` |
-| Raniya Raseen M M | `intern/raniya-raseen-m-m` |
-| V. Naga Phanendra | `intern/v-naga-phanendra` |
+The roster in [`.github/interns.yml`](.github/interns.yml) is the single source of
+truth. CI reads that file — it does not match a pattern, it matches your name, so
+`intern/john` and a misspelling both get rejected with a suggestion of what you
+probably meant.
 
-Use your full name. `intern/john` is not enough when 26 people share a repo.
-
-Named it wrong already?
+### Named it wrong already?
 
 ```bash
-git branch -m intern/correct-name
-git push origin -u intern/correct-name
-git push origin --delete intern/wrong-name
+git branch -m intern/NN-your-roster-name
+git push origin -u intern/NN-your-roster-name
+git push origin --delete intern/your-old-name
 ```
+
+If your name is spelled wrong in the roster, or you are not listed, open an issue.
+Do not invent a branch name.
 
 ---
 
@@ -291,7 +299,7 @@ Two more workflows run alongside it:
 |----------|------|------|
 | **Branch guard** | On any pull request | Fails a pull request that targets `main`; warns when shared CI files are changed |
 | **Security** | Every push and weekly | `pip-audit`, `npm audit`, CodeQL. Reports, does not block |
-| **Intern progress report** | Weekly, and on demand | A table of every `intern/*` branch, its last commit and its latest CI result |
+| **Cohort report** | Weekly, and on demand | Mentor-facing: every intern in the roster, their branch, commits ahead of main, CI result and last push |
 | **Deploy** | Manual only | Milestone 4. Verifies your branch, builds the images, and releases to your environment |
 
 ### Deploying (Milestone 4)
@@ -585,3 +593,60 @@ thing, so your question is probably not unique.
 | Testing | [`docs/07-testing/`](docs/07-testing/) |
 | Deployment | [`docs/08-deployment/`](docs/08-deployment/) |
 | Dataset download | [`ml/data/README.md`](ml/data/README.md) |
+
+---
+
+## 13. Branch roster
+
+Use your row exactly. Branch names are lower case and the number is zero-padded.
+This table mirrors [`.github/interns.yml`](.github/interns.yml), which is what CI
+actually reads.
+
+| # | Intern | Branch |
+|---|---|---|
+| 01 | Mamidi Srija Reddy | `intern/01-mamidi-srija-reddy` |
+| 02 | Padarthi Dhana Lakshmi | `intern/02-padarthi-dhana-lakshmi` |
+| 03 | Kanchan Anamika Maheshwari | `intern/03-kanchan-anamika-maheshwari` |
+| 04 | Nandini Varshney | `intern/04-nandini-varshney` |
+| 05 | Suravarapu Durga Prasad | `intern/05-suravarapu-durga-prasad` |
+| 06 | G Chandrasekhar Reddy | `intern/06-g-chandrasekhar-reddy` |
+| 07 | Mujahad Ahmed | `intern/07-mujahad-ahmed` |
+| 08 | Vaishnavi Agrahari | `intern/08-vaishnavi-agrahari` |
+| 09 | Pasam Sai Divyasri | `intern/09-pasam-sai-divyasri` |
+| 10 | Saumya S | `intern/10-saumya-s` |
+| 11 | Kanak Prabhakar | `intern/11-kanak-prabhakar` |
+| 12 | Chilukuri Venugopal | `intern/12-chilukuri-venugopal` |
+| 13 | Rambilas Sah | `intern/13-rambilas-sah` |
+| 14 | Samarth A C | `intern/14-samarth-a-c` |
+| 15 | Sattu Penchala Prasad | `intern/15-sattu-penchala-prasad` |
+| 16 | Deepak Rajak | `intern/16-deepak-rajak` |
+| 17 | Komakula Mahesh | `intern/17-komakula-mahesh` |
+| 18 | Raniya Raseen M M | `intern/18-raniya-raseen-m-m` |
+| 19 | Niyati R | `intern/19-niyati-r` |
+| 20 | Kiruthika B | `intern/20-kiruthika-b` |
+| 21 | Rachana M N | `intern/21-rachana-m-n` |
+| 22 | Liya Babu | `intern/22-liya-babu` |
+| 23 | Nishakar T | `intern/23-nishakar-t` |
+| 24 | Parimala M | `intern/24-parimala-m` |
+| 25 | V Naga Phanendra | `intern/25-v-naga-phanendra` |
+| 26 | Kaaluru Manjunath | `intern/26-kaaluru-manjunath` |
+
+If your name is spelled wrong, or you are not listed, open an issue — do not
+invent a branch name.
+
+### Your branch was renamed on 5 September 2026
+
+Branches were originally free-form (`intern/your-name`). They now carry a roster
+number so every branch maps to exactly one person. **Your work was not touched** —
+the branch was renamed, and the commits are identical.
+
+Your local clone still points at the old name. Fix it once:
+
+```bash
+git fetch origin --prune
+git branch -m intern/NN-your-roster-name
+git branch --set-upstream-to=origin/intern/NN-your-roster-name
+```
+
+Then carry on as normal. If `git push` complains about a missing upstream, run the
+last line again with your exact roster name.

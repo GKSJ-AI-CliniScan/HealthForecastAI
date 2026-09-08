@@ -52,7 +52,14 @@ def test_promotion_requires_every_threshold() -> None:
 
 @pytest.mark.parametrize(
     ("probability", "expected"),
-    [(0.0, "low"), (0.39, "low"), (0.4, "medium"), (0.69, "medium"), (0.7, "high"), (1.0, "high")],
+    [
+        (0.0, "low"),
+        (0.119, "low"),
+        (0.12, "medium"),
+        (0.199, "medium"),
+        (0.20, "high"),
+        (1.0, "high"),
+    ],
 )
 def test_risk_bands_match_the_backend(probability: float, expected: str) -> None:
     """The ML banding must agree with backend/app/services/risk_service.py."""

@@ -9,10 +9,10 @@ from app.services.risk_service import RISK_HIGH, RISK_LOW, RISK_MEDIUM, categori
     ("probability", "expected"),
     [
         (0.00, RISK_LOW),
-        (0.39, RISK_LOW),
-        (0.40, RISK_MEDIUM),
-        (0.69, RISK_MEDIUM),
-        (0.70, RISK_HIGH),
+        (0.119, RISK_LOW),
+        (0.12, RISK_MEDIUM),
+        (0.199, RISK_MEDIUM),
+        (0.20, RISK_HIGH),
         (1.00, RISK_HIGH),
     ],
 )

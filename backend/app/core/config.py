@@ -33,8 +33,8 @@ class Settings(BaseSettings):
     # ML
     MODEL_ARTIFACT_DIR: str = "ml/artifacts"
     ACTIVE_RISK_MODEL: str = "readmission_xgboost_v1"
-    RISK_THRESHOLD_HIGH: float = 0.70
-    RISK_THRESHOLD_MEDIUM: float = 0.40
+    RISK_THRESHOLD_HIGH: float = 0.20
+    RISK_THRESHOLD_MEDIUM: float = 0.12
 
     @property
     def cors_origins(self) -> list[str]:

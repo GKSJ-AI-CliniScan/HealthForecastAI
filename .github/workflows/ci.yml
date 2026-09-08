@@ -96,7 +96,12 @@ jobs:
       - name: Install check tooling
         run: pip install --quiet pyyaml==6.0.2 ruff==0.8.6
 
-      - name: Branch naming
+      # The roster decides who gets credit for what, so validate it before using it.
+      - name: Intern roster
+        run: python scripts/ci/check_roster.py
+
+      - name: Branch policy
+        if: always()
         run: python scripts/ci/check_branch.py "${{ github.head_ref || github.ref_name }}"
 
       - name: Folder structure
