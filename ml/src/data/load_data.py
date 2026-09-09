@@ -15,11 +15,13 @@ def load_raw(path: str | Path) -> pd.DataFrame:
     Missing values in this dataset are encoded as "?" rather than blanks.
     """
     csv_path = Path(path)
+
     if not csv_path.exists():
         raise FileNotFoundError(
             f"Raw dataset not found at {csv_path}. See ml/data/README.md for the "
             "download instructions - datasets are never committed to git."
         )
+
     return pd.read_csv(csv_path, na_values=["?"], low_memory=False)
 
 
@@ -30,3 +32,19 @@ def binarise_target(series: pd.Series, positive_label: str = "<30") -> pd.Series
     negative outcomes.
     """
     return (series.astype(str).str.strip() == positive_label).astype(int)
+
+
+if __name__ == "__main__":
+    dataset_path = "data/raw/diabetic_data.csv"
+
+    df = load_raw(dataset_path)
+
+    print("Dataset loaded successfully")
+    print("Rows:", len(df))
+    print("Columns:", len(df.columns))
+    print("\nReadmitted target distribution:")
+    print(df["readmitted"].value_counts())
+
+
+# Test-Path data/raw/diabetic_data.csv
+# python -m src.data.load_data
