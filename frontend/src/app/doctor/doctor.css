@@ -1,0 +1,717 @@
+/* =====================================================
+
+   DOCTOR LAYOUT
+
+===================================================== */
+
+.doctor-layout {
+
+  min-height: 100vh;
+
+  background: #f8fcff;
+
+  color: #092957;
+
+}
+
+
+/* =====================================================
+
+   HEADER
+
+===================================================== */
+
+.doctor-header {
+
+  position: fixed;
+
+  top: 0;
+
+  left: 0;
+
+  right: 0;
+
+  height: 90px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 0 42px;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #dce8f5;
+
+  z-index: 1000;
+
+}
+
+
+/* =====================================================
+
+   BRAND / LOGO
+
+===================================================== */
+
+.doctor-brand {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+}
+
+
+.doctor-logo {
+
+  width: 44px;
+
+  height: 44px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: #1268d5;
+
+  color: #ffffff;
+
+  box-shadow:
+
+    0 4px 10px rgba(18, 104, 213, 0.2);
+
+}
+
+
+.doctor-brand h1 {
+
+  margin: 0;
+
+  color: #092957;
+
+  font-size: 21px;
+
+  font-weight: 800;
+
+  line-height: 1.1;
+
+}
+
+
+.doctor-brand h1 span {
+
+  color: #1268d5;
+
+}
+
+
+.doctor-brand p {
+
+  margin: 4px 0 0;
+
+  color: #7188a5;
+
+  font-size: 9px;
+
+  font-weight: 500;
+
+  letter-spacing: 1.4px;
+
+}
+
+
+/* =====================================================
+   DOCTOR PROFILE BUTTON
+===================================================== */
+
+.doctor-profile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.doctor-profile-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 6px 10px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: transparent;
+
+  cursor: pointer;
+  text-align: left;
+
+  transition: 0.2s ease;
+}
+
+.doctor-profile-button:hover {
+  background: #f1f7ff;
+}
+
+
+/* =====================================================
+   PROFILE INFORMATION
+===================================================== */
+
+.doctor-profile-info h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #092957;
+}
+
+.doctor-profile-info p {
+  margin: 3px 0 0;
+  font-size: 10px;
+  color: #7188a5;
+}
+
+
+/* =====================================================
+   SIGN OUT DROPDOWN
+===================================================== */
+
+.doctor-logout-menu {
+  position: absolute;
+
+  top: 58px;
+  right: 0;
+
+  width: 150px;
+
+  padding: 6px;
+
+  background: #ffffff;
+
+  border: 1px solid #dce8f5;
+
+  border-radius: 10px;
+
+  box-shadow:
+    0 8px 25px rgba(18, 80, 130, 0.12);
+
+  z-index: 2000;
+}
+
+
+/* =====================================================
+   SIGN OUT BUTTON
+===================================================== */
+
+.doctor-logout-button {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  width: 100%;
+
+  padding: 10px 12px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #092957;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  text-align: left;
+
+  transition: 0.2s ease;
+}
+
+.doctor-logout-button:hover {
+  background: #fff1f1;
+  color: #c50c0c;
+}
+
+
+/* =====================================================
+
+   BODY
+
+===================================================== */
+
+.doctor-body {
+
+  display: flex;
+
+  padding-top: 90px;
+
+  min-height: 100vh;
+
+}
+
+
+/* =====================================================
+
+   SIDEBAR
+
+===================================================== */
+
+.doctor-sidebar {
+
+  position: fixed;
+
+  top: 90px;
+
+  left: 0;
+
+  bottom: 0;
+
+  width: 320px;
+
+  padding: 42px 28px;
+
+  background: #ffffff;
+
+  border-right: 1px solid #dce8f5;
+
+  overflow-y: auto;
+
+}
+
+
+.sidebar-title {
+
+  margin: 0 0 28px 18px;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  letter-spacing: 2px;
+
+  color: #7f98b5;
+
+}
+
+
+.doctor-menu {
+
+  display: flex;
+
+  align-items: center;
+
+  width: 100%;
+
+  height: 58px;
+
+  padding: 0 22px;
+
+  margin-bottom: 8px;
+
+  border-radius: 14px;
+
+  text-decoration: none;
+
+  color: #58799f;
+
+  background: transparent;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  transition: 0.2s ease;
+
+}
+
+/* ACTIVE PAGE */
+
+.doctor-menu.active {
+
+  background: #1268d5;
+
+  color: #ffffff !important;
+
+}
+
+/* HOVER - ONLY FOR NON-ACTIVE PAGES */
+
+.doctor-menu:hover:not(.active) {
+
+  background: #f1f7ff;
+
+  color: #1268d5;
+
+}
+
+/* =====================================================
+
+   SIDEBAR LINE
+
+===================================================== */
+
+.sidebar-line {
+
+  height: 1px;
+
+  background: #dce8f5;
+
+  margin: 28px 0;
+
+}
+
+
+/* =====================================================
+
+   MAIN CONTENT
+
+===================================================== */
+
+.doctor-content {
+
+  margin-left: 320px;
+
+  width: calc(100% - 320px);
+
+  min-height: calc(100vh - 90px);
+
+  padding: 40px 48px;
+
+}
+
+
+/* =====================================================
+
+   DOCTOR DASHBOARD CONTENT
+
+===================================================== */
+
+.doctor-page-label {
+
+  margin: 0;
+
+  font-size: 13px;
+
+  color: #6684a8;
+
+}
+
+
+.doctor-page-title {
+
+  margin: 6px 0 0;
+
+  font-size: 32px;
+
+  font-weight: 800;
+
+  color: #092957;
+
+}
+
+
+.doctor-page-description {
+
+  margin: 7px 0 28px;
+
+  font-size: 13px;
+
+  color: #7188a5;
+
+}
+
+
+/* =====================================================
+
+   STAT CARDS
+
+===================================================== */
+
+.doctor-stats {
+
+  display: grid;
+
+  grid-template-columns:
+
+    repeat(4, 1fr);
+
+  gap: 18px;
+
+}
+
+
+.doctor-stat-card {
+
+  background: #ffffff;
+
+  border: 1px solid #dce8f5;
+
+  border-top: 3px solid #1268d5;
+
+  border-radius: 15px;
+
+  padding: 21px;
+
+  box-shadow:
+
+    0 7px 20px rgba(18, 80, 130, 0.05);
+
+}
+
+
+.doctor-stat-card p {
+
+  margin: 0;
+
+  color: #6482a6;
+
+  font-size: 12px;
+
+}
+
+
+.doctor-stat-card h2 {
+
+  margin: 10px 0 3px;
+
+  color: #092957;
+
+  font-size: 32px;
+
+  font-weight: 800;
+
+}
+
+
+.doctor-stat-card span {
+
+  color: #89a0bb;
+
+  font-size: 11px;
+
+}
+
+
+/* =====================================================
+
+   PATIENT CARD
+
+===================================================== */
+
+.doctor-patient-card {
+
+  margin-top: 25px;
+
+  background: #ffffff;
+
+  border: 1px solid #dce8f5;
+
+  border-radius: 16px;
+
+  overflow: hidden;
+
+  box-shadow:
+
+    0 7px 20px rgba(18, 80, 130, 0.05);
+
+}
+
+
+.doctor-card-header {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 23px 27px;
+
+  border-bottom: 1px solid #dce8f5;
+
+}
+
+
+.doctor-card-header h2 {
+
+  margin: 0;
+
+  font-size: 17px;
+
+  color: #092957;
+
+}
+
+
+.doctor-card-header p {
+
+  margin: 5px 0 0;
+
+  font-size: 11px;
+
+  color: #7188a5;
+
+}
+
+
+.doctor-card-header a {
+
+  padding: 9px 15px;
+
+  border: 1px solid #cfe0f2;
+
+  border-radius: 9px;
+
+  text-decoration: none;
+
+  color: #092957;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+}
+
+
+/* =====================================================
+
+   TABLE
+
+===================================================== */
+
+.doctor-table-row {
+
+  display: grid;
+
+  grid-template-columns:
+
+    1fr 2fr 1fr 1fr;
+
+  align-items: center;
+
+  min-height: 58px;
+
+  padding: 0 27px;
+
+  border-bottom: 1px solid #e4edf6;
+
+  color: #092957;
+
+  font-size: 12px;
+
+}
+
+
+.doctor-table-row:last-child {
+
+  border-bottom: none;
+
+}
+
+
+.doctor-table-heading {
+
+  background: #f8fbff;
+
+  color: #6684a8;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.7px;
+
+}
+
+
+/* =====================================================
+
+   STATUS
+
+===================================================== */
+
+.status-active {
+
+  display: inline-flex;
+
+  width: fit-content;
+
+  padding: 6px 12px;
+
+  border-radius: 20px;
+
+  background: #e7f8ef;
+
+  color: #14804a;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+}
+
+
+.status-risk {
+
+  display: inline-flex;
+
+  width: fit-content;
+
+  padding: 6px 12px;
+
+  border-radius: 20px;
+
+  background: #ffecec;
+
+  color: #e34848;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+}
+
+
+/* =====================================================
+
+   BUTTON
+
+===================================================== */
+
+.doctor-primary-button {
+
+  border: none;
+
+  padding: 10px 17px;
+
+  border-radius: 9px;
+
+  background: #1268d5;
+
+  color: white;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow:
+
+    0 5px 13px rgba(18, 104, 213, 0.2);
+
+}
