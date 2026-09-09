@@ -212,6 +212,16 @@ Because this Milestone 2 implementation is **FRONTEND/UI ONLY** and utilizes sim
 
 ---
 
+### 3.1 UI Screenshots
+
+#### Patient Risk Prediction Dashboard
+
+![Milestone 2 Risk Prediction Dashboard](../05-wireframes/m2-risk-dashboard.png)
+
+#### Readmission Forecasting Dashboard
+
+![Milestone 2 Readmission Forecasting Dashboard](../05-wireframes/m2-forecast-dashboard.png)
+
 ## Known gaps
 
 - **Real backend / ML prediction API integration pending:** The frontend uses simulated prediction data and what-if calculation formulas; the service layer is structured to connect to the FastAPI `/risk/predict` endpoint once backend models are deployed.
