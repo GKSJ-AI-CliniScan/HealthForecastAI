@@ -6,9 +6,9 @@ from sqlalchemy.orm import Session
 from app.api.deps import CurrentUser, require_permission
 from app.core.rbac import Permission
 from app.db.session import get_db
+from app.models.user import User
 from app.schemas.user import UserCreate, UserRead
-from app.services.user_service import create_user, email_taken
-from app.services.user_service import list_users as list_users_service
+from app.services.auth_service import create_user as create_user_service
 
 router = APIRouter()
 
@@ -18,22 +18,23 @@ _manage_users = require_permission(Permission.USER_MANAGE)
 @router.get("", response_model=list[UserRead], summary="List platform users")
 def list_users(
     db: Session = Depends(get_db),
-    user: CurrentUser = Depends(_manage_users),
+    user: CurrentUser = Depends(_manage_users)
 ) -> list[UserRead]:
-    """Return every platform user."""
-    return list_users_service(db)
+    """Return every platform user from PostgreSQL."""
+    return db.query(User).all()
 
 
 @router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
-def create_new_user(
+def create_user(
     payload: UserCreate,
     db: Session = Depends(get_db),
-    user: CurrentUser = Depends(_manage_users),
+    user: CurrentUser = Depends(_manage_users)
 ) -> UserRead:
-    """Create a new platform user."""
-    if email_taken(db, payload.email):
+    """Create a new platform user in PostgreSQL."""
+    existing = db.query(User).filter(User.email == payload.email).first()
+    if existing:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="A user with this email already exists",
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User with this email already exists",
         )
-    return create_user(db, payload)
+    return create_user_service(db, payload)
