@@ -112,5 +112,29 @@
     "total_prior_visits",
     "num_med_changes",
     "num_meds_prescribed"
-  ]
+  ],
+  "medication_columns": [
+    "metformin",
+    "repaglinide",
+    "nateglinide",
+    "chlorpropamide",
+    "glimepiride",
+    "acetohexamide",
+    "glipizide",
+    "glyburide",
+    "tolbutamide",
+    "pioglitazone",
+    "rosiglitazone",
+    "acarbose",
+    "miglitol",
+    "troglitazone",
+    "tolazamide",
+    "insulin",
+    "glyburide-metformin",
+    "glipizide-metformin",
+    "glimepiride-pioglitazone",
+    "metformin-rosiglitazone",
+    "metformin-pioglitazone"
+  ],
+  "medication_columns_source": "ml/data/raw/diabetic_data.csv"
 }
