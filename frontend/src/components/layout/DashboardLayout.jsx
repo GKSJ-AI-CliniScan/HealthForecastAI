@@ -33,18 +33,21 @@ const DashboardLayout = () => {
       { name: 'Readmission Forecasts', path: '/doctor/readmission', icon: TrendingUp },
       { name: 'Treatment Effectiveness', path: '/doctor/treatment-effectiveness', icon: Activity },
       { name: 'Clinical Insights', path: '/doctor/clinical-insights', icon: Brain },
+      { name: 'Profile Settings', path: '/doctor/settings', icon: Settings },
     ],
     'hospital-admin': [
       { name: 'Hospital Dashboard', path: '/hospital-admin/dashboard', icon: LayoutDashboard },
       { name: 'Outcome Analytics', path: '/hospital-admin/analytics', icon: Activity },
       { name: 'Department Performance', path: '/hospital-admin/performance', icon: TrendingUp },
       { name: 'Reports & Export', path: '/hospital-admin/reports', icon: FileText },
+      { name: 'Profile Settings', path: '/hospital-admin/settings', icon: Settings },
     ],
     researcher: [
       { name: 'Research Dashboard', path: '/researcher/dashboard', icon: LayoutDashboard },
       { name: 'Population Health', path: '/researcher/population-health', icon: HeartPulse },
       { name: 'Readmission Trends', path: '/researcher/readmission-trends', icon: TrendingUp },
       { name: 'Research Datasets', path: '/researcher/datasets', icon: Database },
+      { name: 'Profile Settings', path: '/researcher/settings', icon: Settings },
     ],
     'system-admin': [
       { name: 'System Dashboard', path: '/system-admin/dashboard', icon: LayoutDashboard },
@@ -270,6 +273,12 @@ const DashboardLayout = () => {
                       <p className="font-bold text-zinc-800 truncate">{user?.name}</p>
                       <p className="text-[10px] text-zinc-400 font-semibold truncate">{user?.email}</p>
                     </div>
+                    <button
+                      onClick={() => { setProfileDropdownOpen(false); navigate(`/${role}/settings`); }}
+                      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold text-zinc-700 hover:bg-zinc-100 text-left transition"
+                    >
+                      <Settings className="h-4 w-4 text-zinc-500" /> Profile Settings
+                    </button>
                     <button
                       onClick={() => { setProfileDropdownOpen(false); handleLogout(); }}
                       className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 text-left transition"
