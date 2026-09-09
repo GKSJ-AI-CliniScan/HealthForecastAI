@@ -192,10 +192,24 @@ jobs:
           PGPASSWORD: postgres
         run: |
           psql \
+            -v ON_ERROR_STOP=1 \
             -h localhost \
             -U postgres \
             -d healthforecast \
             -f ../database/postgres/schema/01_schema.sql
+
+          psql \
+            -v ON_ERROR_STOP=1 \
+            -h localhost \
+            -U postgres \
+            -d healthforecast \
+            -c "SELECT to_regclass('public.users') AS users_table;"
+
+          test "$(psql -At \
+            -h localhost \
+            -U postgres \
+            -d healthforecast \
+            -c "SELECT to_regclass('public.users');")" = "users"
 
       - name: Tests (pytest)
         if: always()

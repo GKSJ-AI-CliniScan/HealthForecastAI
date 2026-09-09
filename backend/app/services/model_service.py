@@ -10,7 +10,6 @@ import pandas as pd
 
 from app.core.config import settings
 
-
 MODEL_FILENAME = "readmission_model.joblib"
 MODEL_VERSION = "1.0.0"
 
