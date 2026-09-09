@@ -3,6 +3,7 @@
 These are the metrics listed in section 8 of the brief: accuracy, precision,
 recall, F1 and ROC-AUC. Report all five - accuracy alone is misleading on an
 imbalanced readmission target.
+
 """
 
 from typing import Any
@@ -71,3 +72,64 @@ def categorise_risk(probability: float, high: float = 0.70, medium: float = 0.40
     if probability >= medium:
         return "medium"
     return "low"
+
+
+def find_best_threshold(
+    y_true: np.ndarray,
+    y_proba: np.ndarray,
+    minimum_recall: float,
+) -> tuple[float, dict[str, float]]:
+    """Find the threshold with the best F1 while meeting a recall floor."""
+    if len(y_true) != len(y_proba):
+        raise ValueError("y_true and y_proba must have the same length")
+
+    if not 0.0 <= minimum_recall <= 1.0:
+        raise ValueError("minimum_recall must be between 0.0 and 1.0")
+
+    best_threshold: float | None = None
+    best_metrics: dict[str, float] | None = None
+    best_f1 = -1.0
+
+    for threshold in np.linspace(0.01, 0.99, 99):
+        y_pred = (y_proba >= threshold).astype(int)
+
+        recall = float(
+            recall_score(
+                y_true,
+                y_pred,
+                zero_division=0,
+            )
+        )
+
+        if recall < minimum_recall:
+            continue
+
+        precision = float(
+            precision_score(
+                y_true,
+                y_pred,
+                zero_division=0,
+            )
+        )
+
+        f1 = float(
+            f1_score(
+                y_true,
+                y_pred,
+                zero_division=0,
+            )
+        )
+
+        if f1 > best_f1:
+            best_f1 = f1
+            best_threshold = float(threshold)
+            best_metrics = {
+                "precision": precision,
+                "recall": recall,
+                "f1": f1,
+            }
+
+    if best_threshold is None or best_metrics is None:
+        raise ValueError(f"No threshold satisfies the minimum recall of {minimum_recall}")
+
+    return best_threshold, best_metrics

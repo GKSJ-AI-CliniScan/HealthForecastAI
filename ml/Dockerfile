@@ -13,7 +13,7 @@ RUN python -m pip install --upgrade pip \
     pandas==2.2.3 \
     scipy==1.15.1 \
     scikit-learn==1.6.0 \
-    xgboost==2.1.3 \
+    xgboost==2.1.4\
     imbalanced-learn==0.13.0 \
     joblib==1.4.2 \
     pyarrow==18.1.0 \

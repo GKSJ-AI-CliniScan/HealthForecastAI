@@ -45,6 +45,8 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-healthforecast}
       MONGO_URI: mongodb://mongodb:27017
+    volumes:
+      - ./ml/artifacts:/app/ml/artifacts:ro
     ports:
       - "8000:8000"
     depends_on:

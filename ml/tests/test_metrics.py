@@ -2,11 +2,20 @@
 
 import numpy as np
 import pytest
+"""Tests for probability calibration."""
 
 from src.evaluation.metrics import (
     categorise_risk,
     classification_metrics,
     confusion_counts,
+    meets_promotion_thresholds,
+)
+
+from src.evaluation.metrics import (
+    categorise_risk,
+    classification_metrics,
+    confusion_counts,
+    find_best_threshold,
     meets_promotion_thresholds,
 )
 
@@ -64,3 +73,31 @@ def test_invalid_probability_raises(probability: float) -> None:
     """A probability outside [0, 1] is a bug."""
     with pytest.raises(ValueError):
         categorise_risk(probability)
+
+
+def test_find_best_threshold_meets_recall_floor() -> None:
+    """Selected threshold must satisfy the configured recall floor."""
+    y_true = np.array([0, 0, 0, 1, 1, 1])
+    y_proba = np.array([0.05, 0.20, 0.35, 0.40, 0.60, 0.90])
+
+    threshold, metrics = find_best_threshold(
+        y_true,
+        y_proba,
+        minimum_recall=0.50,
+    )
+
+    assert 0.01 <= threshold <= 0.99
+    assert metrics["recall"] >= 0.50
+
+
+def test_find_best_threshold_rejects_impossible_recall_floor() -> None:
+    """An impossible recall requirement should fail explicitly."""
+    y_true = np.array([0, 0, 1, 1])
+    y_proba = np.array([0.1, 0.2, 0.3, 0.4])
+
+    with pytest.raises(ValueError):
+        find_best_threshold(
+            y_true,
+            y_proba,
+            minimum_recall=1.1,
+        )

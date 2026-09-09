@@ -13,6 +13,7 @@ dataset:
 split:
   test_size: 0.2
   validation_size: 0.1
+  calibration_size: 0.1
   random_state: 42
   stratify: true
 
@@ -28,6 +29,15 @@ preprocessing:
   categorical_imputation: most_frequent
   scale_numeric: true
   one_hot_encode: true
+
+  serving_features:
+  - age
+  - gender
+  - race
+  - time_in_hospital
+  - num_lab_procedures
+  - num_medications
+  - number_diagnoses
 
 imbalance:
   strategy: class_weight   # one of: none | class_weight | smote
