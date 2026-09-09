@@ -138,6 +138,13 @@ so an early branch is not failed for work that has not started.
 The full list of checks and how to run them locally is in
 [INTERN_GUIDE.md](INTERN_GUIDE.md#6-what-ci-checks).
 
+## For mentors
+
+Repository settings the pipeline cannot enforce on its own — branch protection,
+who can merge, Actions permissions — are listed in
+[`docs/mentor-setup.md`](docs/mentor-setup.md). A failing status check does not
+block a merge by itself, so those settings are what actually keep `main` intact.
+
 ## Contributing
 
 This is an internship project repository.
