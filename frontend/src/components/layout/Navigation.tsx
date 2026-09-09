@@ -47,9 +47,9 @@ export const ROLE_NAVIGATION: Record<Role, NavItem[]> = {
     {
       id: 'doc-predictions',
       name: 'Risk Predictions',
-      href: '#risk-predictions',
+      href: '/risk',
       icon: ShieldAlertIcon,
-      isPlaceholder: true,
+      isPlaceholder: false,
     },
     {
       id: 'doc-treatment-reports',
@@ -77,9 +77,9 @@ export const ROLE_NAVIGATION: Record<Role, NavItem[]> = {
     {
       id: 'admin-analytics',
       name: 'Hospital Analytics',
-      href: '#hospital-analytics',
+      href: '/forecast',
       icon: BarChartIcon,
-      isPlaceholder: true,
+      isPlaceholder: false,
     },
     {
       id: 'admin-outcomes',
@@ -121,9 +121,9 @@ export const ROLE_NAVIGATION: Record<Role, NavItem[]> = {
     {
       id: 'res-readmission-trends',
       name: 'Readmission Trends',
-      href: '#readmission-trends',
+      href: '/forecast',
       icon: HeartPulseIcon,
-      isPlaceholder: true,
+      isPlaceholder: false,
     },
     {
       id: 'res-treatment-analysis',
