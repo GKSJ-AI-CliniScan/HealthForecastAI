@@ -98,14 +98,23 @@ def add_prior_visit_features(frame: pd.DataFrame) -> pd.DataFrame:
     return featured
 
 
-def add_medication_features(frame: pd.DataFrame) -> pd.DataFrame:
+def add_medication_features(
+    frame: pd.DataFrame,
+    medication_columns: list[str] | None = None,
+) -> pd.DataFrame:
     """Add counts of prescribed drugs and of dosage changes.
 
     A dosage moved up or down during the stay is a proxy for an unstable patient,
     which is one of the stronger predictors of an early return.
     """
     featured = frame.copy()
-    medication_columns = find_medication_columns(featured)
+    # None = training ka purana behaviour (poore column se detect karo).
+    # List = serving ka raasta: ek row par detection kaam nahi karta,
+    # isliye caller training-time se nikali hui list pass karta hai.
+    if medication_columns is None:
+        medication_columns = find_medication_columns(featured)
+    else:
+        medication_columns = [c for c in medication_columns if c in featured.columns]
     if not medication_columns:
         return featured
     featured["num_med_changes"] = featured[medication_columns].isin(["Up", "Down"]).sum(axis=1)
