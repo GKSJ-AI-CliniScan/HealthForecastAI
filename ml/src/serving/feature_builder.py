@@ -10,6 +10,7 @@ DESIGN: yahan koi logic DOBARA nahi likha gaya — sab preprocess.py aur
 build_features.py se import hota hai. Isse training-serving skew structurally
 impossible hai: training logic badla to serving apne aap badal jayegi.
 """
+
 from __future__ import annotations
 
 import json
@@ -50,7 +51,7 @@ def _medication_columns() -> tuple[str, ...]:
 
 def build_serving_features(row: dict[str, Any]) -> dict[str, Any]:
     """Raw admission row lo, 51-column contract ke liye tayyar row lautao."""
-    frame = pd.DataFrame([dict(row)])   # sab functions DataFrame lete hain
+    frame = pd.DataFrame([dict(row)])  # sab functions DataFrame lete hain
 
     # STEP 1: missing ko explicit "Missing" category banao.
     # KYUN: group_icd9_code() specifically "Missing" string dekhta hai;
@@ -61,8 +62,8 @@ def build_serving_features(row: dict[str, Any]) -> dict[str, Any]:
         else:
             frame[column] = MISSING_LABEL
 
-    frame = add_diagnosis_groups(frame)      # diag_1/2/3_group
-    frame = add_age_features(frame)          # age_numeric + age_group
+    frame = add_diagnosis_groups(frame)  # diag_1/2/3_group
+    frame = add_age_features(frame)  # age_numeric + age_group
     frame = add_prior_visit_features(frame)  # total_prior_visits
 
     # STEP 5: medication features — list contract se, taaki 1-row par bhi chale.
