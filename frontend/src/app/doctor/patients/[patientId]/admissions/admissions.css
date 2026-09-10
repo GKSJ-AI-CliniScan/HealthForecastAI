@@ -1,0 +1,1083 @@
+/* =====================================================
+   ADMISSIONS PAGE
+===================================================== */
+
+.admissions-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+  margin: 0;
+
+  background: #f6faff;
+  color: #092957;
+
+  box-sizing: border-box;
+
+  font-family: inherit;
+}
+
+
+/* =====================================================
+   BACK TO PATIENTS
+===================================================== */
+
+.admissions-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin: 0 0 14px;
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #0875ed;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.admissions-back:hover {
+  color: #075fc2;
+}
+
+.admissions-back svg {
+  flex-shrink: 0;
+}
+
+
+/* =====================================================
+   PATIENT HEADER
+===================================================== */
+
+.admissions-patient-header {
+  width: 100%;
+  min-height: 126px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 20px 22px;
+
+  background: #ffffff;
+
+  border: 1px solid #d9e7f5;
+  border-radius: 9px 9px 0 0;
+
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   HEADER LEFT
+===================================================== */
+
+.admissions-patient-left {
+  display: flex;
+  align-items: center;
+
+  gap: 20px;
+
+  min-width: 0;
+  flex: 1;
+}
+
+
+/* =====================================================
+   AVATAR
+===================================================== */
+
+.admissions-avatar {
+  width: 82px;
+  height: 82px;
+  min-width: 82px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #eaf4ff;
+  color: #0875ed;
+
+  font-size: 29px;
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   PATIENT DETAILS
+===================================================== */
+
+.admissions-patient-details {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+}
+
+
+/* =====================================================
+   NAME
+===================================================== */
+
+.admissions-name-row {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+}
+
+.admissions-name-row h1 {
+  margin: 0;
+
+  color: #071e52;
+
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.admissions-status {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 7px 13px;
+
+  border-radius: 20px;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.admissions-status.active {
+  background: #dcf8e9;
+  color: #079447;
+}
+
+.admissions-status.risk {
+  background: #ffe7e7;
+  color: #df3636;
+}
+
+.admissions-status.monitoring {
+  background: #e7f1ff;
+  color: #1267c9;
+}
+
+.admissions-status-dot {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: currentColor;
+}
+
+
+/* =====================================================
+   BASIC INFO
+===================================================== */
+
+.admissions-basic-info {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 7px;
+
+  color: #53709a;
+
+  font-size: 13px;
+}
+
+
+/* =====================================================
+   CONTACT
+===================================================== */
+
+.admissions-contact {
+  display: flex;
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 18px;
+
+  margin-top: 10px;
+}
+
+.admissions-contact > span {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  color: #49668f;
+
+  font-size: 12px;
+
+  white-space: nowrap;
+}
+
+.admissions-contact svg {
+  color: #0875ed;
+
+  flex-shrink: 0;
+}
+
+
+/* =====================================================
+   EDIT BUTTON
+===================================================== */
+
+.admissions-edit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  flex-shrink: 0;
+
+  margin-left: 30px;
+
+  padding: 10px 17px;
+
+  border: 1px solid #cfe1f4;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #092957;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.admissions-edit:hover {
+  background: #f3f8ff;
+  border-color: #a9ccef;
+}
+
+.admissions-edit svg {
+  color: #0875ed;
+}
+
+
+/* =====================================================
+   TABS
+===================================================== */
+
+.admissions-tabs {
+  width: 100%;
+  height: 66px;
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+
+  background: #ffffff;
+
+  border: 1px solid #d9e7f5;
+  border-top: none;
+  border-radius: 0 0 9px 9px;
+
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   TAB
+===================================================== */
+
+.admissions-tab {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+
+  height: 66px;
+
+  color: #526f99;
+
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  transition: 0.2s ease;
+}
+
+.admissions-tab svg {
+  width: 20px;
+  height: 20px;
+}
+
+.admissions-tab:hover {
+  color: #0875ed;
+  background: #f8fbff;
+}
+
+.admissions-tab.active {
+  color: #0875ed;
+}
+
+.admissions-tab.active::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 3px;
+
+  background: #0875ed;
+
+  border-radius: 3px 3px 0 0;
+}
+
+
+/* =====================================================
+   MAIN CONTENT
+===================================================== */
+
+.admissions-content {
+  width: 100%;
+
+  padding-top: 18px;
+  padding-bottom: 30px;
+
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   ADMISSIONS CARD
+===================================================== */
+
+.admissions-card {
+  width: 100%;
+
+  background: #ffffff;
+
+  border: 1px solid #d9e7f5;
+  border-radius: 9px;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   CARD HEADER
+===================================================== */
+
+.admissions-card-header {
+  min-height: 82px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 16px 20px;
+
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   TITLE AREA
+===================================================== */
+
+.admissions-title-area {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+}
+
+.admissions-title-icon {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #eaf5ff;
+  color: #0875ed;
+}
+
+.admissions-title-area h2 {
+  margin: 0;
+
+  color: #071e52;
+
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.admissions-title-area p {
+  margin: 4px 0 0;
+
+  color: #7088a8;
+
+  font-size: 12px;
+}
+
+
+/* =====================================================
+   TABLE WRAPPER
+===================================================== */
+
+.admissions-table-wrapper {
+  width: 100%;
+
+  padding: 0 20px;
+
+  overflow-x: auto;
+
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.admissions-table {
+  width: 100%;
+
+  min-width: 1000px;
+
+  border-collapse: separate;
+  border-spacing: 0;
+
+  border: 1px solid #d9e7f5;
+  border-radius: 8px;
+
+  overflow: hidden;
+
+  font-size: 12px;
+}
+
+
+/* =====================================================
+   TABLE HEADER
+===================================================== */
+
+.admissions-table thead {
+  background: #edf6ff;
+}
+
+.admissions-table th {
+  height: 48px;
+
+  padding: 0 12px;
+
+  color: #48658f;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  text-align: left;
+
+  white-space: nowrap;
+
+  border-bottom: 1px solid #d9e7f5;
+}
+
+
+/* =====================================================
+   TABLE BODY
+===================================================== */
+
+.admissions-table td {
+  height: 53px;
+
+  padding: 0 12px;
+
+  color: #47658f;
+
+  border-bottom: 1px solid #e5eef7;
+
+  white-space: nowrap;
+}
+
+.admissions-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admissions-table tbody tr:hover {
+  background: #f9fcff;
+}
+
+
+/* =====================================================
+   IMPORTANT TABLE COLUMNS
+===================================================== */
+
+.admissions-table td:first-child {
+  color: #092957;
+
+  width: 40px;
+}
+
+.admissions-table td:nth-child(2) strong {
+  color: #092957;
+
+  font-weight: 600;
+}
+
+.admissions-table td:nth-child(5) {
+  color: #092957;
+
+  font-weight: 500;
+}
+
+
+/* =====================================================
+   DISCHARGED BADGE
+===================================================== */
+
+.discharged-badge {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 6px 10px;
+
+  border-radius: 14px;
+
+  background: #dcf8e9;
+  color: #079447;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.discharged-dot {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: #079447;
+}
+
+
+/* =====================================================
+   VIEW BUTTON
+===================================================== */
+
+.view-admission {
+  width: 38px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #cfe1f4;
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #0875ed;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.view-admission:hover {
+  background: #edf6ff;
+  border-color: #9dc8f4;
+}
+
+
+/* =====================================================
+   TABLE FOOTER
+===================================================== */
+
+.admissions-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 16px 20px;
+
+  color: #6882a5;
+
+  font-size: 12px;
+}
+
+
+/* =====================================================
+   PAGINATION
+===================================================== */
+
+.admissions-pagination {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+}
+
+.admissions-pagination button {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #d4e4f3;
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #34547e;
+
+  font-size: 13px;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.admissions-pagination button:hover {
+  background: #f1f7ff;
+  border-color: #a9ccef;
+}
+
+.admissions-pagination .pagination-active {
+  background: #0875ed;
+  border-color: #0875ed;
+
+  color: #ffffff;
+}
+
+
+/* =====================================================
+   SUMMARY GRID
+===================================================== */
+
+.admissions-summary-grid {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  gap: 14px;
+
+  margin-top: 14px;
+}
+
+
+/* =====================================================
+   SUMMARY CARD
+===================================================== */
+
+.summary-card {
+  min-height: 128px;
+
+  display: flex;
+  align-items: flex-start;
+
+  gap: 14px;
+
+  position: relative;
+
+  padding: 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #d9e7f5;
+  border-radius: 9px;
+
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   SUMMARY ICON
+===================================================== */
+
+.summary-icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #eaf5ff;
+  color: #0875ed;
+}
+
+
+/* =====================================================
+   SUMMARY CONTENT
+===================================================== */
+
+.summary-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.summary-content h3 {
+  margin: 1px 0 13px;
+
+  color: #092957;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   SUMMARY STATS
+===================================================== */
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  border-top: 1px solid #edf3f9;
+  padding-top: 11px;
+}
+
+.summary-stats > div {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  border-right: 1px solid #edf3f9;
+}
+
+.summary-stats > div:last-child {
+  border-right: none;
+}
+
+.summary-stats strong {
+  color: #092957;
+
+  font-size: 19px;
+  line-height: 1;
+}
+
+.summary-stats span {
+  margin-top: 5px;
+
+  color: #7187a5;
+
+  font-size: 10px;
+}
+
+
+/* =====================================================
+   LAST ADMISSION
+===================================================== */
+
+.last-admission {
+  padding-right: 135px;
+}
+
+.last-admission .summary-content h3 {
+  margin-bottom: 9px;
+}
+
+.last-admission-date {
+  display: block;
+
+  color: #092957;
+
+  font-size: 13px;
+}
+
+.last-admission p {
+  margin: 5px 0 0;
+
+  color: #5c769a;
+
+  font-size: 11px;
+}
+
+.last-admission-duration {
+  display: block;
+
+  margin-top: 6px;
+
+  color: #5c769a;
+
+  font-size: 11px;
+}
+
+.last-status {
+  position: absolute;
+
+  top: 20px;
+  right: 18px;
+}
+
+
+/* =====================================================
+   NOT FOUND
+===================================================== */
+
+.admission-not-found {
+  min-height: 500px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  background: #f6faff;
+
+  text-align: center;
+}
+
+.admission-not-found h2 {
+  margin: 0;
+
+  color: #092957;
+
+  font-size: 22px;
+}
+
+.admission-not-found p {
+  margin: 10px 0 18px;
+
+  color: #7088a8;
+
+  font-size: 14px;
+}
+
+.admission-not-found button {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 10px 16px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #0875ed;
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1100px) {
+
+  .admissions-patient-header {
+    padding: 17px;
+  }
+
+  .admissions-patient-left {
+    gap: 14px;
+  }
+
+  .admissions-avatar {
+    width: 70px;
+    height: 70px;
+    min-width: 70px;
+
+    font-size: 24px;
+  }
+
+  .admissions-name-row h1 {
+    font-size: 21px;
+  }
+
+  .admissions-contact {
+    gap: 10px 15px;
+  }
+
+}
+
+
+@media (max-width: 850px) {
+
+  .admissions-patient-header {
+    align-items: flex-start;
+
+    gap: 15px;
+  }
+
+  .admissions-edit {
+    margin-left: 10px;
+  }
+
+  .admissions-tabs {
+    height: 58px;
+  }
+
+  .admissions-tab {
+    height: 58px;
+
+    font-size: 12px;
+  }
+
+  .admissions-tab svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .admissions-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 650px) {
+
+  .admissions-patient-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    padding: 16px;
+  }
+
+  .admissions-patient-left {
+    width: 100%;
+  }
+
+  .admissions-edit {
+    margin-left: 0;
+  }
+
+  .admissions-tabs {
+    height: auto;
+
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .admissions-tab {
+    height: 50px;
+  }
+
+  .admissions-card-header {
+    padding: 14px;
+  }
+
+  .admissions-table-wrapper {
+    padding: 0 12px;
+  }
+
+  .admissions-table-footer {
+    padding: 14px;
+  }
+
+}
+
+
+@media (max-width: 480px) {
+
+  .admissions-back {
+    font-size: 12px;
+  }
+
+  .admissions-patient-left {
+    align-items: flex-start;
+  }
+
+  .admissions-avatar {
+    width: 58px;
+    height: 58px;
+    min-width: 58px;
+
+    font-size: 20px;
+  }
+
+  .admissions-name-row {
+    align-items: flex-start;
+    flex-direction: column;
+
+    gap: 5px;
+  }
+
+  .admissions-name-row h1 {
+    font-size: 18px;
+  }
+
+  .admissions-basic-info {
+    font-size: 11px;
+  }
+
+  .admissions-contact {
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: 7px;
+  }
+
+  .admissions-table-footer {
+    align-items: flex-start;
+    flex-direction: column;
+
+    gap: 12px;
+  }
+
+  .last-admission {
+    padding-right: 18px;
+    padding-top: 60px;
+  }
+
+  .last-status {
+    left: 18px;
+    right: auto;
+    top: 18px;
+  }
+
+}

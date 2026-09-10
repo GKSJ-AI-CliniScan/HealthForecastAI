@@ -1,154 +1,133 @@
 /* =====================================================
+   GLOBAL RESET
+===================================================== */
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+
+/* =====================================================
    DOCTOR LAYOUT
-
 ===================================================== */
 
 .doctor-layout {
-
   min-height: 100vh;
-
-  background: #f8fcff;
-
+  width: 100%;
+  background: #f7fbff;
   color: #092957;
-
 }
 
 
 /* =====================================================
-
    HEADER
-
 ===================================================== */
 
 .doctor-header {
-
   position: fixed;
-
   top: 0;
-
   left: 0;
-
   right: 0;
 
-  height: 90px;
+  height: 72px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
 
-  padding: 0 42px;
+  padding: 0 28px;
 
   background: #ffffff;
-
   border-bottom: 1px solid #dce8f5;
 
   z-index: 1000;
-
 }
 
 
 /* =====================================================
-
    BRAND / LOGO
-
 ===================================================== */
 
 .doctor-brand {
-
   display: flex;
-
   align-items: center;
-
-  gap: 12px;
-
+  gap: 11px;
 }
 
-
 .doctor-logo {
-
   width: 44px;
-
   height: 44px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
-  border-radius: 12px;
+  border-radius: 11px;
 
   background: #1268d5;
-
   color: #ffffff;
 
-  box-shadow:
-
-    0 4px 10px rgba(18, 104, 213, 0.2);
-
+  box-shadow: 0 4px 10px rgba(18, 104, 213, 0.18);
 }
 
-
 .doctor-brand h1 {
-
   margin: 0;
 
   color: #092957;
 
-  font-size: 21px;
-
+  font-size: 20px;
   font-weight: 800;
 
   line-height: 1.1;
-
 }
-
 
 .doctor-brand h1 span {
-
   color: #1268d5;
-
 }
 
-
 .doctor-brand p {
-
-  margin: 4px 0 0;
+  margin: 3px 0 0;
 
   color: #7188a5;
 
-  font-size: 9px;
+  font-size: 8px;
+  font-weight: 600;
 
-  font-weight: 500;
-
-  letter-spacing: 1.4px;
-
+  letter-spacing: 1.3px;
 }
 
 
 /* =====================================================
-   DOCTOR PROFILE BUTTON
+   DOCTOR PROFILE
 ===================================================== */
 
 .doctor-profile {
   position: relative;
+
   display: flex;
   align-items: center;
-  gap: 12px;
+
+  gap: 8px;
 }
 
 .doctor-profile-button {
   display: flex;
   align-items: center;
-  gap: 12px;
 
-  padding: 6px 10px;
+  gap: 9px;
+
+  padding: 5px 8px;
 
   border: none;
-  border-radius: 12px;
+  border-radius: 9px;
 
   background: transparent;
 
@@ -162,83 +141,71 @@
   background: #f1f7ff;
 }
 
-
-/* =====================================================
-   PROFILE INFORMATION
-===================================================== */
-
 .doctor-profile-info h3 {
   margin: 0;
-  font-size: 14px;
+
+  font-size: 13px;
+  font-weight: 600;
+
   color: #092957;
 }
 
 .doctor-profile-info p {
-  margin: 3px 0 0;
-  font-size: 10px;
+  margin: 2px 0 0;
+
+  font-size: 9px;
+
   color: #7188a5;
 }
 
 
 /* =====================================================
-   SIGN OUT DROPDOWN
+   LOGOUT MENU
 ===================================================== */
 
 .doctor-logout-menu {
   position: absolute;
 
-  top: 58px;
+  top: 52px;
   right: 0;
 
-  width: 150px;
+  width: 145px;
 
-  padding: 6px;
+  padding: 5px;
 
   background: #ffffff;
 
   border: 1px solid #dce8f5;
+  border-radius: 9px;
 
-  border-radius: 10px;
-
-  box-shadow:
-    0 8px 25px rgba(18, 80, 130, 0.12);
+  box-shadow: 0 8px 25px rgba(18, 80, 130, 0.12);
 
   z-index: 2000;
 }
 
-
-/* =====================================================
-   SIGN OUT BUTTON
-===================================================== */
-
 .doctor-logout-button {
   display: flex;
-
   align-items: center;
 
-  gap: 10px;
+  gap: 9px;
 
   width: 100%;
 
-  padding: 10px 12px;
+  padding: 9px 10px;
 
   border: none;
-
-  border-radius: 8px;
+  border-radius: 7px;
 
   background: transparent;
 
   color: #092957;
 
-  font-size: 12px;
-
+  font-size: 11px;
   font-weight: 600;
 
   cursor: pointer;
 
   text-align: left;
-
-  transition: 0.2s ease;
 }
 
 .doctor-logout-button:hover {
@@ -248,41 +215,34 @@
 
 
 /* =====================================================
-
    BODY
-
 ===================================================== */
 
 .doctor-body {
+  display: block;
 
-  display: flex;
-
-  padding-top: 90px;
-
+  width: 100%;
   min-height: 100vh;
 
+  padding-top: 72px;
 }
 
 
 /* =====================================================
-
    SIDEBAR
-
 ===================================================== */
 
 .doctor-sidebar {
-
   position: fixed;
 
-  top: 90px;
-
+  top: 72px;
   left: 0;
-
   bottom: 0;
 
-  width: 320px;
+  width: 240px !important;
+  min-width: 240px !important;
 
-  padding: 42px 28px;
+  padding: 28px 14px;
 
   background: #ffffff;
 
@@ -290,39 +250,45 @@
 
   overflow-y: auto;
 
+  box-sizing: border-box;
+
+  z-index: 900;
 }
 
 
+/* =====================================================
+   SIDEBAR TITLE
+===================================================== */
+
 .sidebar-title {
+  margin: 0 0 17px 13px;
 
-  margin: 0 0 28px 18px;
-
-  font-size: 11px;
+  font-size: 10px;
 
   font-weight: 700;
 
-  letter-spacing: 2px;
+  letter-spacing: 1.6px;
 
   color: #7f98b5;
-
 }
 
 
+/* =====================================================
+   SIDEBAR MENU
+===================================================== */
+
 .doctor-menu {
-
   display: flex;
-
   align-items: center;
 
   width: 100%;
+  height: 43px;
 
-  height: 58px;
+  padding: 0 14px;
 
-  padding: 0 22px;
+  margin-bottom: 4px;
 
-  margin-bottom: 8px;
-
-  border-radius: 14px;
+  border-radius: 9px;
 
   text-decoration: none;
 
@@ -330,131 +296,119 @@
 
   background: transparent;
 
-  font-size: 15px;
-
+  font-size: 13px;
   font-weight: 600;
 
   transition: 0.2s ease;
 
+  box-sizing: border-box;
 }
 
-/* ACTIVE PAGE */
-
 .doctor-menu.active {
-
   background: #1268d5;
 
   color: #ffffff !important;
 
+  box-shadow: 0 4px 10px rgba(18, 104, 213, 0.16);
 }
 
-/* HOVER - ONLY FOR NON-ACTIVE PAGES */
-
 .doctor-menu:hover:not(.active) {
-
   background: #f1f7ff;
 
   color: #1268d5;
-
 }
 
+
 /* =====================================================
-
    SIDEBAR LINE
-
 ===================================================== */
 
 .sidebar-line {
-
+  width: 100%;
   height: 1px;
 
   background: #dce8f5;
 
-  margin: 28px 0;
-
+  margin: 22px 0;
 }
 
 
 /* =====================================================
-
    MAIN CONTENT
-
 ===================================================== */
 
 .doctor-content {
+  position: relative;
 
-  margin-left: 320px;
+  display: block;
 
-  width: calc(100% - 320px);
+  margin-left: 240px !important;
 
-  min-height: calc(100vh - 90px);
+  width: calc(100% - 240px) !important;
 
-  padding: 40px 48px;
+  min-width: 0;
 
+  min-height: calc(100vh - 72px);
+
+  padding: 24px !important;
+
+  background: #f7fbff;
+
+  box-sizing: border-box;
+
+  overflow-x: hidden;
 }
 
 
 /* =====================================================
-
-   DOCTOR DASHBOARD CONTENT
-
+   DASHBOARD HEADER
 ===================================================== */
 
 .doctor-page-label {
-
   margin: 0;
 
-  font-size: 13px;
+  font-size: 12px;
 
   color: #6684a8;
-
 }
 
-
 .doctor-page-title {
+  margin: 4px 0 0;
 
-  margin: 6px 0 0;
+  font-size: 27px;
 
-  font-size: 32px;
+  line-height: 1.2;
 
   font-weight: 800;
 
   color: #092957;
-
 }
 
-
 .doctor-page-description {
+  margin: 6px 0 22px;
 
-  margin: 7px 0 28px;
-
-  font-size: 13px;
+  font-size: 12px;
 
   color: #7188a5;
-
 }
 
 
 /* =====================================================
-
    STAT CARDS
-
 ===================================================== */
 
 .doctor-stats {
-
   display: grid;
 
-  grid-template-columns:
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 
-    repeat(4, 1fr);
+  gap: 14px;
 
-  gap: 18px;
-
+  width: 100%;
 }
 
-
 .doctor-stat-card {
+  min-width: 0;
 
   background: #ffffff;
 
@@ -462,195 +416,173 @@
 
   border-top: 3px solid #1268d5;
 
-  border-radius: 15px;
+  border-radius: 11px;
 
-  padding: 21px;
+  padding: 17px;
 
-  box-shadow:
-
-    0 7px 20px rgba(18, 80, 130, 0.05);
-
+  box-shadow: 0 5px 16px rgba(18, 80, 130, 0.045);
 }
 
-
 .doctor-stat-card p {
-
   margin: 0;
 
   color: #6482a6;
 
-  font-size: 12px;
-
+  font-size: 11px;
 }
 
-
 .doctor-stat-card h2 {
-
-  margin: 10px 0 3px;
+  margin: 8px 0 3px;
 
   color: #092957;
 
-  font-size: 32px;
+  font-size: 27px;
+
+  line-height: 1;
 
   font-weight: 800;
-
 }
 
-
 .doctor-stat-card span {
-
   color: #89a0bb;
 
-  font-size: 11px;
-
+  font-size: 10px;
 }
 
 
 /* =====================================================
-
    PATIENT CARD
-
 ===================================================== */
 
 .doctor-patient-card {
+  width: 100%;
 
-  margin-top: 25px;
+  margin-top: 18px;
 
   background: #ffffff;
 
   border: 1px solid #dce8f5;
 
-  border-radius: 16px;
+  border-radius: 12px;
 
   overflow: hidden;
 
-  box-shadow:
-
-    0 7px 20px rgba(18, 80, 130, 0.05);
-
+  box-shadow: 0 5px 16px rgba(18, 80, 130, 0.045);
 }
 
+
+/* =====================================================
+   CARD HEADER
+===================================================== */
 
 .doctor-card-header {
-
   display: flex;
-
   align-items: center;
-
   justify-content: space-between;
 
-  padding: 23px 27px;
+  padding: 18px 20px;
 
   border-bottom: 1px solid #dce8f5;
-
 }
-
 
 .doctor-card-header h2 {
-
   margin: 0;
 
-  font-size: 17px;
+  font-size: 16px;
+
+  font-weight: 700;
 
   color: #092957;
-
 }
-
 
 .doctor-card-header p {
+  margin: 4px 0 0;
 
-  margin: 5px 0 0;
-
-  font-size: 11px;
+  font-size: 10px;
 
   color: #7188a5;
-
 }
 
-
 .doctor-card-header a {
-
-  padding: 9px 15px;
+  padding: 7px 12px;
 
   border: 1px solid #cfe0f2;
 
-  border-radius: 9px;
+  border-radius: 7px;
 
   text-decoration: none;
 
   color: #092957;
 
-  font-size: 11px;
+  font-size: 10px;
 
   font-weight: 600;
 
+  background: #ffffff;
+
+  transition: 0.2s ease;
+}
+
+.doctor-card-header a:hover {
+  background: #f1f7ff;
+
+  border-color: #b9d4ef;
+
+  color: #1268d5;
 }
 
 
 /* =====================================================
-
    TABLE
-
 ===================================================== */
 
 .doctor-table-row {
-
   display: grid;
 
-  grid-template-columns:
-
-    1fr 2fr 1fr 1fr;
+  grid-template-columns: 1fr 2fr 1fr 1fr;
 
   align-items: center;
 
-  min-height: 58px;
+  min-height: 48px;
 
-  padding: 0 27px;
+  padding: 0 20px;
 
   border-bottom: 1px solid #e4edf6;
 
   color: #092957;
 
-  font-size: 12px;
-
+  font-size: 11px;
 }
-
 
 .doctor-table-row:last-child {
-
   border-bottom: none;
-
 }
 
-
 .doctor-table-heading {
+  min-height: 42px;
 
   background: #f8fbff;
 
   color: #6684a8;
 
-  font-size: 10px;
+  font-size: 9px;
 
   font-weight: 700;
 
-  letter-spacing: 0.7px;
-
+  letter-spacing: 0.6px;
 }
 
 
 /* =====================================================
-
    STATUS
-
 ===================================================== */
 
 .status-active {
-
   display: inline-flex;
 
   width: fit-content;
 
-  padding: 6px 12px;
+  padding: 5px 10px;
 
   border-radius: 20px;
 
@@ -658,20 +590,17 @@
 
   color: #14804a;
 
-  font-size: 10px;
+  font-size: 9px;
 
   font-weight: 700;
-
 }
 
-
 .status-risk {
-
   display: inline-flex;
 
   width: fit-content;
 
-  padding: 6px 12px;
+  padding: 5px 10px;
 
   border-radius: 20px;
 
@@ -679,39 +608,160 @@
 
   color: #e34848;
 
-  font-size: 10px;
+  font-size: 9px;
 
   font-weight: 700;
-
 }
 
 
 /* =====================================================
-
-   BUTTON
-
+   PRIMARY BUTTON
 ===================================================== */
 
 .doctor-primary-button {
-
   border: none;
 
-  padding: 10px 17px;
+  padding: 8px 13px;
 
-  border-radius: 9px;
+  border-radius: 7px;
 
   background: #1268d5;
 
-  color: white;
+  color: #ffffff;
 
-  font-size: 11px;
+  font-size: 10px;
 
   font-weight: 700;
 
   cursor: pointer;
 
-  box-shadow:
+  box-shadow: 0 4px 10px rgba(18, 104, 213, 0.18);
 
-    0 5px 13px rgba(18, 104, 213, 0.2);
+  transition: 0.2s ease;
+}
 
+.doctor-primary-button:hover {
+  background: #0d5fca;
+}
+
+
+/* =====================================================
+   RESPONSIVE — TABLET
+===================================================== */
+
+@media (max-width: 1100px) {
+
+  .doctor-sidebar {
+    width: 220px !important;
+    min-width: 220px !important;
+  }
+
+  .doctor-content {
+    margin-left: 220px !important;
+    width: calc(100% - 220px) !important;
+  }
+
+  .doctor-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
+/* =====================================================
+   RESPONSIVE — SMALL TABLET
+===================================================== */
+
+@media (max-width: 800px) {
+
+  .doctor-sidebar {
+    width: 200px !important;
+    min-width: 200px !important;
+  }
+
+  .doctor-content {
+    margin-left: 200px !important;
+    width: calc(100% - 200px) !important;
+
+    padding: 18px !important;
+  }
+
+  .doctor-page-title {
+    font-size: 24px;
+  }
+
+  .doctor-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+
+/* =====================================================
+   RESPONSIVE — MOBILE
+===================================================== */
+
+@media (max-width: 650px) {
+
+  .doctor-header {
+    height: 64px;
+
+    padding: 0 14px;
+  }
+
+  .doctor-body {
+    padding-top: 64px;
+  }
+
+  .doctor-sidebar {
+    position: relative;
+
+    top: auto;
+    left: auto;
+    bottom: auto;
+
+    width: 100% !important;
+    min-width: 100% !important;
+
+    height: auto;
+
+    padding: 12px;
+
+    border-right: none;
+    border-bottom: 1px solid #dce8f5;
+  }
+
+  .doctor-content {
+    margin-left: 0 !important;
+
+    width: 100% !important;
+
+    padding: 16px !important;
+  }
+
+  .doctor-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .doctor-page-title {
+    font-size: 22px;
+  }
+
+  .doctor-patient-card {
+    overflow-x: auto;
+  }
+
+  .doctor-table-row {
+    min-width: 600px;
+  }
+
+  .doctor-brand h1 {
+    font-size: 17px;
+  }
+
+  .doctor-brand p {
+    font-size: 7px;
+  }
+
+  .doctor-profile-info {
+    display: none;
+  }
 }

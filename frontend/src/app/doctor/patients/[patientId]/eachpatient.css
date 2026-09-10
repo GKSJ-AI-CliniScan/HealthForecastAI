@@ -1,0 +1,837 @@
+/* =========================================================
+   PATIENT DETAILS PAGE
+   src/app/doctor/patients/[patientId]/eachpatient.css
+========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   MAIN PAGE
+========================================================= */
+
+.patient-page {
+  width: 100%;
+  min-height: 100vh;
+
+  margin: 0;
+  padding: 18px 0 30px;
+
+  background: #f7fbff;
+  color: #102b5c;
+
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* =========================================================
+   BACK TO PATIENTS
+========================================================= */
+
+.back-patients {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  margin: 0 0 12px;
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #0875ed;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: color 0.2s ease;
+}
+
+.back-patients:hover {
+  color: #075fc2;
+}
+
+.back-patients svg {
+  width: 17px;
+  height: 17px;
+}
+
+
+/* =========================================================
+   PATIENT HEADER
+========================================================= */
+
+.patient-header {
+  width: 100%;
+  min-height: 108px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 20px;
+
+  background: #ffffff;
+
+  border: 1px solid #dbe8f5;
+  border-radius: 10px 10px 0 0;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   HEADER LEFT
+========================================================= */
+
+.patient-header-left {
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+
+  min-width: 0;
+  flex: 1;
+}
+
+
+/* =========================================================
+   AVATAR
+========================================================= */
+
+.patient-avatar {
+  width: 66px;
+  height: 66px;
+  min-width: 66px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #eaf4ff;
+  color: #0875ed;
+
+  font-size: 22px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   PATIENT DETAILS
+========================================================= */
+
+.patient-details {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+
+/* =========================================================
+   NAME + STATUS
+========================================================= */
+
+.patient-name-line {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  margin: 0;
+}
+
+.patient-name-line h1 {
+  margin: 0;
+
+  color: #071e52;
+
+  font-size: 21px;
+  line-height: 1.2;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   STATUS BADGE
+========================================================= */
+
+.patient-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 11px;
+
+  border-radius: 20px;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.patient-status.active {
+  background: #dcf8e9;
+  color: #079447;
+}
+
+.patient-status.risk {
+  background: #ffe6e6;
+  color: #e53935;
+}
+
+.patient-status.monitoring {
+  background: #e5f0ff;
+  color: #1267c9;
+}
+
+
+/* STATUS DOT */
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: currentColor;
+}
+
+
+/* =========================================================
+   BASIC INFORMATION
+========================================================= */
+
+.patient-basic-info {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  margin-top: 7px;
+
+  color: #54709b;
+
+  font-size: 12px;
+  line-height: 1;
+}
+
+.patient-basic-info span {
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   CONTACT INFORMATION
+========================================================= */
+
+.patient-contact {
+  display: flex;
+  align-items: center;
+
+  gap: 24px;
+
+  margin-top: 9px;
+
+  min-width: 0;
+}
+
+.patient-contact > span {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  color: #45628c;
+
+  font-size: 11px;
+
+  white-space: nowrap;
+}
+
+.patient-contact svg {
+  width: 15px;
+  height: 15px;
+
+  color: #0875ed;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   EDIT DETAILS BUTTON
+========================================================= */
+
+.edit-details {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  flex-shrink: 0;
+
+  margin-left: 25px;
+
+  padding: 9px 15px;
+
+  border: 1px solid #cfe1f4;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #102b5c;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.edit-details:hover {
+  background: #f1f7ff;
+  border-color: #bcd5ee;
+}
+
+.edit-details svg {
+  width: 16px;
+  height: 16px;
+
+  color: #0875ed;
+}
+
+
+/* =========================================================
+   TABS
+========================================================= */
+
+.patient-tabs {
+  width: 100%;
+  height: 54px;
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+
+  background: #ffffff;
+
+  border: 1px solid #dbe8f5;
+  border-top: none;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   TAB
+========================================================= */
+
+.patient-tab {
+  position: relative;
+
+  height: 54px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  padding: 0 10px;
+
+  border: none;
+  border-bottom: 3px solid transparent;
+
+  background: #ffffff;
+
+  color: #47658e;
+
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.patient-tab svg {
+  width: 18px;
+  height: 18px;
+
+  flex-shrink: 0;
+}
+
+.patient-tab:hover {
+  background: #f7fbff;
+  color: #0875ed;
+}
+
+
+/* ACTIVE TAB */
+
+.patient-tab.active {
+  color: #0875ed;
+
+  border-bottom-color: #0875ed;
+
+  background: #ffffff;
+}
+
+
+/* =========================================================
+   PATIENT CONTENT
+========================================================= */
+
+.patient-content {
+  width: 100%;
+
+  margin: 0;
+  padding: 25px 0 30px;
+}
+
+
+/* =========================================================
+   OVERVIEW HEADING
+========================================================= */
+
+.overview-heading {
+  margin-bottom: 16px;
+}
+
+.overview-heading h2 {
+  margin: 0;
+
+  color: #071e52;
+
+  font-size: 21px;
+  line-height: 1.2;
+
+  font-weight: 700;
+}
+
+.overview-heading p {
+  margin: 6px 0 0;
+
+  color: #7188a5;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   OVERVIEW GRID
+========================================================= */
+
+.overview-grid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 18px;
+
+  margin: 0;
+}
+
+
+/* =========================================================
+   OVERVIEW CARD
+========================================================= */
+
+.overview-card {
+  width: 100%;
+
+  background: #ffffff;
+
+  border: 1px solid #dbe8f5;
+
+  border-radius: 10px;
+
+  padding: 22px;
+
+  box-shadow:
+    0 4px 14px rgba(18, 80, 130, 0.035);
+}
+
+
+/* =========================================================
+   CARD TITLE
+========================================================= */
+
+.card-title {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 18px;
+}
+
+.card-title h3 {
+  margin: 0;
+
+  color: #071e52;
+
+  font-size: 16px;
+  line-height: 1.2;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   CARD ICON
+========================================================= */
+
+.card-icon {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #edf7ff;
+
+  color: #0875ed;
+}
+
+.card-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+
+/* =========================================================
+   INFORMATION LIST
+========================================================= */
+
+.information-list {
+  width: 100%;
+}
+
+
+/* =========================================================
+   INFORMATION ROW
+========================================================= */
+
+.info-row {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns: 42% 58%;
+
+  align-items: center;
+
+  min-height: 39px;
+
+  border-bottom: 1px solid #eef4fa;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row span {
+  color: #5573a1;
+
+  font-size: 12px;
+}
+
+.info-row strong {
+  color: #071e52;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  word-break: break-word;
+}
+
+
+/* =========================================================
+   PATIENT NOT FOUND
+========================================================= */
+
+.patient-not-found {
+  width: 100%;
+  min-height: 500px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  background: #f7fbff;
+
+  color: #092957;
+
+  text-align: center;
+}
+
+.patient-not-found h2 {
+  margin: 0;
+
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.patient-not-found p {
+  margin: 8px 0 0;
+
+  color: #7188a5;
+
+  font-size: 14px;
+}
+
+.patient-not-found button {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-top: 18px;
+
+  padding: 10px 16px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #0875ed;
+
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+.patient-not-found button:hover {
+  background: #075fc2;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+
+  .patient-header {
+    padding: 13px 16px;
+  }
+
+  .patient-contact {
+    gap: 14px;
+  }
+
+  .patient-contact > span {
+    font-size: 10px;
+  }
+
+  .overview-grid {
+    gap: 14px;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL TABLET
+========================================================= */
+
+@media (max-width: 850px) {
+
+  .patient-header {
+    min-height: auto;
+
+    align-items: flex-start;
+  }
+
+  .patient-header-left {
+    gap: 12px;
+  }
+
+  .patient-avatar {
+    width: 58px;
+    height: 58px;
+    min-width: 58px;
+
+    font-size: 20px;
+  }
+
+  .patient-name-line h1 {
+    font-size: 18px;
+  }
+
+  .patient-contact {
+    flex-wrap: wrap;
+
+    row-gap: 7px;
+  }
+
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+  .patient-page {
+    padding: 14px 0 25px;
+  }
+
+  .back-patients {
+    margin-bottom: 10px;
+
+    font-size: 12px;
+  }
+
+  .patient-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 14px;
+
+    padding: 14px;
+  }
+
+  .patient-header-left {
+    width: 100%;
+  }
+
+  .patient-details {
+    width: 100%;
+  }
+
+  .patient-name-line {
+    flex-wrap: wrap;
+
+    gap: 7px;
+  }
+
+  .patient-name-line h1 {
+    font-size: 18px;
+  }
+
+  .patient-contact {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 7px;
+
+    white-space: normal;
+  }
+
+  .patient-contact > span {
+    white-space: normal;
+  }
+
+  .edit-details {
+    margin-left: 0;
+
+    width: 100%;
+  }
+
+  .patient-tabs {
+    height: auto;
+
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .patient-tab {
+    height: 48px;
+
+    font-size: 11px;
+  }
+
+  .patient-content {
+    padding-top: 18px;
+  }
+
+  .overview-heading h2 {
+    font-size: 18px;
+  }
+
+  .overview-heading p {
+    font-size: 12px;
+  }
+
+  .overview-card {
+    padding: 16px;
+  }
+
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 450px) {
+
+  .patient-avatar {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+
+    font-size: 18px;
+  }
+
+  .patient-name-line h1 {
+    font-size: 16px;
+  }
+
+  .patient-basic-info {
+    font-size: 10px;
+  }
+
+  .patient-tab {
+    gap: 5px;
+
+    font-size: 10px;
+  }
+
+  .patient-tab svg {
+    width: 16px;
+    height: 16px;
+  }
+
+}

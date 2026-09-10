@@ -1,0 +1,1372 @@
+/* =====================================================
+   TREATMENT PAGE
+===================================================== */
+
+.treatment-page {
+  width: 100%;
+  min-height: 100%;
+
+  margin: 0;
+  padding: 0;
+
+  box-sizing: border-box;
+
+  background: #f7fbff;
+
+  color: #102b5c;
+
+  font-size: 12px;
+}
+
+
+/* =====================================================
+   BACK
+===================================================== */
+
+.treatment-back {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  margin: 0 0 8px;
+
+  color: #0875ed;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  text-decoration: none;
+}
+
+.treatment-back:hover {
+  color: #075fc2;
+}
+
+
+/* =====================================================
+   PATIENT HEADER
+===================================================== */
+
+.treatment-patient-header {
+  width: 100%;
+  min-height: 108px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 16px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1px solid #dbe8f5;
+
+  border-radius: 8px 8px 0 0;
+}
+
+
+/* =====================================================
+   HEADER LEFT
+===================================================== */
+
+.treatment-header-left {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  min-width: 0;
+}
+
+
+/* =====================================================
+   AVATAR
+===================================================== */
+
+.treatment-avatar {
+  width: 60px;
+  height: 60px;
+
+  min-width: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #eaf4ff;
+
+  color: #0875ed;
+
+  font-size: 20px;
+
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   PATIENT DETAILS
+===================================================== */
+
+.treatment-patient-details {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* =====================================================
+   NAME
+===================================================== */
+
+.treatment-name-line {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+.treatment-name-line h1 {
+  margin: 0;
+
+  color: #071e52;
+
+  font-size: 18px;
+
+  line-height: 1.2;
+
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.treatment-status {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 5px;
+
+  padding: 5px 10px;
+
+  border-radius: 20px;
+
+  font-size: 10px;
+
+  font-weight: 600;
+}
+
+.treatment-status.active {
+  background: #dcf8e9;
+  color: #079447;
+}
+
+.treatment-status.risk {
+  background: #ffe6e6;
+  color: #e53935;
+}
+
+.treatment-status.monitoring {
+  background: #e5f0ff;
+  color: #1267c9;
+}
+
+.treatment-status-dot {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: currentColor;
+}
+
+
+/* =====================================================
+   BASIC INFO
+===================================================== */
+
+.treatment-basic-info {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-top: 6px;
+
+  color: #54709b;
+
+  font-size: 11px;
+}
+
+
+/* =====================================================
+   CONTACT
+===================================================== */
+
+.treatment-contact {
+  display: flex;
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 8px 20px;
+
+  margin-top: 8px;
+}
+
+.treatment-contact span {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  color: #45628c;
+
+  font-size: 10px;
+}
+
+.treatment-contact svg {
+  color: #0875ed;
+
+  flex-shrink: 0;
+}
+
+
+/* =====================================================
+   EDIT
+===================================================== */
+
+.treatment-edit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  flex-shrink: 0;
+
+  padding: 8px 12px;
+
+  border: 1px solid #cfe1f4;
+
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #102b5c;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.treatment-edit:hover {
+  background: #f1f7ff;
+}
+
+
+/* =====================================================
+   TABS
+===================================================== */
+
+.treatment-tabs {
+  width: 100%;
+  height: 45px;
+
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  background: #ffffff;
+
+  border: 1px solid #dbe8f5;
+
+  border-top: none;
+
+  box-sizing: border-box;
+}
+
+.treatment-tab {
+  height: 45px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  border: none;
+
+  border-bottom: 2px solid transparent;
+
+  background: #ffffff;
+
+  color: #47658e;
+
+  text-decoration: none;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.treatment-tab:hover {
+  background: #f7fbff;
+
+  color: #0875ed;
+}
+
+.treatment-tab.active {
+  color: #0875ed;
+
+  border-bottom-color: #0875ed;
+}
+
+
+/* =====================================================
+   CONTENT
+===================================================== */
+
+.treatment-content {
+  width: 100%;
+
+  padding: 14px 0 30px;
+
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   MAIN CARD
+===================================================== */
+
+.treatment-card {
+  width: 100%;
+
+  background: #ffffff;
+
+  border: 1px solid #dbe8f5;
+
+  border-radius: 8px;
+
+  padding: 16px;
+
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   HEADING
+===================================================== */
+
+.treatment-heading {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 14px;
+}
+
+.treatment-title-left {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+.treatment-title-icon {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #eaf4ff;
+
+  color: #0875ed;
+}
+
+.treatment-title-left h2 {
+  margin: 0;
+
+  color: #071e52;
+
+  font-size: 16px;
+
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   ADD TREATMENT
+===================================================== */
+
+.add-treatment {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  height: 38px;
+
+  padding: 0 15px;
+
+  border: none;
+
+  border-radius: 7px;
+
+  background: #0875ed;
+
+  color: #ffffff;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-shadow: 0 4px 10px rgba(8, 117, 237, 0.15);
+
+  transition: 0.2s ease;
+}
+
+.add-treatment:hover {
+  background: #0769d6;
+
+  transform: translateY(-1px);
+}
+
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.treatment-table-wrapper {
+  width: 100%;
+
+  overflow-x: auto;
+
+  border: 1px solid #e0ebf5;
+
+  border-radius: 7px;
+}
+
+
+/* =====================================================
+   TABLE ROW
+===================================================== */
+
+.treatment-row {
+  min-width: 1150px;
+
+  display: grid;
+
+  grid-template-columns:
+    35px
+    1.15fr
+    0.75fr
+    0.95fr
+    0.85fr
+    0.85fr
+    0.75fr
+    1fr
+    1.25fr
+    70px;
+
+  align-items: center;
+
+  column-gap: 10px;
+
+  padding: 0 12px;
+
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   TABLE HEADER
+===================================================== */
+
+.treatment-table-header {
+  min-height: 40px;
+
+  background: #eef6fd;
+
+  color: #47658e;
+
+  font-size: 10px;
+
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   DATA ROW
+===================================================== */
+
+.treatment-data-row {
+  min-height: 58px;
+
+  color: #45628c;
+
+  font-size: 10px;
+
+  border-top: 1px solid #edf3f9;
+}
+
+.treatment-data-row:hover {
+  background: #fbfdff;
+}
+
+
+/* =====================================================
+   MEDICATION
+===================================================== */
+
+.treatment-medication {
+  color: #102b5c;
+
+  font-size: 11px;
+
+  font-weight: 600;
+}
+
+.treatment-number {
+  color: #102b5c;
+
+  font-weight: 600;
+}
+
+
+/* =====================================================
+   NOTES
+===================================================== */
+
+.treatment-notes {
+  line-height: 1.4;
+}
+
+
+/* =====================================================
+   STATUS BADGES
+===================================================== */
+
+.treatment-badge {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  padding: 5px 8px;
+
+  border-radius: 15px;
+
+  font-size: 9px;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.active-treatment {
+  background: #dcf8e9;
+
+  color: #079447;
+}
+
+.completed-treatment {
+  background: #f0f2f5;
+
+  color: #64748b;
+}
+
+.treatment-badge-dot {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: currentColor;
+}
+
+
+/* =====================================================
+   ACTIONS
+===================================================== */
+
+.treatment-actions {
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+}
+
+.treatment-action {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+
+  background: #ffffff;
+
+  cursor: pointer;
+}
+
+.edit-action {
+  border: 1px solid #cfe1f4;
+
+  color: #0875ed;
+}
+
+.edit-action:hover {
+  background: #eaf4ff;
+}
+
+.delete-action {
+  border: 1px solid #f3caca;
+
+  color: #e53935;
+}
+
+.delete-action:hover {
+  background: #fff1f1;
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.treatment-footer {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-top: 14px;
+
+  color: #6681a6;
+
+  font-size: 10px;
+}
+
+.treatment-pagination {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+}
+
+.treatment-pagination button {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #d8e6f3;
+
+  border-radius: 6px;
+
+  background: #ffffff;
+
+  color: #102b5c;
+
+  cursor: pointer;
+}
+
+.treatment-pagination button:hover {
+  background: #f1f7ff;
+}
+
+.treatment-pagination .active-page {
+  background: #0875ed;
+
+  border-color: #0875ed;
+
+  color: #ffffff;
+}
+
+
+/* =====================================================
+   INFORMATION CARDS
+===================================================== */
+
+.treatment-info-grid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 12px;
+
+  margin-top: 12px;
+}
+
+.treatment-info-card {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 12px;
+
+  padding: 16px;
+
+  background: #ffffff;
+
+  border: 1px solid #dbe8f5;
+
+  border-radius: 8px;
+}
+
+.treatment-info-icon {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #eaf4ff;
+
+  color: #0875ed;
+}
+
+.treatment-info-card h3 {
+  margin: 1px 0 5px;
+
+  color: #071e52;
+
+  font-size: 13px;
+}
+
+.treatment-info-card strong {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #102b5c;
+
+  font-size: 11px;
+}
+
+.treatment-info-card p {
+  margin: 0;
+
+  color: #7188a5;
+
+  font-size: 10px;
+
+  line-height: 1.5;
+}
+
+
+/* =====================================================
+   NOT FOUND
+===================================================== */
+
+.treatment-not-found {
+  min-height: 400px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: #f7fbff;
+
+  color: #092957;
+}
+
+.treatment-not-found h2 {
+  margin: 0;
+
+  font-size: 18px;
+}
+
+.treatment-not-found p {
+  margin: 7px 0 0;
+
+  color: #7188a5;
+
+  font-size: 12px;
+}
+
+.treatment-not-found button {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  margin-top: 14px;
+
+  padding: 9px 14px;
+
+  border: none;
+
+  border-radius: 7px;
+
+  background: #0875ed;
+
+  color: #ffffff;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+/* =====================================================
+   =====================================================
+   ADD TREATMENT MODAL
+   =====================================================
+===================================================== */
+
+
+/* Dark overlay */
+
+.treatment-modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 9999;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(8, 25, 55, 0.52);
+
+  backdrop-filter: blur(2px);
+
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   MODAL BOX
+===================================================== */
+
+.treatment-modal {
+  width: min(620px, 100%);
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  border: 1px solid #dbe7f3;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 25px 70px rgba(7, 30, 82, 0.25);
+
+  animation: treatmentModalAppear 0.2s ease-out;
+
+  box-sizing: border-box;
+}
+
+
+@keyframes treatmentModalAppear {
+
+  from {
+    opacity: 0;
+
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+
+}
+
+
+/* =====================================================
+   MODAL HEADER
+===================================================== */
+
+.treatment-modal-header {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  padding: 20px 22px 17px;
+
+  border-bottom: 1px solid #edf3f9;
+
+  box-sizing: border-box;
+}
+
+
+.treatment-modal-title {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+
+.treatment-modal-icon {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #eaf4ff;
+
+  color: #0875ed;
+}
+
+
+.treatment-modal-title h2 {
+  margin: 0;
+
+  color: #071e52;
+
+  font-size: 18px;
+
+  font-weight: 700;
+}
+
+
+.treatment-modal-title p {
+  margin: 4px 0 0;
+
+  color: #7188a5;
+
+  font-size: 11px;
+}
+
+
+/* =====================================================
+   CLOSE
+===================================================== */
+
+.treatment-modal-close {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+
+  border-radius: 6px;
+
+  background: transparent;
+
+  color: #526b91;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.treatment-modal-close:hover {
+  background: #f1f6fb;
+
+  color: #071e52;
+}
+
+
+/* =====================================================
+   FORM
+===================================================== */
+
+.treatment-form {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 15px;
+
+  padding: 20px 22px 8px;
+
+  box-sizing: border-box;
+}
+
+
+.treatment-form-group {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+
+  min-width: 0;
+}
+
+
+.treatment-form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+
+.treatment-form-group label {
+  color: #071e52;
+
+  font-size: 11px;
+
+  font-weight: 600;
+}
+
+
+.treatment-form-group label span {
+  color: #e53935;
+}
+
+
+/* =====================================================
+   INPUTS
+===================================================== */
+
+.treatment-form-group input,
+.treatment-form-group select,
+.treatment-form-group textarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border: 1px solid #cbddef;
+
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #18365f;
+
+  font-family: inherit;
+
+  font-size: 11px;
+
+  outline: none;
+
+  transition: 0.2s ease;
+}
+
+
+.treatment-form-group input,
+.treatment-form-group select {
+  height: 40px;
+
+  padding: 0 11px;
+}
+
+
+.treatment-form-group textarea {
+  min-height: 82px;
+
+  padding: 10px 11px;
+
+  resize: vertical;
+}
+
+
+.treatment-form-group input::placeholder,
+.treatment-form-group textarea::placeholder {
+  color: #91a4bd;
+}
+
+
+.treatment-form-group input:focus,
+.treatment-form-group select:focus,
+.treatment-form-group textarea:focus {
+  border-color: #0875ed;
+
+  box-shadow:
+    0 0 0 3px rgba(8, 117, 237, 0.08);
+}
+
+
+/* =====================================================
+   NOTES COUNTER
+===================================================== */
+
+.notes-limit {
+  align-self: flex-end;
+
+  margin-top: -3px;
+
+  color: #8195ae;
+
+  font-size: 9px;
+}
+
+
+/* =====================================================
+   MODAL FOOTER
+===================================================== */
+
+.treatment-modal-footer {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  gap: 9px;
+
+  padding: 17px 22px 21px;
+
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   CANCEL
+===================================================== */
+
+.treatment-cancel {
+  height: 40px;
+
+  padding: 0 18px;
+
+  border: 1px solid #cbddef;
+
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #18365f;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.treatment-cancel:hover {
+  background: #f5f9fd;
+
+  border-color: #b9cee4;
+}
+
+
+/* =====================================================
+   SAVE
+===================================================== */
+
+.treatment-save {
+  height: 40px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 7px;
+
+  padding: 0 18px;
+
+  border: none;
+
+  border-radius: 7px;
+
+  background: #0875ed;
+
+  color: #ffffff;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 4px 10px rgba(8, 117, 237, 0.18);
+
+  transition: 0.2s ease;
+}
+
+.treatment-save:hover {
+  background: #0769d6;
+
+  transform: translateY(-1px);
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 900px) {
+
+  .treatment-contact {
+    gap: 8px 12px;
+  }
+
+  .treatment-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 650px) {
+
+  .treatment-patient-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 12px;
+  }
+
+  .treatment-header-left {
+    width: 100%;
+  }
+
+  .treatment-edit {
+    margin-left: 73px;
+  }
+
+  .treatment-tabs {
+    grid-template-columns: repeat(2, 1fr);
+
+    height: auto;
+  }
+
+  .treatment-tab {
+    height: 40px;
+  }
+
+
+  /* Modal */
+
+  .treatment-modal-overlay {
+    padding: 12px;
+  }
+
+  .treatment-modal {
+    max-height: 94vh;
+
+    border-radius: 11px;
+  }
+
+  .treatment-form {
+    grid-template-columns: 1fr;
+
+    gap: 13px;
+
+    padding: 18px;
+  }
+
+  .treatment-form-group.full-width {
+    grid-column: auto;
+  }
+
+  .treatment-modal-header {
+    padding: 18px;
+  }
+
+  .treatment-modal-footer {
+    padding: 15px 18px 18px;
+  }
+
+}
+
+
+@media (max-width: 480px) {
+
+  .treatment-avatar {
+    width: 52px;
+    height: 52px;
+
+    min-width: 52px;
+
+    font-size: 18px;
+  }
+
+  .treatment-name-line h1 {
+    font-size: 16px;
+  }
+
+  .treatment-contact {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 5px;
+  }
+
+  .treatment-edit {
+    margin-left: 0;
+  }
+
+
+  /* Modal buttons */
+
+  .treatment-modal-footer {
+    flex-direction: column-reverse;
+
+    align-items: stretch;
+  }
+
+  .treatment-cancel,
+  .treatment-save {
+    width: 100%;
+  }
+
+}

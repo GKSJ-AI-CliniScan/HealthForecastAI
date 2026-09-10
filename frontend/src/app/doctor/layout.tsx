@@ -135,38 +135,13 @@ export default function DoctorLayout({
 
           {/* MEDICAL HISTORY */}
 
-          <a
-            href="/doctor/medical-history"
-            className={`doctor-menu ${
-              pathname === "/doctor/medical-history" ? "active" : ""
-            }`}
-          >
-            Medical History
-          </a>
+         
 
 
-          {/* TREATMENTS */}
-
-          <a
-            href="/doctor/treatments"
-            className={`doctor-menu ${
-              pathname === "/doctor/treatments" ? "active" : ""
-            }`}
-          >
-            Treatments
-          </a>
+          
 
 
-          {/* ADMISSIONS */}
-
-          <a
-            href="/doctor/admissions"
-            className={`doctor-menu ${
-              pathname === "/doctor/admissions" ? "active" : ""
-            }`}
-          >
-            Admissions
-          </a>
+          
 
 
           {/* ANALYTICS */}
