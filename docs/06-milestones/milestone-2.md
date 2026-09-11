@@ -32,7 +32,7 @@
 
 ## What I built
 
-**ML pipeline** (`ml/`) — switched the modelling pipeline from the original India-dataset
+**ML pipeline** (`ml/`) - switched the modelling pipeline from the original India-dataset
 prototype to the Diabetes 130-US Hospitals dataset named in the project brief, to align
 with the teammate whose model code this branch integrates with:
 - `ml/src/data/load_data.py`, `preprocess.py`, `ml/src/features/build_features.py` -
@@ -69,31 +69,27 @@ with the teammate whose model code this branch integrates with:
   thresholds rather than hardcoded values, so the test verifies banding behaviour
   independent of the specific threshold numbers chosen.
 
-
 ## How to run it
 
-```bash
-git clone <repo-url>
-git checkout intern/24-parimala-m
+    git clone <repo-url>
+    git checkout intern/24-parimala-m
 
-# ML - train and calibrate the model (requires diabetic_data.csv in ml/data/raw/,
-# see ml/data/README.md for the download link - not committed to git)
-cd ml
-pip install -r requirements.txt
-python -m src.models.train --config configs/config.yaml
+    # ML - train and calibrate the model (requires diabetic_data.csv in ml/data/raw/,
+    # see ml/data/README.md for the download link - not committed to git)
+    cd ml
+    pip install -r requirements.txt
+    python -m src.models.train --config configs/config.yaml
 
-# Backend
-cd ../backend
-pip install -r requirements-dev.txt
-uvicorn app.main:app --reload
-# Swagger UI: http://127.0.0.1:8000/docs
-
+    # Backend
+    cd ../backend
+    pip install -r requirements-dev.txt
+    uvicorn app.main:app --reload
+    # Swagger UI: http://127.0.0.1:8000/docs
 
 ## Evidence
 
 - `POST /risk/predict` returns a calibrated probability, risk category, model name/
-  version, and persists to `risk_predictions` (see Swagger screenshot,
-  `docs/05-wireframes/predict-response.png`).
+  version, and persists to `risk_predictions` (verified in Swagger).
 - `GET /risk/forecast?horizon_days=30` vs `?horizon_days=60` - `predicted_rate` and
   `predicted_readmissions` scale linearly with horizon, confirmed manually.
 - `GET /risk/high-risk` returns `[]` when no patient exceeds the threshold, and
@@ -101,9 +97,6 @@ uvicorn app.main:app --reload
 - Role scoping on `/risk/high-risk` confirmed manually: `doctor1@healthforecast.ai`
   returns only that doctor's assigned patients; `admin2@healthforecast.ai`
   (hospital_admin) returns the full hospital list.
-
-_Add actual screenshot files here and reference them, e.g.
-`![predict response](../05-wireframes/predict-response.png)`._
 
 ## Metrics
 
@@ -115,44 +108,43 @@ All models evaluated on the held-out validation set; XGBoost selected and promot
 | Random Forest | 0.672 | 0.177 | 0.515 | 0.263 | 0.650 |
 | XGBoost (selected) | 0.668 | 0.180 | 0.541 | 0.271 | 0.659 |
 
-**Calibrated XGBoost, final test set (untouched until this point):**
-Accuracy 0.677, Precision 0.186, Recall 0.544, F1 0.277, **ROC-AUC 0.669**
-(promotion thresholds: ROC-AUC ≥ 0.65, recall ≥ 0.50 - both cleared).
+Calibrated XGBoost, final test set (untouched until this point):
+Accuracy 0.677, Precision 0.186, Recall 0.544, F1 0.277, ROC-AUC 0.669
+(promotion thresholds: ROC-AUC >= 0.65, recall >= 0.50 - both cleared).
 
 Accuracy is not a meaningful headline metric here: the test set's base readmission
 rate is 11.4%, so a model that always predicts "not readmitted" would score ~89%
 accuracy while catching zero true positives. ROC-AUC and recall are the metrics
 that matter for this problem.
 
-**Risk category thresholds** were derived empirically rather than fixed arbitrarily,
+Risk category thresholds were derived empirically rather than fixed arbitrarily,
 because the calibrated model's probabilities are tightly clustered (99th percentile
 of all test patients is only 0.399; 90th percentile among patients who were actually
 readmitted is 0.262). Fixed defaults of medium=0.40/high=0.70 would have left the
-`"high"` category permanently empty. Final thresholds, from the test-set percentile
+"high" category permanently empty. Final thresholds, from the test-set percentile
 analysis (`ml/scripts/analyze_thresholds.py`):
-- `RISK_THRESHOLD_MEDIUM = 0.12` (≈ 75th percentile of all patients)
-- `RISK_THRESHOLD_HIGH = 0.21` (≈ 95th percentile of all patients)
+- RISK_THRESHOLD_MEDIUM = 0.12 (approx. 75th percentile of all patients)
+- RISK_THRESHOLD_HIGH = 0.21 (approx. 95th percentile of all patients)
 
 ## Known gaps
 
-- **Analytics dashboards (`analytics/*`) and Clinical Decision Support
-  (`clinical_support.py`)** are explicitly out of scope for this milestone -
+- Analytics dashboards (`analytics/*`) and Clinical Decision Support
+  (`clinical_support.py`) are explicitly out of scope for this milestone -
   both are marked `TODO(milestone-3)` in the existing codebase.
-- **Forecasting is a linear scaling of the model's 30-day probability**, not a true
+- Forecasting is a linear scaling of the model's 30-day probability, not a true
   time-series forecast - the model was only ever trained to predict readmission
   within a 30-day window, so horizons other than 30 days are an approximation.
   Documented in `get_readmission_forecast`'s docstring.
-- **Only 8 of the features the model was trained on are exposed via the API**
+- Only 8 of the features the model was trained on are exposed via the API
   (`time_in_hospital`, `num_medications`, `num_lab_procedures`, `number_diagnoses`,
   `number_inpatient`, `number_emergency`, `age_group`, plus a derived
   `prior_visits_total`). The remainder (race, admission type, diagnosis codes,
   specific medication flags, A1C results, etc.) are imputed at prediction time.
   This bounds how far any single input can move the predicted probability.
-- **Frontend auth token is stored in `sessionStorage`**, not an httpOnly cookie -
-  the backend does not currently set one. Acceptable for this milestone's demo but
-  not production-appropriate; flagged in `auth-context.tsx`.
-- **The "clinical insights" scope line** is interpreted narrowly here as
+- The "clinical insights" scope line is interpreted narrowly here as
   human-readable risk-factor explanations (not yet implemented - planned as a small
   rule-based addition to `/risk/predict`'s response), rather than the full Clinical
   Decision Support module (care recommendations, discharge planning), which belongs
   to a later milestone.
+- Risk prediction dashboards and forecasting reports (the UI layer consuming the
+  endpoints above) are not yet built on this branch.
