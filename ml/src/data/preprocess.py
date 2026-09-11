@@ -1,72 +1,14 @@
-"""Cleaning and preprocessing steps shared by training and inference.
-
-Adapted for the India Hospital Readmission Dataset (2015-2024), used instead
-of the Diabetes 130-US Hospitals dataset named in the original brief - see
-docs/06-milestones/milestone-1.md for the reasoning. Source tables:
-  admissions.csv, patients.csv, diagnoses.csv, hospitals.csv, billing.csv
-"""
+"""Cleaning and preprocessing steps shared by training and inference."""
 
 from typing import Any
 
 import pandas as pd
 
 
-def load_raw_tables(raw_dir: str) -> dict[str, pd.DataFrame]:
-    """Load the five source CSVs from the raw data directory."""
-    names = ["admissions", "patients", "diagnoses", "hospitals", "billing"]
-    return {name: pd.read_csv(f"{raw_dir}/{name}.csv") for name in names}
-
-
-def merge_admission_features(tables: dict[str, pd.DataFrame]) -> pd.DataFrame:
-    """Join admissions with patient demographics and hospital metadata.
-
-    diagnoses.csv is one-to-many per admission, so it is summarised (primary
-    diagnosis category + diagnosis count) rather than joined row-for-row.
-    """
-    admissions = tables["admissions"]
-    patients = tables["patients"]
-    hospitals = tables["hospitals"]
-    diagnoses = tables["diagnoses"]
-
-    primary_diag = diagnoses[diagnoses["diag_rank"] == 1][["admission_id", "diag_category"]].rename(
-        columns={"diag_category": "primary_diag_category"}
-    )
-    diag_count = diagnoses.groupby("admission_id").size().rename("diagnosis_count")
-
-    merged = admissions.merge(patients, on="patient_id", how="left")
-    merged = merged.merge(hospitals, on="hospital_id", how="left", suffixes=("", "_hospital"))
-    merged = merged.merge(primary_diag, on="admission_id", how="left")
-    merged = merged.merge(diag_count, on="admission_id", how="left")
-    return merged
-
-
-def fill_missing_insurance(frame: pd.DataFrame) -> pd.DataFrame:
-    """insurance_type is the one column with real missing values - fill as 'Unknown'."""
-    frame = frame.copy()
-    if "insurance_type" in frame.columns:
-        frame["insurance_type"] = frame["insurance_type"].fillna("Unknown")
-    return frame
-
-
-def bucket_age(frame: pd.DataFrame) -> pd.DataFrame:
-    """Bucket raw patient age into four clinically meaningful groups."""
-    frame = frame.copy()
-    if "age" not in frame.columns:
-        return frame
-
-    def _bucket(age: float) -> str:
-        if pd.isna(age):
-            return "unknown"
-        if age < 30:
-            return "under_30"
-        if age < 50:
-            return "30_to_49"
-        if age < 70:
-            return "50_to_69"
-        return "70_plus"
-
-    frame["age_group"] = frame["age"].map(_bucket)
-    return frame
+# Discharge dispositions representing death/hospice outcomes.
+# These encounters should not be used for readmission prediction because
+# subsequent readmission is not a meaningful possible outcome.
+EXCLUDED_DISCHARGE_DISPOSITIONS = {11, 13, 14, 19, 20, 21}
 
 
 def drop_unused_columns(frame: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
@@ -82,10 +24,82 @@ def split_feature_types(frame: pd.DataFrame) -> tuple[list[str], list[str]]:
     return numeric, categorical
 
 
+def remove_non_readmission_outcomes(frame: pd.DataFrame) -> pd.DataFrame:
+    """Remove encounters whose discharge outcome makes readmission impossible."""
+    if "discharge_disposition_id" not in frame.columns:
+        return frame
+
+    return frame.loc[
+        ~frame["discharge_disposition_id"].isin(EXCLUDED_DISCHARGE_DISPOSITIONS)
+    ].copy()
+
+
+def normalise_age(frame: pd.DataFrame) -> pd.DataFrame:
+    """Normalise the dataset's existing ten-year age buckets.
+
+    The source dataset already supplies age as ranges such as [50-60), so we
+    preserve those clinically interpretable buckets instead of inventing a
+    continuous age value.
+    """
+    if "age" not in frame.columns:
+        return frame
+
+    result = frame.copy()
+    result["age"] = result["age"].astype("string").str.strip()
+    return result
+
+
+def collapse_rare_diagnoses(
+    frame: pd.DataFrame,
+    min_frequency: float = 0.01,
+) -> pd.DataFrame:
+    """Collapse infrequent ICD diagnosis codes into an OTHER category.
+
+    Diagnosis columns contain many distinct ICD-9 codes. Rare categories add
+    unnecessary sparsity and can make the feature space unstable.
+    """
+    result = frame.copy()
+
+    for column in ("diag_1", "diag_2", "diag_3"):
+        if column not in result.columns:
+            continue
+
+        frequencies = result[column].value_counts(normalize=True, dropna=True)
+        rare_values = frequencies[frequencies < min_frequency].index
+
+        result[column] = result[column].where(
+            ~result[column].isin(rare_values),
+            "OTHER",
+        )
+
+    return result
+
+
 def basic_clean(frame: pd.DataFrame, config: dict[str, Any]) -> pd.DataFrame:
-    """Apply the configured cleaning steps to an already-merged admissions frame."""
+    """Apply deterministic domain-specific cleaning.
+
+    Steps:
+      1. Remove duplicate encounters.
+      2. Remove discharge outcomes incompatible with readmission modelling.
+      3. Drop identifiers and configured high-missingness columns.
+      4. Preserve and normalise the existing age buckets.
+      5. Collapse rare diagnosis codes.
+    """
     preprocessing = config.get("preprocessing", {})
-    cleaned = fill_missing_insurance(frame)
-    cleaned = drop_unused_columns(cleaned, preprocessing.get("drop_columns", []))
-    cleaned = bucket_age(cleaned)
-    return cleaned.drop_duplicates()
+
+    cleaned = frame.drop_duplicates().copy()
+    cleaned = remove_non_readmission_outcomes(cleaned)
+
+    cleaned = drop_unused_columns(
+        cleaned,
+        preprocessing.get("drop_columns", []),
+    )
+
+    cleaned = normalise_age(cleaned)
+
+    cleaned = collapse_rare_diagnoses(
+        cleaned,
+        min_frequency=0.01,
+    )
+
+    return cleaned.reset_index(drop=True)

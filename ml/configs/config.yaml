@@ -2,32 +2,42 @@
 # Every experiment must be reproducible from this file alone.
 
 dataset:
-  name: india_hospital_readmission_2015_2024
-  source: Kaggle - India Hospital Readmission Dataset (2015-2024)
-  raw_dir: ml/data/raw_india
-  processed_path: ml/data/processed/admissions_features.parquet
-  target_column: readmitted_30d
-  positive_label: 1
-  # NOTE: deviates from the Diabetes 130-US Hospitals dataset named in the
-  # original brief - see docs/06-milestones/milestone-1.md for rationale.
+  name: diabetes_130_us_hospitals
+  source_url: https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008
+  raw_path: data/raw/diabetic_data.csv
+  processed_path: data/processed/admissions_features.parquet
+  target_column: readmitted
+  # The brief targets 30-day readmission: map "<30" -> 1, {">30", "NO"} -> 0
+  positive_label: "<30"
 
 split:
   test_size: 0.2
   validation_size: 0.1
+  calibration_size: 0.1
   random_state: 42
   stratify: true
 
 preprocessing:
   drop_columns:
-    - admission_id
-    - patient_id
-    - admit_date
-    - discharge_date
-    - bill_id
+    - encounter_id
+    - patient_nbr
+    - weight
+    - payer_code
+    - medical_specialty
+  missing_value_token: "?"
   numeric_imputation: median
   categorical_imputation: most_frequent
   scale_numeric: true
   one_hot_encode: true
+
+  serving_features:
+  - age
+  - gender
+  - race
+  - time_in_hospital
+  - num_lab_procedures
+  - num_medications
+  - number_diagnoses
 
 imbalance:
   strategy: class_weight   # one of: none | class_weight | smote
@@ -61,6 +71,6 @@ risk_bands:
   medium: 0.40
 
 artifacts:
-  output_dir: ml/artifacts
+  output_dir: artifacts
   model_filename: readmission_model.joblib
   metrics_filename: metrics.json
