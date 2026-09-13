@@ -43,11 +43,12 @@ models:
     min_samples_leaf: 5
   xgboost:
     enabled: true
-    n_estimators: 400
-    max_depth: 6
-    learning_rate: 0.05
+    n_estimators: 350
+    max_depth: 5
+    learning_rate: 0.04
     subsample: 0.8
     colsample_bytree: 0.8
+    scale_pos_weight: 7.2
 
 evaluation:
   primary_metric: roc_auc

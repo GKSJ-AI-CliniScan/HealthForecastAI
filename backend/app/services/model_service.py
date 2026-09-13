@@ -59,16 +59,42 @@ def predict_readmission_probability(payload: RiskPredictionRequest) -> float:
         "race": ["Caucasian"],
         "change": ["Ch" if payload.num_medications >= 10 else "No"],
         "diabetesMed": ["Yes"],
+        "admission_type_id": ["1"],
+        "discharge_disposition_id": ["1"],
+        "admission_source_id": ["7"],
+        "diag_1": ["250.0"],
+        "diag_2": ["401"],
+        "diag_3": ["250"],
+        "max_glu_serum": ["None"],
+        "A1Cresult": ["None"],
     }
     df = pd.DataFrame(input_dict)
 
-    # Derive engineered features
-    df["prior_visits_total"] = (
-        df["number_outpatient"] + df["number_emergency"] + df["number_inpatient"]
-    )
-    df["is_polypharmacy"] = (df["num_medications"] >= 10).astype(int)
-    df["has_med_change"] = (df["change"].astype(str).str.strip().str.lower() == "ch").astype(int)
-    df["is_long_stay"] = (df["time_in_hospital"] >= 7).astype(int)
+    # Derive engineered features matching training pipeline
+    try:
+        import sys
+        from pathlib import Path
+
+        repo_root = Path(__file__).resolve().parents[3]
+        ml_path = str(repo_root / "ml")
+        if ml_path not in sys.path:
+            sys.path.insert(0, ml_path)
+        from src.features.build_features import add_utilisation_features
+
+        df = add_utilisation_features(df)
+    except Exception:
+        df["prior_visits_total"] = (
+            df["number_outpatient"] + df["number_emergency"] + df["number_inpatient"]
+        )
+        df["is_polypharmacy"] = (df["num_medications"] >= 10).astype(int)
+        df["has_med_change"] = (df["change"].astype(str).str.strip().str.lower() == "ch").astype(int)
+        df["is_long_stay"] = (df["time_in_hospital"] >= 7).astype(int)
+
+    # Ensure all expected trained feature columns are populated
+    if hasattr(model, "feature_names_in_"):
+        for col in model.feature_names_in_:
+            if col not in df.columns:
+                df[col] = "No"
 
     try:
         if hasattr(model, "predict_proba"):

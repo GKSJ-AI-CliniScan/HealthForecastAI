@@ -32,12 +32,19 @@ def build_estimator(name: str, params: dict[str, Any]) -> Any:
     if name == "logistic_regression":
         return LogisticRegression(class_weight="balanced", **options)
     if name == "random_forest":
-        return RandomForestClassifier(class_weight="balanced", random_state=42, **options)
+        return RandomForestClassifier(
+            class_weight="balanced", random_state=42, n_jobs=-1, **options
+        )
     if name == "xgboost":
         from xgboost import XGBClassifier
 
+        spw = options.pop("scale_pos_weight", 7.2)
         return XGBClassifier(
-            eval_metric="logloss", random_state=42, scale_pos_weight=8.0, **options
+            eval_metric="logloss",
+            random_state=42,
+            scale_pos_weight=spw,
+            n_jobs=-1,
+            **options,
         )
     raise ValueError(f"Unknown model: {name}")
 
@@ -103,9 +110,14 @@ def main() -> None:
     promoted = meets_promotion_thresholds(results[best_name], thresholds)
     summary = {"best_model": best_name, "promoted": promoted, "results": results}
 
-    output_dir = Path(config["artifacts"]["output_dir"])
+    output_dir_str = config["artifacts"]["output_dir"]
+    if Path.cwd().name == "ml" and output_dir_str.startswith("ml/"):
+        output_dir = Path(output_dir_str.removeprefix("ml/"))
+    else:
+        output_dir = Path(output_dir_str)
     output_dir.mkdir(parents=True, exist_ok=True)
     joblib.dump(best_pipeline, output_dir / config["artifacts"]["model_filename"])
+    joblib.dump(best_pipeline, output_dir / "best_model.joblib")
     metrics_path = output_dir / config["artifacts"]["metrics_filename"]
     metrics_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
 
