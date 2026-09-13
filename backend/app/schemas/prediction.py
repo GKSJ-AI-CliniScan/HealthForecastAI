@@ -1,21 +1,36 @@
 """Risk prediction and readmission forecasting schemas."""
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
+
+AGE_GROUPS = Literal[
+    "[0-10)",
+    "[10-20)",
+    "[20-30)",
+    "[30-40)",
+    "[40-50)",
+    "[50-60)",
+    "[60-70)",
+    "[70-80)",
+    "[80-90)",
+    "[90-100)",
+]
 
 
 class RiskPredictionRequest(BaseModel):
     """Feature payload submitted for a single readmission risk prediction."""
 
     patient_id: int
-    time_in_hospital: int = Field(ge=0, le=365)
+    time_in_hospital: int = Field(ge=1, le=14)
     num_medications: int = Field(ge=0)
     num_lab_procedures: int = Field(ge=0)
     number_diagnoses: int = Field(ge=0)
     number_inpatient: int = Field(default=0, ge=0)
     number_emergency: int = Field(default=0, ge=0)
-    age_group: str | None = None
+    # was le=365
+    age_group: AGE_GROUPS | None = None
 
 
 class RiskPredictionRead(BaseModel):

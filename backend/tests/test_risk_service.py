@@ -2,22 +2,26 @@
 
 import pytest
 
+from app.core.config import settings
 from app.services.risk_service import RISK_HIGH, RISK_LOW, RISK_MEDIUM, categorise_risk
+
+MEDIUM = settings.RISK_THRESHOLD_MEDIUM
+HIGH = settings.RISK_THRESHOLD_HIGH
 
 
 @pytest.mark.parametrize(
     ("probability", "expected"),
     [
         (0.00, RISK_LOW),
-        (0.39, RISK_LOW),
-        (0.40, RISK_MEDIUM),
-        (0.69, RISK_MEDIUM),
-        (0.70, RISK_HIGH),
+        (MEDIUM - 0.01, RISK_LOW),
+        (MEDIUM, RISK_MEDIUM),
+        (HIGH - 0.01, RISK_MEDIUM),
+        (HIGH, RISK_HIGH),
         (1.00, RISK_HIGH),
     ],
 )
 def test_risk_bands(probability: float, expected: str) -> None:
-    """Probabilities map onto the documented risk bands at the threshold edges."""
+    """Probabilities map onto the configured risk bands at the threshold edges."""
     assert categorise_risk(probability) == expected
 
 
