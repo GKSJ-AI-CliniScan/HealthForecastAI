@@ -183,7 +183,7 @@
 
       <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
         <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span class="hidden sm:inline">Live Server :8000</span>
+        <span class="hidden sm:inline">API :8000</span>
       </div>
     </div>
   </header>
@@ -235,7 +235,7 @@
         </div>
         <div class="flex items-center justify-between">
           <span class="text-slate-400">AI Model</span>
-          <span class="font-semibold text-blue-600">Logistic + RF</span>
+          <span class="font-semibold text-blue-600">readmission_xgboost_v1</span>
         </div>
       </div>
     </aside>
@@ -395,6 +395,34 @@
 </div>
 </div>
 </div>
+<!-- Milestone 2: Readmission Forecast -->
+<div class="clinical-card p-lg clinical-shadow">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">query_stats</span>
+        Readmission Forecast
+      </h2>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+        Hospital-level forecast returned by the Milestone 2 risk API.
+      </p>
+    </div>
+    <div class="grid grid-cols-2 gap-3 min-w-[260px]">
+      <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Forecast Horizon</div>
+        <div id="forecast-horizon" class="text-lg font-bold text-slate-900 mt-1">30 Days</div>
+      </div>
+      <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Predicted Readmissions</div>
+        <div id="forecast-readmissions" class="text-lg font-bold text-rose-600 mt-1">--</div>
+      </div>
+    </div>
+  </div>
+  <div class="mt-4 flex items-center justify-between text-xs">
+    <span class="text-slate-500">Predicted readmission rate</span>
+    <span id="forecast-rate" class="font-bold text-blue-600">--</span>
+  </div>
+</div>
 <!-- Middle Section: Financial Performance -->
 <div class="clinical-card p-lg clinical-shadow">
 <div class="mb-6 flex justify-between items-end">
@@ -459,7 +487,7 @@
       <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Diagnosis ICD-10 Codes</label>
       <div class="relative">
         <span class="material-symbols-outlined absolute left-2.5 top-2 text-slate-400 text-sm">search</span>
-        <input id="cb-icd" type="text" value="E11, I10" placeholder="e.g. E11.9, I10, I50.9" class="w-full pl-8 border border-slate-300 rounded-lg p-2 text-xs text-slate-800" />
+        <input id="cb-icd" type="text" value="" placeholder="e.g. E11.9, I10, I50.9" class="w-full pl-8 border border-slate-300 rounded-lg p-2 text-xs text-slate-800" />
       </div>
       <p class="text-[10px] text-slate-400 mt-1">Comma-separated ICD prefixes (e.g. E11, I10, I50, N18)</p>
     </div>
@@ -907,17 +935,15 @@
 
         <div>
           <h4 class="font-bold text-xs text-slate-700 uppercase tracking-wider mb-2">AI Risk Explanations</h4>
-          <ul class="text-xs text-slate-600 space-y-1 list-disc pl-4">
-            <li>Patient has severe polypharmacy (&gt;12 concurrent medications).</li>
-            <li>Inpatient duration exceeds department median by 4.2 days.</li>
-            <li>Primary diagnostic code mapped to Type 2 Diabetes with secondary circulatory hypertension.</li>
+          <ul id="pm-factors" class="text-xs text-slate-600 space-y-1 list-disc pl-4">
+            <li>Loading prediction factors...</li>
           </ul>
         </div>
 
         <div>
           <h4 class="font-bold text-xs text-slate-700 uppercase tracking-wider mb-2">Clinical Care Recommendation</h4>
-          <div class="p-3 bg-blue-50/70 border border-blue-200 rounded-xl text-xs text-blue-900 leading-relaxed">
-            Recommend 48-hour post-discharge follow-up telehealth appointment and transition to once-daily Metformin formulation with continuous glucose monitoring.
+          <div id="pm-recommendation" class="p-3 bg-blue-50/70 border border-blue-200 rounded-xl text-xs text-blue-900 leading-relaxed">
+            Loading clinical recommendation...
           </div>
         </div>
       </div>
@@ -1008,6 +1034,189 @@
 
   <!-- Client-side View Switcher & JavaScript Interactivity -->
   <script>
+    // ==================== MILESTONE 2 API INTEGRATION ====================
+    const API_BASE = 'http://localhost:8000/api/v1';
+    let doctorApiPatients = [];
+    let currentPatientContext = null;
+    let forecastLoaded = false;
+
+    function getAccessToken() {
+      return (
+        localStorage.getItem('access_token') ||
+        localStorage.getItem('accessToken') ||
+        localStorage.getItem('token') ||
+        ''
+      );
+    }
+
+    async function apiFetch(path, options = {}) {
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+      };
+
+      const token = getAccessToken();
+      if (token) headers.Authorization = `Bearer ${token}`;
+
+      const response = await fetch(`${API_BASE}${path}`, {
+        ...options,
+        headers
+      });
+
+      if (!response.ok) {
+        let detail = `HTTP ${response.status}`;
+        try {
+          const body = await response.json();
+          detail = body.detail || detail;
+        } catch (_) {}
+        throw new Error(detail);
+      }
+
+      return response.json();
+    }
+
+    function findLocalPatient(patientId) {
+      return initialCohortDataset.find(p => p.id === patientId) || null;
+    }
+
+    function mergeApiPatient(apiPatient) {
+      const id = apiPatient.patient_id || apiPatient.id;
+      const local = findLocalPatient(id) || {};
+      const probability = Number(
+        apiPatient.readmission_probability ?? apiPatient.risk ?? local.risk ?? 0
+      );
+
+      let tier = String(apiPatient.risk_category || apiPatient.tier || local.tier || '').toUpperCase();
+      if (!tier) tier = probability >= 0.70 ? 'HIGH' : probability >= 0.40 ? 'MODERATE' : 'LOW';
+
+      return {
+        ...local,
+        id: id || local.id || 'UNKNOWN',
+        risk: probability,
+        tier,
+        modelName: apiPatient.model_name,
+        modelVersion: apiPatient.model_version,
+        contributingFactors: apiPatient.contributing_factors || [],
+        recommendedActions: apiPatient.recommended_actions || []
+      };
+    }
+
+    async function loadHighRiskPatients() {
+      try {
+        const data = await apiFetch('/risk/high-risk');
+        const list = Array.isArray(data) ? data : (data.items || data.results || []);
+        doctorApiPatients = list.map(mergeApiPatient);
+        renderDoctorWatchlist(doctorApiPatients);
+        updateDoctorRiskKpis(doctorApiPatients);
+        showToast(`Loaded ${doctorApiPatients.length} high-risk patients from Risk API`);
+      } catch (error) {
+        console.warn('High-risk API unavailable:', error.message);
+        doctorApiPatients = [...initialCohortDataset];
+        renderDoctorWatchlist(doctorApiPatients);
+        updateDoctorRiskKpis(doctorApiPatients);
+        console.info('Using local demonstration cohort until API authentication/availability is configured.');
+      }
+    }
+
+    function updateDoctorRiskKpis(patients) {
+      const highCount = patients.filter(p => Number(p.risk) >= 0.70).length;
+      const avg = patients.length
+        ? patients.reduce((sum, p) => sum + Number(p.risk || 0), 0) / patients.length
+        : 0;
+
+      const highRiskKpi = document.querySelector('#view-doctor .font-display-lg');
+      if (highRiskKpi) highRiskKpi.innerText = highCount;
+
+      const probabilityKpi = document.querySelector('#view-doctor .font-headline-sm.text-on-surface.z-10');
+      if (probabilityKpi) probabilityKpi.innerText = (avg * 100).toFixed(1);
+    }
+
+    async function loadReadmissionForecast() {
+      if (forecastLoaded) return;
+      forecastLoaded = true;
+
+      try {
+        const data = await apiFetch('/risk/forecast?horizon_days=30');
+        document.getElementById('forecast-horizon').innerText = `${data.horizon_days ?? 30} Days`;
+        document.getElementById('forecast-readmissions').innerText =
+          data.predicted_readmissions ?? '--';
+        document.getElementById('forecast-rate').innerText =
+          data.predicted_rate != null
+            ? `${(Number(data.predicted_rate) * 100).toFixed(1)}%`
+            : '--';
+      } catch (error) {
+        console.warn('Forecast API unavailable:', error.message);
+        document.getElementById('forecast-readmissions').innerText = 'Unavailable';
+        document.getElementById('forecast-rate').innerText = 'API unavailable';
+        forecastLoaded = false;
+      }
+    }
+
+    async function loadPatientPrediction(patient) {
+      currentPatientContext = patient;
+
+      const factorsBox = document.getElementById('pm-factors');
+      const recommendationBox = document.getElementById('pm-recommendation');
+      if (factorsBox) factorsBox.innerHTML = '<li>Requesting prediction from Risk API...</li>';
+      if (recommendationBox) recommendationBox.innerText = 'Requesting clinical recommendation...';
+
+      // Payload uses the fields consumed by the Milestone 2 risk service.
+      const payload = {
+        patient_id: patient.id,
+        number_inpatient: Number(patient.number_inpatient ?? 0),
+        number_emergency: Number(patient.number_emergency ?? 0),
+        time_in_hospital: Number(patient.los ?? 1),
+        num_medications: Number(patient.meds ?? 1),
+        number_diagnoses: Number(patient.number_diagnoses ?? 2),
+        A1Cresult: Number.parseFloat(patient.hba1c ?? 8.4) >= 8 ? '>8' : 'Normal'
+      };
+
+      try {
+        const result = await apiFetch('/risk/predict', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+
+        const probability = Number(result.readmission_probability ?? patient.risk ?? 0);
+        const category = String(result.risk_category || patient.tier || 'LOW').toUpperCase();
+
+        document.getElementById('pm-risk').innerText =
+          `${category.charAt(0) + category.slice(1).toLowerCase()} (${(probability * 100).toFixed(0)}%)`;
+
+        if (factorsBox) {
+          const factors = Array.isArray(result.contributing_factors)
+            ? result.contributing_factors
+            : [];
+          factorsBox.innerHTML = factors.length
+            ? factors.map(f => `<li>${String(f)}</li>`).join('')
+            : '<li>No contributing factors were returned by the API.</li>';
+        }
+
+        if (recommendationBox) {
+          const actions = Array.isArray(result.recommended_actions)
+            ? result.recommended_actions
+            : [];
+          recommendationBox.innerText = actions.length
+            ? actions.join(' ')
+            : 'No clinical recommendation was returned by the API.';
+        }
+
+        showToast(`Risk prediction loaded for ${patient.id}`);
+      } catch (error) {
+        console.warn('Patient prediction API unavailable:', error.message);
+        if (factorsBox) {
+          factorsBox.innerHTML = `
+            <li>API prediction unavailable; showing the demonstration record.</li>
+            <li>Connect an authorized backend session to display live factors.</li>`;
+        }
+        if (recommendationBox) {
+          recommendationBox.innerText =
+            'Live clinical recommendation is unavailable until the Risk API is authenticated and reachable.';
+        }
+      }
+    }
+
+    // ==================== EXISTING DASHBOARD ====================
     const userProfiles = {
       doctor: {
         name: "Dr. Smith",
@@ -1097,7 +1306,10 @@
         document.getElementById('user-avatar').src = prof.avatar;
       }
 
-      if (viewName === 'hospital') initHospitalCharts();
+      if (viewName === 'hospital') {
+        initHospitalCharts();
+        loadReadmissionForecast();
+      }
       if (viewName === 'researcher') {
         renderCohortTable(activeCohortList);
         initResearcherCharts();
@@ -1123,6 +1335,8 @@
       document.getElementById('pm-los').innerText = los;
       document.getElementById('pm-hba1c').innerText = hba1c;
       document.getElementById('pm-avatar').innerText = name.split(' ').map(n=>n[0]).join('');
+      document.getElementById('pm-factors').innerHTML = '<li>Loading live AI risk explanation...</li>';
+      document.getElementById('pm-recommendation').innerText = 'Loading live clinical recommendation...';
 
       const medsBox = document.getElementById('pm-meds');
       medsBox.innerHTML = '';
@@ -1163,27 +1377,24 @@
     function toggleRiskFilter() {
       currentRiskFilter = (currentRiskFilter + 1) % 3;
       const filterText = document.getElementById('risk-filter-text');
-      const rows = document.querySelectorAll('#view-doctor table tbody tr');
+      const rows = document.querySelectorAll('#doctor-watchlist-tbody tr');
 
-      if (currentRiskFilter === 0) {
-        filterText.innerText = 'Filter: All';
-        rows.forEach(r => r.style.display = '');
-        showToast('Displaying all patient records');
-      } else if (currentRiskFilter === 1) {
-        filterText.innerText = 'Filter: High Risk';
-        rows.forEach(r => {
-          const isHigh = r.innerText.includes('High') || r.innerText.includes('89%') || r.innerText.includes('92%');
-          r.style.display = isHigh ? '' : 'none';
-        });
-        showToast('Filtered: High readmission risk only (>70%)');
-      } else {
-        filterText.innerText = 'Filter: Moderate Risk';
-        rows.forEach(r => {
-          const isMod = r.innerText.includes('Moderate') || r.innerText.includes('45%');
-          r.style.display = isMod ? '' : 'none';
-        });
-        showToast('Filtered: Moderate readmission risk only');
-      }
+      rows.forEach(row => {
+        const tier = row.dataset.tier || '';
+        const visible =
+          currentRiskFilter === 0 ||
+          (currentRiskFilter === 1 && tier === 'HIGH') ||
+          (currentRiskFilter === 2 && tier === 'MODERATE');
+        row.style.display = visible ? '' : 'none';
+      });
+
+      const labels = ['All', 'High Risk', 'Moderate Risk'];
+      filterText.innerText = `Filter: ${labels[currentRiskFilter]}`;
+      showToast(
+        currentRiskFilter === 0
+          ? 'Displaying all patient records'
+          : `Filtered: ${labels[currentRiskFilter]} only`
+      );
     }
 
     // Global Patient & Record Search
@@ -1257,37 +1468,75 @@
       const tbody = document.getElementById('doctor-watchlist-tbody');
       if (!tbody) return;
 
+      if (!patients.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="p-8 text-center text-slate-400 font-sans">
+              No high-risk patients returned by the API.
+            </td>
+          </tr>`;
+        return;
+      }
+
       tbody.innerHTML = patients.map(p => {
-        const initials = p.id.replace('PT-', 'P');
-        let riskBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-label-md text-[10px] uppercase font-bold tracking-wider">High (${(p.risk * 100).toFixed(0)}%)</span>`;
-        if (p.tier === 'MODERATE') {
-          riskBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-label-md text-[10px] uppercase font-bold tracking-wider">Moderate (${(p.risk * 100).toFixed(0)}%)</span>`;
-        } else if (p.tier === 'LOW') {
-          riskBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-label-md text-[10px] uppercase font-bold tracking-wider">Low (${(p.risk * 100).toFixed(0)}%)</span>`;
+        const initials = String(p.id || 'P').replace('PT-', 'P');
+        const risk = Number(p.risk || 0);
+        const tier = String(p.tier || '').toUpperCase();
+        let riskBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-label-md text-[10px] uppercase font-bold tracking-wider">High (${(risk * 100).toFixed(0)}%)</span>`;
+
+        if (tier === 'MODERATE') {
+          riskBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-label-md text-[10px] uppercase font-bold tracking-wider">Moderate (${(risk * 100).toFixed(0)}%)</span>`;
+        } else if (tier === 'LOW') {
+          riskBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-label-md text-[10px] uppercase font-bold tracking-wider">Low (${(risk * 100).toFixed(0)}%)</span>`;
         }
 
-        let hba1cText = p.risk >= 0.7 ? '<span class="text-rose-600 font-semibold">8.4% (Elevated)</span>' : '<span class="text-slate-700">6.2% (Normal)</span>';
+        const hba1c = Number(p.hba1c ?? (risk >= 0.7 ? 8.4 : 6.2));
+        const hba1cText = hba1c >= 8
+          ? `<span class="text-rose-600 font-semibold">${hba1c.toFixed(1)}% (Elevated)</span>`
+          : `<span class="text-slate-700">${hba1c.toFixed(1)}% (Normal)</span>`;
 
         return `
-          <tr class="hover:bg-slate-50 transition-colors">
+          <tr class="hover:bg-slate-50 transition-colors" data-risk="${risk}" data-tier="${tier}">
             <td class="p-sm flex items-center gap-sm font-body-md text-body-md font-medium">
               <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0">${initials}</div>
               <div>
-                <div class="text-slate-900 font-semibold">${p.diagnosis}</div>
-                <div class="text-[11px] text-slate-500 font-mono">Patient: ${p.id} (${p.gender}, ${p.age}y)</div>
+                <div class="text-slate-900 font-semibold">${p.diagnosis || p.id}</div>
+                <div class="text-[11px] text-slate-500 font-mono">Patient: ${p.id} (${p.gender || '--'}, ${p.age || '--'}y)</div>
               </div>
             </td>
-            <td class="p-sm font-mono font-bold text-slate-800">ADM-${p.id.replace('PT-', '')}</td>
+            <td class="p-sm font-mono font-bold text-slate-800">ADM-${String(p.id).replace('PT-', '')}</td>
             <td class="p-sm">${riskBadge}</td>
-            <td class="p-sm">${p.los} Days</td>
+            <td class="p-sm">${p.los ?? '--'} Days</td>
             <td class="p-sm">${hba1cText}</td>
             <td class="p-sm text-right flex gap-xs justify-end">
-              <button onclick="openPatientModal('${p.id} (${p.diagnosis})', 'ADM-${p.id.replace('PT-', '')}', '${(p.risk*100).toFixed(0)}%', '${p.los} Days', '8.4%', '${p.tier}', ['Metformin 1000mg', 'Lisinopril 20mg', 'Insulin Glargine'])" class="px-sm py-xs bg-surface border border-primary text-primary rounded-md font-label-md hover:bg-surface-container-low transition-colors whitespace-nowrap">View Timeline</button>
+              <button onclick="openPatientModalById('${p.id}')" class="px-sm py-xs bg-surface border border-primary text-primary rounded-md font-label-md hover:bg-surface-container-low transition-colors whitespace-nowrap">View Timeline</button>
               <button onclick="openAssignModal(this)" class="px-sm py-xs bg-primary-container text-on-primary rounded-md font-label-md hover:bg-primary transition-colors whitespace-nowrap">Assign</button>
             </td>
           </tr>
         `;
       }).join('');
+    }
+
+    function openPatientModalById(patientId) {
+      const patient = doctorApiPatients.find(p => p.id === patientId)
+        || initialCohortDataset.find(p => p.id === patientId);
+
+      if (!patient) {
+        showToast('Patient record not found', 'error');
+        return;
+      }
+
+      const hba1c = Number(patient.hba1c ?? (Number(patient.risk) >= 0.7 ? 8.4 : 6.2));
+      openPatientModal(
+        patient.diagnosis || patient.id,
+        `ADM-${String(patient.id).replace('PT-', '')}`,
+        `${(Number(patient.risk || 0) * 100).toFixed(0)}%`,
+        `${patient.los ?? '--'} Days`,
+        `${hba1c.toFixed(1)}%`,
+        patient.tier || 'LOW',
+        patient.medication_list || ['Metformin 1000mg', 'Lisinopril 20mg']
+      );
+      loadPatientPrediction(patient);
     }
 
     function renderCohortTable(patients) {
@@ -1393,7 +1642,7 @@
       document.getElementById('cb-age-min').value = '18';
       document.getElementById('cb-age-max').value = '85';
       document.getElementById('cb-gender').value = 'All';
-      document.getElementById('cb-icd').value = 'E11, I10';
+      document.getElementById('cb-icd').value = '';
       document.getElementById('cb-meds').value = 'All';
       applyCohortFilters();
       showToast('Cohort filters reset to default');
@@ -1604,6 +1853,7 @@
       renderDoctorWatchlist(activeCohortList);
       renderCohortTable(activeCohortList);
       applyCohortFilters();
+      loadHighRiskPatients();
       const hash = window.location.hash.replace('#', '');
       if (hash && ['doctor', 'hospital', 'researcher', 'system'].includes(hash)) {
         switchView(hash);
