@@ -14,7 +14,7 @@ export class ApiError extends Error {
 export async function apiFetch<T>(
   path: string,
   options: RequestInit = {},
-  token?: string,
+  token?: string | null,
 ): Promise<T> {
   const headers = new Headers(options.headers);
 

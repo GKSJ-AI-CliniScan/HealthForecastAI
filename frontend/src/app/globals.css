@@ -3,23 +3,60 @@
 @tailwind utilities;
 
 :root {
-  --background: #f7f9fc;
-  --foreground: #0f1c2e;
-  --surface: #ffffff;
-  --border: #dde3ec;
+  --background: #f5f7fa;
+  --foreground: #172033;
+  --muted: #667085;
+  --border: #dfe4ea;
+  --panel: #ffffff;
+  --sidebar: #172033;
+  --primary: #155eef;
+  --primary-dark: #124dcc;
+  --success: #087443;
+  --success-bg: #ecfdf3;
+  --warning: #a15c00;
+  --warning-bg: #fff7e8;
+  --danger: #b42318;
+  --danger-bg: #fef3f2;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0b1220;
-    --foreground: #e6ecf5;
-    --surface: #131c2b;
-    --border: #23304a;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
 }
 
 body {
+  margin: 0;
+  min-height: 100vh;
   background: var(--background);
   color: var(--foreground);
-  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+table {
+  border-collapse: collapse;
 }

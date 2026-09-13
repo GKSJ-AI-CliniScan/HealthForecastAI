@@ -32,9 +32,36 @@ class RiskPredictionRead(BaseModel):
 
 
 class ReadmissionForecast(BaseModel):
-    """Aggregated readmission forecast for a department or hospital."""
-
     scope: str
-    horizon_days: int
-    predicted_readmissions: int
+    horizon_days: int = Field(gt=0, le=365)
+    predicted_readmissions: float = Field(ge=0.0)
     predicted_rate: float = Field(ge=0.0, le=1.0)
+
+
+class RiskDriver(BaseModel):
+    """A model-derived feature contribution."""
+
+    feature: str
+    value: str | float | int | None = None
+    contribution: float
+    direction: str
+
+
+class ClinicalInsight(BaseModel):
+    """Human-readable interpretation of a patient risk prediction."""
+
+    title: str
+    detail: str
+    severity: str
+
+
+class RiskDriversRead(BaseModel):
+    """Model-derived drivers for one patient risk prediction."""
+
+    patient_id: int
+    probability: float = Field(ge=0.0, le=1.0)
+    model_name: str
+    model_version: str
+    drivers: list[RiskDriver]
+    insights: list[ClinicalInsight]
+
