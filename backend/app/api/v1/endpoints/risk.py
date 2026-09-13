@@ -1,16 +1,29 @@
 """Risk prediction and readmission forecasting endpoints - Module 3."""
 
 from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
-from app.api.deps import CurrentUser, require_permission
+from app.api.deps import (
+    CurrentUser,
+    VerifiedUser,
+    require_permission,
+    require_verified_permission,
+)
 from app.core.config import settings
 from app.core.rbac import Permission
+from app.db.session import get_db
 from app.schemas.prediction import (
     ReadmissionForecast,
     RiskPredictionRead,
     RiskPredictionRequest,
 )
-from app.services.risk_service import categorise_risk
+from app.services.risk_service import (
+    categorise_risk,
+    get_readmission_forecast,
+    list_high_risk_predictions,
+)
+
+
 
 router = APIRouter()
 
@@ -37,27 +50,39 @@ def predict_risk(
 
 @router.get("/high-risk", summary="List patients currently in the high risk band")
 def list_high_risk_patients(
-    user: CurrentUser = Depends(require_permission(Permission.RISK_REPORT_READ)),
+    db: Session = Depends(get_db),
+    caller: VerifiedUser = Depends(
+        require_verified_permission(Permission.RISK_REPORT_READ)
+    ),
 ) -> list[RiskPredictionRead]:
-    """Return the current high risk cohort.
+    """Return high-risk predictions visible to the caller."""
 
-    TODO(milestone-2): query risk_predictions, scoped to the caller's role.
-    """
-    return []
+    predictions = list_high_risk_predictions(db, caller)
+
+    return [RiskPredictionRead.model_validate(prediction) for prediction in predictions]
 
 
-@router.get("/forecast", response_model=ReadmissionForecast, summary="Readmission forecast")
+@router.get(
+    "/forecast",
+    response_model=ReadmissionForecast,
+    summary="Readmission forecast",
+)
 def readmission_forecast(
     horizon_days: int = 30,
-    user: CurrentUser = Depends(require_permission(Permission.READMISSION_FORECAST_READ)),
+    db: Session = Depends(get_db),
+    caller: VerifiedUser = Depends(
+        require_verified_permission(Permission.READMISSION_FORECAST_READ)
+    ),
 ) -> ReadmissionForecast:
-    """Return an aggregated readmission forecast over the requested horizon.
+    """Return an aggregated readmission forecast over the requested horizon."""
 
-    TODO(milestone-2): aggregate model output per department.
-    """
+    predicted_readmissions, predicted_rate = get_readmission_forecast(
+        db, caller, horizon_days
+    )
+
     return ReadmissionForecast(
         scope="hospital",
         horizon_days=horizon_days,
-        predicted_readmissions=0,
-        predicted_rate=0.0,
+        predicted_readmissions=predicted_readmissions,
+        predicted_rate=predicted_rate,
     )
