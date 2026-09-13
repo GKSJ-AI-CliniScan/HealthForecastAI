@@ -64,4 +64,3 @@ class RiskDriversRead(BaseModel):
     model_version: str
     drivers: list[RiskDriver]
     insights: list[ClinicalInsight]
-

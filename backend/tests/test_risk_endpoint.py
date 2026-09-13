@@ -278,6 +278,7 @@ def test_forecast_rejects_invalid_horizon(
 
     assert response.status_code == 422
 
+
 def test_risk_drivers_returns_model_contributions(
     test_client: TestClient,
     patients: list[Patient],

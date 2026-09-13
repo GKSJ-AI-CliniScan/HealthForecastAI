@@ -70,10 +70,25 @@ def test_doctor_cannot_manage_users(client: TestClient, auth_header) -> None:
     assert response.status_code == 403
 
 
-def test_system_admin_can_list_users(client: TestClient, auth_header) -> None:
+def test_system_admin_can_list_users(
+    client: TestClient,
+    auth_header,
+    monkeypatch,
+) -> None:
     """A system administrator reaches the user management endpoint."""
-    response = client.get("/api/v1/users", headers=auth_header(Role.SYSTEM_ADMIN))
+
+    monkeypatch.setattr(
+        "app.api.v1.endpoints.users.list_users_service",
+        lambda *args, **kwargs: [],
+    )
+
+    response = client.get(
+        "/api/v1/users",
+        headers=auth_header(Role.SYSTEM_ADMIN),
+    )
+
     assert response.status_code == 200
+    assert response.json() == []
 
 
 def test_researcher_is_pushed_to_the_anonymised_endpoint(client: TestClient, auth_header) -> None:

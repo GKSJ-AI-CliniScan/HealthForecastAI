@@ -18,29 +18,17 @@ def generate_clinical_insights(
     insights.append(
         {
             "title": f"Estimated readmission risk: {percentage:.1f}%",
-            "detail": (
-                f"The model categorises this patient as "
-                f"{risk_category} risk."
-            ),
+            "detail": (f"The model categorises this patient as " f"{risk_category} risk."),
             "severity": risk_category,
         }
     )
 
-    increasing = [
-        driver for driver in drivers
-        if driver["direction"] == "increases_risk"
-    ]
+    increasing = [driver for driver in drivers if driver["direction"] == "increases_risk"]
 
-    decreasing = [
-        driver for driver in drivers
-        if driver["direction"] == "decreases_risk"
-    ]
+    decreasing = [driver for driver in drivers if driver["direction"] == "decreases_risk"]
 
     if increasing:
-        names = [
-            driver["feature"]
-            for driver in increasing[:3]
-        ]
+        names = [driver["feature"] for driver in increasing[:3]]
 
         insights.append(
             {
@@ -51,10 +39,7 @@ def generate_clinical_insights(
         )
 
     if decreasing:
-        names = [
-            driver["feature"]
-            for driver in decreasing[:3]
-        ]
+        names = [driver["feature"] for driver in decreasing[:3]]
 
         insights.append(
             {

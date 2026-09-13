@@ -168,15 +168,12 @@ def get_risk_drivers(
                 "feature": feature_name,
                 "value": None,
                 "contribution": contribution,
-                "direction": (
-                    "increases_risk"
-                    if contribution > 0
-                    else "decreases_risk"
-                ),
+                "direction": ("increases_risk" if contribution > 0 else "decreases_risk"),
             }
         )
 
     return probability, drivers
+
 
 def format_driver_name(feature_name: str) -> str:
     """Convert preprocessing feature names into readable labels."""

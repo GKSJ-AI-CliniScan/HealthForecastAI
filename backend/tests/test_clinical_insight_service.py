@@ -31,10 +31,7 @@ def test_generates_increasing_risk_insight() -> None:
         drivers=drivers,
     )
 
-    assert any(
-        insight["title"] == "Factors increasing predicted risk"
-        for insight in insights
-    )
+    assert any(insight["title"] == "Factors increasing predicted risk" for insight in insights)
 
 
 def test_generates_decreasing_risk_insight() -> None:
@@ -53,7 +50,4 @@ def test_generates_decreasing_risk_insight() -> None:
         drivers=drivers,
     )
 
-    assert any(
-        insight["title"] == "Factors reducing predicted risk"
-        for insight in insights
-    )
+    assert any(insight["title"] == "Factors reducing predicted risk" for insight in insights)
