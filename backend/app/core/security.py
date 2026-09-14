@@ -17,7 +17,7 @@ _bcrypt_hashpw = bcrypt.hashpw
 
 
 def _safe_bcrypt_hashpw(password: bytes, salt: bytes) -> bytes:
-    if isinstance(password, (bytes, bytearray)) and len(password) > 72:
+    if isinstance(password, bytes | bytearray) and len(password) > 72:
         password = password[:72]
     return _bcrypt_hashpw(password, salt)
 
