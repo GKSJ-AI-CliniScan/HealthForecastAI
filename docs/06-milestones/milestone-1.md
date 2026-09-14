@@ -1,7 +1,7 @@
 # Milestone 1 report - Week 1 & 2 - Project Initialization, Design Process & Core Setup
 
 - **Intern name:** Samarth A C
-- **Branch:** `intern/samarth-ac`
+- **Branch:** `intern/14-samarth-a-c`
 - **Submitted on:** 31-09-2025
 
 ---
