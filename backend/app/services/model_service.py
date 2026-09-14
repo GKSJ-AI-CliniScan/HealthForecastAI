@@ -1,5 +1,6 @@
 """Machine-learning model loading and inference service."""
 
+import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -23,6 +24,21 @@ def load_risk_model() -> Any:
         raise FileNotFoundError(f"Risk model artifact not found at {model_path}")
 
     return joblib.load(model_path)
+
+
+def _age_band_to_numeric(age_group: str | None) -> float | None:
+    """Convert an age band such as '[70-80)' into the numeric band start.
+
+    Training applies ml/src/data/preprocess.py:bucket_age before fitting, which
+    makes ``age`` a numeric column routed through the preprocessor's numeric
+    branch (median impute + scale). Passing the raw band string here would hand
+    that branch a value it cannot cast, so the band is reduced to its lower
+    bound exactly as training does.
+    """
+    if age_group is None:
+        return None
+    digits = re.search(r"(\d+)", age_group)
+    return float(digits.group(1)) if digits else None
 
 
 def get_expected_features(model: Any) -> list[str]:
@@ -64,7 +80,7 @@ def build_prediction_features(
             "number_diagnoses": number_diagnoses,
             "number_inpatient": number_inpatient,
             "number_emergency": number_emergency,
-            "age": age_group,
+            "age": _age_band_to_numeric(age_group),
             "prior_visits_total": (number_inpatient + number_emergency),
         }
     )

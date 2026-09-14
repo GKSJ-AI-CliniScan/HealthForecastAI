@@ -9,6 +9,7 @@ from app.api.v1.endpoints import (
     clinical_support,
     ml_models,
     patients,
+    reports,
     risk,
     treatment,
     users,
@@ -23,6 +24,9 @@ api_router.include_router(patients.router, prefix="/patients", tags=["Patient Da
 # that module's scope rules.
 api_router.include_router(admissions.router, prefix="/patients", tags=["Admissions"])
 api_router.include_router(risk.router, prefix="/risk", tags=["Risk Prediction"])
+# Reports compose patient, admission and risk data, so they sit on their own
+# prefix rather than under /risk.
+api_router.include_router(reports.router, prefix="/reports", tags=["Reports"])
 api_router.include_router(treatment.router, prefix="/treatment", tags=["Treatment Effectiveness"])
 api_router.include_router(
     clinical_support.router, prefix="/clinical-support", tags=["Clinical Decision Support"]
