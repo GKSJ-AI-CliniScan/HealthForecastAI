@@ -26,17 +26,38 @@ from src.features.build_features import add_utilisation_features, build_preproce
 from src.utils.config import load_config
 
 
-def build_estimator(name: str, params: dict[str, Any]) -> Any:
+def build_estimator(
+    name: str,
+    params: dict[str, Any],
+    y_train: Any = None,
+) -> Any:
     """Return an untrained estimator by config name."""
     options = {key: value for key, value in params.items() if key != "enabled"}
+
     if name == "logistic_regression":
         return LogisticRegression(class_weight="balanced", **options)
+
     if name == "random_forest":
-        return RandomForestClassifier(class_weight="balanced", random_state=42, **options)
+        return RandomForestClassifier(
+            class_weight="balanced",
+            random_state=42,
+            **options,
+        )
+
     if name == "xgboost":
         from xgboost import XGBClassifier
 
-        return XGBClassifier(eval_metric="logloss", random_state=42, **options)
+        if y_train is not None:
+            negative_count = (y_train == 0).sum()
+            positive_count = (y_train == 1).sum()
+            options["scale_pos_weight"] = negative_count / positive_count
+
+        return XGBClassifier(
+            eval_metric="logloss",
+            random_state=42,
+            **options,
+        )
+
     raise ValueError(f"Unknown model: {name}")
 
 
@@ -77,7 +98,7 @@ def main() -> None:
         pipeline = Pipeline(
             [
                 ("preprocess", build_preprocessor(x_train, config)),
-                ("model", build_estimator(name, params)),
+                ("model", build_estimator(name, params, y_train)),
             ]
         )
         pipeline.fit(x_train, y_train)
