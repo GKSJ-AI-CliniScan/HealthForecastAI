@@ -3,10 +3,26 @@
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+import bcrypt
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from app.core.config import settings
+
+# Compatibility shim for passlib with bcrypt >= 4.1.0
+if not hasattr(bcrypt, "__about__"):
+    bcrypt.__about__ = type("about", (), {"__version__": bcrypt.__version__})  # type: ignore[attr-defined]
+
+_bcrypt_hashpw = bcrypt.hashpw
+
+
+def _safe_bcrypt_hashpw(password: bytes, salt: bytes) -> bytes:
+    if isinstance(password, (bytes, bytearray)) and len(password) > 72:
+        password = password[:72]
+    return _bcrypt_hashpw(password, salt)
+
+
+bcrypt.hashpw = _safe_bcrypt_hashpw  # type: ignore[assignment]
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

@@ -87,7 +87,9 @@ def predict_readmission_probability(payload: RiskPredictionRequest) -> float:
             df["number_outpatient"] + df["number_emergency"] + df["number_inpatient"]
         )
         df["is_polypharmacy"] = (df["num_medications"] >= 10).astype(int)
-        df["has_med_change"] = (df["change"].astype(str).str.strip().str.lower() == "ch").astype(int)
+        df["has_med_change"] = (df["change"].astype(str).str.strip().str.lower() == "ch").astype(
+            int
+        )
         df["is_long_stay"] = (df["time_in_hospital"] >= 7).astype(int)
 
     # Ensure all expected trained feature columns are populated
