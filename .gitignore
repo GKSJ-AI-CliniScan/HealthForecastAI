@@ -69,6 +69,8 @@ ml/artifacts/*
 !ml/artifacts/.gitkeep
 *.pkl
 *.joblib
+!ml/artifacts/risk_model.pkl
+!ml/artifacts/feature_columns.pkl
 *.h5
 *.keras
 *.pt
