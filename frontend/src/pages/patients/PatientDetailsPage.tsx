@@ -28,6 +28,8 @@ import { MedicalHistoryTab } from '@/components/patients/MedicalHistoryTab';
 import { AdmissionsTab } from '@/components/patients/AdmissionsTab';
 import { TreatmentsTab } from '@/components/patients/TreatmentsTab';
 import { PatientFormModal } from '@/components/patients/PatientFormModal';
+import { PatientPredictionTab } from '@/components/patients/PatientPredictionTab';
+import { Activity } from 'lucide-react';
 
 export const PatientDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,7 +39,7 @@ export const PatientDetailsPage: React.FC = () => {
   const isResearcher = user?.role === 'RESEARCHER';
   const canEdit = user?.role === 'DOCTOR' || user?.role === 'SYSTEM_ADMIN';
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'medical' | 'admissions' | 'treatments'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'medical' | 'admissions' | 'treatments' | 'prediction'>('overview');
   const [editModalOpen, setEditModalOpen] = useState(false);
 
   // Queries
@@ -219,6 +221,17 @@ export const PatientDetailsPage: React.FC = () => {
           <Stethoscope className="w-4 h-4" />
           Treatments ({treatments.length})
         </button>
+        <button
+          onClick={() => setActiveTab('prediction')}
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all whitespace-nowrap ${
+            activeTab === 'prediction'
+              ? 'border-teal-500 text-teal-600 dark:text-teal-400 bg-teal-50/40 dark:bg-teal-950/20 rounded-t-xl'
+              : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+          }`}
+        >
+          <Activity className="w-4 h-4 text-teal-500" />
+          AI Risk Prediction
+        </button>
       </div>
 
       {/* Tab Panels */}
@@ -360,6 +373,10 @@ export const PatientDetailsPage: React.FC = () => {
             await deleteTreatmentMutation.mutateAsync(txId);
           }}
         />
+      )}
+
+      {activeTab === 'prediction' && (
+        <PatientPredictionTab patientId={id!} />
       )}
 
       {/* Edit Modal */}

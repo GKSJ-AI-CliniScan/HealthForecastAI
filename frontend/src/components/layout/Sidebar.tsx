@@ -12,6 +12,9 @@ import {
   Database,
   Activity,
   LogOut,
+  TrendingUp,
+  AlertTriangle,
+  History,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { ROLE_BADGE_COLORS, ROLE_LABELS } from '@/constants/roles';
@@ -31,6 +34,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onCloseMobile }) => {
     { name: 'Medical Records', path: '/medical-records', icon: FileText },
     { name: 'Admissions', path: '/admissions', icon: Building2 },
     { name: 'Treatments', path: '/treatments', icon: Stethoscope },
+  ];
+
+  const aiRiskNav = [
+    { name: 'Risk Dashboard', path: '/predictions/dashboard', icon: TrendingUp },
+    { name: 'High-Risk Watchlist', path: '/predictions/high-risk', icon: AlertTriangle },
+    { name: 'Prediction History', path: '/predictions/history', icon: History },
   ];
 
   const adminNav = [
@@ -104,6 +113,32 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onCloseMobile }) => {
             </p>
             <nav className="space-y-1">
               {commonNav.map((item) => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={onCloseMobile}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                      isActive
+                        ? 'bg-gradient-to-r from-teal-500/10 to-teal-500/5 text-teal-700 dark:text-teal-300 font-bold border border-teal-500/20 shadow-sm'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100/60 dark:hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <item.icon className="w-4 h-4" />
+                  {item.name}
+                </NavLink>
+              ))}
+            </nav>
+          </div>
+
+          {/* AI Risk Intelligence (Milestone 2) */}
+          <div>
+            <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
+              AI Risk Intelligence
+            </p>
+            <nav className="space-y-1">
+              {aiRiskNav.map((item) => (
                 <NavLink
                   key={item.path}
                   to={item.path}

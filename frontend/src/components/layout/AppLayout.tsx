@@ -10,6 +10,10 @@ export const AppLayout: React.FC = () => {
   // Dynamic header title from path
   const getPageTitle = (pathname: string): string => {
     if (pathname.startsWith('/dashboard')) return 'Clinical Dashboard';
+    if (pathname.startsWith('/predictions/dashboard')) return 'AI Risk Intelligence Dashboard';
+    if (pathname.startsWith('/predictions/high-risk')) return 'High-Risk Patient Watchlist';
+    if (pathname.startsWith('/predictions/history')) return 'Prediction Audit & History';
+    if (pathname.startsWith('/predictions')) return 'Readmission Prediction Assessment';
     if (pathname.startsWith('/patients/new')) return 'Register Patient';
     if (pathname.startsWith('/patients')) return 'Patient Directory';
     if (pathname.startsWith('/medical-records')) return 'Medical Histories';

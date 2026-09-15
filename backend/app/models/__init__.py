@@ -8,6 +8,7 @@ from app.models.medical_history import MedicalHistory
 from app.models.admission import Admission
 from app.models.treatment import Treatment
 from app.models.audit_log import AuditLog
+from app.models.prediction import Prediction, RiskPrediction, ModelVersion
 
 __all__ = [
     "Role",
@@ -18,4 +19,7 @@ __all__ = [
     "Admission",
     "Treatment",
     "AuditLog",
+    "Prediction",
+    "RiskPrediction",
+    "ModelVersion",
 ]

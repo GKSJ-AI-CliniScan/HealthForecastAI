@@ -1,0 +1,29 @@
+{
+    "model_name": "readmission_prediction",
+    "version": "v1.0",
+    "algorithm": "Random Forest",
+    "accuracy": 0.7027,
+    "precision": 0.1942,
+    "recall": 0.5288,
+    "f1_score": 0.2841,
+    "roc_auc": 0.683,
+    "training_date": "2026-09-13T18:30:44.567163+00:00",
+    "all_model_metrics": {
+        "Random Forest": {
+            "accuracy": 0.7027,
+            "precision": 0.1942,
+            "recall": 0.5288,
+            "f1_score": 0.2841,
+            "roc_auc": 0.683
+        },
+        "XGBoost": {
+            "accuracy": 0.6682,
+            "precision": 0.1851,
+            "recall": 0.5799,
+            "f1_score": 0.2806,
+            "roc_auc": 0.6829
+        }
+    },
+    "positive_class": "Readmitted within 30 days (<30)",
+    "negative_class": "Not readmitted or readmitted after 30 days (>30 / NO)"
+}

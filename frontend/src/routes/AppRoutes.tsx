@@ -24,6 +24,11 @@ import { DoctorPatientAssignmentPage } from '@/pages/admin/DoctorPatientAssignme
 import { AuditLogsPage } from '@/pages/admin/AuditLogsPage';
 import { DatasetSummaryPage } from '@/pages/admin/DatasetSummaryPage';
 
+import { PredictionDashboard } from '@/pages/predictions/PredictionDashboard';
+import { HighRiskPatients } from '@/pages/predictions/HighRiskPatients';
+import { PredictionHistory } from '@/pages/predictions/PredictionHistory';
+import { PredictionDetail } from '@/pages/predictions/PredictionDetail';
+
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
@@ -47,6 +52,12 @@ export const AppRoutes: React.FC = () => {
           <Route path="/admissions" element={<AdmissionsPage />} />
           <Route path="/treatments" element={<TreatmentsPage />} />
           <Route path="/profile" element={<UserProfilePage />} />
+
+          {/* AI Risk Intelligence Routes (Milestone 2) */}
+          <Route path="/predictions/dashboard" element={<PredictionDashboard />} />
+          <Route path="/predictions/high-risk" element={<HighRiskPatients />} />
+          <Route path="/predictions/history" element={<PredictionHistory />} />
+          <Route path="/predictions/:id" element={<PredictionDetail />} />
 
           {/* Locked System Administrator Routes */}
           <Route element={<RoleBasedRoute allowedRoles={['SYSTEM_ADMIN']} />}>
