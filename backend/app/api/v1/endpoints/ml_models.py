@@ -32,7 +32,7 @@ def active_model(user: CurrentUser = Depends(_manage_models)) -> dict[str, str]:
 def model_metrics(user: CurrentUser = Depends(_manage_models)) -> dict[str, float | None]:
     """Return accuracy, precision, recall, F1 and ROC-AUC for the active model."""
     metrics_data = model_service.get_metrics_data()
-    
+
     # Check if metrics exist
     results = metrics_data.get("results", {})
     best_model_name = metrics_data.get("best_model", "xgboost")

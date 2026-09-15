@@ -1,9 +1,10 @@
 """Auth service - business logic layer for authentication and user management."""
 
 from sqlalchemy.orm import Session
+
 from app.core.security import hash_password, verify_password
-from app.models.user import User
 from app.models.audit_log import AuditLog
+from app.models.user import User
 from app.schemas.user import UserCreate
 
 

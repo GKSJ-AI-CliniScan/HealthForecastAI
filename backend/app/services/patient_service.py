@@ -1,9 +1,10 @@
 """Patient service - business logic layer for patient records and scoping."""
 
 from sqlalchemy.orm import Session
-from app.models import Patient, User
-from app.core.rbac import Role
+
 from app.api.deps import CurrentUser
+from app.core.rbac import Role
+from app.models import Patient, User
 
 
 def get_patients_for_user(db: Session, current_user: CurrentUser) -> list[Patient]:

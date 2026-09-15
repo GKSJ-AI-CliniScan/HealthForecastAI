@@ -15,7 +15,6 @@ from app.schemas.prediction import (
     RiskPredictionRequest,
 )
 from app.services import model_service
-from app.services.risk_service import categorise_risk
 from app.services.risk_service import save_prediction
 
 router = APIRouter()
@@ -36,10 +35,14 @@ def predict_risk(
         .first()
     )
     if patient is None or admission is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient or admission not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient or admission not found"
+        )
 
     probability = model_service.predict_probability(patient, admission)
-    prediction = save_prediction(db, payload.patient_id, probability, settings.ACTIVE_RISK_MODEL, "1.0.0")
+    prediction = save_prediction(
+        db, payload.patient_id, probability, settings.ACTIVE_RISK_MODEL, "1.0.0"
+    )
     return RiskPredictionRead.model_validate(prediction)
 
 

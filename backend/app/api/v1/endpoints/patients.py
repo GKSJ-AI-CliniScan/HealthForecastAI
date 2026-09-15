@@ -15,8 +15,7 @@ router = APIRouter()
 
 @router.get("", response_model=list[PatientRead], summary="List patients visible to the caller")
 def list_patients(
-    db: Session = Depends(get_db),
-    user: CurrentUser = Depends(get_current_user)
+    db: Session = Depends(get_db), user: CurrentUser = Depends(get_current_user)
 ) -> list[PatientRead]:
     """Return the patients the caller is allowed to see based on RBAC scope."""
     if user.role is Role.RESEARCHER:

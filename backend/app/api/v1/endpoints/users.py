@@ -17,8 +17,7 @@ _manage_users = require_permission(Permission.USER_MANAGE)
 
 @router.get("", response_model=list[UserRead], summary="List platform users")
 def list_users(
-    db: Session = Depends(get_db),
-    user: CurrentUser = Depends(_manage_users)
+    db: Session = Depends(get_db), user: CurrentUser = Depends(_manage_users)
 ) -> list[UserRead]:
     """Return every platform user from PostgreSQL."""
     return db.query(User).all()
@@ -26,9 +25,7 @@ def list_users(
 
 @router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 def create_user(
-    payload: UserCreate,
-    db: Session = Depends(get_db),
-    user: CurrentUser = Depends(_manage_users)
+    payload: UserCreate, db: Session = Depends(get_db), user: CurrentUser = Depends(_manage_users)
 ) -> UserRead:
     """Create a new platform user in PostgreSQL."""
     existing = db.query(User).filter(User.email == payload.email).first()

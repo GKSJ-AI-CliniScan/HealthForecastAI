@@ -21,23 +21,25 @@ from app.core.config import settings
 from app.models.admission import Admission
 from app.models.patient import Patient
 
+
 # Patch XGBoost MRO incompatibility with scikit-learn 1.6 __sklearn_tags__
 def _patch_xgboost_tags():
     try:
+        import sklearn.utils._tags as sk_tags
         from xgboost import XGBClassifier
         from xgboost.sklearn import XGBModel
-        import sklearn.utils._tags as sk_tags
-        
+
         def _custom_sklearn_tags(self):
             tags = sk_tags.Tags()
             tags.requires_fit = True
             tags.classifier_tags = sk_tags.ClassifierTags()
             return tags
-            
+
         XGBClassifier.__sklearn_tags__ = _custom_sklearn_tags
         XGBModel.__sklearn_tags__ = _custom_sklearn_tags
     except Exception:
         pass
+
 
 _patch_xgboost_tags()
 
@@ -104,9 +106,7 @@ def _import_feature_builder():
     try:
         from src.serving.feature_builder import build_serving_features
     except ModuleNotFoundError as exc:
-        raise RuntimeError(
-            f"ml/src/serving/feature_builder.py not found at {ml_root}."
-        ) from exc
+        raise RuntimeError(f"ml/src/serving/feature_builder.py not found at {ml_root}.") from exc
     return build_serving_features
 
 
@@ -132,17 +132,14 @@ def _admission_to_raw_row(patient: Patient, admission: Admission) -> dict[str, A
         "number_emergency": _safe_int(getattr(admission, "number_emergency", 0)) or 0,
         "number_outpatient": _safe_int(getattr(admission, "number_outpatient", 0)) or 0,
         "num_procedures": None,
-        
         # Categorical patient fields
         "age": patient.age_group,
         "race": patient.race,
         "gender": patient.gender,
-
         # Numeric IDs (must be int or None)
         "admission_type_id": _safe_int(getattr(admission, "admission_type_id", None)),
         "discharge_disposition_id": _safe_int(getattr(admission, "discharge_disposition_id", None)),
         "admission_source_id": _safe_int(getattr(admission, "admission_source_id", None)),
-
         # Clinical attributes & diagnoses
         "medical_specialty": None,
         "diag_1": getattr(admission, "diag_1", None),
@@ -150,14 +147,26 @@ def _admission_to_raw_row(patient: Patient, admission: Admission) -> dict[str, A
         "diag_3": getattr(admission, "diag_3", None),
         "max_glu_serum": None,
         "A1Cresult": None,
-        "metformin": None, "repaglinide": None, "nateglinide": None,
-        "chlorpropamide": None, "glimepiride": None, "acetohexamide": None,
-        "glipizide": None, "glyburide": None, "tolbutamide": None,
-        "pioglitazone": None, "rosiglitazone": None, "acarbose": None,
-        "miglitol": None, "troglitazone": None, "tolazamide": None,
+        "metformin": None,
+        "repaglinide": None,
+        "nateglinide": None,
+        "chlorpropamide": None,
+        "glimepiride": None,
+        "acetohexamide": None,
+        "glipizide": None,
+        "glyburide": None,
+        "tolbutamide": None,
+        "pioglitazone": None,
+        "rosiglitazone": None,
+        "acarbose": None,
+        "miglitol": None,
+        "troglitazone": None,
+        "tolazamide": None,
         "insulin": None,
-        "glyburide-metformin": None, "glipizide-metformin": None,
-        "glimepiride-pioglitazone": None, "metformin-rosiglitazone": None,
+        "glyburide-metformin": None,
+        "glipizide-metformin": None,
+        "glimepiride-pioglitazone": None,
+        "metformin-rosiglitazone": None,
         "metformin-pioglitazone": None,
         "change": None,
         "diabetesMed": None,
@@ -182,16 +191,16 @@ def _predict_proba_safe(model: Any, frame: pd.DataFrame) -> float:
     if hasattr(pipeline, "named_steps"):
         preprocessor = pipeline.named_steps["preprocess"]
         classifier = pipeline.named_steps["model"]
-        
+
         # Transform features through ColumnTransformer
         x_trans = preprocessor.transform(frame)
-        
+
         # Predict probability through XGBoost
         if hasattr(classifier, "predict_proba"):
             raw_proba = classifier.predict_proba(x_trans)[:, 1]
         else:
             raw_proba = classifier._Booster.inplace_predict(x_trans)[:, 1]
-            
+
         # Apply isotonic calibrator if present
         if calibrator is not None:
             calibrated = calibrator.predict(raw_proba)
