@@ -61,10 +61,9 @@ def predict_risk(features: dict[str, Any]) -> float:
         frame = pd.DataFrame([features])
 
         if "number_inpatient" in frame.columns and "number_emergency" in frame.columns:
-            frame["prior_visits_total"] = (
-                pd.to_numeric(frame["number_inpatient"], errors="coerce").fillna(0)
-                + pd.to_numeric(frame["number_emergency"], errors="coerce").fillna(0)
-            )
+            frame["prior_visits_total"] = pd.to_numeric(
+                frame["number_inpatient"], errors="coerce"
+            ).fillna(0) + pd.to_numeric(frame["number_emergency"], errors="coerce").fillna(0)
 
         if hasattr(model, "feature_names_in_"):
             expected_features = list(model.feature_names_in_)

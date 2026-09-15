@@ -55,5 +55,5 @@ def test_add_utilisation_features() -> None:
     )
     result = add_utilisation_features(df)
     assert list(result["prior_visits_total"]) == [6, 1]
-    assert list(result["medication_changed"]) == [1, 0]
-    assert list(result["diabetes_med_prescribed"]) == [1, 0]
+    assert list(result["medication_change_flag"]) == [1, 0]
+    assert list(result["diabetes_medication_flag"]) == [1, 0]
