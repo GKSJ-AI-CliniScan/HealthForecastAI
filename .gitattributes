@@ -1,5 +1,4 @@
 * text=auto eol=lf
-
 *.py    text eol=lf
 *.ts    text eol=lf
 *.tsx   text eol=lf
@@ -12,7 +11,6 @@
 *.sql   text eol=lf
 *.sh    text eol=lf
 Dockerfile text eol=lf
-
 *.png   binary
 *.jpg   binary
 *.jpeg  binary
@@ -20,8 +18,7 @@ Dockerfile text eol=lf
 *.svg   text eol=lf
 *.pdf   binary
 *.xlsx  binary
-*.pkl   binary
+*.pkl filter=lfs diff=lfs merge=lfs -text
 *.joblib binary
 *.h5    binary
-
 *.ipynb text eol=lf linguist-documentation
