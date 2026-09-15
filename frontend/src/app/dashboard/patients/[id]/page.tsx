@@ -1,9 +1,9 @@
 import Link from 'next/link';
 
-import { Badge, Card, Cell, ErrorNote, Row, StatTile, Table } from '@/components/ui';
+import { Badge, Card, Cell, EmptyNote, ErrorNote, RiskBadge, Row, StatTile, Table } from '@/components/ui';
 import { apiFetch } from '@/lib/api';
 import { getToken, requireUser } from '@/lib/session';
-import type { Patient } from '@/types';
+import type { Patient, PatientRiskReport } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,6 +45,7 @@ export default async function PatientDetailPage({
   let patient: Patient | null = null;
   let admissions: Admission[] = [];
   let summary: ReadmissionSummary | null = null;
+  let riskReport: PatientRiskReport | null = null;
 
   try {
     patient = await apiFetch<Patient>(`/patients/${id}`, { cache: 'no-store' }, token);
@@ -60,6 +61,20 @@ export default async function PatientDetailPage({
     );
   } catch {
     patient = null;
+  }
+
+  // The risk report is a separate concern: a role without reporting access still
+  // gets the patient record, so a failure here must not blank the page.
+  if (patient) {
+    try {
+      riskReport = await apiFetch<PatientRiskReport>(
+        `/reports/patients/${id}`,
+        { cache: 'no-store' },
+        token,
+      );
+    } catch {
+      riskReport = null;
+    }
   }
 
   if (!patient) {
@@ -87,9 +102,46 @@ export default async function PatientDetailPage({
         </Link>
       </div>
 
+      <Card
+        title="Readmission risk"
+        actions={
+          riskReport ? (
+            <Link
+              href={`/dashboard/reports/${patient.id}`}
+              className="text-sm underline underline-offset-2"
+            >
+              View full report
+            </Link>
+          ) : undefined
+        }
+      >
+        {!riskReport ? (
+          <EmptyNote>
+            Risk reporting is not available for your role, or this patient has not been scored.
+          </EmptyNote>
+        ) : riskReport.risk_category === null || riskReport.readmission_probability === null ? (
+          <EmptyNote>This patient has no stored risk prediction yet.</EmptyNote>
+        ) : (
+          <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">
+            <p className="text-3xl font-semibold tabular-nums">
+              {(riskReport.readmission_probability * 100).toFixed(1)}%
+            </p>
+            <RiskBadge band={riskReport.risk_category} />
+            <p className="text-sm opacity-70">30-day readmission probability</p>
+            <p className="w-full text-xs opacity-60">
+              Scored by {riskReport.model_name} ({riskReport.model_version}).
+            </p>
+          </div>
+        )}
+      </Card>
+
       <div className="grid gap-4 sm:grid-cols-3">
         <StatTile label="Admissions" value={summary?.total_admissions ?? admissions.length} />
-        <StatTile label="Readmissions" value={summary?.readmitted_total ?? 0} />
+        <StatTile
+          label="Readmissions"
+          value={summary?.readmitted_total ?? 0}
+          tone={(summary?.readmitted_total ?? 0) > 0 ? 'alert' : 'default'}
+        />
         <StatTile label="Age group" value={patient.age_group ?? '-'} />
       </div>
 

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
+import NavLinks from '@/components/layout/NavLinks';
 import SignOutButton from '@/components/layout/SignOutButton';
 import { Badge } from '@/components/ui';
 import { dashboardLinks } from '@/lib/navigation';
@@ -33,13 +34,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
           <Link href="/dashboard" className="font-semibold">
             HealthForecast AI
           </Link>
-          <nav className="flex gap-4 text-sm">
-            {links.map((link) => (
-              <Link key={link.href} href={link.href} className="opacity-80 hover:opacity-100">
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+          <NavLinks links={links} />
           <div className="ml-auto flex items-center gap-3 text-sm">
             <span className="opacity-70">{user.profile?.full_name ?? user.subject}</span>
             <Badge>{ROLE_LABELS[user.role] ?? user.role}</Badge>

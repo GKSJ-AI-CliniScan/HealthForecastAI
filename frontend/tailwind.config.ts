@@ -5,10 +5,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Mapped onto the CSS variables in globals.css so the same risk
+        // palette works in light and dark mode. The token names are unchanged.
         risk: {
-          low: '#0f9d58',
-          medium: '#f4b400',
-          high: '#d93025',
+          low: 'var(--risk-low)',
+          medium: 'var(--risk-medium)',
+          high: 'var(--risk-high)',
         },
       },
     },

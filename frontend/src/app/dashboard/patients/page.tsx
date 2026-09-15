@@ -1,9 +1,9 @@
 import Link from 'next/link';
 
-import { Card, Cell, ErrorNote, Row, Table } from '@/components/ui';
+import { Card, Cell, ErrorNote, RiskBadge, Row, Table } from '@/components/ui';
 import { apiFetch } from '@/lib/api';
-import { getToken, requireUser } from '@/lib/session';
-import type { Patient } from '@/types';
+import { can, getToken, requireUser } from '@/lib/session';
+import type { ForecastingReport, Patient, RiskCategory } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,6 +31,11 @@ export default async function PatientsPage({
   let patients: Patient[] = [];
   let error: string | null = null;
 
+  // Risk bands for the whole visible cohort in ONE request, rather than a
+  // per-row lookup. /reports/forecast already returns the high-risk cohort
+  // scoped to this caller, so a patient absent from it is simply not high risk.
+  const highRiskBands = new Map<number, RiskCategory>();
+
   try {
     patients = await apiFetch<Patient[]>(path, { cache: 'no-store' }, token);
   } catch {
@@ -38,6 +43,22 @@ export default async function PatientsPage({
       user.role === 'researcher'
         ? 'Researchers may only read the anonymised cohort.'
         : 'Could not load patients. Is the backend running?';
+  }
+
+  const canSeeRisk = can(user, 'risk_report:read');
+  if (canSeeRisk && !error) {
+    try {
+      const report = await apiFetch<ForecastingReport>(
+        '/reports/forecast?horizon_days=30',
+        { cache: 'no-store' },
+        token,
+      );
+      for (const entry of report.high_risk_patients ?? []) {
+        highRiskBands.set(entry.patient_id, entry.risk_category);
+      }
+    } catch {
+      // Risk is supplementary here - the patient list still stands without it.
+    }
   }
 
   return (
@@ -75,7 +96,14 @@ export default async function PatientsPage({
       ) : (
         <Card>
           <Table
-            headers={['Record number', 'Age group', 'Gender', 'Primary diagnosis', '']}
+            headers={[
+              'Record number',
+              'Age group',
+              'Gender',
+              'Primary diagnosis',
+              ...(canSeeRisk ? ['Risk'] : []),
+              '',
+            ]}
             empty={query ? `No patients match "${query}".` : 'No patients yet.'}
           >
             {patients.map((patient) => (
@@ -84,6 +112,15 @@ export default async function PatientsPage({
                 <Cell>{patient.age_group ?? '-'}</Cell>
                 <Cell>{patient.gender ?? '-'}</Cell>
                 <Cell>{patient.primary_diagnosis ?? '-'}</Cell>
+                {canSeeRisk && (
+                  <Cell>
+                    {highRiskBands.has(patient.id) ? (
+                      <RiskBadge band={highRiskBands.get(patient.id)!} />
+                    ) : (
+                      <span className="text-xs opacity-50">Not high risk</span>
+                    )}
+                  </Cell>
+                )}
                 <Cell>
                   <Link
                     href={`/dashboard/patients/${patient.id}`}

@@ -7,6 +7,15 @@
   --foreground: #0f1c2e;
   --surface: #ffffff;
   --border: #dde3ec;
+
+  /* Risk band colours. The names match tailwind.config.ts, which maps
+     risk-low / risk-medium / risk-high onto these variables so there is one
+     system rather than two. Values are darkened from the scaffold's originals
+     to clear WCAG AA on white; the dark-mode block lightens them for contrast
+     on the dark surface. Always paired with a text label - never colour alone. */
+  --risk-low: #0f7a45;
+  --risk-medium: #8a5300;
+  --risk-high: #c5221f;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -15,6 +24,10 @@
     --foreground: #e6ecf5;
     --surface: #131c2b;
     --border: #23304a;
+
+    --risk-low: #5ecf9a;
+    --risk-medium: #e0a750;
+    --risk-high: #ef8b84;
   }
 }
 
