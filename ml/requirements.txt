@@ -10,7 +10,7 @@ imbalanced-learn==0.13.0
 joblib==1.4.2
 
 # ---- Deep learning (Milestone 2 stretch goal) ----
-tensorflow-cpu==2.18.0
+# tensorflow-cpu==2.18.0
 
 # ---- Explainability ----
 shap==0.46.0
