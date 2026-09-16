@@ -1,16 +1,14 @@
 """Risk scoring helpers shared by the API and the batch jobs."""
 
-from datetime import datetime, timedelta, timezone
-
-from app.core.config import settings
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy.orm import Session
 
 from app.api.deps import VerifiedUser
+from app.core.config import settings
 from app.core.rbac import Role
 from app.models.patient import Patient
 from app.models.prediction import RiskPrediction
-
 
 RISK_LOW = "low"
 RISK_MEDIUM = "medium"
@@ -27,9 +25,8 @@ def categorise_risk(probability: float) -> str:
         return RISK_MEDIUM
     return RISK_LOW
 
-def list_high_risk_predictions(
-    db: Session, caller: VerifiedUser
-) -> list[RiskPrediction]:
+
+def list_high_risk_predictions(db: Session, caller: VerifiedUser) -> list[RiskPrediction]:
     """Return high-risk predictions visible to the caller."""
 
     query = (
@@ -43,6 +40,7 @@ def list_high_risk_predictions(
 
     return query.order_by(RiskPrediction.created_at.desc()).all()
 
+
 def get_readmission_forecast(
     db: Session, caller: VerifiedUser, horizon_days: int
 ) -> tuple[int, float]:
@@ -51,7 +49,7 @@ def get_readmission_forecast(
     if horizon_days <= 0:
         raise ValueError("horizon_days must be greater than 0")
 
-    cutoff = datetime.now(timezone.utc) - timedelta(days=horizon_days)
+    cutoff = datetime.now(UTC) - timedelta(days=horizon_days)
 
     query = (
         db.query(RiskPrediction)
@@ -68,10 +66,7 @@ def get_readmission_forecast(
     if total_predictions == 0:
         return 0, 0.0
 
-    high_risk_predictions = sum(
-        prediction.risk_category == RISK_HIGH
-        for prediction in predictions
-    )
+    high_risk_predictions = sum(prediction.risk_category == RISK_HIGH for prediction in predictions)
 
     predicted_rate = high_risk_predictions / total_predictions
 

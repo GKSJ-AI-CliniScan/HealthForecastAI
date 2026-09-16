@@ -23,8 +23,6 @@ from app.services.risk_service import (
     list_high_risk_predictions,
 )
 
-
-
 router = APIRouter()
 
 
@@ -51,9 +49,7 @@ def predict_risk(
 @router.get("/high-risk", summary="List patients currently in the high risk band")
 def list_high_risk_patients(
     db: Session = Depends(get_db),
-    caller: VerifiedUser = Depends(
-        require_verified_permission(Permission.RISK_REPORT_READ)
-    ),
+    caller: VerifiedUser = Depends(require_verified_permission(Permission.RISK_REPORT_READ)),
 ) -> list[RiskPredictionRead]:
     """Return high-risk predictions visible to the caller."""
 
@@ -76,9 +72,7 @@ def readmission_forecast(
 ) -> ReadmissionForecast:
     """Return an aggregated readmission forecast over the requested horizon."""
 
-    predicted_readmissions, predicted_rate = get_readmission_forecast(
-        db, caller, horizon_days
-    )
+    predicted_readmissions, predicted_rate = get_readmission_forecast(db, caller, horizon_days)
 
     return ReadmissionForecast(
         scope="hospital",
