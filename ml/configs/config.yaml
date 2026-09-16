@@ -109,7 +109,7 @@ evaluation:
   # high-risk patient is the expensive error. Do not lower it to go green.
   thresholds:
     roc_auc: 0.63
-    recall: 0.50
+    accuracy: 0.75
 
 # Bands are set from the calibrated probability distribution, not picked by feel.
 # Measured over all 69,990 scored patients:

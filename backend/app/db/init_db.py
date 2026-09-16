@@ -72,6 +72,78 @@ def seed_users(db: Session, password: str) -> list[User]:
     return created
 
 
+def seed_sample_clinical_data(db: Session) -> None:
+    """Seed sample patients, admissions, and treatment outcomes if empty."""
+    if db.query(Patient).count() > 0:
+        logger.info("Patients already exist in DB, skipping clinical seed.")
+        return
+
+    doctors = db.query(User).filter(User.role == Role.DOCTOR).all()
+    doc_id = doctors[0].id if doctors else None
+
+    # Sample treatment options
+    treatments = [
+        "Insulin Intensive Therapy",
+        "Metformin Monotherapy",
+        "Dual Therapy (Sulfonylurea + Metformin)",
+        "GLP-1 Receptor Agonist",
+        "SGLT2 Inhibitor Protocol",
+    ]
+
+    sample_patients = [
+        ("MRN-1001", "Female", "[60-70)", "Caucasian", "Diabetes Mellitus Type 2"),
+        ("MRN-1002", "Male", "[70-80)", "AfricanAmerican", "Circulatory System Disease"),
+        ("MRN-1003", "Female", "[50-60)", "Caucasian", "Respiratory System Disease"),
+        ("MRN-1004", "Male", "[80-90)", "Hispanic", "Metabolic Disorder"),
+        ("MRN-1005", "Female", "[40-50)", "Caucasian", "Digestive System Disease"),
+    ]
+
+    for i, (mrn, gender, age_group, race, diag) in enumerate(sample_patients):
+        patient = Patient(
+            medical_record_number=mrn,
+            gender=gender,
+            age_group=age_group,
+            race=race,
+            primary_diagnosis=diag,
+            assigned_doctor_id=doc_id,
+        )
+        db.add(patient)
+        db.flush()
+
+        # Create admissions for patient
+        readmitted_status = "<30" if i % 2 == 0 else "NO"
+        adm = Admission(
+            patient_id=patient.id,
+            admission_type="Emergency" if i % 2 == 0 else "Elective",
+            time_in_hospital=3 + i * 2,
+            num_medications=12 + i * 3,
+            num_lab_procedures=42 + i * 5,
+            number_diagnoses=7 + i,
+            discharge_disposition="Discharged to home",
+            readmitted=readmitted_status,
+        )
+        db.add(adm)
+        db.flush()
+
+        # Create treatment outcome
+        treatment_name = treatments[i % len(treatments)]
+        recovery_score = round(70.0 + (i * 5.5) - (15.0 if readmitted_status == "<30" else 0.0), 1)
+        outcome_status = "Readmitted <30d" if readmitted_status == "<30" else "Recovered"
+        
+        outcome = TreatmentOutcome(
+            admission_id=adm.id,
+            treatment_name=treatment_name,
+            medication_change=True if i % 2 == 0 else False,
+            recovery_score=min(100.0, max(30.0, recovery_score)),
+            length_of_stay_days=adm.time_in_hospital,
+            outcome=outcome_status,
+        )
+        db.add(outcome)
+
+    db.commit()
+    logger.info("Seeded sample patients, admissions, and treatment outcomes.")
+
+
 def main() -> int:
     """Create the schema and seed the demo accounts."""
     password = os.environ.get("SEED_PASSWORD")
@@ -85,6 +157,7 @@ def main() -> int:
         # Read the values inside the session: the ORM objects are detached once
         # it closes, and touching an attribute then raises.
         created = [(user.role, user.email) for user in seed_users(db, password)]
+        seed_sample_clinical_data(db)
 
     if not created:
         print("Nothing to seed - every demo account already exists.")

@@ -160,3 +160,40 @@ export interface PatientRiskScore {
   features_expected?: number | null;
   created_at?: string | null;
 }
+
+// ---------- Milestone 3: CDS & Treatment Effectiveness ----------
+
+export interface CareRecommendationsResponse {
+  patient_id: number;
+  risk_category: RiskCategory;
+  readmission_probability: number;
+  recommendations: string[];
+  follow_up_days: number | null;
+}
+
+export interface DischargePlanCheckitem {
+  item: string;
+  completed: boolean;
+}
+
+export interface DischargePlanResponse {
+  patient_id: number;
+  risk_category: RiskCategory;
+  ready_for_discharge: boolean | null;
+  readiness_score: number;
+  risk_mitigation: string[];
+  checklist: DischargePlanCheckitem[];
+}
+
+export interface TreatmentEffectivenessSummary {
+  treatment_name: string;
+  patients_treated: number;
+  average_recovery_score: number;
+  readmission_rate: number;
+}
+
+export interface RecoveryTrendPoint {
+  week: string;
+  average_recovery_score: number;
+}
+

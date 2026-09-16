@@ -6,7 +6,7 @@ import { KpiCard } from '@/components/ui/KpiCard';
 import { RiskBadge, RiskMeter } from '@/components/ui/RiskBadge';
 import { EmptyBlock, ErrorBlock, Loading } from '@/components/ui/StateBlock';
 import { useApi } from '@/hooks/useApi';
-import type { PatientDetail, PatientRiskScore } from '@/types';
+import type { CareRecommendationsResponse, DischargePlanResponse, PatientDetail, PatientRiskScore } from '@/types';
 
 const READMISSION_LABEL: Record<string, string> = {
   '<30': 'Readmitted within 30 days',
@@ -20,6 +20,9 @@ export default function PatientDetailPage() {
   // A 404 here just means this patient has not been scored yet, which is a
   // normal state - the page renders without the risk panel.
   const risk = useApi<PatientRiskScore>(`/risk/patients/${params.id}`);
+
+  const cdsRecs = useApi<CareRecommendationsResponse>(`/clinical-support/recommendations/${params.id}`);
+  const discharge = useApi<DischargePlanResponse>(`/clinical-support/discharge-plan/${params.id}`);
 
   if (loading) return <Loading />;
   if (error) {
@@ -121,6 +124,72 @@ export default function PatientDetailPage() {
         </section>
       ) : null}
 
+      {/* CDS Care Recommendations */}
+      {cdsRecs.data && cdsRecs.data.recommendations.length > 0 ? (
+        <section className="card space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 className="text-lg font-semibold">Clinical decision support</h2>
+              <p className="muted text-sm">
+                Care recommendations derived from model risk drivers and admission profile.
+              </p>
+            </div>
+            {cdsRecs.data.follow_up_days ? (
+              <span className="rounded-md bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-800">
+                Follow-up window: {cdsRecs.data.follow_up_days} days
+              </span>
+            ) : null}
+          </div>
+          <ul className="space-y-2">
+            {cdsRecs.data.recommendations.map((rec: string, idx: number) => (
+              <li key={idx} className="flex items-start gap-2.5 text-sm">
+                <span className="mt-0.5 text-blue-600 font-bold">•</span>
+                <span>{rec}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {/* Discharge Readiness Plan */}
+      {discharge.data ? (
+        <section className="card space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 className="text-lg font-semibold">Discharge support plan</h2>
+              <p className="muted text-sm">
+                Readiness score: <strong className="text-foreground">{discharge.data.readiness_score}/100</strong>
+              </p>
+            </div>
+            <span
+              className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                discharge.data.ready_for_discharge
+                  ? 'bg-emerald-100 text-emerald-800'
+                  : 'bg-amber-100 text-amber-900'
+              }`}
+            >
+              {discharge.data.ready_for_discharge ? 'Ready for Discharge' : 'Review Required Before Discharge'}
+            </span>
+          </div>
+
+          {discharge.data.risk_mitigation.length > 0 ? (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide muted mb-2">
+                Risk Mitigation Protocol
+              </p>
+              <ul className="space-y-1.5">
+                {discharge.data.risk_mitigation.map((step: string, idx: number) => (
+                  <li key={idx} className="flex items-start gap-2 text-sm">
+                    <span className="text-amber-600">✔</span>
+                    <span>{step}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
+
       <section className="card">
         <h2 className="text-lg font-semibold">Clinical summary</h2>
         <dl className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -188,11 +257,7 @@ export default function PatientDetailPage() {
           </div>
         )}
       </section>
-
-      <p className="muted text-xs">
-        Care recommendations and discharge planning for this patient arrive in
-        Milestone 3.
-      </p>
     </div>
   );
 }
+

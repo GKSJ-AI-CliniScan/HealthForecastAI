@@ -75,7 +75,10 @@ def write_predictions(
     """Insert prediction rows in batches."""
     if replace:
         with engine.begin() as connection:
-            connection.execute(text("TRUNCATE risk_predictions RESTART IDENTITY"))
+            if "sqlite" in str(engine.url):
+                connection.execute(text("DELETE FROM risk_predictions"))
+            else:
+                connection.execute(text("TRUNCATE risk_predictions RESTART IDENTITY"))
 
     statement = text(
         "INSERT INTO risk_predictions "
