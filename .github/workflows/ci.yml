@@ -141,6 +141,20 @@ jobs:
     needs: detect
     if: needs.detect.outputs.backend == 'true'
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: healthforecast
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
     defaults:
       run:
         working-directory: backend
@@ -169,6 +183,11 @@ jobs:
         if: always()
         continue-on-error: true
         run: mypy app
+
+      - name: Apply database migrations
+        env:
+          SECRET_KEY: ci-only-secret-not-used-anywhere-else
+        run: alembic upgrade head
 
       - name: Tests (pytest)
         if: always()
