@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends
 from app.api.deps import CurrentUser, require_permission
 from app.core.config import settings
 from app.core.rbac import Permission
+from app.services import model_service
 
 router = APIRouter()
 
@@ -26,7 +27,7 @@ def active_model(user: CurrentUser = Depends(_manage_models)) -> dict[str, str]:
     return {
         "name": settings.ACTIVE_RISK_MODEL,
         "artifact_dir": settings.MODEL_ARTIFACT_DIR,
-        "status": "not-loaded",
+        **model_service.model_status(),
     }
 
 
@@ -34,6 +35,7 @@ def active_model(user: CurrentUser = Depends(_manage_models)) -> dict[str, str]:
 def model_metrics(user: CurrentUser = Depends(_manage_models)) -> dict[str, float | None]:
     """Return accuracy, precision, recall, F1 and ROC-AUC for the active model.
 
-    TODO(milestone-2): populate from ml/src/evaluation/metrics.py output.
+    Values are all None until a model has been trained (ml/artifacts/metrics.json
+    exists) - see model_service.load_metrics().
     """
-    return {"accuracy": None, "precision": None, "recall": None, "f1": None, "roc_auc": None}
+    return model_service.load_metrics()

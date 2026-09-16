@@ -23,6 +23,46 @@ preprocessing:
     - weight
     - payer_code
     - medical_specialty
+    # Milestone 2: the API's RiskPredictionRequest only carries the fields
+    # below, so the trained pipeline must be fit on the same reduced set or
+    # ColumnTransformer.transform() raises a KeyError at inference time.
+    # Kept: race, gender, age, time_in_hospital, num_lab_procedures,
+    # num_medications, number_diagnoses, number_inpatient, number_emergency.
+    - admission_type_id
+    - discharge_disposition_id
+    - admission_source_id
+    - num_procedures
+    - number_outpatient
+    - diag_1
+    - diag_2
+    - diag_3
+    - max_glu_serum
+    - A1Cresult
+    - metformin
+    - repaglinide
+    - nateglinide
+    - chlorpropamide
+    - glimepiride
+    - acetohexamide
+    - glipizide
+    - glyburide
+    - tolbutamide
+    - pioglitazone
+    - rosiglitazone
+    - acarbose
+    - miglitol
+    - troglitazone
+    - tolazamide
+    - examide
+    - citoglipton
+    - insulin
+    - glyburide-metformin
+    - glipizide-metformin
+    - glimepiride-pioglitazone
+    - metformin-rosiglitazone
+    - metformin-pioglitazone
+    - change
+    - diabetesMed
   missing_value_token: "?"
   numeric_imputation: median
   categorical_imputation: most_frequent
