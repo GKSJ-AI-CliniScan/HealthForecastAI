@@ -2,10 +2,11 @@
 
 import uuid
 from datetime import UTC, date, datetime
-from sqlalchemy import Date, DateTime, ForeignKey, String, Text
+
+from sqlalchemy import Date, DateTime, Float, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.base import Base, GUID
+from app.db.base import GUID, Base
 
 
 class Treatment(Base):
@@ -18,13 +19,15 @@ class Treatment(Base):
         GUID(), ForeignKey("patients.id", ondelete="CASCADE"), nullable=False, index=True
     )
     treatment_name: Mapped[str] = mapped_column(String(255), nullable=False)
-    treatment_type: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    treatment_type: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
     start_date: Mapped[date] = mapped_column(Date, nullable=False)
     end_date: Mapped[date | None] = mapped_column(Date, nullable=True)
-    status: Mapped[str] = mapped_column(String(32), default="ACTIVE", nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="ACTIVE", nullable=False, index=True)
+    outcome: Mapped[str | None] = mapped_column(String(32), nullable=True, index=True)
+    effectiveness_score: Mapped[float | None] = mapped_column(Float, nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False, index=True
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

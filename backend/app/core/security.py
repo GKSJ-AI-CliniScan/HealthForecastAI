@@ -2,6 +2,7 @@
 
 from datetime import UTC, datetime, timedelta
 from typing import Any
+
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 

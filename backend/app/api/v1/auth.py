@@ -1,6 +1,7 @@
 """Authentication API endpoints."""
 
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 

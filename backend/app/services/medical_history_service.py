@@ -1,14 +1,15 @@
 """Medical History Service."""
 
 import uuid
+
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models.medical_history import MedicalHistory
 from app.models.user import User
+from app.repositories.assignment_repository import AssignmentRepository
 from app.repositories.medical_history_repository import MedicalHistoryRepository
 from app.repositories.patient_repository import PatientRepository
-from app.repositories.assignment_repository import AssignmentRepository
 from app.schemas.medical_history import (
     MedicalHistoryCreate,
     MedicalHistoryResponse,

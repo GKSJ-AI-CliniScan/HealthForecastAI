@@ -2,8 +2,9 @@
 
 import uuid
 from collections.abc import Sequence
-from typing import Any, Generic, TypeVar
-from sqlalchemy import select, func
+from typing import Generic, TypeVar
+
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.db.base import Base

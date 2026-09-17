@@ -1,7 +1,9 @@
 """Doctor-Patient Assignment Repository."""
 
 import uuid
+
 from sqlalchemy.orm import Session, joinedload
+
 from app.models.doctor_patient_assignment import DoctorPatientAssignment
 from app.repositories.base_repository import BaseRepository
 

@@ -3,7 +3,7 @@
 import hashlib
 import uuid
 from datetime import date
-from typing import Any
+
 from app.models.patient import Patient
 from app.schemas.patient import AnonymizedPatientResponse
 

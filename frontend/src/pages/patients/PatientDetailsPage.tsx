@@ -29,7 +29,18 @@ import { AdmissionsTab } from '@/components/patients/AdmissionsTab';
 import { TreatmentsTab } from '@/components/patients/TreatmentsTab';
 import { PatientFormModal } from '@/components/patients/PatientFormModal';
 import { PatientPredictionTab } from '@/components/patients/PatientPredictionTab';
-import { Activity } from 'lucide-react';
+import { Activity, Pill, HeartPulse, CheckSquare } from 'lucide-react';
+import {
+  usePatientMedications,
+  useCreateMedication,
+  useDeleteMedication,
+  usePatientRecovery,
+  usePatientOutcomes,
+  useCreatePatientOutcome,
+} from '@/features/treatments/treatment.hooks';
+import { MedicationTable } from '@/components/treatments/MedicationTable';
+import { RecoveryTimeline } from '@/components/treatments/RecoveryTimeline';
+import { ClinicalDisclaimer } from '@/components/common/ClinicalDisclaimer';
 
 export const PatientDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -39,7 +50,9 @@ export const PatientDetailsPage: React.FC = () => {
   const isResearcher = user?.role === 'RESEARCHER';
   const canEdit = user?.role === 'DOCTOR' || user?.role === 'SYSTEM_ADMIN';
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'medical' | 'admissions' | 'treatments' | 'prediction'>('overview');
+  const [activeTab, setActiveTab] = useState<
+    'overview' | 'medical' | 'admissions' | 'treatments' | 'medications' | 'prediction' | 'recovery' | 'outcomes'
+  >('overview');
   const [editModalOpen, setEditModalOpen] = useState(false);
 
   // Queries
@@ -71,6 +84,14 @@ export const PatientDetailsPage: React.FC = () => {
     queryFn: () => treatmentsApi.getPatientTreatments(id!),
     enabled: !!id,
   });
+
+  const { data: medications = [] } = usePatientMedications(id!);
+  const { data: recoveryData } = usePatientRecovery(id!);
+  const { data: outcomes = [] } = usePatientOutcomes(id!);
+
+  const createMedicationMutation = useCreateMedication(id!);
+  const deleteMedicationMutation = useDeleteMedication(id!);
+  const createOutcomeMutation = useCreatePatientOutcome(id!);
 
   // Mutations
   const updatePatientMutation = useMutation({
@@ -222,6 +243,17 @@ export const PatientDetailsPage: React.FC = () => {
           Treatments ({treatments.length})
         </button>
         <button
+          onClick={() => setActiveTab('medications')}
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all whitespace-nowrap ${
+            activeTab === 'medications'
+              ? 'border-teal-500 text-teal-600 dark:text-teal-400 bg-teal-50/40 dark:bg-teal-950/20 rounded-t-xl'
+              : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+          }`}
+        >
+          <Pill className="w-4 h-4" />
+          Medications ({medications.length})
+        </button>
+        <button
           onClick={() => setActiveTab('prediction')}
           className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all whitespace-nowrap ${
             activeTab === 'prediction'
@@ -230,7 +262,29 @@ export const PatientDetailsPage: React.FC = () => {
           }`}
         >
           <Activity className="w-4 h-4 text-teal-500" />
-          AI Risk Prediction
+          Risk Predictions
+        </button>
+        <button
+          onClick={() => setActiveTab('recovery')}
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all whitespace-nowrap ${
+            activeTab === 'recovery'
+              ? 'border-teal-500 text-teal-600 dark:text-teal-400 bg-teal-50/40 dark:bg-teal-950/20 rounded-t-xl'
+              : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+          }`}
+        >
+          <HeartPulse className="w-4 h-4 text-rose-500" />
+          Recovery Timeline
+        </button>
+        <button
+          onClick={() => setActiveTab('outcomes')}
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition-all whitespace-nowrap ${
+            activeTab === 'outcomes'
+              ? 'border-teal-500 text-teal-600 dark:text-teal-400 bg-teal-50/40 dark:bg-teal-950/20 rounded-t-xl'
+              : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+          }`}
+        >
+          <CheckSquare className="w-4 h-4 text-emerald-500" />
+          Outcomes ({outcomes.length})
         </button>
       </div>
 
@@ -375,8 +429,115 @@ export const PatientDetailsPage: React.FC = () => {
         />
       )}
 
+      {activeTab === 'medications' && (
+        <div className="space-y-4">
+          <MedicationTable
+            medications={medications}
+            canEdit={canEdit}
+            onAdd={async (payload) => {
+              await createMedicationMutation.mutateAsync(payload);
+            }}
+            onDelete={async (medId) => {
+              await deleteMedicationMutation.mutateAsync(medId);
+            }}
+          />
+        </div>
+      )}
+
       {activeTab === 'prediction' && (
         <PatientPredictionTab patientId={id!} />
+      )}
+
+      {activeTab === 'recovery' && (
+        <div className="space-y-4">
+          <ClinicalDisclaimer />
+          <Card className="p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
+                  Patient Clinical Recovery Trajectory
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Chronological unified flow: Admission → Treatment → Outcome → Discharge → Follow-up
+                </p>
+              </div>
+              {recoveryData?.recovery_status && (
+                <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                  Status: {recoveryData.recovery_status.replace('_', ' ')}
+                </span>
+              )}
+            </div>
+
+            <RecoveryTimeline
+              timeline={recoveryData?.timeline || []}
+              canAddOutcome={canEdit}
+              onAddOutcome={async (payload) => {
+                await createOutcomeMutation.mutateAsync(payload);
+              }}
+            />
+          </Card>
+        </div>
+      )}
+
+      {activeTab === 'outcomes' && (
+        <div className="space-y-4">
+          <ClinicalDisclaimer />
+          <Card className="p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
+                  Recorded Clinical Recovery Outcomes
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Patient evaluation progression and recovery scores
+                </p>
+              </div>
+            </div>
+
+            {outcomes.length === 0 ? (
+              <div className="py-8 text-center text-slate-400 text-xs">
+                No clinical recovery assessments recorded yet for this patient.
+              </div>
+            ) : (
+              <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
+                    <tr>
+                      <th className="py-3 px-4">Recorded Date</th>
+                      <th className="py-3 px-4">Outcome Status</th>
+                      <th className="py-3 px-4">Outcome Score</th>
+                      <th className="py-3 px-4">Clinical Observations</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                    {outcomes.map((o) => (
+                      <tr key={o.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                        <td className="py-3 px-4 font-mono text-slate-600 dark:text-slate-300">
+                          {o.recorded_date}
+                        </td>
+                        <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">
+                          {o.outcome_status.replace('_', ' ')}
+                        </td>
+                        <td className="py-3 px-4">
+                          {o.outcome_score !== null && o.outcome_score !== undefined ? (
+                            <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                              {Math.round(o.outcome_score)} / 100
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 italic">No score</span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-slate-600 dark:text-slate-400">
+                          {o.notes || '—'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+        </div>
       )}
 
       {/* Edit Modal */}

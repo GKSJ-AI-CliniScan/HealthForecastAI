@@ -2,7 +2,8 @@
 
 import uuid
 from collections.abc import Generator
-from datetime import date, datetime, timezone
+from datetime import date
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -14,14 +15,10 @@ from app.db.base import Base
 from app.db.session import get_db
 from app.main import app
 from app.models import (
+    DoctorPatientAssignment,
+    Patient,
     Role,
     User,
-    Patient,
-    DoctorPatientAssignment,
-    MedicalHistory,
-    Admission,
-    Treatment,
-    AuditLog,
 )
 
 # In-memory SQLite for fast, isolated tests
@@ -193,3 +190,28 @@ def user_tokens(db_session: Session) -> dict[str, str]:
         "RESEARCHER": f"Bearer {create_access_token(str(researcher.id), 'RESEARCHER')}",
         "SYSTEM_ADMIN": f"Bearer {create_access_token(str(sysadmin.id), 'SYSTEM_ADMIN')}",
     }
+
+
+@pytest.fixture
+def doctor_token_headers(user_tokens: dict[str, str]) -> dict[str, str]:
+    return {"Authorization": user_tokens["DOCTOR"]}
+
+
+@pytest.fixture
+def admin_token_headers(user_tokens: dict[str, str]) -> dict[str, str]:
+    return {"Authorization": user_tokens["HOSPITAL_ADMIN"]}
+
+
+@pytest.fixture
+def researcher_token_headers(user_tokens: dict[str, str]) -> dict[str, str]:
+    return {"Authorization": user_tokens["RESEARCHER"]}
+
+
+@pytest.fixture
+def sysadmin_token_headers(user_tokens: dict[str, str]) -> dict[str, str]:
+    return {"Authorization": user_tokens["SYSTEM_ADMIN"]}
+
+
+@pytest.fixture
+def doctor_user(db_session: Session) -> User:
+    return db_session.query(User).filter(User.username == "dr.test").first()

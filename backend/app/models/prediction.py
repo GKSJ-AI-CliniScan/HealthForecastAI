@@ -5,10 +5,11 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, datetime
 from typing import Any
-from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, JSON, String
+
+from sqlalchemy import JSON, Boolean, DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.base import Base, GUID
+from app.db.base import GUID, Base
 
 
 class Prediction(Base):
@@ -28,7 +29,9 @@ class Prediction(Base):
     risk_category: Mapped[str] = mapped_column(String(16), nullable=False, index=True)
     readmission_probability: Mapped[float] = mapped_column(Float, nullable=False)
     confidence_score: Mapped[float] = mapped_column(Float, nullable=False)
-    contributing_factors: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list, nullable=False)
+    contributing_factors: Mapped[list[dict[str, Any]]] = mapped_column(
+        JSON, default=list, nullable=False
+    )
     clinical_insights: Mapped[str | None] = mapped_column(String(512), nullable=True)
     model_name: Mapped[str] = mapped_column(String(128), default="XGBoost", nullable=False)
     model_version: Mapped[str] = mapped_column(String(32), default="v1.0", nullable=False)
@@ -37,7 +40,7 @@ class Prediction(Base):
     )
 
     # Relationships
-    patient: Mapped["Patient"] = relationship("Patient")  # type: ignore[name-defined]
+    patient: Mapped[Patient] = relationship("Patient")  # type: ignore[name-defined]
 
 
 # Backward compatibility alias

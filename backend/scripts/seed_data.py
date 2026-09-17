@@ -6,25 +6,25 @@ medical histories, admissions, treatments, and audit logs.
 
 import sys
 import uuid
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 # Add backend to path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app.db.session import SessionLocal, engine
+from app.core.security import hash_password
 from app.db.base import Base
+from app.db.session import SessionLocal, engine
 from app.models import (
-    Role,
-    User,
-    Patient,
+    Admission,
+    AuditLog,
     DoctorPatientAssignment,
     MedicalHistory,
-    Admission,
+    Patient,
+    Role,
     Treatment,
-    AuditLog,
+    User,
 )
-from app.core.security import hash_password
 
 
 def seed_database():
@@ -279,7 +279,7 @@ def seed_database():
                     action="SYSTEM_INIT",
                     resource="SYSTEM",
                     resource_id="INITIAL_SETUP",
-                    created_at=datetime.now(timezone.utc),
+                    created_at=datetime.now(UTC),
                 )
             )
 

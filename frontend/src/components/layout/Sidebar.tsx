@@ -42,6 +42,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onCloseMobile }) => {
     { name: 'Prediction History', path: '/predictions/history', icon: History },
   ];
 
+  const canViewHospitalAnalytics = ['HOSPITAL_ADMIN', 'RESEARCHER', 'SYSTEM_ADMIN'].includes(role);
+
+  const analyticsNav = [
+    { name: 'Treatment Effectiveness', path: '/analytics/treatments', icon: Stethoscope },
+    { name: 'Recovery Analysis', path: '/analytics/recovery', icon: Activity },
+    { name: 'Medication Outcomes', path: '/analytics/medications', icon: FileText },
+    ...(canViewHospitalAnalytics
+      ? [
+          { name: 'Hospital Performance', path: '/analytics/hospital-performance', icon: Building2 },
+          { name: 'Department Analytics', path: '/analytics/departments', icon: Users },
+          { name: 'Healthcare Trends', path: '/analytics/trends', icon: TrendingUp },
+        ]
+      : []),
+  ];
+
   const adminNav = [
     { name: 'User Management', path: '/admin/users', icon: Users },
     { name: 'Role Management', path: '/admin/roles', icon: ShieldCheck },
@@ -139,6 +154,32 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onCloseMobile }) => {
             </p>
             <nav className="space-y-1">
               {aiRiskNav.map((item) => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={onCloseMobile}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                      isActive
+                        ? 'bg-gradient-to-r from-teal-500/10 to-teal-500/5 text-teal-700 dark:text-teal-300 font-bold border border-teal-500/20 shadow-sm'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100/60 dark:hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <item.icon className="w-4 h-4" />
+                  {item.name}
+                </NavLink>
+              ))}
+            </nav>
+          </div>
+
+          {/* Healthcare Analytics (Milestone 3) */}
+          <div>
+            <p className="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">
+              Healthcare Analytics
+            </p>
+            <nav className="space-y-1">
+              {analyticsNav.map((item) => (
                 <NavLink
                   key={item.path}
                   to={item.path}

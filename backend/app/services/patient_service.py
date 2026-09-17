@@ -2,15 +2,15 @@
 
 import uuid
 from typing import Any
+
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models.patient import Patient
 from app.models.user import User
-from app.repositories.patient_repository import PatientRepository
 from app.repositories.assignment_repository import AssignmentRepository
+from app.repositories.patient_repository import PatientRepository
 from app.schemas.patient import (
-    AnonymizedPatientResponse,
     PatientCreate,
     PatientResponse,
     PatientUpdate,

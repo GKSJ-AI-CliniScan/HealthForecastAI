@@ -1,7 +1,9 @@
 """Medical History Repository."""
 
 import uuid
+
 from sqlalchemy.orm import Session
+
 from app.models.medical_history import MedicalHistory
 from app.repositories.base_repository import BaseRepository
 

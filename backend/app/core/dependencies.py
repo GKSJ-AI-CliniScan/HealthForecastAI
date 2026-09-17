@@ -1,16 +1,16 @@
 """FastAPI reusable security dependencies and RBAC authorizers."""
 
 import uuid
-
 from collections.abc import Callable
 from typing import Annotated
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session, joinedload
 
 from app.core.security import decode_token
 from app.db.session import get_db
-from app.models import User, Role, DoctorPatientAssignment
+from app.models import DoctorPatientAssignment, User
 
 security_scheme = HTTPBearer(auto_error=False)
 
@@ -45,12 +45,12 @@ def get_current_user(
 
     try:
         user_id = uuid.UUID(user_id_str)
-    except ValueError:
+    except ValueError as err:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Malformed user ID in token",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from err
 
     user = db.query(User).options(joinedload(User.role_rel)).filter(User.id == user_id).first()
 

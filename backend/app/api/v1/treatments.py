@@ -2,6 +2,7 @@
 
 import uuid
 from typing import Annotated
+
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
@@ -32,6 +33,23 @@ def get_patient_treatments(
 ) -> list[TreatmentResponse]:
     service = TreatmentService(db)
     return service.get_patient_treatments(patient_id, current_user=current_user)
+
+
+@router.get(
+    "/patients/{patient_id}/treatment-analysis",
+    summary="Get Patient Treatment Analysis",
+    description="Retrieve treatment history with duration, status, outcome, and effectiveness summary.",
+    dependencies=[Depends(require_roles("DOCTOR", "HOSPITAL_ADMIN", "RESEARCHER", "SYSTEM_ADMIN"))],
+)
+def get_patient_treatment_analysis(
+    patient_id: uuid.UUID,
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    db: Annotated[Session, Depends(get_db)],
+):
+    from app.services.treatment_effectiveness_service import TreatmentEffectivenessService
+
+    service = TreatmentEffectivenessService(db)
+    return service.get_patient_treatment_analysis(patient_id, current_user=current_user)
 
 
 @router.post(

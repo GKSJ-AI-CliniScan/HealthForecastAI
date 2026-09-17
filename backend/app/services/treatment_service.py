@@ -1,14 +1,15 @@
 """Treatment Service."""
 
 import uuid
+
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models.treatment import Treatment
 from app.models.user import User
-from app.repositories.treatment_repository import TreatmentRepository
-from app.repositories.patient_repository import PatientRepository
 from app.repositories.assignment_repository import AssignmentRepository
+from app.repositories.patient_repository import PatientRepository
+from app.repositories.treatment_repository import TreatmentRepository
 from app.schemas.treatment import (
     TreatmentCreate,
     TreatmentResponse,
@@ -52,6 +53,8 @@ class TreatmentService:
                 start_date=r.start_date,
                 end_date=r.end_date,
                 status=r.status,
+                outcome=r.outcome,
+                effectiveness_score=r.effectiveness_score,
                 notes=r.notes,
                 created_at=r.created_at,
                 updated_at=r.updated_at,
@@ -77,6 +80,8 @@ class TreatmentService:
             start_date=payload.start_date,
             end_date=payload.end_date,
             status=payload.status,
+            outcome=payload.outcome,
+            effectiveness_score=payload.effectiveness_score,
             notes=payload.notes,
         )
         created = self.repo.create(treatment)
@@ -96,6 +101,8 @@ class TreatmentService:
             start_date=created.start_date,
             end_date=created.end_date,
             status=created.status,
+            outcome=created.outcome,
+            effectiveness_score=created.effectiveness_score,
             notes=created.notes,
             created_at=created.created_at,
             updated_at=created.updated_at,
@@ -122,6 +129,10 @@ class TreatmentService:
             tx.end_date = payload.end_date
         if payload.status is not None:
             tx.status = payload.status
+        if payload.outcome is not None:
+            tx.outcome = payload.outcome
+        if payload.effectiveness_score is not None:
+            tx.effectiveness_score = payload.effectiveness_score
         if payload.notes is not None:
             tx.notes = payload.notes
 
@@ -142,6 +153,8 @@ class TreatmentService:
             start_date=updated.start_date,
             end_date=updated.end_date,
             status=updated.status,
+            outcome=updated.outcome,
+            effectiveness_score=updated.effectiveness_score,
             notes=updated.notes,
             created_at=updated.created_at,
             updated_at=updated.updated_at,

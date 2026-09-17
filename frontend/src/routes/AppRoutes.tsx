@@ -29,6 +29,13 @@ import { HighRiskPatients } from '@/pages/predictions/HighRiskPatients';
 import { PredictionHistory } from '@/pages/predictions/PredictionHistory';
 import { PredictionDetail } from '@/pages/predictions/PredictionDetail';
 
+import { TreatmentEffectiveness } from '@/pages/analytics/TreatmentEffectiveness';
+import { RecoveryAnalysis } from '@/pages/analytics/RecoveryAnalysis';
+import { MedicationEffectiveness } from '@/pages/analytics/MedicationEffectiveness';
+import { HospitalPerformance } from '@/pages/analytics/HospitalPerformance';
+import { DepartmentPerformance } from '@/pages/analytics/DepartmentPerformance';
+import { HealthcareTrends } from '@/pages/analytics/HealthcareTrends';
+
 export const AppRoutes: React.FC = () => {
   return (
     <Routes>
@@ -58,6 +65,16 @@ export const AppRoutes: React.FC = () => {
           <Route path="/predictions/high-risk" element={<HighRiskPatients />} />
           <Route path="/predictions/history" element={<PredictionHistory />} />
           <Route path="/predictions/:id" element={<PredictionDetail />} />
+
+          {/* Clinical & Healthcare Analytics Routes (Milestone 3) */}
+          <Route path="/analytics/treatments" element={<TreatmentEffectiveness />} />
+          <Route path="/analytics/recovery" element={<RecoveryAnalysis />} />
+          <Route path="/analytics/medications" element={<MedicationEffectiveness />} />
+          <Route element={<RoleBasedRoute allowedRoles={['HOSPITAL_ADMIN', 'RESEARCHER', 'SYSTEM_ADMIN']} />}>
+            <Route path="/analytics/hospital-performance" element={<HospitalPerformance />} />
+            <Route path="/analytics/departments" element={<DepartmentPerformance />} />
+            <Route path="/analytics/trends" element={<HealthcareTrends />} />
+          </Route>
 
           {/* Locked System Administrator Routes */}
           <Route element={<RoleBasedRoute allowedRoles={['SYSTEM_ADMIN']} />}>

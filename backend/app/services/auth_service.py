@@ -1,6 +1,7 @@
 """Authentication Service."""
 
 import uuid
+
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -15,7 +16,7 @@ from app.core.security import (
 from app.models.role import Role
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
-from app.schemas.auth import LoginRequest, RefreshTokenRequest, TokenResponse, UserMeResponse
+from app.schemas.auth import LoginRequest, RefreshTokenRequest, TokenResponse
 from app.schemas.user import UserCreate
 from app.services.audit_service import AuditService
 

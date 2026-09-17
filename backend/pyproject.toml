@@ -11,11 +11,12 @@ exclude = ["alembic", ".venv", "__pycache__"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM"]
-ignore = ["B008", "E501"]
+ignore = ["B008", "E501", "N803", "N806", "N815"]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
-"tests/*" = ["S101"]
+"tests/*" = ["S101", "F401"]
+"app/models/*" = ["F821"]
 
 [tool.black]
 line-length = 100

@@ -1,6 +1,5 @@
 """Researcher patient de-identification and anonymization test suite."""
 
-import pytest
 from fastapi.testclient import TestClient
 
 

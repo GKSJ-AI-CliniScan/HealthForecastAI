@@ -2,10 +2,11 @@
 
 import uuid
 from datetime import UTC, date, datetime
+
 from sqlalchemy import Date, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.base import Base, GUID
+from app.db.base import GUID, Base
 
 
 class Admission(Base):
@@ -17,16 +18,20 @@ class Admission(Base):
     patient_id: Mapped[uuid.UUID] = mapped_column(
         GUID(), ForeignKey("patients.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    admission_date: Mapped[date] = mapped_column(Date, nullable=False)
+    admission_date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
     discharge_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     admission_type: Mapped[str | None] = mapped_column(String(64), nullable=True)
-    department: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    department: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
     primary_diagnosis: Mapped[str | None] = mapped_column(String(255), nullable=True)
     length_of_stay: Mapped[int | None] = mapped_column(Integer, nullable=True)
     discharge_disposition: Mapped[str | None] = mapped_column(String(128), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False, index=True
     )
 
     # Relationships
     patient: Mapped["Patient"] = relationship("Patient", back_populates="admissions")  # type: ignore[name-defined]
+    patient_outcomes: Mapped[list["PatientOutcome"]] = relationship(  # type: ignore[name-defined]
+        "PatientOutcome",
+        back_populates="admission",
+    )

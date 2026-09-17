@@ -1,8 +1,8 @@
 """Audit Log Repository."""
 
-import uuid
 from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
+
 from app.models.audit_log import AuditLog
 from app.repositories.base_repository import BaseRepository
 

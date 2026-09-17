@@ -1,6 +1,5 @@
 """Role-Based Access Control test suite."""
 
-import pytest
 from fastapi.testclient import TestClient
 
 

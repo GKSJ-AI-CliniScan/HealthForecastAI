@@ -1,6 +1,7 @@
 """Authentication schemas."""
 
 import uuid
+
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 

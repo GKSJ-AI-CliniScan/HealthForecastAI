@@ -5,12 +5,13 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 from typing import Any
-from pydantic import BaseModel, ConfigDict, Field
 
+from pydantic import BaseModel, ConfigDict, Field
 
 # -------------------------------------------------------------
 # Legacy Milestone 1 Schemas (Preserved for compatibility)
 # -------------------------------------------------------------
+
 
 class RiskPredictionRequest(BaseModel):
     """Feature payload submitted for a single readmission risk prediction."""
@@ -50,6 +51,7 @@ class ReadmissionForecast(BaseModel):
 # -------------------------------------------------------------
 # Milestone 2 Schemas
 # -------------------------------------------------------------
+
 
 class ReadmissionPredictRequest(BaseModel):
     """Request payload for triggering patient readmission risk prediction."""
@@ -148,6 +150,7 @@ class ModelVersionResponse(BaseModel):
 # -------------------------------------------------------------
 # Analytics Schemas
 # -------------------------------------------------------------
+
 
 class RiskDistributionItem(BaseModel):
     category: str

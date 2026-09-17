@@ -1,6 +1,7 @@
 """System Admin and Analytics API endpoints."""
 
 from typing import Annotated, Any
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
@@ -115,8 +116,8 @@ def get_dashboard_stats(
         }
 
     elif role == "HOSPITAL_ADMIN":
-        from app.repositories.patient_repository import PatientRepository
         from app.repositories.admission_repository import AdmissionRepository
+        from app.repositories.patient_repository import PatientRepository
 
         p_repo = PatientRepository(db)
         adm_repo = AdmissionRepository(db)

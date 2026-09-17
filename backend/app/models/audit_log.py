@@ -2,10 +2,11 @@
 
 import uuid
 from datetime import UTC, datetime
+
 from sqlalchemy import DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.base import Base, GUID
+from app.db.base import GUID, Base
 
 
 class AuditLog(Base):

@@ -2,10 +2,11 @@
 
 import uuid
 from datetime import UTC, date, datetime
+
 from sqlalchemy import Date, DateTime, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.base import Base, GUID
+from app.db.base import GUID, Base
 
 
 class Patient(Base):
@@ -53,6 +54,16 @@ class Patient(Base):
     )
     treatments: Mapped[list["Treatment"]] = relationship(  # type: ignore[name-defined]
         "Treatment",
+        back_populates="patient",
+        cascade="all, delete-orphan",
+    )
+    medications: Mapped[list["Medication"]] = relationship(  # type: ignore[name-defined]
+        "Medication",
+        back_populates="patient",
+        cascade="all, delete-orphan",
+    )
+    patient_outcomes: Mapped[list["PatientOutcome"]] = relationship(  # type: ignore[name-defined]
+        "PatientOutcome",
         back_populates="patient",
         cascade="all, delete-orphan",
     )

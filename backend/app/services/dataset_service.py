@@ -1,7 +1,7 @@
 """Dataset Service for Milestone 1 foundation."""
 
-import os
 from pathlib import Path
+
 import pandas as pd
 
 from app.schemas.dataset import DatasetSummaryResponse

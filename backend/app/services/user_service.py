@@ -1,14 +1,14 @@
 """User Management Service."""
 
 import uuid
+
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.security import hash_password
 from app.models.role import Role
-from app.models.user import User
 from app.repositories.user_repository import UserRepository
-from app.schemas.user import UserCreate, UserResponse, UserUpdate
+from app.schemas.user import UserResponse, UserUpdate
 from app.services.audit_service import AuditService
 
 

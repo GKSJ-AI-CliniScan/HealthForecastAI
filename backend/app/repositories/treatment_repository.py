@@ -1,9 +1,11 @@
 """Treatment Repository."""
 
 import uuid
+
 from sqlalchemy.orm import Session
-from app.models.treatment import Treatment
+
 from app.models.doctor_patient_assignment import DoctorPatientAssignment
+from app.models.treatment import Treatment
 from app.repositories.base_repository import BaseRepository
 
 

@@ -14,6 +14,12 @@ export const AppLayout: React.FC = () => {
     if (pathname.startsWith('/predictions/high-risk')) return 'High-Risk Patient Watchlist';
     if (pathname.startsWith('/predictions/history')) return 'Prediction Audit & History';
     if (pathname.startsWith('/predictions')) return 'Readmission Prediction Assessment';
+    if (pathname.startsWith('/analytics/treatments')) return 'Treatment Effectiveness Analysis';
+    if (pathname.startsWith('/analytics/recovery')) return 'Patient Recovery Analysis';
+    if (pathname.startsWith('/analytics/medications')) return 'Medication Outcome Analytics';
+    if (pathname.startsWith('/analytics/hospital-performance')) return 'Hospital Performance Dashboard';
+    if (pathname.startsWith('/analytics/departments')) return 'Department Analytics';
+    if (pathname.startsWith('/analytics/trends')) return 'Healthcare Trend Monitoring';
     if (pathname.startsWith('/patients/new')) return 'Register Patient';
     if (pathname.startsWith('/patients')) return 'Patient Directory';
     if (pathname.startsWith('/medical-records')) return 'Medical Histories';

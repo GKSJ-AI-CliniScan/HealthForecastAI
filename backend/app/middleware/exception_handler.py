@@ -1,6 +1,7 @@
 """Global exception handlers for standardized JSON error responses."""
 
 import logging
+
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse

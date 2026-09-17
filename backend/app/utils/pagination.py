@@ -2,6 +2,7 @@
 
 import math
 from typing import Any, TypeVar
+
 from pydantic import BaseModel
 
 T = TypeVar("T")

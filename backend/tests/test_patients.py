@@ -1,6 +1,5 @@
 """Patient CRUD and Doctor scoping test suite."""
 
-import pytest
 from fastapi.testclient import TestClient
 
 

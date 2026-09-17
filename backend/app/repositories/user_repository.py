@@ -1,11 +1,12 @@
 """User Repository."""
 
 import uuid
-from sqlalchemy import or_, func
+
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session, joinedload
 
-from app.models.user import User
 from app.models.role import Role
+from app.models.user import User
 from app.repositories.base_repository import BaseRepository
 
 
@@ -85,7 +86,7 @@ class UserRepository(BaseRepository[User]):
         return (
             self.db.query(User)
             .join(User.role_rel)
-            .filter(Role.name == "DOCTOR", User.is_active == True)
+            .filter(Role.name == "DOCTOR", User.is_active.is_(True))
             .order_by(User.first_name)
             .all()
         )

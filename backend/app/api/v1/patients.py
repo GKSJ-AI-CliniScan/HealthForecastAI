@@ -2,6 +2,7 @@
 
 import uuid
 from typing import Annotated, Any
+
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
@@ -9,7 +10,6 @@ from app.core.dependencies import get_current_active_user, require_roles
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.patient import (
-    AnonymizedPatientResponse,
     PatientCreate,
     PatientListResponse,
     PatientResponse,

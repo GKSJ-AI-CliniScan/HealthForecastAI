@@ -1,11 +1,12 @@
 """Patient Repository."""
 
 import uuid
-from sqlalchemy import or_, func
-from sqlalchemy.orm import Session, joinedload
 
-from app.models.patient import Patient
+from sqlalchemy import func, or_
+from sqlalchemy.orm import Session
+
 from app.models.doctor_patient_assignment import DoctorPatientAssignment
+from app.models.patient import Patient
 from app.repositories.base_repository import BaseRepository
 
 
