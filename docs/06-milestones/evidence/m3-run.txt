@@ -1,0 +1,207 @@
+Milestone 3 pipeline and test run
+Captured 2026-09-19 09:16 UTC on branch intern/11-kanak-prabhakar
+Interpreter: backend/.venv (Python 3.11.16), run from ml/
+Key versions: scikit-learn 1.6.0, xgboost 2.1.4, shap 0.46.0, pandas 2.2.3
+The saved model was pickled with scikit-learn 1.6.0, which is why this venv is used and not the system interpreter.
+
+================================================================
+$ python -m src.evaluation.treatment_report
+================================================================
+Analysis population: 69987 rows, 30-day rate 0.0898
+Model evaluation on 13998 held-out rows: 0.6518 ROC-AUC
+Wrote treatment_metrics.json
+Wrote feature_importance.json using shap_tree_explainer
+
+================================================================
+$ python -m src.evaluation.make_m3_charts
+================================================================
+Writing charts to docs/06-milestones/evidence/
+  m3-readmission-by-medication-change.png  50 KB
+  m3-readmission-by-a1c-tested.png  49 KB
+  m3-top-shap-drivers.png  81 KB
+  m3-recovery-by-diagnosis-cohort.png  60 KB
+
+================================================================
+$ ls -l ml/artifacts (generated this run)
+================================================================
+200338     artifacts/feature_importance.json
+47418      artifacts/treatment_metrics.json
+
+================================================================
+$ python -m pytest tests -v
+================================================================
+tests/test_charts.py::test_group_codes_become_readable_names[No-Not changed] PASSED [  1%]
+tests/test_charts.py::test_group_codes_become_readable_names[tested-Tested] PASSED [  2%]
+tests/test_charts.py::test_group_codes_become_readable_names[not tested-Not tested] PASSED [  2%]
+tests/test_charts.py::test_an_unlisted_group_is_title_cased_not_dropped PASSED [  3%]
+tests/test_charts.py::test_a_missing_artefact_names_the_command_that_builds_it PASSED [  4%]
+tests/test_charts.py::test_charts_render_from_the_artefacts PASSED       [  4%]
+tests/test_charts.py::test_the_committed_charts_stay_small[m3-readmission-by-medication-change.png] PASSED [  5%]
+tests/test_charts.py::test_the_committed_charts_stay_small[m3-readmission-by-a1c-tested.png] PASSED [  6%]
+tests/test_charts.py::test_the_committed_charts_stay_small[m3-top-shap-drivers.png] PASSED [  7%]
+tests/test_charts.py::test_the_committed_charts_stay_small[m3-recovery-by-diagnosis-cohort.png] PASSED [  7%]
+tests/test_cohorts.py::test_icd9_codes_map_to_the_expected_group[428-circulatory] PASSED [  8%]
+tests/test_cohorts.py::test_icd9_codes_map_to_the_expected_group[785-circulatory] PASSED [  9%]
+tests/test_cohorts.py::test_icd9_codes_map_to_the_expected_group[486-respiratory] PASSED [  9%]
+tests/test_cohorts.py::test_icd9_codes_map_to_the_expected_group[786-respiratory] PASSED [ 10%]
+tests/test_cohorts.py::test_icd9_codes_map_to_the_expected_group[562-digestive] PASSED [ 11%]
+tests/test_cohorts.py::test_icd9_codes_map_to_the_expected_group[250.83-diabetes] PASSED [ 11%]
+tests/test_cohorts.py::test_icd9_codes_map_to_the_expected_group[250-diabetes] PASSED [ 12%]
+tests/test_cohorts.py::test_icd9_codes_map_to_the_expected_group[820-injury] PASSED [ 13%]
+tests/test_cohorts.py::test_icd9_codes_map_to_the_expected_group[715-musculoskeletal] PASSED [ 14%]
+tests/test_cohorts.py::test_icd9_codes_map_to_the_expected_group[599-genitourinary] PASSED [ 14%]
+tests/test_cohorts.py::test_icd9_codes_map_to_the_expected_group[788-genitourinary] PASSED [ 15%]
+tests/test_cohorts.py::test_icd9_codes_map_to_the_expected_group[199-neoplasms] PASSED [ 16%]
+tests/test_cohorts.py::test_icd9_codes_map_to_the_expected_group[V57-other] PASSED [ 16%]
+tests/test_cohorts.py::test_icd9_codes_map_to_the_expected_group[E909-other] PASSED [ 17%]
+tests/test_cohorts.py::test_icd9_codes_map_to_the_expected_group[Missing-missing] PASSED [ 18%]
+tests/test_cohorts.py::test_diabetes_range_is_exclusive_at_251 PASSED    [ 19%]
+tests/test_cohorts.py::test_every_group_the_milestone_names_is_reachable PASSED [ 19%]
+tests/test_cohorts.py::test_cohort_column_prefers_the_precomputed_group PASSED [ 20%]
+tests/test_cohorts.py::test_cohort_column_falls_back_to_the_raw_code PASSED [ 21%]
+tests/test_cohorts.py::test_small_cohorts_are_flagged_and_large_ones_are_not PASSED [ 21%]
+tests/test_cohorts.py::test_a_small_cohort_is_reported_not_dropped PASSED [ 22%]
+tests/test_cohorts.py::test_cohort_rates_and_recovery_scores_are_computed PASSED [ 23%]
+tests/test_cohorts.py::test_unscored_rows_are_excluded_from_the_mean_not_the_count PASSED [ 23%]
+tests/test_cohorts.py::test_cohort_analytics_returns_every_configured_type PASSED [ 24%]
+tests/test_config.py::test_default_config_loads PASSED                   [ 25%]
+tests/test_config.py::test_required_sections_are_present PASSED          [ 26%]
+tests/test_config.py::test_risk_bands_match_the_backend_defaults PASSED  [ 26%]
+tests/test_config.py::test_at_least_one_model_is_enabled PASSED          [ 27%]
+tests/test_explain.py::test_source_columns_prefers_the_longer_name PASSED [ 28%]
+tests/test_explain.py::test_every_transformed_column_maps_to_exactly_one_input PASSED [ 28%]
+tests/test_explain.py::test_aggregate_by_source_sums_a_columns_one_hot_block PASSED [ 29%]
+tests/test_explain.py::test_aggregate_by_source_returns_the_input_column_order PASSED [ 30%]
+tests/test_explain.py::test_a_column_with_no_transformed_output_is_zero_not_missing PASSED [ 30%]
+tests/test_explain.py::test_unwrap_returns_a_bare_pipeline_unchanged PASSED [ 31%]
+tests/test_explain.py::test_unwrap_digs_through_the_calibrated_wrapper PASSED [ 32%]
+tests/test_explain.py::test_unwrap_raises_on_something_that_holds_no_pipeline PASSED [ 33%]
+tests/test_explain.py::test_labels_are_readable_and_fall_back_to_the_column_name PASSED [ 33%]
+tests/test_explain.py::test_additivity_error_is_zero_for_a_perfect_reconstruction PASSED [ 34%]
+tests/test_explain.py::test_densifying_the_matrix_changes_what_the_model_predicts PASSED [ 35%]
+tests/test_explain.py::test_the_exported_explanation_reconstructs_the_model PASSED [ 35%]
+tests/test_explain.py::test_prior_inpatient_visits_are_reported_as_raising_risk PASSED [ 36%]
+tests/test_insights_loader.py::test_global_drivers_respect_top_n PASSED  [ 37%]
+tests/test_insights_loader.py::test_patient_drivers_are_trimmed_to_top_n PASSED [ 38%]
+tests/test_insights_loader.py::test_a_patient_outside_the_sample_returns_none PASSED [ 38%]
+tests/test_insights_loader.py::test_an_integer_encounter_id_works_like_the_string PASSED [ 39%]
+tests/test_insights_loader.py::test_treatment_summary_carries_the_limitations PASSED [ 40%]
+tests/test_insights_loader.py::test_every_cohort_type_loads[age] PASSED  [ 40%]
+tests/test_insights_loader.py::test_every_cohort_type_loads[gender] PASSED [ 41%]
+tests/test_insights_loader.py::test_every_cohort_type_loads[race] PASSED [ 42%]
+tests/test_insights_loader.py::test_every_cohort_type_loads[diagnosis] PASSED [ 42%]
+tests/test_insights_loader.py::test_an_unknown_cohort_type_names_the_valid_ones PASSED [ 43%]
+tests/test_insights_loader.py::test_a_schema_mismatch_raises_rather_than_returning_data PASSED [ 44%]
+tests/test_insights_loader.py::test_a_missing_artefact_says_how_to_generate_it PASSED [ 45%]
+tests/test_insights_loader.py::test_the_artefact_is_read_from_disk_only_once PASSED [ 45%]
+tests/test_insights_loader.py::test_treatment_metrics_has_the_contracted_top_level_shape PASSED [ 46%]
+tests/test_insights_loader.py::test_every_group_entry_has_every_contracted_field PASSED [ 47%]
+tests/test_insights_loader.py::test_rates_sit_inside_their_confidence_intervals PASSED [ 47%]
+tests/test_insights_loader.py::test_all_four_cohort_types_are_present_and_flagged PASSED [ 48%]
+tests/test_insights_loader.py::test_the_nine_named_diagnosis_groups_are_covered PASSED [ 49%]
+tests/test_insights_loader.py::test_feature_importance_has_the_contracted_shape PASSED [ 50%]
+tests/test_insights_loader.py::test_patient_drivers_are_capped_at_five PASSED [ 50%]
+tests/test_insights_loader.py::test_both_artefacts_stay_well_under_the_five_megabyte_limit PASSED [ 51%]
+tests/test_metrics.py::test_classification_metrics_on_a_perfect_prediction PASSED [ 52%]
+tests/test_metrics.py::test_roc_auc_is_omitted_for_a_single_class PASSED [ 52%]
+tests/test_metrics.py::test_confusion_counts_are_labelled_correctly PASSED [ 53%]
+tests/test_metrics.py::test_promotion_requires_every_threshold PASSED    [ 54%]
+tests/test_metrics.py::test_risk_bands_match_the_backend[0.0-low] PASSED [ 54%]
+tests/test_metrics.py::test_risk_bands_match_the_backend[0.39-low] PASSED [ 55%]
+tests/test_metrics.py::test_risk_bands_match_the_backend[0.4-medium] PASSED [ 56%]
+tests/test_metrics.py::test_risk_bands_match_the_backend[0.69-medium] PASSED [ 57%]
+tests/test_metrics.py::test_risk_bands_match_the_backend[0.7-high] PASSED [ 57%]
+tests/test_metrics.py::test_risk_bands_match_the_backend[1.0-high] PASSED [ 58%]
+tests/test_metrics.py::test_invalid_probability_raises[-0.5] PASSED      [ 59%]
+tests/test_metrics.py::test_invalid_probability_raises[1.5] PASSED       [ 59%]
+tests/test_metrics.py::test_threshold_metrics_use_the_given_cutoff_not_the_default PASSED [ 60%]
+tests/test_metrics.py::test_threshold_metrics_omit_auc_for_a_single_class PASSED [ 61%]
+tests/test_metrics.py::test_calibration_is_perfect_when_predictions_match_the_observed_rate PASSED [ 61%]
+tests/test_metrics.py::test_calibration_reports_the_gap_when_predictions_are_too_high PASSED [ 62%]
+tests/test_metrics.py::test_calibration_bins_cover_every_row PASSED      [ 63%]
+tests/test_n3_feature_levers.py::test_drop_raw_diagnosis_codes_keeps_only_the_groups PASSED [ 64%]
+tests/test_n3_feature_levers.py::test_utilisation_ratio_and_interaction_are_computed_per_row PASSED [ 64%]
+tests/test_n3_feature_levers.py::test_utilisation_ratio_missing_columns_is_a_no_op PASSED [ 65%]
+tests/test_n3_feature_levers.py::test_any_medication_change_flag_thresholds_the_count PASSED [ 66%]
+tests/test_n3_feature_levers.py::test_number_diagnoses_binning_is_ordinal_and_drops_the_raw_count PASSED [ 66%]
+tests/test_n3_feature_levers.py::test_ordinal_age_drops_one_hot_columns_keeps_numeric PASSED [ 67%]
+tests/test_preprocess.py::test_death_and_hospice_encounters_are_removed PASSED [ 68%]
+tests/test_preprocess.py::test_only_the_first_encounter_per_patient_is_kept PASSED [ 69%]
+tests/test_preprocess.py::test_target_counts_only_readmission_within_thirty_days PASSED [ 69%]
+tests/test_preprocess.py::test_constant_columns_are_dropped PASSED       [ 70%]
+tests/test_preprocess.py::test_missing_values_become_an_explicit_category PASSED [ 71%]
+tests/test_preprocess.py::test_icd9_codes_map_to_clinical_groups PASSED  [ 71%]
+tests/test_preprocess.py::test_diagnosis_group_columns_are_added PASSED  [ 72%]
+tests/test_preprocess.py::test_age_bracket_becomes_numeric_and_banded PASSED [ 73%]
+tests/test_preprocess.py::test_medication_columns_are_detected_by_their_values PASSED [ 73%]
+tests/test_preprocess.py::test_medication_features_count_changes_and_prescriptions PASSED [ 74%]
+tests/test_preprocess.py::test_prior_visits_are_summed PASSED            [ 75%]
+tests/test_serving_skew.py::test_serving_matches_training_on_every_derived_column PASSED [ 76%]
+tests/test_serving_skew.py::test_no_derived_column_is_none PASSED        [ 76%]
+tests/test_serving_skew.py::test_known_values_are_exactly_what_training_produced PASSED [ 77%]
+tests/test_serving_skew.py::test_missing_diagnosis_becomes_missing_not_other[diag_1] PASSED [ 78%]
+tests/test_serving_skew.py::test_missing_diagnosis_becomes_missing_not_other[diag_2] PASSED [ 78%]
+tests/test_serving_skew.py::test_missing_diagnosis_becomes_missing_not_other[diag_3] PASSED [ 79%]
+tests/test_serving_skew.py::test_missing_diagnosis_becomes_missing_not_other[race] PASSED [ 80%]
+tests/test_train.py::test_forbidden_columns_match_the_m2_contract PASSED [ 80%]
+tests/test_train.py::test_clean_feature_list_passes PASSED               [ 81%]
+tests/test_train.py::test_each_forbidden_column_is_individually_caught[readmitted] PASSED [ 82%]
+tests/test_train.py::test_each_forbidden_column_is_individually_caught[readmitted_30d] PASSED [ 83%]
+tests/test_train.py::test_each_forbidden_column_is_individually_caught[encounter_id] PASSED [ 83%]
+tests/test_train.py::test_each_forbidden_column_is_individually_caught[patient_nbr] PASSED [ 84%]
+tests/test_train.py::test_multiple_leaked_columns_are_all_named_in_the_error PASSED [ 85%]
+tests/test_train.py::test_positive_class_weight_is_negatives_over_positives PASSED [ 85%]
+tests/test_train.py::test_positive_class_weight_rejects_no_positives PASSED [ 86%]
+tests/test_treatment.py::test_all_three_components_present PASSED        [ 87%]
+tests/test_treatment.py::test_worst_case_scores_zero PASSED              [ 88%]
+tests/test_treatment.py::test_a1c_none_drops_the_component_and_renormalises PASSED [ 88%]
+tests/test_treatment.py::test_a1c_missing_behaves_like_not_tested PASSED [ 89%]
+tests/test_treatment.py::test_an_all_null_row_scores_none_not_zero PASSED [ 90%]
+tests/test_treatment.py::test_unmapped_readmitted_value_is_dropped PASSED [ 90%]
+tests/test_treatment.py::test_stay_outside_the_configured_range_is_clamped[0-100.0] PASSED [ 91%]
+tests/test_treatment.py::test_stay_outside_the_configured_range_is_clamped[1-100.0] PASSED [ 92%]
+tests/test_treatment.py::test_stay_outside_the_configured_range_is_clamped[14-0.0] PASSED [ 92%]
+tests/test_treatment.py::test_stay_outside_the_configured_range_is_clamped[30-0.0] PASSED [ 93%]
+tests/test_treatment.py::test_a_non_numeric_stay_is_dropped PASSED       [ 94%]
+tests/test_treatment.py::test_wilson_interval_brackets_the_rate PASSED   [ 95%]
+tests/test_treatment.py::test_wilson_interval_stays_in_range_for_zero_events PASSED [ 95%]
+tests/test_treatment.py::test_wilson_interval_of_an_empty_group_is_not_an_error PASSED [ 96%]
+tests/test_treatment.py::test_group_outcomes_counts_both_rates PASSED    [ 97%]
+tests/test_treatment.py::test_small_groups_are_flagged_not_dropped PASSED [ 97%]
+tests/test_treatment.py::test_chi_square_is_null_when_there_is_only_one_group PASSED [ 98%]
+tests/test_treatment.py::test_a1c_and_medication_change_is_labelled_as_an_association PASSED [ 99%]
+tests/test_treatment.py::test_treatment_effectiveness_skips_a_constant_medication_column PASSED [100%]
+
+=============================== warnings summary ===============================
+../backend/.venv/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:64
+    prop = Group((name + Suppress("=") + comma_separated(value)) | oneOf(_CONSTANTS))
+
+../backend/.venv/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:85
+../backend/.venv/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:85
+../backend/.venv/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:85
+../backend/.venv/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:85
+../backend/.venv/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:85
+../backend/.venv/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:85
+    parse = parser.parseString(pattern)
+
+../backend/.venv/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:89
+../backend/.venv/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:89
+../backend/.venv/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:89
+../backend/.venv/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:89
+../backend/.venv/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:89
+../backend/.venv/lib/python3.11/site-packages/matplotlib/_fontconfig_pattern.py:89
+    parser.resetCache()
+
+
+======================= 142 passed, 14 warnings in 2.38s =======================
+
+================================================================
+$ python -m ruff check .
+================================================================
+All checks passed!
+
+================================================================
+$ python -m black --check .
+================================================================
+All done! ✨ 🍰 ✨
+37 files would be left unchanged.
