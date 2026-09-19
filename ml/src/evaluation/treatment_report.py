@@ -205,9 +205,14 @@ def main() -> None:
     print(f"Wrote {TREATMENT_FILENAME}")
 
     # SHAP runs on a sample of the test split only. The full test set would be
-    # slower and would make the artefact far larger for no extra insight.
-    sample_size = min(int(config["explainability"]["sample_size"]), len(x_test))
-    sample = x_test.head(sample_size)
+    # slower and would make the artefact far larger for no extra insight. The
+    # sample is drawn with the seed from the config rather than taken off the
+    # front of the split: head() would keep re-reading the same rows in whatever
+    # order the split happened to leave them, and a seeded draw is both
+    # reproducible and spread across the whole split.
+    settings = config["explainability"]
+    sample_size = min(int(settings["sample_size"]), len(x_test))
+    sample = x_test.sample(n=sample_size, random_state=int(settings["random_state"]))
     importance = explain(
         model,
         sample,
