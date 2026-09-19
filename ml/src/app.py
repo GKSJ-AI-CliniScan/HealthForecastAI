@@ -4,9 +4,8 @@ import joblib
 import pandas as pd
 
 # 1. Load the saved model and feature columns
-model = joblib.load("risk_model.pkl")
-feature_columns = joblib.load("feature_columns.pkl")
-
+model = joblib.load("../artifacts/risk_model.pkl")
+feature_columns = joblib.load("../artifacts/feature_columns.pkl")
 # 2. Create the FastAPI app
 app = FastAPI(title="Patient Risk Prediction API")
 
