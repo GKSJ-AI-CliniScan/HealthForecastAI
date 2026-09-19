@@ -10,7 +10,11 @@ from pathlib import Path
 
 import pytest
 
-from src.evaluation import make_m3_charts
+# CI's ML job installs only numpy, pandas, scikit-learn and pyyaml, so
+# matplotlib is missing there. Skip these tests instead of breaking the run.
+pytest.importorskip("matplotlib")
+
+from src.evaluation import make_m3_charts  # noqa: E402
 
 EVIDENCE = Path(__file__).resolve().parents[2] / "docs" / "06-milestones" / "evidence"
 ARTIFACTS = Path(__file__).resolve().parents[1] / "artifacts"
