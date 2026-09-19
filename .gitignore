@@ -107,3 +107,8 @@ AI_Hospital Readmission Prediction & Patient Risk Intelligence System.pdf
 
 # feature_contract.json backend ke liye chahiye — chhoti JSON, ise track karo
 !ml/artifacts/feature_contract.json
+
+# M3 analytics artifacts - small JSON, backend reads them through
+# ml/src/serving/insights_loader.py, so they are tracked like feature_contract.json
+!ml/artifacts/treatment_metrics.json
+!ml/artifacts/feature_importance.json

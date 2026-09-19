@@ -4,10 +4,12 @@ import numpy as np
 import pytest
 
 from src.evaluation.metrics import (
+    calibration_check,
     categorise_risk,
     classification_metrics,
     confusion_counts,
     meets_promotion_thresholds,
+    threshold_metrics,
 )
 
 
@@ -71,3 +73,50 @@ def test_invalid_probability_raises(probability: float) -> None:
     """A probability outside [0, 1] is a bug."""
     with pytest.raises(ValueError):
         categorise_risk(probability)
+
+
+def test_threshold_metrics_use_the_given_cutoff_not_the_default() -> None:
+    """The platform ships a tuned threshold near 0.11, nowhere near predict()'s 0.5."""
+    y_true = np.array([0, 0, 1, 1])
+    y_proba = np.array([0.05, 0.20, 0.30, 0.40])
+    at_low = threshold_metrics(y_true, y_proba, 0.25)
+    at_high = threshold_metrics(y_true, y_proba, 0.45)
+    assert at_low["recall"] == 1.0
+    assert at_high["recall"] == 0.0
+    assert at_low["decision_threshold"] == 0.25
+
+
+def test_threshold_metrics_omit_auc_for_a_single_class() -> None:
+    """ROC-AUC is undefined with one class; recall and precision still are not."""
+    metrics = threshold_metrics(np.zeros(4, dtype=int), np.array([0.1, 0.2, 0.3, 0.4]), 0.25)
+    assert "roc_auc" not in metrics
+    assert metrics["precision"] == 0.0
+
+
+def test_calibration_is_perfect_when_predictions_match_the_observed_rate() -> None:
+    """Half the rows positive, every prediction 0.5 - the gap should be zero."""
+    y_true = np.array([0, 1] * 50)
+    y_proba = np.full(100, 0.5)
+    result = calibration_check(y_true, y_proba, n_bins=5)
+    assert result["expected_calibration_error"] == 0.0
+    assert result["observed_prevalence"] == 0.5
+
+
+def test_calibration_reports_the_gap_when_predictions_are_too_high() -> None:
+    """This is the failure Milestone 2 fixed - predictions far above prevalence."""
+    y_true = np.array([0] * 90 + [1] * 10)
+    y_proba = np.full(100, 0.5)
+    result = calibration_check(y_true, y_proba, n_bins=5)
+    assert result["mean_predicted_probability"] == 0.5
+    assert result["observed_prevalence"] == 0.1
+    assert result["expected_calibration_error"] == pytest.approx(0.4)
+
+
+def test_calibration_bins_cover_every_row() -> None:
+    """No row may fall outside the bins, or the error is computed on a subset."""
+    rng = np.random.default_rng(0)
+    y_proba = rng.random(200)
+    y_true = (rng.random(200) < y_proba).astype(int)
+    result = calibration_check(y_true, y_proba, n_bins=10)
+    assert sum(entry["n"] for entry in result["bins"]) == 200
+    assert 0.0 <= result["brier_score"] <= 1.0

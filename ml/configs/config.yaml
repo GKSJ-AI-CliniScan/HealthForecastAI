@@ -80,3 +80,67 @@ artifacts:
   output_dir: ml/artifacts
   model_filename: readmission_model.joblib
   metrics_filename: metrics.json
+
+# Milestone 3 - treatment modelling and analytics. Every weight, mapping and
+# cutoff below is read by src/evaluation/treatment.py and src/evaluation/cohorts.py;
+# none of them is repeated in Python.
+recovery_score:
+  # Frozen as v1 on 2026-09-19 - see docs/06-milestones/milestone-3.md.
+  # The weights only sum to 1.0 when all three components are present. When one
+  # is missing the remaining weights are re-normalised, so the score keeps
+  # meaning the same thing on a row with no A1C result.
+  weights:
+    readmitted: 0.50
+    time_in_hospital: 0.25
+    a1c_result: 0.25
+  # "NO" and "Norm" are quoted because unquoted NO parses as a boolean in YAML.
+  readmitted_values:
+    "NO": 1.0
+    ">30": 0.5
+    "<30": 0.0
+  a1c_values:
+    "Norm": 1.0
+    ">7": 0.5
+    ">8": 0.0
+  # Fixed bounds, not the min/max of whatever rows are being scored. A range
+  # taken from the current batch would score the same patient differently
+  # depending on who else was in the batch.
+  time_in_hospital_range:
+    min: 1
+    max: 14
+
+treatment_analysis:
+  confidence_level: 0.95
+  # Groups smaller than this are reported with reliable=false rather than
+  # dropped, so a small group is never mistaken for a group with no events.
+  min_group_size: 30
+  # Non-medication treatment factors. Medication columns are read from
+  # artifacts/feature_contract.json instead, so the two stay in step.
+  factors:
+    - change
+    - diabetesMed
+  # Any other A1Cresult value (the dataset uses the literal string "None")
+  # counts as not tested.
+  a1c_tested_values:
+    - ">7"
+    - ">8"
+    - "Norm"
+
+cohorts:
+  min_size: 30
+  # Cohort type -> the column it groups by, after basic_clean has run.
+  columns:
+    age: age
+    gender: gender
+    race: race
+    diagnosis: diag_1_group
+
+explainability:
+  # Rows drawn from the test split for the SHAP background and global ranking.
+  sample_size: 2000
+  # Patients written into feature_importance.json's patient_drivers. Kept small
+  # on purpose: full per-patient drivers belong on demand, not in a checked-in file.
+  patient_sample_size: 200
+  top_global_drivers: 20
+  top_patient_drivers: 5
+  random_state: 42

@@ -1,0 +1,1999 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-09-19T09:03:22.136226+00:00",
+  "population": {
+    "rows": 69987,
+    "description": "one row per patient after basic_clean - first encounter only, death and hospice discharges removed; the same population the model was trained on"
+  },
+  "recovery_score": {
+    "version": "1.0",
+    "definition": "0-100, higher is better. readmitted 50%, time_in_hospital 25%, A1Cresult 25%; weights re-normalised over whichever components are present. Defined in configs/config.yaml under recovery_score.",
+    "scored_rows": 69987,
+    "unscored_rows": 0,
+    "mean": 73.45,
+    "median": 78.85,
+    "percentiles": {
+      "p10": 38.46,
+      "p25": 58.97,
+      "p75": 94.87,
+      "p90": 97.44
+    }
+  },
+  "treatment_effectiveness": {
+    "factors": {
+      "change": {
+        "factor": "change",
+        "groups": [
+          {
+            "value": "Ch",
+            "n": 31495,
+            "readmitted_30d": 2973,
+            "rate_30d": 0.0944,
+            "ci_95_30d": [
+              0.0912,
+              0.0977
+            ],
+            "readmitted_any": 13449,
+            "rate_any": 0.427,
+            "ci_95_any": [
+              0.4216,
+              0.4325
+            ],
+            "reliable": true
+          },
+          {
+            "value": "No",
+            "n": 38492,
+            "readmitted_30d": 3312,
+            "rate_30d": 0.086,
+            "ci_95_30d": [
+              0.0833,
+              0.0889
+            ],
+            "readmitted_any": 15062,
+            "rate_any": 0.3913,
+            "ci_95_any": [
+              0.3864,
+              0.3962
+            ],
+            "reliable": true
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.000127,
+          "statistic": 14.6809
+        }
+      },
+      "diabetesMed": {
+        "factor": "diabetesMed",
+        "groups": [
+          {
+            "value": "No",
+            "n": 16685,
+            "readmitted_30d": 1262,
+            "rate_30d": 0.0756,
+            "ci_95_30d": [
+              0.0717,
+              0.0797
+            ],
+            "readmitted_any": 5902,
+            "rate_any": 0.3537,
+            "ci_95_any": [
+              0.3465,
+              0.361
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Yes",
+            "n": 53302,
+            "readmitted_30d": 5023,
+            "rate_30d": 0.0942,
+            "ci_95_30d": [
+              0.0918,
+              0.0967
+            ],
+            "readmitted_any": 22609,
+            "rate_any": 0.4242,
+            "ci_95_any": [
+              0.42,
+              0.4284
+            ],
+            "reliable": true
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.0,
+          "statistic": 53.5558
+        }
+      },
+      "a1c_tested": {
+        "factor": "a1c_tested",
+        "groups": [
+          {
+            "value": "not tested",
+            "n": 57141,
+            "readmitted_30d": 5206,
+            "rate_30d": 0.0911,
+            "ci_95_30d": [
+              0.0888,
+              0.0935
+            ],
+            "readmitted_any": 23571,
+            "rate_any": 0.4125,
+            "ci_95_any": [
+              0.4085,
+              0.4165
+            ],
+            "reliable": true
+          },
+          {
+            "value": "tested",
+            "n": 12846,
+            "readmitted_30d": 1079,
+            "rate_30d": 0.084,
+            "ci_95_30d": [
+              0.0793,
+              0.0889
+            ],
+            "readmitted_any": 4940,
+            "rate_any": 0.3846,
+            "ci_95_any": [
+              0.3762,
+              0.393
+            ],
+            "reliable": true
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.011379,
+          "statistic": 6.4052
+        }
+      },
+      "a1c_and_medication_change": {
+        "factor": "a1c_and_change",
+        "groups": [
+          {
+            "value": "a1c not tested + medication changed",
+            "n": 24414,
+            "readmitted_30d": 2361,
+            "rate_30d": 0.0967,
+            "ci_95_30d": [
+              0.0931,
+              0.1005
+            ],
+            "readmitted_any": 10558,
+            "rate_any": 0.4325,
+            "ci_95_any": [
+              0.4263,
+              0.4387
+            ],
+            "reliable": true
+          },
+          {
+            "value": "a1c not tested + medication unchanged",
+            "n": 32727,
+            "readmitted_30d": 2845,
+            "rate_30d": 0.0869,
+            "ci_95_30d": [
+              0.0839,
+              0.09
+            ],
+            "readmitted_any": 13013,
+            "rate_any": 0.3976,
+            "ci_95_any": [
+              0.3923,
+              0.4029
+            ],
+            "reliable": true
+          },
+          {
+            "value": "a1c tested + medication changed",
+            "n": 7081,
+            "readmitted_30d": 612,
+            "rate_30d": 0.0864,
+            "ci_95_30d": [
+              0.0801,
+              0.0932
+            ],
+            "readmitted_any": 2891,
+            "rate_any": 0.4083,
+            "ci_95_any": [
+              0.3969,
+              0.4198
+            ],
+            "reliable": true
+          },
+          {
+            "value": "a1c tested + medication unchanged",
+            "n": 5765,
+            "readmitted_30d": 467,
+            "rate_30d": 0.081,
+            "ci_95_30d": [
+              0.0742,
+              0.0883
+            ],
+            "readmitted_any": 2049,
+            "rate_any": 0.3554,
+            "ci_95_any": [
+              0.3432,
+              0.3679
+            ],
+            "reliable": true
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 2.5e-05,
+          "statistic": 23.9826
+        },
+        "measures": "association between A1C testing, medication change and readmission; not a measured HbA1c reduction - the dataset has no follow-up A1C value"
+      }
+    },
+    "medications": {
+      "metformin": {
+        "factor": "metformin",
+        "groups": [
+          {
+            "value": "Down",
+            "n": 435,
+            "readmitted_30d": 44,
+            "rate_30d": 0.1011,
+            "ci_95_30d": [
+              0.0762,
+              0.1331
+            ],
+            "readmitted_any": 171,
+            "rate_any": 0.3931,
+            "ci_95_any": [
+              0.3483,
+              0.4397
+            ],
+            "reliable": true
+          },
+          {
+            "value": "No",
+            "n": 55083,
+            "readmitted_30d": 5046,
+            "rate_30d": 0.0916,
+            "ci_95_30d": [
+              0.0892,
+              0.094
+            ],
+            "readmitted_any": 22774,
+            "rate_any": 0.4134,
+            "ci_95_any": [
+              0.4093,
+              0.4176
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 13635,
+            "readmitted_30d": 1137,
+            "rate_30d": 0.0834,
+            "ci_95_30d": [
+              0.0789,
+              0.0881
+            ],
+            "readmitted_any": 5258,
+            "rate_any": 0.3856,
+            "ci_95_any": [
+              0.3775,
+              0.3938
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Up",
+            "n": 834,
+            "readmitted_30d": 58,
+            "rate_30d": 0.0695,
+            "ci_95_30d": [
+              0.0542,
+              0.0889
+            ],
+            "readmitted_any": 308,
+            "rate_any": 0.3693,
+            "ci_95_any": [
+              0.3372,
+              0.4026
+            ],
+            "reliable": true
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.003001,
+          "statistic": 13.9304
+        }
+      },
+      "repaglinide": {
+        "factor": "repaglinide",
+        "groups": [
+          {
+            "value": "Down",
+            "n": 28,
+            "readmitted_30d": 1,
+            "rate_30d": 0.0357,
+            "ci_95_30d": [
+              0.0063,
+              0.1771
+            ],
+            "readmitted_any": 12,
+            "rate_any": 0.4286,
+            "ci_95_any": [
+              0.2651,
+              0.6093
+            ],
+            "reliable": false
+          },
+          {
+            "value": "No",
+            "n": 69070,
+            "readmitted_30d": 6171,
+            "rate_30d": 0.0893,
+            "ci_95_30d": [
+              0.0872,
+              0.0915
+            ],
+            "readmitted_any": 28057,
+            "rate_any": 0.4062,
+            "ci_95_any": [
+              0.4026,
+              0.4099
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 818,
+            "readmitted_30d": 98,
+            "rate_30d": 0.1198,
+            "ci_95_30d": [
+              0.0993,
+              0.1439
+            ],
+            "readmitted_any": 411,
+            "rate_any": 0.5024,
+            "ci_95_any": [
+              0.4682,
+              0.5366
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Up",
+            "n": 71,
+            "readmitted_30d": 15,
+            "rate_30d": 0.2113,
+            "ci_95_30d": [
+              0.1324,
+              0.3197
+            ],
+            "readmitted_any": 31,
+            "rate_any": 0.4366,
+            "ci_95_any": [
+              0.3275,
+              0.5523
+            ],
+            "reliable": true
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 4e-05,
+          "statistic": 23.0032
+        }
+      },
+      "nateglinide": {
+        "factor": "nateglinide",
+        "groups": [
+          {
+            "value": "Down",
+            "n": 8,
+            "readmitted_30d": 0,
+            "rate_30d": 0.0,
+            "ci_95_30d": [
+              0.0,
+              0.3244
+            ],
+            "readmitted_any": 3,
+            "rate_any": 0.375,
+            "ci_95_any": [
+              0.1368,
+              0.6943
+            ],
+            "reliable": false
+          },
+          {
+            "value": "No",
+            "n": 69496,
+            "readmitted_30d": 6247,
+            "rate_30d": 0.0899,
+            "ci_95_30d": [
+              0.0878,
+              0.092
+            ],
+            "readmitted_any": 28298,
+            "rate_any": 0.4072,
+            "ci_95_any": [
+              0.4035,
+              0.4108
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 467,
+            "readmitted_30d": 38,
+            "rate_30d": 0.0814,
+            "ci_95_30d": [
+              0.0599,
+              0.1097
+            ],
+            "readmitted_any": 205,
+            "rate_any": 0.439,
+            "ci_95_any": [
+              0.3946,
+              0.4843
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Up",
+            "n": 16,
+            "readmitted_30d": 0,
+            "rate_30d": 0.0,
+            "ci_95_30d": [
+              0.0,
+              0.1936
+            ],
+            "readmitted_any": 5,
+            "rate_any": 0.3125,
+            "ci_95_any": [
+              0.1416,
+              0.556
+            ],
+            "reliable": false
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.426696,
+          "statistic": 2.7806
+        }
+      },
+      "chlorpropamide": {
+        "factor": "chlorpropamide",
+        "groups": [
+          {
+            "value": "Down",
+            "n": 1,
+            "readmitted_30d": 0,
+            "rate_30d": 0.0,
+            "ci_95_30d": [
+              0.0,
+              0.7935
+            ],
+            "readmitted_any": 0,
+            "rate_any": 0.0,
+            "ci_95_any": [
+              0.0,
+              0.7935
+            ],
+            "reliable": false
+          },
+          {
+            "value": "No",
+            "n": 69916,
+            "readmitted_30d": 6282,
+            "rate_30d": 0.0899,
+            "ci_95_30d": [
+              0.0878,
+              0.092
+            ],
+            "readmitted_any": 28480,
+            "rate_any": 0.4073,
+            "ci_95_any": [
+              0.4037,
+              0.411
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 66,
+            "readmitted_30d": 3,
+            "rate_30d": 0.0455,
+            "ci_95_30d": [
+              0.0156,
+              0.1253
+            ],
+            "readmitted_any": 28,
+            "rate_any": 0.4242,
+            "ci_95_any": [
+              0.3124,
+              0.5444
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Up",
+            "n": 4,
+            "readmitted_30d": 0,
+            "rate_30d": 0.0,
+            "ci_95_30d": [
+              0.0,
+              0.4899
+            ],
+            "readmitted_any": 3,
+            "rate_any": 0.75,
+            "ci_95_any": [
+              0.3006,
+              0.9544
+            ],
+            "reliable": false
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.555286,
+          "statistic": 2.0834
+        }
+      },
+      "glimepiride": {
+        "factor": "glimepiride",
+        "groups": [
+          {
+            "value": "Down",
+            "n": 136,
+            "readmitted_30d": 18,
+            "rate_30d": 0.1324,
+            "ci_95_30d": [
+              0.0854,
+              0.1995
+            ],
+            "readmitted_any": 62,
+            "rate_any": 0.4559,
+            "ci_95_any": [
+              0.3745,
+              0.5397
+            ],
+            "reliable": true
+          },
+          {
+            "value": "No",
+            "n": 66289,
+            "readmitted_30d": 5960,
+            "rate_30d": 0.0899,
+            "ci_95_30d": [
+              0.0878,
+              0.0921
+            ],
+            "readmitted_any": 26978,
+            "rate_any": 0.407,
+            "ci_95_any": [
+              0.4032,
+              0.4107
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 3332,
+            "readmitted_30d": 284,
+            "rate_30d": 0.0852,
+            "ci_95_30d": [
+              0.0762,
+              0.0952
+            ],
+            "readmitted_any": 1382,
+            "rate_any": 0.4148,
+            "ci_95_any": [
+              0.3981,
+              0.4316
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Up",
+            "n": 230,
+            "readmitted_30d": 23,
+            "rate_30d": 0.1,
+            "ci_95_30d": [
+              0.0676,
+              0.1456
+            ],
+            "readmitted_any": 89,
+            "rate_any": 0.387,
+            "ci_95_any": [
+              0.3264,
+              0.4513
+            ],
+            "reliable": true
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.244178,
+          "statistic": 4.1651
+        }
+      },
+      "acetohexamide": {
+        "factor": "acetohexamide",
+        "groups": [
+          {
+            "value": "No",
+            "n": 69986,
+            "readmitted_30d": 6285,
+            "rate_30d": 0.0898,
+            "ci_95_30d": [
+              0.0877,
+              0.0919
+            ],
+            "readmitted_any": 28510,
+            "rate_any": 0.4074,
+            "ci_95_any": [
+              0.4037,
+              0.411
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 1,
+            "readmitted_30d": 0,
+            "rate_30d": 0.0,
+            "ci_95_30d": [
+              0.0,
+              0.7935
+            ],
+            "readmitted_any": 1,
+            "rate_any": 1.0,
+            "ci_95_any": [
+              0.2065,
+              1.0
+            ],
+            "reliable": false
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 1.0,
+          "statistic": 0.0
+        }
+      },
+      "glipizide": {
+        "factor": "glipizide",
+        "groups": [
+          {
+            "value": "Down",
+            "n": 371,
+            "readmitted_30d": 48,
+            "rate_30d": 0.1294,
+            "ci_95_30d": [
+              0.099,
+              0.1674
+            ],
+            "readmitted_any": 185,
+            "rate_any": 0.4987,
+            "ci_95_any": [
+              0.448,
+              0.5493
+            ],
+            "reliable": true
+          },
+          {
+            "value": "No",
+            "n": 60978,
+            "readmitted_30d": 5407,
+            "rate_30d": 0.0887,
+            "ci_95_30d": [
+              0.0864,
+              0.091
+            ],
+            "readmitted_any": 24530,
+            "rate_any": 0.4023,
+            "ci_95_any": [
+              0.3984,
+              0.4062
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 8065,
+            "readmitted_30d": 767,
+            "rate_30d": 0.0951,
+            "ci_95_30d": [
+              0.0889,
+              0.1017
+            ],
+            "readmitted_any": 3539,
+            "rate_any": 0.4388,
+            "ci_95_any": [
+              0.428,
+              0.4497
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Up",
+            "n": 573,
+            "readmitted_30d": 63,
+            "rate_30d": 0.1099,
+            "ci_95_30d": [
+              0.0869,
+              0.1382
+            ],
+            "readmitted_any": 257,
+            "rate_any": 0.4485,
+            "ci_95_any": [
+              0.4083,
+              0.4894
+            ],
+            "reliable": true
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.003374,
+          "statistic": 13.6806
+        }
+      },
+      "glyburide": {
+        "factor": "glyburide",
+        "groups": [
+          {
+            "value": "Down",
+            "n": 418,
+            "readmitted_30d": 40,
+            "rate_30d": 0.0957,
+            "ci_95_30d": [
+              0.0711,
+              0.1277
+            ],
+            "readmitted_any": 192,
+            "rate_any": 0.4593,
+            "ci_95_any": [
+              0.4121,
+              0.5073
+            ],
+            "reliable": true
+          },
+          {
+            "value": "No",
+            "n": 62211,
+            "readmitted_30d": 5556,
+            "rate_30d": 0.0893,
+            "ci_95_30d": [
+              0.0871,
+              0.0916
+            ],
+            "readmitted_any": 25257,
+            "rate_any": 0.406,
+            "ci_95_any": [
+              0.4021,
+              0.4099
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 6745,
+            "readmitted_30d": 630,
+            "rate_30d": 0.0934,
+            "ci_95_30d": [
+              0.0867,
+              0.1006
+            ],
+            "readmitted_any": 2804,
+            "rate_any": 0.4157,
+            "ci_95_any": [
+              0.404,
+              0.4275
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Up",
+            "n": 613,
+            "readmitted_30d": 59,
+            "rate_30d": 0.0962,
+            "ci_95_30d": [
+              0.0754,
+              0.1222
+            ],
+            "readmitted_any": 258,
+            "rate_any": 0.4209,
+            "ci_95_any": [
+              0.3824,
+              0.4603
+            ],
+            "reliable": true
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.627217,
+          "statistic": 1.7439
+        }
+      },
+      "tolbutamide": {
+        "factor": "tolbutamide",
+        "groups": [
+          {
+            "value": "No",
+            "n": 69970,
+            "readmitted_30d": 6284,
+            "rate_30d": 0.0898,
+            "ci_95_30d": [
+              0.0877,
+              0.092
+            ],
+            "readmitted_any": 28505,
+            "rate_any": 0.4074,
+            "ci_95_any": [
+              0.4038,
+              0.411
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 17,
+            "readmitted_30d": 1,
+            "rate_30d": 0.0588,
+            "ci_95_30d": [
+              0.0105,
+              0.2698
+            ],
+            "readmitted_any": 6,
+            "rate_any": 0.3529,
+            "ci_95_any": [
+              0.1731,
+              0.587
+            ],
+            "reliable": false
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.981967,
+          "statistic": 0.0005
+        }
+      },
+      "pioglitazone": {
+        "factor": "pioglitazone",
+        "groups": [
+          {
+            "value": "Down",
+            "n": 81,
+            "readmitted_30d": 9,
+            "rate_30d": 0.1111,
+            "ci_95_30d": [
+              0.0596,
+              0.1979
+            ],
+            "readmitted_any": 44,
+            "rate_any": 0.5432,
+            "ci_95_any": [
+              0.4352,
+              0.6473
+            ],
+            "reliable": true
+          },
+          {
+            "value": "No",
+            "n": 64722,
+            "readmitted_30d": 5825,
+            "rate_30d": 0.09,
+            "ci_95_30d": [
+              0.0878,
+              0.0922
+            ],
+            "readmitted_any": 26230,
+            "rate_any": 0.4053,
+            "ci_95_any": [
+              0.4015,
+              0.4091
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 5006,
+            "readmitted_30d": 430,
+            "rate_30d": 0.0859,
+            "ci_95_30d": [
+              0.0784,
+              0.094
+            ],
+            "readmitted_any": 2148,
+            "rate_any": 0.4291,
+            "ci_95_any": [
+              0.4154,
+              0.4428
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Up",
+            "n": 178,
+            "readmitted_30d": 21,
+            "rate_30d": 0.118,
+            "ci_95_30d": [
+              0.0785,
+              0.1736
+            ],
+            "readmitted_any": 89,
+            "rate_any": 0.5,
+            "ci_95_any": [
+              0.4273,
+              0.5727
+            ],
+            "reliable": true
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.369973,
+          "statistic": 3.1439
+        }
+      },
+      "rosiglitazone": {
+        "factor": "rosiglitazone",
+        "groups": [
+          {
+            "value": "Down",
+            "n": 74,
+            "readmitted_30d": 4,
+            "rate_30d": 0.0541,
+            "ci_95_30d": [
+              0.0212,
+              0.1309
+            ],
+            "readmitted_any": 22,
+            "rate_any": 0.2973,
+            "ci_95_any": [
+              0.2053,
+              0.4093
+            ],
+            "reliable": true
+          },
+          {
+            "value": "No",
+            "n": 65327,
+            "readmitted_30d": 5875,
+            "rate_30d": 0.0899,
+            "ci_95_30d": [
+              0.0878,
+              0.0922
+            ],
+            "readmitted_any": 26441,
+            "rate_any": 0.4047,
+            "ci_95_any": [
+              0.401,
+              0.4085
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 4454,
+            "readmitted_30d": 393,
+            "rate_30d": 0.0882,
+            "ci_95_30d": [
+              0.0803,
+              0.0969
+            ],
+            "readmitted_any": 1998,
+            "rate_any": 0.4486,
+            "ci_95_any": [
+              0.434,
+              0.4632
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Up",
+            "n": 132,
+            "readmitted_30d": 13,
+            "rate_30d": 0.0985,
+            "ci_95_30d": [
+              0.0585,
+              0.1612
+            ],
+            "readmitted_any": 50,
+            "rate_any": 0.3788,
+            "ci_95_any": [
+              0.3006,
+              0.4639
+            ],
+            "reliable": true
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.699454,
+          "statistic": 1.426
+        }
+      },
+      "acarbose": {
+        "factor": "acarbose",
+        "groups": [
+          {
+            "value": "No",
+            "n": 69787,
+            "readmitted_30d": 6270,
+            "rate_30d": 0.0898,
+            "ci_95_30d": [
+              0.0877,
+              0.092
+            ],
+            "readmitted_any": 28409,
+            "rate_any": 0.4071,
+            "ci_95_any": [
+              0.4034,
+              0.4107
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 190,
+            "readmitted_30d": 13,
+            "rate_30d": 0.0684,
+            "ci_95_30d": [
+              0.0404,
+              0.1135
+            ],
+            "readmitted_any": 96,
+            "rate_any": 0.5053,
+            "ci_95_any": [
+              0.4348,
+              0.5755
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Up",
+            "n": 10,
+            "readmitted_30d": 2,
+            "rate_30d": 0.2,
+            "ci_95_30d": [
+              0.0567,
+              0.5098
+            ],
+            "readmitted_any": 6,
+            "rate_any": 0.6,
+            "ci_95_any": [
+              0.3127,
+              0.8318
+            ],
+            "reliable": false
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.279449,
+          "statistic": 2.5499
+        }
+      },
+      "miglitol": {
+        "factor": "miglitol",
+        "groups": [
+          {
+            "value": "Down",
+            "n": 1,
+            "readmitted_30d": 0,
+            "rate_30d": 0.0,
+            "ci_95_30d": [
+              0.0,
+              0.7935
+            ],
+            "readmitted_any": 1,
+            "rate_any": 1.0,
+            "ci_95_any": [
+              0.2065,
+              1.0
+            ],
+            "reliable": false
+          },
+          {
+            "value": "No",
+            "n": 69967,
+            "readmitted_30d": 6284,
+            "rate_30d": 0.0898,
+            "ci_95_30d": [
+              0.0877,
+              0.092
+            ],
+            "readmitted_any": 28498,
+            "rate_any": 0.4073,
+            "ci_95_any": [
+              0.4037,
+              0.411
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 18,
+            "readmitted_30d": 1,
+            "rate_30d": 0.0556,
+            "ci_95_30d": [
+              0.0099,
+              0.2576
+            ],
+            "readmitted_any": 11,
+            "rate_any": 0.6111,
+            "ci_95_any": [
+              0.3862,
+              0.7969
+            ],
+            "reliable": false
+          },
+          {
+            "value": "Up",
+            "n": 1,
+            "readmitted_30d": 0,
+            "rate_30d": 0.0,
+            "ci_95_30d": [
+              0.0,
+              0.7935
+            ],
+            "readmitted_any": 1,
+            "rate_any": 1.0,
+            "ci_95_any": [
+              0.2065,
+              1.0
+            ],
+            "reliable": false
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.928507,
+          "statistic": 0.4557
+        }
+      },
+      "troglitazone": {
+        "factor": "troglitazone",
+        "groups": [
+          {
+            "value": "No",
+            "n": 69984,
+            "readmitted_30d": 6285,
+            "rate_30d": 0.0898,
+            "ci_95_30d": [
+              0.0877,
+              0.0919
+            ],
+            "readmitted_any": 28509,
+            "rate_any": 0.4074,
+            "ci_95_any": [
+              0.4037,
+              0.411
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 3,
+            "readmitted_30d": 0,
+            "rate_30d": 0.0,
+            "ci_95_30d": [
+              0.0,
+              0.5615
+            ],
+            "readmitted_any": 2,
+            "rate_any": 0.6667,
+            "ci_95_any": [
+              0.2077,
+              0.9385
+            ],
+            "reliable": false
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 1.0,
+          "statistic": 0.0
+        }
+      },
+      "tolazamide": {
+        "factor": "tolazamide",
+        "groups": [
+          {
+            "value": "No",
+            "n": 69957,
+            "readmitted_30d": 6284,
+            "rate_30d": 0.0898,
+            "ci_95_30d": [
+              0.0877,
+              0.092
+            ],
+            "readmitted_any": 28501,
+            "rate_any": 0.4074,
+            "ci_95_any": [
+              0.4038,
+              0.4111
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 30,
+            "readmitted_30d": 1,
+            "rate_30d": 0.0333,
+            "ci_95_30d": [
+              0.0059,
+              0.1667
+            ],
+            "readmitted_any": 10,
+            "rate_any": 0.3333,
+            "ci_95_any": [
+              0.1923,
+              0.5122
+            ],
+            "reliable": true
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.445645,
+          "statistic": 0.5817
+        }
+      },
+      "insulin": {
+        "factor": "insulin",
+        "groups": [
+          {
+            "value": "Down",
+            "n": 7324,
+            "readmitted_30d": 772,
+            "rate_30d": 0.1054,
+            "ci_95_30d": [
+              0.0986,
+              0.1126
+            ],
+            "readmitted_any": 3319,
+            "rate_any": 0.4532,
+            "ci_95_any": [
+              0.4418,
+              0.4646
+            ],
+            "reliable": true
+          },
+          {
+            "value": "No",
+            "n": 34265,
+            "readmitted_30d": 2843,
+            "rate_30d": 0.083,
+            "ci_95_30d": [
+              0.0801,
+              0.0859
+            ],
+            "readmitted_any": 13361,
+            "rate_any": 0.3899,
+            "ci_95_any": [
+              0.3848,
+              0.3951
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 21621,
+            "readmitted_30d": 2003,
+            "rate_30d": 0.0926,
+            "ci_95_30d": [
+              0.0888,
+              0.0966
+            ],
+            "readmitted_any": 8826,
+            "rate_any": 0.4082,
+            "ci_95_any": [
+              0.4017,
+              0.4148
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Up",
+            "n": 6777,
+            "readmitted_30d": 667,
+            "rate_30d": 0.0984,
+            "ci_95_30d": [
+              0.0916,
+              0.1057
+            ],
+            "readmitted_any": 3005,
+            "rate_any": 0.4434,
+            "ci_95_any": [
+              0.4316,
+              0.4553
+            ],
+            "reliable": true
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.0,
+          "statistic": 49.673
+        }
+      },
+      "glyburide-metformin": {
+        "factor": "glyburide-metformin",
+        "groups": [
+          {
+            "value": "Down",
+            "n": 4,
+            "readmitted_30d": 1,
+            "rate_30d": 0.25,
+            "ci_95_30d": [
+              0.0456,
+              0.6994
+            ],
+            "readmitted_any": 1,
+            "rate_any": 0.25,
+            "ci_95_any": [
+              0.0456,
+              0.6994
+            ],
+            "reliable": false
+          },
+          {
+            "value": "No",
+            "n": 69491,
+            "readmitted_30d": 6246,
+            "rate_30d": 0.0899,
+            "ci_95_30d": [
+              0.0878,
+              0.092
+            ],
+            "readmitted_any": 28304,
+            "rate_any": 0.4073,
+            "ci_95_any": [
+              0.4037,
+              0.411
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 485,
+            "readmitted_30d": 38,
+            "rate_30d": 0.0784,
+            "ci_95_30d": [
+              0.0576,
+              0.1057
+            ],
+            "readmitted_any": 205,
+            "rate_any": 0.4227,
+            "ci_95_any": [
+              0.3795,
+              0.4671
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Up",
+            "n": 7,
+            "readmitted_30d": 0,
+            "rate_30d": 0.0,
+            "ci_95_30d": [
+              0.0,
+              0.3543
+            ],
+            "readmitted_any": 1,
+            "rate_any": 0.1429,
+            "ci_95_any": [
+              0.0257,
+              0.5131
+            ],
+            "reliable": false
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.435138,
+          "statistic": 2.7301
+        }
+      },
+      "glipizide-metformin": {
+        "factor": "glipizide-metformin",
+        "groups": [
+          {
+            "value": "No",
+            "n": 69980,
+            "readmitted_30d": 6285,
+            "rate_30d": 0.0898,
+            "ci_95_30d": [
+              0.0877,
+              0.092
+            ],
+            "readmitted_any": 28507,
+            "rate_any": 0.4074,
+            "ci_95_any": [
+              0.4037,
+              0.411
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 7,
+            "readmitted_30d": 0,
+            "rate_30d": 0.0,
+            "ci_95_30d": [
+              0.0,
+              0.3543
+            ],
+            "readmitted_any": 4,
+            "rate_any": 0.5714,
+            "ci_95_any": [
+              0.2505,
+              0.8418
+            ],
+            "reliable": false
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 0.864976,
+          "statistic": 0.0289
+        }
+      },
+      "metformin-rosiglitazone": {
+        "factor": "metformin-rosiglitazone",
+        "groups": [
+          {
+            "value": "No",
+            "n": 69985,
+            "readmitted_30d": 6285,
+            "rate_30d": 0.0898,
+            "ci_95_30d": [
+              0.0877,
+              0.0919
+            ],
+            "readmitted_any": 28511,
+            "rate_any": 0.4074,
+            "ci_95_any": [
+              0.4038,
+              0.411
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 2,
+            "readmitted_30d": 0,
+            "rate_30d": 0.0,
+            "ci_95_30d": [
+              0.0,
+              0.6576
+            ],
+            "readmitted_any": 0,
+            "rate_any": 0.0,
+            "ci_95_any": [
+              0.0,
+              0.6576
+            ],
+            "reliable": false
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 1.0,
+          "statistic": 0.0
+        }
+      },
+      "metformin-pioglitazone": {
+        "factor": "metformin-pioglitazone",
+        "groups": [
+          {
+            "value": "No",
+            "n": 69986,
+            "readmitted_30d": 6285,
+            "rate_30d": 0.0898,
+            "ci_95_30d": [
+              0.0877,
+              0.0919
+            ],
+            "readmitted_any": 28511,
+            "rate_any": 0.4074,
+            "ci_95_any": [
+              0.4037,
+              0.411
+            ],
+            "reliable": true
+          },
+          {
+            "value": "Steady",
+            "n": 1,
+            "readmitted_30d": 0,
+            "rate_30d": 0.0,
+            "ci_95_30d": [
+              0.0,
+              0.7935
+            ],
+            "readmitted_any": 0,
+            "rate_any": 0.0,
+            "ci_95_any": [
+              0.0,
+              0.7935
+            ],
+            "reliable": false
+          }
+        ],
+        "chi_square_30d": {
+          "p_value": 1.0,
+          "statistic": 0.0
+        }
+      }
+    }
+  },
+  "cohorts": {
+    "age": [
+      {
+        "cohort": "[0-10)",
+        "n": 153,
+        "readmitted_30d": 3,
+        "rate_30d": 0.0196,
+        "ci_95_30d": [
+          0.0067,
+          0.0561
+        ],
+        "rate_any": 0.1765,
+        "mean_recovery_score": 77.57,
+        "scored_rows": 153,
+        "reliable": true
+      },
+      {
+        "cohort": "[10-20)",
+        "n": 534,
+        "readmitted_30d": 26,
+        "rate_30d": 0.0487,
+        "ci_95_30d": [
+          0.0334,
+          0.0704
+        ],
+        "rate_any": 0.3146,
+        "mean_recovery_score": 74.42,
+        "scored_rows": 534,
+        "reliable": true
+      },
+      {
+        "cohort": "[20-30)",
+        "n": 1121,
+        "readmitted_30d": 83,
+        "rate_30d": 0.074,
+        "ci_95_30d": [
+          0.0601,
+          0.0909
+        ],
+        "rate_any": 0.3211,
+        "mean_recovery_score": 76.32,
+        "scored_rows": 1121,
+        "reliable": true
+      },
+      {
+        "cohort": "[30-40)",
+        "n": 2692,
+        "readmitted_30d": 188,
+        "rate_30d": 0.0698,
+        "ci_95_30d": [
+          0.0608,
+          0.0801
+        ],
+        "rate_any": 0.3258,
+        "mean_recovery_score": 76.91,
+        "scored_rows": 2692,
+        "reliable": true
+      },
+      {
+        "cohort": "[40-50)",
+        "n": 6828,
+        "readmitted_30d": 506,
+        "rate_30d": 0.0741,
+        "ci_95_30d": [
+          0.0681,
+          0.0806
+        ],
+        "rate_any": 0.3587,
+        "mean_recovery_score": 75.59,
+        "scored_rows": 6828,
+        "reliable": true
+      },
+      {
+        "cohort": "[50-60)",
+        "n": 12351,
+        "readmitted_30d": 880,
+        "rate_30d": 0.0712,
+        "ci_95_30d": [
+          0.0668,
+          0.0759
+        ],
+        "rate_any": 0.3736,
+        "mean_recovery_score": 75.42,
+        "scored_rows": 12351,
+        "reliable": true
+      },
+      {
+        "cohort": "[60-70)",
+        "n": 15688,
+        "readmitted_30d": 1415,
+        "rate_30d": 0.0902,
+        "ci_95_30d": [
+          0.0858,
+          0.0948
+        ],
+        "rate_any": 0.4056,
+        "mean_recovery_score": 73.68,
+        "scored_rows": 15688,
+        "reliable": true
+      },
+      {
+        "cohort": "[70-80)",
+        "n": 17749,
+        "readmitted_30d": 1817,
+        "rate_30d": 0.1024,
+        "ci_95_30d": [
+          0.098,
+          0.1069
+        ],
+        "rate_any": 0.4476,
+        "mean_recovery_score": 71.82,
+        "scored_rows": 17749,
+        "reliable": true
+      },
+      {
+        "cohort": "[80-90)",
+        "n": 11110,
+        "readmitted_30d": 1199,
+        "rate_30d": 0.1079,
+        "ci_95_30d": [
+          0.1023,
+          0.1138
+        ],
+        "rate_any": 0.4555,
+        "mean_recovery_score": 70.89,
+        "scored_rows": 11110,
+        "reliable": true
+      },
+      {
+        "cohort": "[90-100)",
+        "n": 1761,
+        "readmitted_30d": 168,
+        "rate_30d": 0.0954,
+        "ci_95_30d": [
+          0.0825,
+          0.11
+        ],
+        "rate_any": 0.3674,
+        "mean_recovery_score": 74.09,
+        "scored_rows": 1761,
+        "reliable": true
+      }
+    ],
+    "gender": [
+      {
+        "cohort": "Female",
+        "n": 37239,
+        "readmitted_30d": 3365,
+        "rate_30d": 0.0904,
+        "ci_95_30d": [
+          0.0875,
+          0.0933
+        ],
+        "rate_any": 0.4148,
+        "mean_recovery_score": 73.19,
+        "scored_rows": 37239,
+        "reliable": true
+      },
+      {
+        "cohort": "Male",
+        "n": 32748,
+        "readmitted_30d": 2920,
+        "rate_30d": 0.0892,
+        "ci_95_30d": [
+          0.0861,
+          0.0923
+        ],
+        "rate_any": 0.3989,
+        "mean_recovery_score": 73.75,
+        "scored_rows": 32748,
+        "reliable": true
+      }
+    ],
+    "race": [
+      {
+        "cohort": "AfricanAmerican",
+        "n": 12627,
+        "readmitted_30d": 1095,
+        "rate_30d": 0.0867,
+        "ci_95_30d": [
+          0.0819,
+          0.0918
+        ],
+        "rate_any": 0.393,
+        "mean_recovery_score": 73.57,
+        "scored_rows": 12627,
+        "reliable": true
+      },
+      {
+        "cohort": "Asian",
+        "n": 488,
+        "readmitted_30d": 41,
+        "rate_30d": 0.084,
+        "ci_95_30d": [
+          0.0625,
+          0.112
+        ],
+        "rate_any": 0.3033,
+        "mean_recovery_score": 77.96,
+        "scored_rows": 488,
+        "reliable": true
+      },
+      {
+        "cohort": "Caucasian",
+        "n": 52305,
+        "readmitted_30d": 4807,
+        "rate_30d": 0.0919,
+        "ci_95_30d": [
+          0.0895,
+          0.0944
+        ],
+        "rate_any": 0.4187,
+        "mean_recovery_score": 73.15,
+        "scored_rows": 52305,
+        "reliable": true
+      },
+      {
+        "cohort": "Hispanic",
+        "n": 1501,
+        "readmitted_30d": 122,
+        "rate_30d": 0.0813,
+        "ci_95_30d": [
+          0.0685,
+          0.0962
+        ],
+        "rate_any": 0.3558,
+        "mean_recovery_score": 75.31,
+        "scored_rows": 1501,
+        "reliable": true
+      },
+      {
+        "cohort": "Missing",
+        "n": 1917,
+        "readmitted_30d": 141,
+        "rate_30d": 0.0736,
+        "ci_95_30d": [
+          0.0627,
+          0.0861
+        ],
+        "rate_any": 0.301,
+        "mean_recovery_score": 76.67,
+        "scored_rows": 1917,
+        "reliable": true
+      },
+      {
+        "cohort": "Other",
+        "n": 1149,
+        "readmitted_30d": 79,
+        "rate_30d": 0.0688,
+        "ci_95_30d": [
+          0.0555,
+          0.0849
+        ],
+        "rate_any": 0.3394,
+        "mean_recovery_score": 76.18,
+        "scored_rows": 1149,
+        "reliable": true
+      }
+    ],
+    "diagnosis": [
+      {
+        "cohort": "circulatory",
+        "n": 21389,
+        "readmitted_30d": 2070,
+        "rate_30d": 0.0968,
+        "ci_95_30d": [
+          0.0929,
+          0.1008
+        ],
+        "rate_any": 0.4255,
+        "mean_recovery_score": 72.96,
+        "scored_rows": 21389,
+        "reliable": true
+      },
+      {
+        "cohort": "diabetes",
+        "n": 5748,
+        "readmitted_30d": 524,
+        "rate_30d": 0.0912,
+        "ci_95_30d": [
+          0.084,
+          0.0989
+        ],
+        "rate_any": 0.4283,
+        "mean_recovery_score": 69.48,
+        "scored_rows": 5748,
+        "reliable": true
+      },
+      {
+        "cohort": "digestive",
+        "n": 6488,
+        "readmitted_30d": 520,
+        "rate_30d": 0.0801,
+        "ci_95_30d": [
+          0.0738,
+          0.087
+        ],
+        "rate_any": 0.396,
+        "mean_recovery_score": 74.77,
+        "scored_rows": 6488,
+        "reliable": true
+      },
+      {
+        "cohort": "genitourinary",
+        "n": 3441,
+        "readmitted_30d": 309,
+        "rate_30d": 0.0898,
+        "ci_95_30d": [
+          0.0807,
+          0.0998
+        ],
+        "rate_any": 0.3883,
+        "mean_recovery_score": 74.99,
+        "scored_rows": 3441,
+        "reliable": true
+      },
+      {
+        "cohort": "injury",
+        "n": 4694,
+        "readmitted_30d": 507,
+        "rate_30d": 0.108,
+        "ci_95_30d": [
+          0.0994,
+          0.1172
+        ],
+        "rate_any": 0.3926,
+        "mean_recovery_score": 73.61,
+        "scored_rows": 4694,
+        "reliable": true
+      },
+      {
+        "cohort": "missing",
+        "n": 10,
+        "readmitted_30d": 2,
+        "rate_30d": 0.2,
+        "ci_95_30d": [
+          0.0567,
+          0.5098
+        ],
+        "rate_any": 0.4,
+        "mean_recovery_score": 70.19,
+        "scored_rows": 10,
+        "reliable": false
+      },
+      {
+        "cohort": "musculoskeletal",
+        "n": 4064,
+        "readmitted_30d": 341,
+        "rate_30d": 0.0839,
+        "ci_95_30d": [
+          0.0758,
+          0.0928
+        ],
+        "rate_any": 0.3558,
+        "mean_recovery_score": 77.43,
+        "scored_rows": 4064,
+        "reliable": true
+      },
+      {
+        "cohort": "neoplasms",
+        "n": 2538,
+        "readmitted_30d": 230,
+        "rate_30d": 0.0906,
+        "ci_95_30d": [
+          0.0801,
+          0.1024
+        ],
+        "rate_any": 0.327,
+        "mean_recovery_score": 74.89,
+        "scored_rows": 2538,
+        "reliable": true
+      },
+      {
+        "cohort": "other",
+        "n": 12124,
+        "readmitted_30d": 1089,
+        "rate_30d": 0.0898,
+        "ci_95_30d": [
+          0.0849,
+          0.095
+        ],
+        "rate_any": 0.4008,
+        "mean_recovery_score": 73.04,
+        "scored_rows": 12124,
+        "reliable": true
+      },
+      {
+        "cohort": "respiratory",
+        "n": 9491,
+        "readmitted_30d": 693,
+        "rate_30d": 0.073,
+        "ci_95_30d": [
+          0.068,
+          0.0784
+        ],
+        "rate_any": 0.4279,
+        "mean_recovery_score": 73.87,
+        "scored_rows": 9491,
+        "reliable": true
+      }
+    ]
+  },
+  "model_evaluation": {
+    "decision_threshold": 0.1117478534579277,
+    "recall": 0.5099443118536198,
+    "precision": 0.14538444091630756,
+    "roc_auc": 0.6518298564066656,
+    "test_rows": 13998,
+    "calibration": {
+      "bins": [
+        {
+          "bin": 0,
+          "n": 2881,
+          "mean_predicted": 0.0462,
+          "observed_rate": 0.0451,
+          "gap": 0.001
+        },
+        {
+          "bin": 1,
+          "n": 2452,
+          "mean_predicted": 0.0611,
+          "observed_rate": 0.0571,
+          "gap": 0.004
+        },
+        {
+          "bin": 2,
+          "n": 843,
+          "mean_predicted": 0.0684,
+          "observed_rate": 0.0759,
+          "gap": -0.0076
+        },
+        {
+          "bin": 3,
+          "n": 972,
+          "mean_predicted": 0.0713,
+          "observed_rate": 0.071,
+          "gap": 0.0003
+        },
+        {
+          "bin": 4,
+          "n": 1961,
+          "mean_predicted": 0.0874,
+          "observed_rate": 0.0841,
+          "gap": 0.0032
+        },
+        {
+          "bin": 5,
+          "n": 2534,
+          "mean_predicted": 0.1089,
+          "observed_rate": 0.1034,
+          "gap": 0.0055
+        },
+        {
+          "bin": 6,
+          "n": 1047,
+          "mean_predicted": 0.1277,
+          "observed_rate": 0.1394,
+          "gap": -0.0118
+        },
+        {
+          "bin": 7,
+          "n": 1308,
+          "mean_predicted": 0.2074,
+          "observed_rate": 0.2148,
+          "gap": -0.0074
+        }
+      ],
+      "brier_score": 0.079124,
+      "expected_calibration_error": 0.0044,
+      "mean_predicted_probability": 0.0902,
+      "observed_prevalence": 0.0898
+    },
+    "note": "Measured offline on the full 51-column feature set. The API currently supplies 7 of those 51 per request - see ml/artifacts/a16_serving_fidelity.json for what that costs in production."
+  },
+  "limitations": [
+    "Associations only. Patients whose medication changed were not randomised into that group, so a rate difference is not an effect.",
+    "No HbA1c improvement is measured anywhere. The dataset holds one A1Cresult per encounter and no follow-up value.",
+    "No time trends. The dataset carries no admission dates."
+  ]
+}
