@@ -17,6 +17,12 @@ interface RateBarChartProps {
   /** Render the y value as a percentage rather than a raw count. */
   asPercent?: boolean;
   height?: number;
+  barColor?: string;
+  secondaryBar?: {
+    key: string;
+    name: string;
+    color: string;
+  };
 }
 
 export function RateBarChart({
@@ -25,6 +31,8 @@ export function RateBarChart({
   yKey,
   asPercent = false,
   height = 280,
+  barColor,
+  secondaryBar,
 }: RateBarChartProps) {
   const formatter = (value: number) =>
     asPercent ? `${(value * 100).toFixed(1)}%` : value.toLocaleString();
@@ -46,17 +54,22 @@ export function RateBarChart({
             width={56}
           />
           <Tooltip
-            formatter={(value) => formatter(Number(value))}
+            formatter={(value, name) => [formatter(Number(value)), name]}
             contentStyle={{
               background: 'var(--surface)',
               border: '1px solid var(--border)',
               borderRadius: 8,
               color: 'var(--foreground)',
+              fontSize: 12,
             }}
           />
-          <Bar dataKey={yKey} fill="var(--accent)" radius={[4, 4, 0, 0]} />
+          <Bar dataKey={yKey} fill={barColor ?? 'var(--accent)'} radius={[4, 4, 0, 0]} />
+          {secondaryBar && (
+            <Bar dataKey={secondaryBar.key} name={secondaryBar.name} fill={secondaryBar.color} radius={[4, 4, 0, 0]} />
+          )}
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
 }
+

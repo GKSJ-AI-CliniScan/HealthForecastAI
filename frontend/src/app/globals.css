@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --background: #f4f7fb;
+  --background: #f1f5f9;
   --surface: #ffffff;
-  --surface-muted: #eef2f8;
+  --surface-muted: #f8fafc;
   --foreground: #0e1a2b;
   --muted: #5b6b82;
   --border: #d9e1ed;
@@ -27,14 +27,16 @@
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(219, 234, 254, 0.55), transparent 28rem),
+    var(--background);
   color: var(--foreground);
   font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 @layer components {
   .card {
-    @apply rounded-xl border p-5;
+    @apply rounded-xl border p-5 shadow-sm;
     background: var(--surface);
     border-color: var(--border);
   }
@@ -51,6 +53,7 @@ body {
     background: var(--surface);
     color: var(--foreground);
   }
+  .btn-ghost:hover { border-color: #93c5fd; background: #eff6ff; }
   .input {
     @apply w-full rounded-lg px-3 py-2 text-sm outline-none;
     background: var(--surface);

@@ -56,17 +56,15 @@ class LoadedModel:
 
 
 def artifact_path() -> Path:
-    """Return the absolute path of the model artifact.
-
-    MODEL_ARTIFACT_DIR is written relative to the repository root so it reads the
-    same in the docs, but the backend runs from backend/. Anchor it.
-    """
+    """Return the absolute path of the model artifact."""
+    repo_root = Path(__file__).resolve().parents[3]
+    primary = repo_root / "ml" / "artifacts" / "readmission_model.joblib"
+    if primary.exists():
+        return primary
     configured = Path(settings.MODEL_ARTIFACT_DIR)
     if configured.is_absolute():
         return configured / "readmission_model.joblib"
-
-    repo_root = Path(__file__).resolve().parents[3]
-    return repo_root / configured / "readmission_model.joblib"
+    return (repo_root / configured / "readmission_model.joblib").resolve()
 
 
 def load_model(force: bool = False) -> LoadedModel | None:
@@ -131,6 +129,32 @@ def reset_cache() -> None:
         _cached = None
 
 
+def metrics_path() -> Path:
+    """Return the absolute path of the metrics.json summary."""
+    repo_root = Path(__file__).resolve().parents[3]
+    primary = repo_root / "ml" / "artifacts" / "metrics.json"
+    if primary.exists():
+        return primary
+    configured = Path(settings.MODEL_ARTIFACT_DIR)
+    if configured.is_absolute():
+        return configured / "metrics.json"
+    return (repo_root / configured / "metrics.json").resolve()
+
+
+def load_metrics_summary() -> dict[str, Any] | None:
+    """Load the full metrics.json file containing model training comparisons."""
+    path = metrics_path()
+    if not path.exists():
+        return None
+
+    try:
+        import json
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        logger.exception("Failed to read metrics summary at %s", path)
+        return None
+
+
 def is_loaded() -> bool:
     """Return True when a model artifact is available."""
     return load_model() is not None
@@ -139,10 +163,12 @@ def is_loaded() -> bool:
 def model_info() -> dict[str, Any]:
     """Return a description of the active model for the management endpoints."""
     model = load_model()
+    summary = load_metrics_summary()
     if model is None:
         return {
             "loaded": False,
             "artifact_path": str(artifact_path()),
+            "metrics_summary": summary,
             "hint": "Run: cd ml && python -m src.models.train",
         }
 
@@ -155,4 +181,6 @@ def model_info() -> dict[str, Any]:
         "metrics": model.metrics,
         "feature_count": len(model.feature_columns),
         "artifact_path": str(artifact_path()),
+        "metrics_summary": summary,
     }
+

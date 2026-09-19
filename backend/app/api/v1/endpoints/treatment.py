@@ -3,11 +3,13 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
-from app.api.deps import require_permission
+from app.api.deps import get_db, require_permission
 from app.core.rbac import Permission
 from app.models.user import User
 from app.schemas.analytics import TreatmentEffectivenessSummary
+from app.services import treatment_service
 
 router = APIRouter()
 
@@ -15,18 +17,18 @@ CanReadTreatment = Annotated[User, Depends(require_permission(Permission.TREATME
 
 
 @router.get("", response_model=list[TreatmentEffectivenessSummary])
-def list_treatment_effectiveness(user: CanReadTreatment) -> list[TreatmentEffectivenessSummary]:
-    """Return effectiveness rollups per treatment.
-
-    TODO(milestone-3): aggregate treatment_outcomes and compare cohorts.
-    """
-    return []
+def list_treatment_effectiveness(
+    user: CanReadTreatment, db: Session = Depends(get_db)
+) -> list[TreatmentEffectivenessSummary]:
+    """Return effectiveness rollups per treatment regimen."""
+    return treatment_service.get_treatment_effectiveness_summary(db)
 
 
 @router.get("/recovery-trends", summary="Recovery trend series")
-def recovery_trends(user: CanReadTreatment) -> list[dict[str, float]]:
-    """Return a recovery score time series.
+def recovery_trends(
+    user: CanReadTreatment, db: Session = Depends(get_db)
+) -> list[dict[str, object]]:
+    """Return a recovery score time series."""
+    return treatment_service.get_recovery_trends(db)
 
-    TODO(milestone-3): compute weekly recovery trends from treatment_outcomes.
-    """
-    return []
+

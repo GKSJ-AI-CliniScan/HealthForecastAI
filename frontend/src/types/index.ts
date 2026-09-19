@@ -160,3 +160,135 @@ export interface PatientRiskScore {
   features_expected?: number | null;
   created_at?: string | null;
 }
+
+// ---------- Milestone 3: CDS & Treatment Effectiveness ----------
+
+export interface CareRecommendationsResponse {
+  patient_id: number;
+  risk_category: RiskCategory;
+  readmission_probability: number;
+  recommendations: string[];
+  follow_up_days: number | null;
+}
+
+export interface DischargePlanCheckitem {
+  item: string;
+  completed: boolean;
+}
+
+export interface DischargePlanResponse {
+  patient_id: number;
+  risk_category: RiskCategory;
+  ready_for_discharge: boolean | null;
+  readiness_score: number;
+  risk_mitigation: string[];
+  checklist: DischargePlanCheckitem[];
+}
+
+export interface TreatmentEffectivenessSummary {
+  treatment_name: string;
+  patients_treated: number;
+  average_recovery_score: number;
+  readmission_rate: number;
+}
+
+export interface RecoveryTrendPoint {
+  week: string;
+  average_recovery_score: number;
+}
+
+export interface TreatmentRegimenDetail extends TreatmentEffectivenessSummary {
+  category: string;
+  primary_indication: string;
+  avg_cost_per_stay: number;
+  adverse_event_rate: number;
+  adherence_rate: number;
+  average_los_days: number;
+  efficacy_tier: 'High' | 'Moderate' | 'Under Review';
+  contraindications: string[];
+}
+
+export interface MedicationOutcomeStat {
+  drug_class: string;
+  dosage_status: 'Adjusted (Ch)' | 'Unchanged (No)' | 'Initiated' | 'Discontinued';
+  patients_count: number;
+  readmission_rate: number;
+  avg_recovery_score: number;
+  glycemic_control_delta: string;
+}
+
+export interface PolypharmacyStat {
+  medication_range: string;
+  patient_count: number;
+  readmission_rate: number;
+  risk_multiplier: number;
+  avg_adverse_events: number;
+}
+
+export interface DepartmentPerformanceStat {
+  department: string;
+  total_beds: number;
+  active_patients: number;
+  occupancy_rate: number;
+  average_los: number;
+  readmission_rate: number;
+  target_readmission_rate: number;
+  recovery_rate: number;
+  patient_satisfaction: number;
+  protocol_compliance: number;
+  preventable_readmissions_cost: number;
+}
+
+export interface HospitalQualityKPIs {
+  overall_readmission_rate: number;
+  cms_national_benchmark: number;
+  hospital_wide_recovery_rate: number;
+  average_length_of_stay: number;
+  alos_target: number;
+  bed_turnover_rate: number;
+  clinical_protocol_compliance: number;
+  projected_annual_cost_savings: number;
+  cms_penalty_risk_tier: 'Low' | 'Moderate' | 'High';
+  quality_star_rating: number;
+}
+
+export interface TrendDataPoint {
+  period: string;
+  readmission_rate: number;
+  moving_average: number;
+  upper_control_limit: number;
+  lower_control_limit: number;
+  admissions_volume: number;
+  projected_rate?: number;
+}
+
+export interface EarlyWarningAlert {
+  id: string;
+  timestamp: string;
+  department: string;
+  severity: 'critical' | 'warning' | 'info';
+  title: string;
+  description: string;
+  metric_name: string;
+  current_value: string;
+  baseline_value: string;
+  recommended_action: string;
+}
+
+export interface PatientOutcomeRecord {
+  id: number;
+  medical_record_number: string;
+  age_group: string;
+  gender: string;
+  primary_diagnosis: string;
+  treatment_regimen: string;
+  dosage_adjusted: boolean;
+  recovery_score: number;
+  outcome_category: 'Full Recovery' | 'Partial Improvement' | 'Readmitted (<30d)' | 'Chronic Care';
+  time_in_hospital: number;
+  num_medications: number;
+  discharge_status: string;
+  follow_up_completed: boolean;
+}
+
+
