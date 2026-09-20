@@ -80,41 +80,42 @@ export default function RiskPage() {
             try {
                 setError('');
 
-                const [
-                    patientData,
-                    highRiskData,
-                    forecastData,
-                ] = await Promise.all([
-                    apiFetch<Patient[]>(
-                        '/patients',
-                        {},
-                        token,
-                    ),
-
-                    apiFetch<RiskPrediction[]>(
-                        '/risk/high-risk',
-                        {},
-                        token,
-                    ),
-
-                    apiFetch<ReadmissionForecast>(
-                        '/risk/forecast?horizon_days=30',
-                        {},
-                        token,
-                    ),
+                const results = await Promise.allSettled([
+                    apiFetch<Patient[]>('/patients', {}, token),
+                    apiFetch<RiskPrediction[]>('/risk/high-risk', {}, token),
+                    apiFetch<ReadmissionForecast>('/risk/forecast?horizon_days=30', {}, token),
                 ]);
 
-                setPatients(patientData);
-                setHighRiskPatients(highRiskData);
-                setForecast(forecastData);
+                const [patientResult, highRiskResult, forecastResult] = results;
+                const failures: string[] = [];
 
-                setSelectedPatientId((current) => {
-                    if (current) return current;
+                if (patientResult.status === 'fulfilled') {
+                    setPatients(patientResult.value);
+                    setSelectedPatientId((current) => {
+                        if (current) return current;
+                        return patientResult.value.length > 0
+                            ? String(patientResult.value[0].id)
+                            : '';
+                    });
+                } else {
+                    failures.push(getRequestError(patientResult.reason, 'Patient list'));
+                }
 
-                    return patientData.length > 0
-                        ? String(patientData[0].id)
-                        : '';
-                });
+                if (highRiskResult.status === 'fulfilled') {
+                    setHighRiskPatients(highRiskResult.value);
+                } else {
+                    failures.push(getRequestError(highRiskResult.reason, 'High-risk list'));
+                }
+
+                if (forecastResult.status === 'fulfilled') {
+                    setForecast(forecastResult.value);
+                } else {
+                    failures.push(getRequestError(forecastResult.reason, 'Forecast'));
+                }
+
+                if (failures.length > 0) {
+                    setError(failures.join(' '));
+                }
             } catch (err) {
                 setError(
                     err instanceof ApiError
@@ -210,8 +211,8 @@ export default function RiskPage() {
 
     if (!token || !currentUser) {
         return (
-            <main className="flex min-h-screen items-center justify-center bg-[#f5f7fa] px-6">
-                <div className="w-full max-w-md border border-slate-200 bg-white p-8 text-center shadow-sm">
+            <main className="hf-shell items-center justify-center bg-[#f5f7fa] px-6">
+                <div className="w-full max-w-md hf-panel p-8 text-center shadow-sm">
                     <p className="text-sm font-semibold text-[#155eef]">
                         HealthForecast AI
                     </p>
@@ -237,17 +238,17 @@ export default function RiskPage() {
     }
 
     return (
-        <main className="min-h-screen bg-[#f5f7fa]">
-            <div className="flex min-h-screen">
+        <main className="hf-page">
+            <div className="hf-shell">
 
                 <RiskSidebar />
 
-                <div className="min-w-0 flex-1">
+                <div className="hf-main">
 
-                    <header className="border-b border-slate-200 bg-white">
+                    <header className="hf-header">
                         <div className="flex min-h-[72px] items-center justify-between px-6">
                             <div>
-                                <p className="text-xs uppercase tracking-wider text-slate-400">
+                                <p className="hf-header-eyebrow">
                                     Clinical analytics
                                 </p>
 
@@ -271,7 +272,7 @@ export default function RiskPage() {
 
                                 <button
                                     onClick={logout}
-                                    className="border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                                    className="hf-button hf-button-secondary"
                                 >
                                     Sign out
                                 </button>
@@ -279,7 +280,7 @@ export default function RiskPage() {
                         </div>
                     </header>
 
-                    <div className="mx-auto max-w-[1400px] px-6 py-7">
+                    <div className="hf-content">
 
                         <div className="mb-7 flex flex-col justify-between gap-4 md:flex-row md:items-end">
                             <div>
@@ -287,7 +288,7 @@ export default function RiskPage() {
                                     Risk prediction
                                 </p>
 
-                                <h2 className="mt-1 text-2xl font-semibold text-slate-900">
+                                <h2 className="mt-1 hf-page-title">
                                     Hospital readmission monitoring
                                 </h2>
 
@@ -300,21 +301,21 @@ export default function RiskPage() {
 
                             <Link
                                 href="/"
-                                className="text-sm font-medium text-[#155eef] hover:underline"
+                                className="hf-link"
                             >
                                 Back to overview
                             </Link>
                         </div>
 
                         {error && (
-                            <div className="mb-6 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                            <div className="mb-6 hf-alert hf-alert-danger">
                                 {error}
                             </div>
                         )}
 
                         {/* KPI ROW */}
 
-                        <section className="grid gap-px overflow-hidden border border-slate-200 bg-slate-200 md:grid-cols-4">
+                        <section className="hf-kpi-grid md:grid-cols-4">
                             <Kpi
                                 label="Visible patients"
                                 value={patients.length}
@@ -355,9 +356,9 @@ export default function RiskPage() {
 
                         <section className="mt-7 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
 
-                            <div className="border border-slate-200 bg-white">
+                            <div className="hf-panel">
 
-                                <div className="border-b border-slate-200 px-5 py-4">
+                                <div className="hf-section-head">
                                     <h3 className="text-sm font-semibold text-slate-900">
                                         Readmission forecast
                                     </h3>
@@ -405,9 +406,9 @@ export default function RiskPage() {
                                 </div>
                             </div>
 
-                            <div className="border border-slate-200 bg-white">
+                            <div className="hf-panel">
 
-                                <div className="border-b border-slate-200 px-5 py-4">
+                                <div className="hf-section-head">
                                     <h3 className="text-sm font-semibold text-slate-900">
                                         Model information
                                     </h3>
@@ -449,9 +450,9 @@ export default function RiskPage() {
 
                         {/* PATIENT SCORING */}
 
-                        <section className="mt-7 border border-slate-200 bg-white">
+                        <section className="mt-7 hf-panel">
 
-                            <div className="border-b border-slate-200 px-5 py-4">
+                            <div className="hf-section-head">
                                 <h3 className="text-sm font-semibold text-slate-900">
                                     Patient risk assessment
                                 </h3>
@@ -563,7 +564,7 @@ export default function RiskPage() {
 
                                     </div>
 
-                                    <div className="mt-6 flex justify-end border-t border-slate-200 pt-5">
+                                    <div className="mt-6 flex justify-end hf-table-row pt-5">
                                         <button
                                             type="submit"
                                             disabled={
@@ -571,7 +572,7 @@ export default function RiskPage() {
                                                 dashboardLoading ||
                                                 patients.length === 0
                                             }
-                                            className="bg-[#155eef] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#124dcc] disabled:opacity-50"
+                                            className="hf-button hf-button-primary disabled:opacity-50"
                                         >
                                             {loading
                                                 ? 'Calculating...'
@@ -633,7 +634,7 @@ export default function RiskPage() {
                                                 </span>
                                             </div>
 
-                                            <div className="mt-5 border-t border-slate-200 pt-5">
+                                            <div className="mt-5 hf-table-row pt-5">
                                                 <div className="flex justify-between text-xs text-slate-500">
                                                     <span>
                                                         Model probability
@@ -647,12 +648,12 @@ export default function RiskPage() {
                                                 <div className="mt-2 h-2 bg-slate-100">
                                                     <div
                                                         className={`h-2 ${prediction.risk_category ===
-                                                                'high'
-                                                                ? 'bg-red-500'
-                                                                : prediction.risk_category ===
-                                                                    'medium'
-                                                                    ? 'bg-amber-500'
-                                                                    : 'bg-emerald-500'
+                                                            'high'
+                                                            ? 'bg-red-500'
+                                                            : prediction.risk_category ===
+                                                                'medium'
+                                                                ? 'bg-amber-500'
+                                                                : 'bg-emerald-500'
                                                             }`}
                                                         style={{
                                                             width: `${Math.min(
@@ -677,9 +678,9 @@ export default function RiskPage() {
                         {drivers && (
                             <section className="mt-7 grid gap-6 lg:grid-cols-2">
 
-                                <div className="border border-slate-200 bg-white">
+                                <div className="hf-panel">
 
-                                    <div className="border-b border-slate-200 px-5 py-4">
+                                    <div className="hf-section-head">
                                         <h3 className="text-sm font-semibold text-slate-900">
                                             Prediction factors
                                         </h3>
@@ -709,8 +710,8 @@ export default function RiskPage() {
 
                                                             <p
                                                                 className={`mt-1 text-xs ${increases
-                                                                        ? 'text-red-600'
-                                                                        : 'text-emerald-700'
+                                                                    ? 'text-red-600'
+                                                                    : 'text-emerald-700'
                                                                     }`}
                                                             >
                                                                 {increases
@@ -736,9 +737,9 @@ export default function RiskPage() {
 
                                 </div>
 
-                                <div className="border border-slate-200 bg-white">
+                                <div className="hf-panel">
 
-                                    <div className="border-b border-slate-200 px-5 py-4">
+                                    <div className="hf-section-head">
                                         <h3 className="text-sm font-semibold text-slate-900">
                                             Clinical interpretation
                                         </h3>
@@ -774,9 +775,9 @@ export default function RiskPage() {
 
                         {/* HIGH RISK */}
 
-                        <section className="mt-7 border border-slate-200 bg-white">
+                        <section className="mt-7 hf-panel">
 
-                            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                            <div className="flex items-center justify-between hf-section-head">
                                 <div>
                                     <h3 className="text-sm font-semibold text-slate-900">
                                         High-risk patients
@@ -834,7 +835,7 @@ export default function RiskPage() {
                                                 (item) => (
                                                     <tr
                                                         key={`${item.patient_id}-${item.created_at ?? ''}`}
-                                                        className="border-t border-slate-200"
+                                                        className="hf-table-row"
                                                     >
                                                         <td className="px-5 py-4 text-sm font-medium text-slate-800">
                                                             Patient #
@@ -891,53 +892,34 @@ export default function RiskPage() {
 }
 
 const inputClass =
-    'w-full border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none focus:border-[#155eef] focus:ring-1 focus:ring-[#155eef]';
+    'w-full hf-input';
 
 function RiskSidebar() {
     return (
-        <aside className="hidden w-60 shrink-0 bg-[#172033] text-white lg:block">
-            <div className="sticky top-0 h-screen">
-
-                <div className="border-b border-white/10 px-5 py-5">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-300">
-                        HealthForecast
-                    </p>
-
-                    <p className="mt-1 text-sm text-slate-300">
-                        Clinical Workspace
-                    </p>
+        <>
+            <aside className="hf-sidebar">
+                <div className="hf-sidebar-inner">
+                    <div className="hf-sidebar-brand">
+                        <p>HealthForecast</p>
+                        <p>Clinical workspace</p>
+                    </div>
+                    <nav className="hf-sidebar-nav">
+                        <Link href="/" className="hf-nav-item">Overview</Link>
+                        <Link href="/risk" className="hf-nav-item hf-nav-active">Risk prediction</Link>
+                        <Link href="/analytics" className="hf-nav-item">Healthcare analytics</Link>
+                    </nav>
+                    <div className="hf-sidebar-footer">
+                        <p>Clinical analytics</p>
+                        <p>Readmission monitoring</p>
+                    </div>
                 </div>
-
-                <nav className="px-3 py-5">
-
-                    <Link
-                        href="/"
-                        className="mb-1 block border-l-2 border-transparent px-3 py-2.5 text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white"
-                    >
-                        Overview
-                    </Link>
-
-                    <Link
-                        href="/risk"
-                        className="mb-1 block border-l-2 border-blue-400 bg-white/10 px-3 py-2.5 text-sm font-medium text-white"
-                    >
-                        Risk prediction
-                    </Link>
-
-                </nav>
-
-                <div className="absolute bottom-0 left-0 right-0 border-t border-white/10 px-5 py-4">
-                    <p className="text-xs text-slate-500">
-                        Clinical analytics
-                    </p>
-
-                    <p className="mt-1 text-sm text-slate-300">
-                        Readmission monitoring
-                    </p>
-                </div>
-
-            </div>
-        </aside>
+            </aside>
+            <nav className="hf-mobile-nav" aria-label="Primary navigation">
+                <Link href="/">Overview</Link>
+                <Link href="/risk" className="active">Risk prediction</Link>
+                <Link href="/analytics">Analytics</Link>
+            </nav>
+        </>
     );
 }
 
@@ -949,7 +931,7 @@ function Kpi({
     value: string | number;
 }) {
     return (
-        <div className="bg-white px-5 py-5">
+        <div className="hf-kpi">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                 {label}
             </p>
@@ -969,7 +951,7 @@ function ForecastMetric({
     value: string;
 }) {
     return (
-        <div className="px-5 py-5">
+        <div className="hf-kpi">
             <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
                 {label}
             </p>
@@ -1073,7 +1055,7 @@ function TableHead({
     children: React.ReactNode;
 }) {
     return (
-        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <th className="hf-table-head">
             {children}
         </th>
     );
@@ -1085,12 +1067,19 @@ function LoadingScreen({
     text: string;
 }) {
     return (
-        <main className="flex min-h-screen items-center justify-center bg-[#f5f7fa]">
+        <main className="hf-shell items-center justify-center bg-[#f5f7fa]">
             <p className="text-sm text-slate-500">
                 {text}
             </p>
         </main>
     );
+}
+
+function getRequestError(error: unknown, label: string) {
+    if (error instanceof ApiError) {
+        return `${label}: ${error.message}`;
+    }
+    return `${label}: unable to load data.`;
 }
 
 function formatRole(role: string) {

@@ -1,42 +1,66 @@
-"""Healthcare analytics dashboard endpoints - Module 6."""
+"""Healthcare analytics dashboard endpoints."""
+
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentUser, require_permission
 from app.core.rbac import Permission
-from app.schemas.analytics import HospitalAnalyticsSummary
+from app.db.session import get_db
+from app.schemas.analytics import (
+    HospitalAnalyticsSummary,
+    PopulationHealthResponse,
+    ReadmissionTrend,
+)
+from app.services.analytics_service import (
+    get_hospital_summary,
+    get_population_health,
+    get_readmission_trends,
+)
 
 router = APIRouter()
 
 
-@router.get("/summary", response_model=HospitalAnalyticsSummary)
+@router.get(
+    "/summary",
+    response_model=HospitalAnalyticsSummary,
+)
 def hospital_summary(
+    db: Session = Depends(get_db),
     user: CurrentUser = Depends(require_permission(Permission.HOSPITAL_ANALYTICS_READ)),
 ) -> HospitalAnalyticsSummary:
-    """Return the headline KPIs for the hospital dashboard.
+    """Return headline KPIs for the hospital dashboard."""
 
-    TODO(milestone-3): aggregate from PostgreSQL with cached rollups.
-    """
-    return HospitalAnalyticsSummary()
+    return get_hospital_summary(db)
 
 
-@router.get("/readmissions", summary="Readmission analytics series")
+@router.get(
+    "/readmissions",
+    response_model=list[ReadmissionTrend],
+    summary="Readmission analytics series",
+)
 def readmission_analytics(
+    db: Session = Depends(get_db),
     user: CurrentUser = Depends(require_permission(Permission.HOSPITAL_ANALYTICS_READ)),
-) -> list[dict[str, float]]:
-    """Return readmission rate over time.
+) -> list[ReadmissionTrend]:
+    """Return monthly readmission statistics."""
 
-    TODO(milestone-3): group admissions by month and discharge disposition.
-    """
-    return []
+    return get_readmission_trends(db)
 
 
-@router.get("/population-health", summary="Population health statistics")
+@router.get(
+    "/population-health",
+    response_model=PopulationHealthResponse,
+    summary="Population health statistics",
+)
 def population_health(
+    db: Session = Depends(get_db),
     user: CurrentUser = Depends(require_permission(Permission.POPULATION_HEALTH_READ)),
-) -> dict[str, object]:
-    """Return aggregated population health statistics for researchers.
+) -> PopulationHealthResponse:
+    """Return aggregated population-health statistics."""
 
-    TODO(milestone-3): only aggregate values, never row level records.
-    """
-    return {"cohorts": [], "generated_at": None}
+    return PopulationHealthResponse(
+        cohorts=get_population_health(db),
+        generated_at=datetime.now(timezone.utc),
+    )

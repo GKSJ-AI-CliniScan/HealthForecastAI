@@ -36,12 +36,11 @@ export async function apiFetch<T>(
 
     try {
       const body = await response.json();
-
       if (typeof body.detail === 'string') {
         message = body.detail;
       }
     } catch {
-      // Keep the default error message.
+      // Keep the default error message when the response is not JSON.
     }
 
     throw new ApiError(response.status, message);

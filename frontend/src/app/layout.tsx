@@ -4,9 +4,8 @@ import './globals.css';
 import { AuthProvider } from '@/hooks/use-auth';
 
 export const metadata: Metadata = {
-  title: 'HealthForecast AI',
-  description:
-    'Hospital readmission risk and patient analytics.',
+  title: 'HealthForecast AI | Clinical Workspace',
+  description: 'Hospital readmission risk and healthcare analytics workspace.',
 };
 
 export default function RootLayout({
@@ -17,9 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

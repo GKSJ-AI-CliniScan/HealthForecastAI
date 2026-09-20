@@ -112,7 +112,7 @@ export default function Home() {
 
   if (authLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#f5f7fa]">
+      <main className="hf-shell items-center justify-center bg-[#f5f7fa]">
         <p className="text-sm text-slate-500">
           Loading workspace...
         </p>
@@ -135,25 +135,25 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f5f7fa]">
-      <div className="flex min-h-screen">
+    <main className="hf-page">
+      <div className="hf-shell">
 
         <Sidebar
           currentPage="overview"
           role={currentUser.role}
         />
 
-        <div className="min-w-0 flex-1">
+        <div className="hf-main">
 
           <Header
             currentUser={currentUser}
             onLogout={logout}
           />
 
-          <div className="mx-auto max-w-[1400px] px-6 py-7">
+          <div className="hf-content">
 
             {dataError && (
-              <div className="mb-6 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div className="mb-6 hf-alert hf-alert-danger">
                 {dataError}
               </div>
             )}
@@ -163,7 +163,7 @@ export default function Home() {
                 Overview
               </p>
 
-              <h1 className="mt-1 text-2xl font-semibold text-slate-900">
+              <h1 className="mt-1 hf-page-title">
                 Healthcare Dashboard
               </h1>
 
@@ -173,7 +173,7 @@ export default function Home() {
               </p>
             </div>
 
-            <section className="grid gap-px overflow-hidden border border-slate-200 bg-slate-200 md:grid-cols-3">
+            <section className="hf-kpi-grid md:grid-cols-3">
               <Metric
                 label="Visible patients"
                 value={patients.length}
@@ -194,8 +194,8 @@ export default function Home() {
               />
             </section>
 
-            <section className="mt-7 border border-slate-200 bg-white">
-              <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+            <section className="mt-7 hf-panel">
+              <div className="flex items-center justify-between hf-section-head">
                 <div>
                   <h2 className="font-semibold text-slate-900">
                     Risk prediction
@@ -210,7 +210,7 @@ export default function Home() {
 
                 <Link
                   href="/risk"
-                  className="border border-[#155eef] bg-[#155eef] px-4 py-2 text-sm font-medium text-white hover:bg-[#124dcc]"
+                  className="border border-[#155eef] hf-button hf-button-primary"
                 >
                   Open risk dashboard
                 </Link>
@@ -234,7 +234,7 @@ export default function Home() {
               </div>
             </section>
 
-            <section className="mt-7 border border-slate-200 bg-white">
+            <section className="mt-7 hf-panel">
               <SectionHeader
                 title="Patients"
                 description="Patients currently visible to your role."
@@ -252,7 +252,7 @@ export default function Home() {
 
             {currentUser.role ===
               'system_admin' && (
-                <section className="mt-7 border border-slate-200 bg-white">
+                <section className="mt-7 hf-panel">
                   <SectionHeader
                     title="User management"
                     description="System administrator view."
@@ -293,9 +293,9 @@ function LoginPage({
   ) => void;
 }) {
   return (
-    <main className="flex min-h-screen bg-[#f5f7fa]">
+    <main className="flex hf-page">
 
-      <section className="hidden w-[46%] bg-[#172033] px-14 py-12 lg:block">
+      <section className="hf-login-hero">
         <div className="max-w-xl">
           <div className="border-l-4 border-blue-500 pl-4">
             <p className="text-sm font-semibold uppercase tracking-wider text-blue-300">
@@ -329,7 +329,7 @@ function LoginPage({
         </div>
       </section>
 
-      <section className="flex flex-1 items-center justify-center px-6 py-12">
+      <section className="hf-login-form-area">
         <div className="w-full max-w-md">
 
           <div className="mb-8 lg:hidden">
@@ -337,19 +337,19 @@ function LoginPage({
               HealthForecast AI
             </p>
 
-            <h1 className="mt-2 text-2xl font-semibold text-slate-900">
+            <h1 className="mt-2 hf-page-title">
               Clinical workspace
             </h1>
           </div>
 
-          <div className="border border-slate-200 bg-white p-8 shadow-sm">
+          <div className="hf-login-card">
 
             <div className="border-b border-slate-200 pb-6">
               <p className="text-sm font-medium text-[#155eef]">
                 Secure sign in
               </p>
 
-              <h2 className="mt-2 text-2xl font-semibold text-slate-900">
+              <h2 className="mt-2 hf-page-title">
                 Sign in to your workspace
               </h2>
 
@@ -378,7 +378,7 @@ function LoginPage({
                   onChange={(event) =>
                     setEmail(event.target.value)
                   }
-                  className="w-full border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#155eef] focus:ring-1 focus:ring-[#155eef]"
+                  className="hf-input"
                   required
                 />
               </div>
@@ -398,7 +398,7 @@ function LoginPage({
                   onChange={(event) =>
                     setPassword(event.target.value)
                   }
-                  className="w-full border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-[#155eef] focus:ring-1 focus:ring-[#155eef]"
+                  className="hf-input"
                   required
                 />
               </div>
@@ -412,7 +412,7 @@ function LoginPage({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#155eef] px-4 py-3 text-sm font-semibold text-white hover:bg-[#124dcc] disabled:opacity-50"
+                className="w-full hf-button hf-button-primary w-full disabled:opacity-50"
               >
                 {loading
                   ? 'Signing in...'
@@ -438,44 +438,30 @@ function Sidebar({
   role: string;
 }) {
   return (
-    <aside className="hidden w-60 shrink-0 bg-[#172033] text-white lg:block">
-      <div className="sticky top-0 h-screen">
-
-        <div className="border-b border-white/10 px-5 py-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-300">
-            HealthForecast
-          </p>
-
-          <p className="mt-1 text-sm font-medium text-slate-300">
-            Clinical Workspace
-          </p>
+    <>
+      <aside className="hf-sidebar">
+        <div className="hf-sidebar-inner">
+          <div className="hf-sidebar-brand">
+            <p>HealthForecast</p>
+            <p>Clinical workspace</p>
+          </div>
+          <nav className="hf-sidebar-nav">
+            <NavItem href="/" label="Overview" active={currentPage === 'overview'} />
+            <NavItem href="/risk" label="Risk prediction" active={currentPage === 'risk'} />
+            <NavItem href="/analytics" label="Healthcare analytics" active={currentPage === 'analytics'} />
+          </nav>
+          <div className="hf-sidebar-footer">
+            <p>Signed in as</p>
+            <p>{formatRole(role)}</p>
+          </div>
         </div>
-
-        <nav className="px-3 py-5">
-          <NavItem
-            href="/"
-            label="Overview"
-            active={currentPage === 'overview'}
-          />
-
-          <NavItem
-            href="/risk"
-            label="Risk prediction"
-            active={currentPage === 'risk'}
-          />
-        </nav>
-
-        <div className="absolute bottom-0 left-0 right-0 border-t border-white/10 px-5 py-4">
-          <p className="text-xs text-slate-500">
-            Signed in as
-          </p>
-
-          <p className="mt-1 text-sm font-medium text-slate-300">
-            {formatRole(role)}
-          </p>
-        </div>
-      </div>
-    </aside>
+      </aside>
+      <nav className="hf-mobile-nav" aria-label="Primary navigation">
+        <Link href="/" className={currentPage === 'overview' ? 'active' : ''}>Overview</Link>
+        <Link href="/risk" className={currentPage === 'risk' ? 'active' : ''}>Risk prediction</Link>
+        <Link href="/analytics" className={currentPage === 'analytics' ? 'active' : ''}>Analytics</Link>
+      </nav>
+    </>
   );
 }
 
@@ -489,13 +475,7 @@ function NavItem({
   active: boolean;
 }) {
   return (
-    <Link
-      href={href}
-      className={`mb-1 block border-l-2 px-3 py-2.5 text-sm font-medium ${active
-          ? 'border-blue-400 bg-white/10 text-white'
-          : 'border-transparent text-slate-400 hover:bg-white/5 hover:text-white'
-        }`}
-    >
+    <Link href={href} className={`hf-nav-item ${active ? 'hf-nav-active' : ''}`}>
       {label}
     </Link>
   );
@@ -512,11 +492,11 @@ function Header({
   onLogout: () => void;
 }) {
   return (
-    <header className="border-b border-slate-200 bg-white">
+    <header className="hf-header">
       <div className="flex h-[72px] items-center justify-between px-6">
 
         <div>
-          <p className="text-xs uppercase tracking-wider text-slate-400">
+          <p className="hf-header-eyebrow">
             Hospital operations
           </p>
 
@@ -538,7 +518,7 @@ function Header({
 
           <button
             onClick={onLogout}
-            className="border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="hf-button hf-button-secondary"
           >
             Sign out
           </button>
@@ -556,12 +536,12 @@ function Metric({
   value: string | number;
 }) {
   return (
-    <div className="bg-white px-5 py-5">
+    <div className="bg-white hf-kpi">
       <p className="text-xs font-medium uppercase tracking-wider text-slate-500">
         {label}
       </p>
 
-      <p className="mt-2 text-2xl font-semibold text-slate-900">
+      <p className="mt-2 hf-page-title">
         {value}
       </p>
     </div>
@@ -576,7 +556,7 @@ function Feature({
   text: string;
 }) {
   return (
-    <div className="px-5 py-5">
+    <div className="hf-kpi">
       <p className="text-sm font-semibold text-slate-800">
         {title}
       </p>
@@ -598,7 +578,7 @@ function SectionHeader({
   count: number;
 }) {
   return (
-    <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+    <div className="flex items-center justify-between hf-section-head">
       <div>
         <h2 className="text-sm font-semibold text-slate-900">
           {title}
@@ -638,7 +618,7 @@ function PatientTable({
           {patients.map((patient) => (
             <tr
               key={patient.id}
-              className="border-t border-slate-200"
+              className="hf-table-row"
             >
               <td className="px-5 py-4 text-sm font-medium text-[#155eef]">
                 {patient.medical_record_number}
@@ -691,7 +671,7 @@ function UserTable({
           {users.map((user) => (
             <tr
               key={user.id}
-              className="border-t border-slate-200"
+              className="hf-table-row"
             >
               <td className="px-5 py-4 text-sm font-medium text-slate-800">
                 {user.full_name}
@@ -737,7 +717,7 @@ function TableHead({
   children: React.ReactNode;
 }) {
   return (
-    <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+    <th className="hf-table-head">
       {children}
     </th>
   );

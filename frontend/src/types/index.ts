@@ -4,10 +4,7 @@ export type Role =
   | 'researcher'
   | 'system_admin';
 
-export type RiskCategory =
-  | 'low'
-  | 'medium'
-  | 'high';
+export type RiskCategory = 'low' | 'medium' | 'high';
 
 export interface User {
   id: number;
@@ -40,9 +37,7 @@ export interface RiskDriver {
   feature: string;
   value: string | number | null;
   contribution: number;
-  direction:
-  | 'increases_risk'
-  | 'decreases_risk';
+  direction: 'increases_risk' | 'decreases_risk';
 }
 
 export interface ClinicalInsight {
@@ -65,4 +60,59 @@ export interface ReadmissionForecast {
   horizon_days: number;
   predicted_readmissions: number;
   predicted_rate: number;
+}
+
+export interface RiskDistribution {
+  low: number;
+  medium: number;
+  high: number;
+}
+
+export interface HospitalAnalyticsSummary {
+  total_patients: number;
+  total_admissions: number;
+  readmission_rate: number;
+  average_length_of_stay: number;
+  risk_distribution: RiskDistribution;
+}
+
+export interface TreatmentEffectivenessSummary {
+  treatment_name: string;
+  patients_treated: number;
+  average_recovery_score: number;
+  readmission_rate: number;
+}
+
+export interface RecoveryTrend {
+  week: string;
+  average_recovery_score: number;
+}
+
+export interface ReadmissionTrend {
+  period: string;
+  admissions: number;
+  readmissions: number;
+  readmission_rate: number;
+}
+
+export interface PopulationHealthCohort {
+  age_group: string | null;
+  patient_count: number;
+  admission_count: number;
+  readmission_rate: number;
+}
+
+export interface PopulationHealthResponse {
+  cohorts: PopulationHealthCohort[];
+  generated_at: string | null;
+}
+
+export interface MedicationOutcomeSummary {
+  medication_change: boolean;
+  patients_treated: number;
+  average_recovery_score: number;
+  readmission_rate: number;
+  improved_count: number;
+  stable_count: number;
+  partial_recovery_count: number;
 }
