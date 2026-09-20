@@ -45,17 +45,6 @@ class Settings(BaseSettings):
                 origins.append(extra)
         return origins
 
-    # ML
-    MODEL_ARTIFACT_DIR: str = "ml/artifacts"
-    ACTIVE_RISK_MODEL: str = "readmission_xgboost_v1"
-    RISK_THRESHOLD_HIGH: float = 0.70
-    RISK_THRESHOLD_MEDIUM: float = 0.40
-
-    @property
-    def cors_origins(self) -> list[str]:
-        """Return CORS origins as a list."""
-        return [o.strip() for o in self.BACKEND_CORS_ORIGINS.split(",") if o.strip()]
-
 
 @lru_cache
 def get_settings() -> Settings:
