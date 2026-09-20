@@ -28,9 +28,22 @@ class Settings(BaseSettings):
     MONGO_DB: str = "healthforecast"
 
     # CORS - comma separated list of allowed origins
-    BACKEND_CORS_ORIGINS: str = (
-        "http://localhost:3000,http://localhost:5500,http://127.0.0.1:5500"
-    )
+    BACKEND_CORS_ORIGINS: str = "http://localhost:3000"
+
+    # ML
+    MODEL_ARTIFACT_DIR: str = "ml/artifacts"
+    ACTIVE_RISK_MODEL: str = "readmission_xgboost_v1"
+    RISK_THRESHOLD_HIGH: float = 0.70
+    RISK_THRESHOLD_MEDIUM: float = 0.40
+
+    @property
+    def cors_origins(self) -> list[str]:
+        """Return CORS origins as a list, including frontend dev ports."""
+        origins = [o.strip() for o in self.BACKEND_CORS_ORIGINS.split(",") if o.strip()]
+        for extra in ["http://localhost:5500", "http://127.0.0.1:5500"]:
+            if extra not in origins:
+                origins.append(extra)
+        return origins
 
     # ML
     MODEL_ARTIFACT_DIR: str = "ml/artifacts"
