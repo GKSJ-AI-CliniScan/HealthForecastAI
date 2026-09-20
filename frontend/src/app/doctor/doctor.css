@@ -1,6 +1,6 @@
-/* =====================================================
+/* =========================================================
    GLOBAL RESET
-===================================================== */
+========================================================= */
 
 *,
 *::before,
@@ -12,102 +12,203 @@ html,
 body {
   margin: 0;
   padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f6faff;
 }
 
 
-/* =====================================================
-   DOCTOR LAYOUT
-===================================================== */
+/* =========================================================
+   MAIN DOCTOR LAYOUT
+========================================================= */
 
 .doctor-layout {
-  min-height: 100vh;
   width: 100%;
-  background: #f7fbff;
+  min-height: 100vh;
+
+  background: #f6faff;
   color: #092957;
 }
 
 
-/* =====================================================
-   HEADER
-===================================================== */
+/* =========================================================
+   TOP NAVBAR
+========================================================= */
 
 .doctor-header {
   position: fixed;
+
   top: 0;
   left: 0;
   right: 0;
 
-  height: 72px;
+  height: 76px;
 
-  display: flex;
+  display: grid;
+
+  grid-template-columns:
+    315px
+    minmax(300px, 1fr)
+    auto;
+
   align-items: center;
-  justify-content: space-between;
+
+  gap: 24px;
 
   padding: 0 28px;
 
   background: #ffffff;
+
   border-bottom: 1px solid #dce8f5;
 
   z-index: 1000;
 }
 
 
-/* =====================================================
-   BRAND / LOGO
-===================================================== */
+/* =========================================================
+   BRAND
+========================================================= */
 
 .doctor-brand {
+  width: 100%;
+
   display: flex;
   align-items: center;
-  gap: 11px;
+
+  gap: 13px;
+
+  min-width: 0;
 }
 
 .doctor-logo {
-  width: 44px;
-  height: 44px;
+  width: 54px;
+  height: 54px;
+
+  flex-shrink: 0;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 11px;
+  border-radius: 14px;
 
   background: #1268d5;
   color: #ffffff;
 
-  box-shadow: 0 4px 10px rgba(18, 104, 213, 0.18);
+  box-shadow:
+    0 5px 14px rgba(18, 104, 213, 0.18);
 }
 
-.doctor-brand h1 {
+.doctor-brand > div:last-child,
+.doctor-brand-text {
+  min-width: 0;
+}
+
+.doctor-brand h1,
+.doctor-brand-text h1 {
   margin: 0;
+
+  white-space: nowrap;
 
   color: #092957;
 
-  font-size: 20px;
+  font-size: 22px;
+  line-height: 1.1;
+
   font-weight: 800;
 
-  line-height: 1.1;
+  letter-spacing: -0.6px;
 }
 
-.doctor-brand h1 span {
+.doctor-brand h1 span,
+.doctor-brand-text h1 span {
   color: #1268d5;
 }
 
-.doctor-brand p {
-  margin: 3px 0 0;
+.doctor-brand p,
+.doctor-brand-text p {
+  margin: 5px 0 0;
+
+  white-space: nowrap;
 
   color: #7188a5;
 
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 600;
 
-  letter-spacing: 1.3px;
+  letter-spacing: 1.5px;
 }
 
 
-/* =====================================================
-   DOCTOR PROFILE
-===================================================== */
+/* =========================================================
+   TOP SEARCH
+========================================================= */
+
+.doctor-search {
+  width: 100%;
+  max-width: 490px;
+
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 0 15px;
+
+  background: #f5f9fe;
+
+  border: 1px solid #e1ebf6;
+
+  border-radius: 10px;
+
+  color: #092957;
+
+  justify-self: start;
+}
+
+.doctor-search svg {
+  flex-shrink: 0;
+  color: #092957;
+}
+
+.doctor-search input {
+  width: 100%;
+  min-width: 0;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  color: #092957;
+
+  font-size: 14px;
+}
+
+.doctor-search input::placeholder {
+  color: #8295ad;
+}
+
+
+/* =========================================================
+   HEADER RIGHT
+========================================================= */
+
+.doctor-header-right {
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+
+  min-width: max-content;
+}
 
 .doctor-profile {
   position: relative;
@@ -115,213 +216,388 @@ body {
   display: flex;
   align-items: center;
 
-  gap: 8px;
+  gap: 16px;
+
+  min-width: max-content;
 }
+
+
+/* =========================================================
+   NOTIFICATION
+========================================================= */
+
+.doctor-notification {
+  position: relative;
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+
+  background: transparent;
+
+  color: #092957;
+
+  cursor: pointer;
+
+  padding: 0;
+
+  font-size: 20px;
+}
+
+.doctor-notification:hover {
+  background: #f3f7fc;
+  border-radius: 50%;
+}
+
+.notification-count {
+  position: absolute;
+
+  top: 1px;
+  right: 1px;
+
+  width: 18px;
+  height: 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #ef4444;
+  color: #ffffff;
+
+  border: 2px solid #ffffff;
+
+  font-size: 9px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   PROFILE BUTTON
+========================================================= */
 
 .doctor-profile-button {
   display: flex;
   align-items: center;
 
-  gap: 9px;
+  gap: 10px;
 
-  padding: 5px 8px;
+  padding: 4px 7px;
 
   border: none;
-  border-radius: 9px;
 
   background: transparent;
 
-  cursor: pointer;
-  text-align: left;
+  border-radius: 10px;
 
-  transition: 0.2s ease;
+  cursor: pointer;
+
+  text-align: left;
 }
 
 .doctor-profile-button:hover {
-  background: #f1f7ff;
+  background: #f3f7fc;
+}
+
+
+/* =========================================================
+   DOCTOR AVATAR
+========================================================= */
+
+.doctor-avatar {
+  width: 44px;
+  height: 44px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #e7f1ff;
+
+  color: #1268d5;
+
+  font-size: 18px;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   PROFILE INFORMATION
+========================================================= */
+
+.doctor-profile-info {
+  min-width: 110px;
 }
 
 .doctor-profile-info h3 {
   margin: 0;
 
-  font-size: 13px;
-  font-weight: 600;
-
   color: #092957;
+
+  font-size: 14px;
+
+  font-weight: 700;
 }
 
 .doctor-profile-info p {
-  margin: 2px 0 0;
-
-  font-size: 9px;
+  margin: 3px 0 0;
 
   color: #7188a5;
+
+  font-size: 11px;
 }
 
 
-/* =====================================================
-   LOGOUT MENU
-===================================================== */
+/* =========================================================
+   PROFILE ARROW
+========================================================= */
 
+.profile-arrow {
+  color: #092957;
+
+  transition: transform 0.2s ease;
+}
+
+.profile-arrow-open {
+  transform: rotate(180deg);
+}
+
+
+/* =========================================================
+   PROFILE DROPDOWN
+========================================================= */
+
+.doctor-profile-menu,
 .doctor-logout-menu {
   position: absolute;
 
-  top: 52px;
+  top: 55px;
   right: 0;
 
-  width: 145px;
+  width: 190px;
 
-  padding: 5px;
+  padding: 7px;
 
   background: #ffffff;
 
   border: 1px solid #dce8f5;
-  border-radius: 9px;
 
-  box-shadow: 0 8px 25px rgba(18, 80, 130, 0.12);
+  border-radius: 11px;
+
+  box-shadow:
+    0 12px 30px rgba(9, 41, 87, 0.13);
 
   z-index: 2000;
 }
 
+.doctor-profile-menu button,
+.doctor-logout-menu button,
 .doctor-logout-button {
+  width: 100%;
+
   display: flex;
   align-items: center;
 
   gap: 9px;
 
-  width: 100%;
-
-  padding: 9px 10px;
+  padding: 10px;
 
   border: none;
-  border-radius: 7px;
 
   background: transparent;
 
-  color: #092957;
+  border-radius: 8px;
 
-  font-size: 11px;
-  font-weight: 600;
+  color: #173d6b;
+
+  font-size: 13px;
 
   cursor: pointer;
 
   text-align: left;
 }
 
+.doctor-profile-menu button:hover,
+.doctor-logout-menu button:hover,
 .doctor-logout-button:hover {
-  background: #fff1f1;
-  color: #c50c0c;
+  background: #f1f7ff;
+}
+
+.doctor-profile-menu .logout-item,
+.doctor-logout-button {
+  color: #dc2626;
 }
 
 
-/* =====================================================
+/* =========================================================
    BODY
-===================================================== */
+========================================================= */
 
 .doctor-body {
-  display: block;
-
   width: 100%;
+
   min-height: 100vh;
 
-  padding-top: 72px;
+  padding-top: 76px;
 }
 
 
-/* =====================================================
+/* =========================================================
    SIDEBAR
-===================================================== */
+========================================================= */
 
 .doctor-sidebar {
   position: fixed;
 
-  top: 72px;
+  top: 76px;
   left: 0;
   bottom: 0;
 
-  width: 240px !important;
-  min-width: 240px !important;
+  width: 315px;
 
-  padding: 28px 14px;
+  padding: 34px 22px 24px;
 
   background: #ffffff;
 
   border-right: 1px solid #dce8f5;
 
   overflow-y: auto;
-
-  box-sizing: border-box;
+  overflow-x: hidden;
 
   z-index: 900;
 }
 
 
-/* =====================================================
-   SIDEBAR TITLE
-===================================================== */
+/* =========================================================
+   SIDEBAR SECTION TITLES
+========================================================= */
 
 .sidebar-title {
-  margin: 0 0 17px 13px;
+  margin: 0 0 14px;
 
-  font-size: 10px;
+  padding-left: 14px;
+
+  color: #7188a5;
+
+  font-size: 12px;
 
   font-weight: 700;
 
-  letter-spacing: 1.6px;
+  letter-spacing: 1.7px;
+}
 
-  color: #7f98b5;
+.ai-section {
+  margin-top: 27px;
+}
+
+.separated-section {
+  margin-top: 23px;
+
+  padding-top: 23px;
+
+  border-top: 1px solid #dce8f5;
+}
+
+.system-section {
+  margin-top: 23px;
 }
 
 
-/* =====================================================
+/* =========================================================
    SIDEBAR MENU
-===================================================== */
+========================================================= */
 
 .doctor-menu {
+  width: 100%;
+
+  min-height: 46px;
+
   display: flex;
   align-items: center;
 
-  width: 100%;
-  height: 43px;
+  gap: 14px;
 
-  padding: 0 14px;
+  padding: 0 18px;
 
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 
-  border-radius: 9px;
+  border-radius: 11px;
 
   text-decoration: none;
 
-  color: #58799f;
+  color: #173b69;
 
   background: transparent;
 
-  font-size: 13px;
+  font-size: 15px;
+
   font-weight: 600;
 
-  transition: 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
 
-  box-sizing: border-box;
+  white-space: nowrap;
 }
+
+.doctor-menu svg {
+  width: 21px;
+  height: 21px;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   HOVER
+========================================================= */
+
+.doctor-menu:hover:not(.active) {
+  background: #f1f7ff;
+  color: #1268d5;
+}
+
+.doctor-menu:hover:not(.active) svg {
+  color: #1268d5;
+}
+
+
+/* =========================================================
+   ACTIVE
+========================================================= */
 
 .doctor-menu.active {
   background: #1268d5;
 
   color: #ffffff !important;
 
-  box-shadow: 0 4px 10px rgba(18, 104, 213, 0.16);
+  font-weight: 700;
+
+  box-shadow:
+    0 5px 12px rgba(18, 104, 213, 0.16);
 }
 
-.doctor-menu:hover:not(.active) {
-  background: #f1f7ff;
-
-  color: #1268d5;
+.doctor-menu.active svg {
+  color: #ffffff !important;
 }
 
 
-/* =====================================================
-   SIDEBAR LINE
-===================================================== */
+/* =========================================================
+   SIDEBAR DIVIDER
+========================================================= */
 
 .sidebar-line {
   width: 100%;
@@ -329,86 +605,124 @@ body {
 
   background: #dce8f5;
 
-  margin: 22px 0;
+  margin: 25px 0;
 }
 
 
-/* =====================================================
+/* =========================================================
+   SIDEBAR BOTTOM
+========================================================= */
+
+.sidebar-bottom {
+  margin-top: 24px;
+
+  padding-top: 20px;
+
+  border-top: 1px solid #edf2f8;
+}
+
+.sidebar-n {
+  width: 43px;
+  height: 43px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-left: 3px;
+
+  border-radius: 50%;
+
+  background: #202020;
+
+  color: #ffffff;
+
+  font-size: 18px;
+}
+
+
+/* =========================================================
    MAIN CONTENT
-===================================================== */
+   UPDATED: SMALL GAP FROM SIDEBAR
+========================================================= */
 
 .doctor-content {
   position: relative;
 
-  display: block;
+  width: calc(100% - 315px);
 
-  margin-left: 240px !important;
+  min-height: calc(100vh - 76px);
 
-  width: calc(100% - 240px) !important;
+  margin-left: 315px;
 
-  min-width: 0;
+  /*
+     IMPORTANT:
+     Keep this padding small.
+     The individual pages control their own
+     internal spacing.
+  */
+  padding: 26px 18px 40px;
 
-  min-height: calc(100vh - 72px);
-
-  padding: 24px !important;
-
-  background: #f7fbff;
-
-  box-sizing: border-box;
+  background: #f6faff;
 
   overflow-x: hidden;
 }
 
 
-/* =====================================================
-   DASHBOARD HEADER
-===================================================== */
+/* =========================================================
+   DASHBOARD COMMON
+========================================================= */
 
 .doctor-page-label {
   margin: 0;
 
-  font-size: 12px;
-
   color: #6684a8;
+
+  font-size: 13px;
 }
 
 .doctor-page-title {
-  margin: 4px 0 0;
+  margin: 5px 0 0;
 
-  font-size: 27px;
+  color: #092957;
+
+  font-size: 30px;
 
   line-height: 1.2;
 
   font-weight: 800;
 
-  color: #092957;
+  letter-spacing: -0.7px;
 }
 
 .doctor-page-description {
-  margin: 6px 0 22px;
-
-  font-size: 12px;
+  margin: 7px 0 23px;
 
   color: #7188a5;
+
+  font-size: 14px;
 }
 
 
-/* =====================================================
-   STAT CARDS
-===================================================== */
+/* =========================================================
+   DASHBOARD STAT CARDS
+========================================================= */
 
 .doctor-stats {
+  width: 100%;
+
   display: grid;
 
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
 
-  gap: 14px;
-
-  width: 100%;
+  gap: 16px;
 }
 
 .doctor-stat-card {
   min-width: 0;
+
+  padding: 20px;
 
   background: #ffffff;
 
@@ -416,11 +730,10 @@ body {
 
   border-top: 3px solid #1268d5;
 
-  border-radius: 11px;
+  border-radius: 12px;
 
-  padding: 17px;
-
-  box-shadow: 0 5px 16px rgba(18, 80, 130, 0.045);
+  box-shadow:
+    0 5px 16px rgba(18, 80, 130, 0.045);
 }
 
 .doctor-stat-card p {
@@ -428,15 +741,15 @@ body {
 
   color: #6482a6;
 
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .doctor-stat-card h2 {
-  margin: 8px 0 3px;
+  margin: 9px 0 4px;
 
   color: #092957;
 
-  font-size: 27px;
+  font-size: 29px;
 
   line-height: 1;
 
@@ -446,18 +759,18 @@ body {
 .doctor-stat-card span {
   color: #89a0bb;
 
-  font-size: 10px;
+  font-size: 11px;
 }
 
 
-/* =====================================================
+/* =========================================================
    PATIENT CARD
-===================================================== */
+========================================================= */
 
 .doctor-patient-card {
   width: 100%;
 
-  margin-top: 18px;
+  margin-top: 20px;
 
   background: #ffffff;
 
@@ -467,20 +780,23 @@ body {
 
   overflow: hidden;
 
-  box-shadow: 0 5px 16px rgba(18, 80, 130, 0.045);
+  box-shadow:
+    0 5px 16px rgba(18, 80, 130, 0.045);
 }
 
 
-/* =====================================================
+/* =========================================================
    CARD HEADER
-===================================================== */
+========================================================= */
 
 .doctor-card-header {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
 
-  padding: 18px 20px;
+  padding: 19px 22px;
 
   border-bottom: 1px solid #dce8f5;
 }
@@ -488,70 +804,70 @@ body {
 .doctor-card-header h2 {
   margin: 0;
 
-  font-size: 16px;
+  color: #092957;
+
+  font-size: 17px;
 
   font-weight: 700;
-
-  color: #092957;
 }
 
 .doctor-card-header p {
   margin: 4px 0 0;
 
-  font-size: 10px;
-
   color: #7188a5;
+
+  font-size: 11px;
 }
 
 .doctor-card-header a {
-  padding: 7px 12px;
+  padding: 8px 13px;
 
   border: 1px solid #cfe0f2;
 
-  border-radius: 7px;
-
-  text-decoration: none;
-
-  color: #092957;
-
-  font-size: 10px;
-
-  font-weight: 600;
+  border-radius: 8px;
 
   background: #ffffff;
 
-  transition: 0.2s ease;
+  color: #1268d5;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  text-decoration: none;
 }
 
 .doctor-card-header a:hover {
   background: #f1f7ff;
 
   border-color: #b9d4ef;
-
-  color: #1268d5;
 }
 
 
-/* =====================================================
+/* =========================================================
    TABLE
-===================================================== */
+========================================================= */
 
 .doctor-table-row {
   display: grid;
 
-  grid-template-columns: 1fr 2fr 1fr 1fr;
+  grid-template-columns:
+    1fr
+    2fr
+    1fr
+    1fr;
 
   align-items: center;
 
-  min-height: 48px;
+  min-height: 52px;
 
-  padding: 0 20px;
+  padding: 0 22px;
 
   border-bottom: 1px solid #e4edf6;
 
   color: #092957;
 
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .doctor-table-row:last-child {
@@ -559,13 +875,13 @@ body {
 }
 
 .doctor-table-heading {
-  min-height: 42px;
+  min-height: 44px;
 
   background: #f8fbff;
 
   color: #6684a8;
 
-  font-size: 9px;
+  font-size: 10px;
 
   font-weight: 700;
 
@@ -573,16 +889,16 @@ body {
 }
 
 
-/* =====================================================
+/* =========================================================
    STATUS
-===================================================== */
+========================================================= */
 
 .status-active {
   display: inline-flex;
 
   width: fit-content;
 
-  padding: 5px 10px;
+  padding: 6px 11px;
 
   border-radius: 20px;
 
@@ -590,7 +906,7 @@ body {
 
   color: #14804a;
 
-  font-size: 9px;
+  font-size: 10px;
 
   font-weight: 700;
 }
@@ -600,7 +916,7 @@ body {
 
   width: fit-content;
 
-  padding: 5px 10px;
+  padding: 6px 11px;
 
   border-radius: 20px;
 
@@ -608,107 +924,236 @@ body {
 
   color: #e34848;
 
-  font-size: 9px;
+  font-size: 10px;
 
   font-weight: 700;
 }
 
 
-/* =====================================================
+/* =========================================================
    PRIMARY BUTTON
-===================================================== */
+========================================================= */
 
 .doctor-primary-button {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 9px 15px;
+
   border: none;
 
-  padding: 8px 13px;
-
-  border-radius: 7px;
+  border-radius: 8px;
 
   background: #1268d5;
 
   color: #ffffff;
 
-  font-size: 10px;
+  font-size: 11px;
 
   font-weight: 700;
 
   cursor: pointer;
 
-  box-shadow: 0 4px 10px rgba(18, 104, 213, 0.18);
+  box-shadow:
+    0 4px 10px rgba(18, 104, 213, 0.18);
 
   transition: 0.2s ease;
 }
 
 .doctor-primary-button:hover {
   background: #0d5fca;
+
+  transform: translateY(-1px);
 }
 
 
-/* =====================================================
-   RESPONSIVE — TABLET
-===================================================== */
+/* =========================================================
+   SIDEBAR SCROLLBAR
+========================================================= */
+
+.doctor-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.doctor-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.doctor-sidebar::-webkit-scrollbar-thumb {
+  background: #d7e4f1;
+
+  border-radius: 10px;
+}
+
+.doctor-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #b8cde1;
+}
+
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (max-width: 1400px) {
+
+  .doctor-header {
+    grid-template-columns:
+      285px
+      minmax(280px, 1fr)
+      auto;
+
+    gap: 18px;
+
+    padding: 0 24px;
+  }
+
+  .doctor-sidebar {
+    width: 285px;
+  }
+
+  .doctor-content {
+    width: calc(100% - 285px);
+
+    margin-left: 285px;
+
+    /* Small content gap */
+    padding: 24px 16px 35px;
+  }
+
+  .doctor-brand h1,
+  .doctor-brand-text h1 {
+    font-size: 20px;
+  }
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
 
 @media (max-width: 1100px) {
 
+  .doctor-header {
+    grid-template-columns:
+      240px
+      minmax(220px, 1fr)
+      auto;
+
+    gap: 14px;
+
+    padding: 0 20px;
+  }
+
   .doctor-sidebar {
-    width: 220px !important;
-    min-width: 220px !important;
+    width: 240px;
+
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   .doctor-content {
-    margin-left: 220px !important;
-    width: calc(100% - 220px) !important;
+    width: calc(100% - 240px);
+
+    margin-left: 240px;
+
+    padding: 22px 16px 30px;
   }
 
   .doctor-stats {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .doctor-brand h1,
+  .doctor-brand-text h1 {
+    font-size: 18px;
+  }
+
+  .doctor-brand p,
+  .doctor-brand-text p {
+    font-size: 7px;
   }
 }
 
 
-/* =====================================================
-   RESPONSIVE — SMALL TABLET
-===================================================== */
+/* =========================================================
+   SMALL TABLET
+========================================================= */
 
-@media (max-width: 800px) {
+@media (max-width: 850px) {
+
+  .doctor-header {
+    grid-template-columns:
+      auto
+      1fr
+      auto;
+
+    height: 70px;
+  }
+
+  .doctor-body {
+    padding-top: 70px;
+  }
 
   .doctor-sidebar {
-    width: 200px !important;
-    min-width: 200px !important;
+    top: 70px;
+
+    width: 210px;
   }
 
   .doctor-content {
-    margin-left: 200px !important;
-    width: calc(100% - 200px) !important;
+    width: calc(100% - 210px);
 
-    padding: 18px !important;
+    margin-left: 210px;
+
+    padding: 20px 14px 30px;
   }
 
-  .doctor-page-title {
-    font-size: 24px;
+  .doctor-search {
+    max-width: 350px;
+  }
+
+  .doctor-profile-info {
+    display: none;
   }
 
   .doctor-stats {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns:
+      1fr 1fr;
   }
 }
 
 
-/* =====================================================
-   RESPONSIVE — MOBILE
-===================================================== */
+/* =========================================================
+   MOBILE
+========================================================= */
 
 @media (max-width: 650px) {
 
   .doctor-header {
     height: 64px;
 
+    display: flex;
+
+    justify-content: space-between;
+
     padding: 0 14px;
   }
 
   .doctor-body {
     padding-top: 64px;
+  }
+
+  .doctor-brand > div:last-child,
+  .doctor-brand-text {
+    display: none;
+  }
+
+  .doctor-search {
+    display: none;
   }
 
   .doctor-sidebar {
@@ -718,23 +1163,27 @@ body {
     left: auto;
     bottom: auto;
 
-    width: 100% !important;
-    min-width: 100% !important;
+    width: 100%;
 
     height: auto;
 
     padding: 12px;
 
     border-right: none;
+
     border-bottom: 1px solid #dce8f5;
   }
 
   .doctor-content {
-    margin-left: 0 !important;
+    width: 100%;
 
-    width: 100% !important;
+    margin-left: 0;
 
-    padding: 16px !important;
+    padding: 18px 14px 30px;
+  }
+
+  .doctor-menu {
+    min-height: 44px;
   }
 
   .doctor-stats {
@@ -742,7 +1191,7 @@ body {
   }
 
   .doctor-page-title {
-    font-size: 22px;
+    font-size: 24px;
   }
 
   .doctor-patient-card {
@@ -751,17 +1200,5 @@ body {
 
   .doctor-table-row {
     min-width: 600px;
-  }
-
-  .doctor-brand h1 {
-    font-size: 17px;
-  }
-
-  .doctor-brand p {
-    font-size: 7px;
-  }
-
-  .doctor-profile-info {
-    display: none;
   }
 }

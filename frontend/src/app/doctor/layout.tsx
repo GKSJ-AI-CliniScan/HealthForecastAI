@@ -1,8 +1,26 @@
 "use client";
 
 import "./doctor.css";
-import { HeartPulse, LogOut } from "lucide-react";
-import { usePathname } from "next/navigation";
+
+import {
+  HeartPulse,
+  Bell,
+  ChevronDown,
+  LayoutDashboard,
+  Users,
+  ShieldCheck,
+  TrendingUp,
+  Lightbulb,
+  Pill,
+  BarChart3,
+  FileText,
+  Settings,
+  HelpCircle,
+  LogOut,
+  Search,
+} from "lucide-react";
+
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function DoctorLayout({
@@ -11,8 +29,25 @@ export default function DoctorLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
 
-  const [showLogout, setShowLogout] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+
+  /* =====================================================
+     ACTIVE SIDEBAR
+  ===================================================== */
+
+  const isActive = (path: string) => {
+    if (path === "/doctor") {
+      return pathname === "/doctor";
+    }
+
+    return pathname.startsWith(path);
+  };
+
+  /* =====================================================
+     SIGN OUT
+  ===================================================== */
 
   const handleSignOut = () => {
     window.location.href = "/login";
@@ -21,91 +56,171 @@ export default function DoctorLayout({
   return (
     <div className="doctor-layout">
 
-      {/* ================= HEADER ================= */}
+      {/* =================================================
+          TOP NAVBAR
+      ================================================= */}
 
       <header className="doctor-header">
 
-        {/* ================= BRAND ================= */}
+        {/* ================= LOGO ================= */}
 
         <div className="doctor-brand">
 
           <div className="doctor-logo">
-            <HeartPulse size={24} strokeWidth={2.5} />
+            <HeartPulse
+              size={29}
+              strokeWidth={2.5}
+            />
           </div>
 
-          <div>
+          <div className="doctor-brand-text">
+
             <h1>
               HealthForecast <span>AI</span>
             </h1>
 
-            <p>HEALTHCARE INTELLIGENCE</p>
+            <p>
+              HEALTHCARE INTELLIGENCE
+            </p>
+
           </div>
 
         </div>
 
 
-        {/* ================= RIGHT PROFILE ================= */}
+        {/* ================= SEARCH ================= */}
 
-        <div className="doctor-profile">
+        <div className="doctor-search">
 
-          <span className="doctor-notification">
-            🔔
-          </span>
+          <Search size={20} />
+
+          <input
+            type="text"
+            placeholder="Search patients by name or ID..."
+          />
+
+        </div>
 
 
-          {/* PROFILE BUTTON */}
+        {/* ================= RIGHT SIDE ================= */}
+
+        <div className="doctor-header-right">
+
+          {/* Notification */}
 
           <button
             type="button"
-            className="doctor-profile-button"
-            onClick={() => setShowLogout(!showLogout)}
+            className="doctor-notification"
           >
 
-            
+            <Bell size={22} />
 
-            <div className="doctor-profile-info">
-              <h3>Doctor</h3>
-              <p>Healthcare Team</p>
-            </div>
+            <span className="notification-count">
+              3
+            </span>
 
           </button>
 
 
-          {/* ================= SIGN OUT DROPDOWN ================= */}
+          {/* ================= PROFILE ================= */}
 
-          {showLogout && (
-            <div className="doctor-logout-menu">
+          <div className="doctor-profile-wrapper">
 
-              <button
-                type="button"
-                className="doctor-logout-button"
-                onClick={handleSignOut}
-              >
+            <button
+              type="button"
+              className="doctor-profile-button"
+              onClick={() =>
+                setShowProfile(!showProfile)
+              }
+            >
 
-                <LogOut size={16} />
+              <div className="doctor-avatar">
+                D
+              </div>
 
-                <span>Sign out</span>
+              <div className="doctor-profile-info">
 
-              </button>
+                <h3>
+                  Doctor
+                </h3>
 
-            </div>
-          )}
+                <p>
+                  Healthcare Team
+                </p>
+
+              </div>
+
+              <ChevronDown
+                size={17}
+                className={
+                  showProfile
+                    ? "profile-arrow profile-arrow-open"
+                    : "profile-arrow"
+                }
+              />
+
+            </button>
+
+
+            {/* PROFILE DROPDOWN */}
+
+            {showProfile && (
+              <div className="doctor-profile-menu">
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    router.push("/doctor/settings")
+                  }
+                >
+
+                  <Settings size={16} />
+
+                  Profile Settings
+
+                </button>
+
+
+                <button
+                  type="button"
+                  className="logout-item"
+                  onClick={handleSignOut}
+                >
+
+                  <LogOut size={16} />
+
+                  Sign out
+
+                </button>
+
+              </div>
+            )}
+
+          </div>
 
         </div>
 
       </header>
 
 
-      {/* ================= BODY ================= */}
+      {/* =================================================
+          DOCTOR BODY
+      ================================================= */}
 
       <div className="doctor-body">
 
-        {/* ================= SIDEBAR ================= */}
+
+        {/* =================================================
+            SIDEBAR
+        ================================================= */}
 
         <aside className="doctor-sidebar">
 
+
+          {/* ================= MAIN ================= */}
+
           <p className="sidebar-title">
-            MAIN MENU
+            MAIN
           </p>
 
 
@@ -114,10 +229,18 @@ export default function DoctorLayout({
           <a
             href="/doctor"
             className={`doctor-menu ${
-              pathname === "/doctor" ? "active" : ""
+              isActive("/doctor")
+                ? "active"
+                : ""
             }`}
           >
-            Dashboard
+
+            <LayoutDashboard size={21} />
+
+            <span>
+              Dashboard
+            </span>
+
           </a>
 
 
@@ -126,22 +249,117 @@ export default function DoctorLayout({
           <a
             href="/doctor/patients"
             className={`doctor-menu ${
-              pathname === "/doctor/patients" ? "active" : ""
+              isActive("/doctor/patients")
+                ? "active"
+                : ""
             }`}
           >
-            Patients
+
+            <Users size={21} />
+
+            <span>
+              Patients
+            </span>
+
           </a>
 
 
-          {/* MEDICAL HISTORY */}
+          {/* =================================================
+              AI INTELLIGENCE
+          ================================================= */}
 
-         
+          <p className="sidebar-title ai-section">
+            AI INTELLIGENCE
+          </p>
 
 
-          
+          {/* RISK ASSESSMENT */}
+
+          <a
+            href="/doctor/risk-assessment"
+            className={`doctor-menu ${
+              isActive("/doctor/risk-assessment")
+                ? "active"
+                : ""
+            }`}
+          >
+
+            <ShieldCheck size={21} />
+
+            <span>
+              Risk Assessment
+            </span>
+
+          </a>
 
 
-          
+          {/* READMISSION FORECAST */}
+
+          <a
+            href="/doctor/readmission-forecast"
+            className={`doctor-menu ${
+              isActive("/doctor/readmission-forecast")
+                ? "active"
+                : ""
+            }`}
+          >
+
+            <TrendingUp size={21} />
+
+            <span>
+              Readmission Forecast
+            </span>
+
+          </a>
+
+
+          {/* CLINICAL INSIGHTS */}
+
+          <a
+            href="/doctor/clinical-insights"
+            className={`doctor-menu ${
+              isActive("/doctor/clinical-insights")
+                ? "active"
+                : ""
+            }`}
+          >
+
+            <Lightbulb size={21} />
+
+            <span>
+              Clinical Insights
+            </span>
+
+          </a>
+
+
+          {/* TREATMENT EFFECTIVENESS */}
+
+          <a
+            href="/doctor/treatment-effectiveness"
+            className={`doctor-menu ${
+              isActive("/doctor/treatment-effectiveness")
+                ? "active"
+                : ""
+            }`}
+          >
+
+            <Pill size={21} />
+
+            <span>
+              Treatment Effectiveness
+            </span>
+
+          </a>
+
+
+          {/* =================================================
+              ANALYTICS
+          ================================================= */}
+
+          <p className="sidebar-title separated-section">
+            ANALYTICS
+          </p>
 
 
           {/* ANALYTICS */}
@@ -149,10 +367,18 @@ export default function DoctorLayout({
           <a
             href="/doctor/analytics"
             className={`doctor-menu ${
-              pathname === "/doctor/analytics" ? "active" : ""
+              isActive("/doctor/analytics")
+                ? "active"
+                : ""
             }`}
           >
-            Analytics
+
+            <BarChart3 size={21} />
+
+            <span>
+              Analytics
+            </span>
+
           </a>
 
 
@@ -161,19 +387,26 @@ export default function DoctorLayout({
           <a
             href="/doctor/reports"
             className={`doctor-menu ${
-              pathname === "/doctor/reports" ? "active" : ""
+              isActive("/doctor/reports")
+                ? "active"
+                : ""
             }`}
           >
-            Reports
+
+            <FileText size={21} />
+
+            <span>
+              Reports
+            </span>
+
           </a>
 
 
-          <div className="sidebar-line" />
+          {/* =================================================
+              SYSTEM
+          ================================================= */}
 
-
-          {/* ================= SYSTEM ================= */}
-
-          <p className="sidebar-title">
+          <p className="sidebar-title separated-section system-section">
             SYSTEM
           </p>
 
@@ -183,19 +416,56 @@ export default function DoctorLayout({
           <a
             href="/doctor/settings"
             className={`doctor-menu ${
-              pathname === "/doctor/settings" ? "active" : ""
+              isActive("/doctor/settings")
+                ? "active"
+                : ""
             }`}
           >
-            Settings
+
+            <Settings size={21} />
+
+            <span>
+              Settings
+            </span>
+
           </a>
+
+
+          {/* HELP */}
+
+          <a
+            href="/doctor/help"
+            className={`doctor-menu ${
+              isActive("/doctor/help")
+                ? "active"
+                : ""
+            }`}
+          >
+
+            <HelpCircle size={21} />
+
+            <span>
+              Help & Support
+            </span>
+
+          </a>
+
+
+          {/* ================= BOTTOM MARK ================= */}
+
+         
 
         </aside>
 
 
-        {/* ================= PAGE CONTENT ================= */}
+        {/* =================================================
+            PAGE CONTENT
+        ================================================= */}
 
         <main className="doctor-content">
+
           {children}
+
         </main>
 
       </div>

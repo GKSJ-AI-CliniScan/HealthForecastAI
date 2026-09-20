@@ -19,7 +19,7 @@
   min-height: 100vh;
 
   margin: 0;
-  padding: 18px 0 30px;
+  padding: 12px 0 35px;
 
   background: #f7fbff;
   color: #102b5c;
@@ -29,7 +29,7 @@
 
 
 /* =========================================================
-   BACK TO PATIENTS
+   BACK
 ========================================================= */
 
 .back-patients {
@@ -37,29 +37,19 @@
   align-items: center;
   gap: 8px;
 
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   padding: 0;
-
-  border: none;
-  background: transparent;
 
   color: #0875ed;
 
+  text-decoration: none;
+
   font-size: 13px;
   font-weight: 600;
-
-  cursor: pointer;
-
-  transition: color 0.2s ease;
 }
 
 .back-patients:hover {
   color: #075fc2;
-}
-
-.back-patients svg {
-  width: 17px;
-  height: 17px;
 }
 
 
@@ -69,20 +59,18 @@
 
 .patient-header {
   width: 100%;
-  min-height: 108px;
+  min-height: 101px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  padding: 14px 20px;
+  padding: 13px 16px;
 
   background: #ffffff;
 
   border: 1px solid #dbe8f5;
-  border-radius: 10px 10px 0 0;
-
-  overflow: hidden;
+  border-radius: 9px 9px 0 0;
 }
 
 
@@ -106,9 +94,9 @@
 ========================================================= */
 
 .patient-avatar {
-  width: 66px;
-  height: 66px;
-  min-width: 66px;
+  width: 67px;
+  height: 67px;
+  min-width: 67px;
 
   display: flex;
   align-items: center;
@@ -116,38 +104,31 @@
 
   border-radius: 50%;
 
-  background: #eaf4ff;
+  background: #e8f3ff;
   color: #0875ed;
 
-  font-size: 22px;
+  font-size: 23px;
   font-weight: 700;
 }
 
 
 /* =========================================================
-   PATIENT DETAILS
+   DETAILS
 ========================================================= */
 
 .patient-details {
   min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 
 /* =========================================================
-   NAME + STATUS
+   NAME
 ========================================================= */
 
 .patient-name-line {
   display: flex;
   align-items: center;
-
-  gap: 12px;
-
-  margin: 0;
+  gap: 11px;
 }
 
 .patient-name-line h1 {
@@ -155,7 +136,7 @@
 
   color: #071e52;
 
-  font-size: 21px;
+  font-size: 20px;
   line-height: 1.2;
 
   font-weight: 700;
@@ -163,7 +144,7 @@
 
 
 /* =========================================================
-   STATUS BADGE
+   STATUS
 ========================================================= */
 
 .patient-status {
@@ -171,33 +152,28 @@
   align-items: center;
   gap: 6px;
 
-  padding: 6px 11px;
+  padding: 5px 10px;
 
-  border-radius: 20px;
+  border-radius: 18px;
 
   font-size: 11px;
   font-weight: 600;
-
-  white-space: nowrap;
 }
 
 .patient-status.active {
-  background: #dcf8e9;
+  background: #ddf8e9;
   color: #079447;
 }
 
 .patient-status.risk {
-  background: #ffe6e6;
+  background: #ffe5e5;
   color: #e53935;
 }
 
 .patient-status.monitoring {
-  background: #e5f0ff;
+  background: #e6f1ff;
   color: #1267c9;
 }
-
-
-/* STATUS DOT */
 
 .status-dot {
   width: 6px;
@@ -210,41 +186,35 @@
 
 
 /* =========================================================
-   BASIC INFORMATION
+   BASIC INFO
 ========================================================= */
 
 .patient-basic-info {
   display: flex;
   align-items: center;
+  gap: 8px;
 
-  gap: 9px;
-
-  margin-top: 7px;
+  margin-top: 6px;
 
   color: #54709b;
 
   font-size: 12px;
-  line-height: 1;
-}
-
-.patient-basic-info span {
-  white-space: nowrap;
 }
 
 
 /* =========================================================
-   CONTACT INFORMATION
+   CONTACT
 ========================================================= */
 
 .patient-contact {
   display: flex;
   align-items: center;
 
-  gap: 24px;
+  gap: 21px;
 
-  margin-top: 9px;
+  margin-top: 8px;
 
-  min-width: 0;
+  overflow: hidden;
 }
 
 .patient-contact > span {
@@ -255,23 +225,19 @@
 
   color: #45628c;
 
-  font-size: 11px;
+  font-size: 10.5px;
 
   white-space: nowrap;
 }
 
 .patient-contact svg {
-  width: 15px;
-  height: 15px;
-
   color: #0875ed;
-
   flex-shrink: 0;
 }
 
 
 /* =========================================================
-   EDIT DETAILS BUTTON
+   EDIT BUTTON
 ========================================================= */
 
 .edit-details {
@@ -283,12 +249,12 @@
 
   flex-shrink: 0;
 
-  margin-left: 25px;
+  margin-left: 20px;
 
-  padding: 9px 15px;
+  padding: 9px 14px;
 
   border: 1px solid #cfe1f4;
-  border-radius: 8px;
+  border-radius: 7px;
 
   background: #ffffff;
 
@@ -297,24 +263,14 @@
   font-size: 12px;
   font-weight: 600;
 
-  white-space: nowrap;
-
   cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease;
 }
 
 .edit-details:hover {
-  background: #f1f7ff;
-  border-color: #bcd5ee;
+  background: #f2f8ff;
 }
 
 .edit-details svg {
-  width: 16px;
-  height: 16px;
-
   color: #0875ed;
 }
 
@@ -325,7 +281,7 @@
 
 .patient-tabs {
   width: 100%;
-  height: 54px;
+  height: 47px;
 
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -344,17 +300,13 @@
 ========================================================= */
 
 .patient-tab {
-  position: relative;
-
-  height: 54px;
+  height: 47px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  gap: 9px;
-
-  padding: 0 10px;
+  gap: 8px;
 
   border: none;
   border-bottom: 3px solid transparent;
@@ -365,58 +317,43 @@
 
   text-decoration: none;
 
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
-}
-
-.patient-tab svg {
-  width: 18px;
-  height: 18px;
-
-  flex-shrink: 0;
 }
 
 .patient-tab:hover {
-  background: #f7fbff;
   color: #0875ed;
+  background: #f7fbff;
 }
-
-
-/* ACTIVE TAB */
 
 .patient-tab.active {
   color: #0875ed;
 
   border-bottom-color: #0875ed;
-
-  background: #ffffff;
 }
 
 
 /* =========================================================
-   PATIENT CONTENT
+   CONTENT
 ========================================================= */
 
 .patient-content {
   width: 100%;
 
-  margin: 0;
-  padding: 25px 0 30px;
+  padding: 17px 0 30px;
 }
 
 
 /* =========================================================
-   OVERVIEW HEADING
+   PAGE HEADING
 ========================================================= */
 
 .overview-heading {
-  margin-bottom: 16px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  margin-bottom: 12px;
 }
 
 .overview-heading h2 {
@@ -425,54 +362,51 @@
   color: #071e52;
 
   font-size: 21px;
-  line-height: 1.2;
-
   font-weight: 700;
 }
 
 .overview-heading p {
-  margin: 6px 0 0;
+  margin: 5px 0 0;
 
   color: #7188a5;
 
-  font-size: 13px;
+  font-size: 12px;
+}
+
+.last-updated {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  color: #7188a5;
+
+  font-size: 11px;
+}
+
+.last-updated svg {
+  color: #54709b;
 }
 
 
 /* =========================================================
-   OVERVIEW GRID
-========================================================= */
-
-.overview-grid {
-  width: 100%;
-
-  display: grid;
-
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  gap: 18px;
-
-  margin: 0;
-}
-
-
-/* =========================================================
-   OVERVIEW CARD
+   CARD
 ========================================================= */
 
 .overview-card {
   width: 100%;
 
+  margin-bottom: 12px;
+
+  padding: 14px 20px;
+
   background: #ffffff;
 
   border: 1px solid #dbe8f5;
 
-  border-radius: 10px;
+  border-radius: 8px;
 
-  padding: 22px;
-
-  box-shadow:
-    0 4px 14px rgba(18, 80, 130, 0.035);
+  box-shadow: 0 3px 12px rgba(18, 80, 130, 0.025);
 }
 
 
@@ -484,9 +418,9 @@
   display: flex;
   align-items: center;
 
-  gap: 10px;
+  gap: 9px;
 
-  margin-bottom: 18px;
+  margin-bottom: 9px;
 }
 
 .card-title h3 {
@@ -494,9 +428,7 @@
 
   color: #071e52;
 
-  font-size: 16px;
-  line-height: 1.2;
-
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -506,9 +438,8 @@
 ========================================================= */
 
 .card-icon {
-  width: 34px;
-  height: 34px;
-  min-width: 34px;
+  width: 30px;
+  height: 30px;
 
   display: flex;
   align-items: center;
@@ -521,9 +452,21 @@
   color: #0875ed;
 }
 
-.card-icon svg {
-  width: 18px;
-  height: 18px;
+.card-icon.health {
+  background: #edf7ff;
+}
+
+
+/* =========================================================
+   TWO COLUMN INFORMATION
+========================================================= */
+
+.two-column-info {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 38px;
 }
 
 
@@ -537,49 +480,454 @@
 
 
 /* =========================================================
-   INFORMATION ROW
+   INFO ROW
 ========================================================= */
 
 .info-row {
   width: 100%;
 
-  display: grid;
+  min-height: 29px;
 
-  grid-template-columns: 42% 58%;
+  display: grid;
+  grid-template-columns: 43% 57%;
 
   align-items: center;
 
-  min-height: 39px;
-
-  border-bottom: 1px solid #eef4fa;
-}
-
-.info-row:last-child {
-  border-bottom: none;
+  border-top: 1px solid #edf3f8;
 }
 
 .info-row span {
   color: #5573a1;
 
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .info-row strong {
   color: #071e52;
 
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
 
   word-break: break-word;
 }
 
+.green-value {
+  color: #079447 !important;
+}
+
 
 /* =========================================================
-   PATIENT NOT FOUND
+   RECENT VITALS
+========================================================= */
+
+.vitals-list {
+  width: 100%;
+}
+
+.vital-row {
+  min-height: 30px;
+
+  display: grid;
+
+  grid-template-columns: 35% 35% 30%;
+
+  align-items: center;
+
+  border-top: 1px solid #edf3f8;
+}
+
+.vital-row span {
+  color: #5573a1;
+
+  font-size: 11px;
+}
+
+.vital-row strong {
+  color: #071e52;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.vital-row small {
+  color: #7188a5;
+
+  font-size: 10px;
+
+  text-align: right;
+}
+
+
+/* =========================================================
+   AI CLINICAL INTELLIGENCE
+========================================================= */
+
+.ai-section {
+  width: 100%;
+}
+
+.ai-heading {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin: 16px 0 10px;
+}
+
+.ai-title-icon {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #edf7ff;
+
+  color: #0875ed;
+}
+
+.ai-heading h2 {
+  margin: 0;
+
+  color: #071e52;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.ai-heading p {
+  margin: 3px 0 0;
+
+  color: #7188a5;
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   AI CARD
+========================================================= */
+
+.ai-card {
+  width: 100%;
+
+  margin-bottom: 12px;
+
+  padding: 14px 20px;
+
+  background: #ffffff;
+
+  border: 1px solid #dbe8f5;
+
+  border-radius: 8px;
+}
+
+
+/* =========================================================
+   AI CARD HEADER
+========================================================= */
+
+.ai-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 10px;
+}
+
+.ai-card-title {
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+}
+
+.ai-card-title h3 {
+  margin: 0;
+
+  color: #071e52;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ai-icon {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #edf7ff;
+
+  color: #0875ed;
+}
+
+
+/* =========================================================
+   HIGH RISK
+========================================================= */
+
+.high-risk-badge {
+  min-width: 140px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 8px 14px;
+
+  border-radius: 6px;
+
+  background: #ffe9e9;
+
+  color: #e53935;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.high-risk-badge span {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: #e53935;
+}
+
+
+/* =========================================================
+   RISK CONTENT
+========================================================= */
+
+.risk-content {
+  display: grid;
+
+  grid-template-columns: 180px 1fr;
+
+  align-items: end;
+
+  gap: 25px;
+}
+
+.metric-label {
+  margin: 0 0 3px;
+
+  color: #5573a1;
+
+  font-size: 11px;
+}
+
+.metric-value {
+  color: #071e52;
+
+  font-size: 25px;
+  line-height: 1;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   RISK BAR
+========================================================= */
+
+.risk-bar-container {
+  padding-bottom: 2px;
+}
+
+.risk-bar {
+  width: 100%;
+  height: 9px;
+
+  background: #dfe4eb;
+
+  border-radius: 10px;
+
+  overflow: hidden;
+}
+
+.risk-progress {
+  height: 100%;
+
+  background: #ff5252;
+
+  border-radius: 10px;
+}
+
+.model-date {
+  margin: 8px 0 0;
+
+  color: #7188a5;
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   MODERATE BADGE
+========================================================= */
+
+.moderate-badge {
+  min-width: 150px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 8px 14px;
+
+  border-radius: 6px;
+
+  background: #fff1df;
+
+  color: #ed7900;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.moderate-badge span {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: #ed7900;
+}
+
+
+/* =========================================================
+   FORECAST
+========================================================= */
+
+.forecast-content {
+  width: 100%;
+}
+
+.forecast-bar {
+  width: 100%;
+
+  height: 9px;
+
+  margin-top: 8px;
+
+  background: #dfe4eb;
+
+  border-radius: 10px;
+
+  overflow: hidden;
+}
+
+.forecast-progress {
+  height: 100%;
+
+  background: #ffa500;
+
+  border-radius: 10px;
+}
+
+
+/* =========================================================
+   RISK FACTORS
+========================================================= */
+
+.risk-factors {
+  margin-top: 2px;
+
+  padding: 10px 15px;
+
+  border-radius: 6px;
+
+  background: #fff4f4;
+}
+
+.risk-factors > div {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  min-height: 24px;
+
+  color: #102b5c;
+
+  font-size: 11px;
+}
+
+.risk-point {
+  width: 7px;
+  height: 7px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #f12632;
+}
+
+
+/* =========================================================
+   RECOMMENDATIONS
+========================================================= */
+
+.from-model {
+  margin-left: 4px;
+
+  font-size: 11px;
+
+  font-weight: 400;
+
+  color: #54709b;
+}
+
+.recommendations {
+  margin-top: 2px;
+
+  padding: 10px 15px;
+
+  border-radius: 6px;
+
+  background: #eefaf5;
+}
+
+.recommendations > div {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  min-height: 25px;
+
+  color: #294d52;
+
+  font-size: 11px;
+}
+
+.recommendations svg {
+  color: #079b67;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   NOT FOUND
 ========================================================= */
 
 .patient-not-found {
-  width: 100%;
   min-height: 500px;
 
   display: flex;
@@ -588,55 +936,42 @@
   align-items: center;
   justify-content: center;
 
-  background: #f7fbff;
-
-  color: #092957;
-
   text-align: center;
+
+  background: #f7fbff;
 }
 
 .patient-not-found h2 {
   margin: 0;
 
+  color: #071e52;
+
   font-size: 24px;
-  font-weight: 700;
 }
 
 .patient-not-found p {
-  margin: 8px 0 0;
-
   color: #7188a5;
 
   font-size: 14px;
 }
 
-.patient-not-found button {
+.patient-not-found a {
   display: inline-flex;
   align-items: center;
 
   gap: 8px;
 
-  margin-top: 18px;
-
   padding: 10px 16px;
 
-  border: none;
-  border-radius: 8px;
+  border-radius: 7px;
 
   background: #0875ed;
 
-  color: #ffffff;
+  color: white;
+
+  text-decoration: none;
 
   font-size: 13px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition: background 0.2s ease;
-}
-
-.patient-not-found button:hover {
-  background: #075fc2;
 }
 
 
@@ -644,22 +979,18 @@
    TABLET
 ========================================================= */
 
-@media (max-width: 1100px) {
-
-  .patient-header {
-    padding: 13px 16px;
-  }
+@media (max-width: 1000px) {
 
   .patient-contact {
-    gap: 14px;
+    gap: 12px;
   }
 
   .patient-contact > span {
-    font-size: 10px;
+    font-size: 9px;
   }
 
-  .overview-grid {
-    gap: 14px;
+  .two-column-info {
+    gap: 20px;
   }
 
 }
@@ -669,38 +1000,24 @@
    SMALL TABLET
 ========================================================= */
 
-@media (max-width: 850px) {
+@media (max-width: 800px) {
 
   .patient-header {
-    min-height: auto;
-
     align-items: flex-start;
-  }
-
-  .patient-header-left {
-    gap: 12px;
-  }
-
-  .patient-avatar {
-    width: 58px;
-    height: 58px;
-    min-width: 58px;
-
-    font-size: 20px;
-  }
-
-  .patient-name-line h1 {
-    font-size: 18px;
   }
 
   .patient-contact {
     flex-wrap: wrap;
-
-    row-gap: 7px;
   }
 
-  .overview-grid {
+  .two-column-info {
     grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .risk-content {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
 }
@@ -710,22 +1027,14 @@
    MOBILE
 ========================================================= */
 
-@media (max-width: 650px) {
+@media (max-width: 600px) {
 
   .patient-page {
-    padding: 14px 0 25px;
-  }
-
-  .back-patients {
-    margin-bottom: 10px;
-
-    font-size: 12px;
+    padding-top: 10px;
   }
 
   .patient-header {
     flex-direction: column;
-
-    align-items: flex-start;
 
     gap: 14px;
 
@@ -736,66 +1045,66 @@
     width: 100%;
   }
 
-  .patient-details {
-    width: 100%;
-  }
-
-  .patient-name-line {
-    flex-wrap: wrap;
-
-    gap: 7px;
-  }
-
-  .patient-name-line h1 {
-    font-size: 18px;
-  }
-
   .patient-contact {
     flex-direction: column;
 
     align-items: flex-start;
 
-    gap: 7px;
-
-    white-space: normal;
-  }
-
-  .patient-contact > span {
-    white-space: normal;
+    gap: 6px;
   }
 
   .edit-details {
-    margin-left: 0;
-
     width: 100%;
+
+    margin-left: 0;
   }
 
   .patient-tabs {
-    height: auto;
-
     grid-template-columns: repeat(2, 1fr);
+
+    height: auto;
   }
 
   .patient-tab {
-    height: 48px;
+    height: 45px;
 
     font-size: 11px;
   }
 
-  .patient-content {
-    padding-top: 18px;
+  .overview-heading {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 8px;
   }
 
-  .overview-heading h2 {
-    font-size: 18px;
+  .overview-card,
+  .ai-card {
+    padding: 13px;
   }
 
-  .overview-heading p {
-    font-size: 12px;
+  .vital-row {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .overview-card {
-    padding: 16px;
+  .vital-row small {
+    display: none;
+  }
+
+  .ai-card-header {
+    align-items: flex-start;
+
+    gap: 10px;
+  }
+
+  .high-risk-badge,
+  .moderate-badge {
+    min-width: auto;
+
+    padding: 7px 9px;
+
+    font-size: 9px;
   }
 
 }
@@ -805,18 +1114,18 @@
    VERY SMALL MOBILE
 ========================================================= */
 
-@media (max-width: 450px) {
+@media (max-width: 430px) {
 
   .patient-avatar {
-    width: 52px;
-    height: 52px;
-    min-width: 52px;
+    width: 55px;
+    height: 55px;
+    min-width: 55px;
 
-    font-size: 18px;
+    font-size: 19px;
   }
 
   .patient-name-line h1 {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   .patient-basic-info {
@@ -829,9 +1138,174 @@
     font-size: 10px;
   }
 
-  .patient-tab svg {
-    width: 16px;
-    height: 16px;
+  .ai-card-title h3 {
+    font-size: 13px;
   }
 
+}
+/* =========================================================
+   PATIENT INTELLIGENCE
+========================================================= */
+
+.patient-intelligence {
+  width: 100%;
+  margin-top: 24px;
+}
+
+.patient-intelligence-header {
+  margin-bottom: 14px;
+}
+
+.patient-intelligence-label {
+  margin: 0 0 5px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  color: #1268d5;
+}
+
+.patient-intelligence-header h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 600;
+  color: #092957;
+}
+
+.patient-intelligence-header p {
+  margin: 5px 0 0;
+  font-size: 12px;
+  color: #7187a5;
+}
+
+
+/* =========================================================
+   AI CARDS
+========================================================= */
+
+.patient-intelligence-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.patient-intelligence-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  padding: 16px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+  border: 1px solid #dce8f7;
+  border-radius: 10px;
+
+  text-decoration: none;
+  text-align: left;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.patient-intelligence-card:hover {
+  border-color: #bcd3ec;
+  box-shadow: 0 4px 14px rgba(18, 80, 130, 0.06);
+  transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   ICONS
+========================================================= */
+
+.patient-intelligence-icon {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 9px;
+}
+
+.patient-intelligence-icon.blue {
+  background: #eaf4ff;
+  color: #1268d5;
+}
+
+.patient-intelligence-icon.green {
+  background: #eaf8f1;
+  color: #17865a;
+}
+
+.patient-intelligence-icon.purple {
+  background: #f2edff;
+  color: #7655c7;
+}
+
+
+/* =========================================================
+   CARD CONTENT
+========================================================= */
+
+.patient-intelligence-content {
+  min-width: 0;
+}
+
+.patient-intelligence-content h3 {
+  margin: 0 0 5px;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  color: #092957;
+}
+
+.patient-intelligence-content p {
+  margin: 0 0 10px;
+
+  font-size: 11px;
+  line-height: 1.5;
+
+  color: #7187a5;
+}
+
+.patient-intelligence-content span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  color: #1268d5;
+}
+
+.patient-intelligence-content span svg {
+  width: 14px;
+  height: 14px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+  .patient-intelligence-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .patient-intelligence-card {
+    padding: 14px;
+  }
 }

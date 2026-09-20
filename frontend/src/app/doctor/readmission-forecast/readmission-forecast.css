@@ -1,0 +1,578 @@
+/* =====================================================
+   READMISSION FORECAST
+===================================================== */
+
+.readmission-page {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  color: #092957;
+  box-sizing: border-box;
+}
+
+/* =====================================================
+   PAGE HEADER
+===================================================== */
+
+.readmission-header {
+  margin: 0 0 22px;
+}
+
+.readmission-eyebrow {
+  margin: 0 0 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #1268d5;
+}
+
+.readmission-header h1 {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #092957;
+}
+
+.readmission-description {
+  margin: 7px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #7187a5;
+}
+
+/* =====================================================
+   BACK BUTTON
+===================================================== */
+
+.back-selection {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  margin: 0 0 18px;
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #1268d5;
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.back-selection:hover {
+  color: #092957;
+}
+
+/* =====================================================
+   SELECTED PATIENT
+===================================================== */
+
+.selected-patient-card {
+  width: 100%;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+
+  background: #ffffff;
+  border: 1px solid #dce8f7;
+  border-radius: 12px;
+
+  box-sizing: border-box;
+}
+
+.selected-patient-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.large-avatar {
+  width: 54px;
+  height: 54px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+  background: #eaf4ff;
+  color: #1268d5;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.selected-patient-left h2 {
+  margin: 0 0 4px;
+
+  font-size: 19px;
+  line-height: 1.25;
+  font-weight: 600;
+
+  color: #092957;
+}
+
+.selected-patient-left p {
+  margin: 0 0 7px;
+
+  font-size: 12px;
+  color: #7187a5;
+}
+
+.condition-badge {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 4px 9px;
+
+  border-radius: 14px;
+
+  background: #edf5ff;
+  color: #1268d5;
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* =====================================================
+   ASSESSMENT TITLE
+===================================================== */
+
+.assessment-title {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 20px;
+  margin-bottom: 14px;
+}
+
+.assessment-title h2 {
+  margin: 0;
+
+  font-size: 20px;
+  line-height: 1.25;
+  font-weight: 600;
+
+  color: #092957;
+}
+
+.assessment-title p:not(.readmission-eyebrow) {
+  margin: 5px 0 0;
+
+  font-size: 12px;
+  line-height: 1.5;
+
+  color: #7187a5;
+}
+
+.assessment-period {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  flex-shrink: 0;
+
+  font-size: 12px;
+  font-weight: 600;
+  color: #536f91;
+}
+
+.assessment-period svg {
+  color: #1268d5;
+}
+
+/* =====================================================
+   RESULT GRID
+===================================================== */
+
+.risk-result-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+
+  gap: 16px;
+  width: 100%;
+
+  margin-bottom: 16px;
+}
+
+/* =====================================================
+   RESULT CARDS
+===================================================== */
+
+.risk-score-card,
+.risk-level-card {
+  min-height: 150px;
+
+  padding: 20px;
+
+  background: #ffffff;
+  border: 1px solid #dce8f7;
+  border-radius: 12px;
+
+  box-sizing: border-box;
+}
+
+/* =====================================================
+   RESULT CARD HEADER
+===================================================== */
+
+.result-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-bottom: 18px;
+}
+
+.result-card-header > span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #092957;
+}
+
+/* =====================================================
+   RESULT ICON
+===================================================== */
+
+.result-icon {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 9px;
+}
+
+.result-icon.blue {
+  background: #eaf4ff;
+  color: #1268d5;
+}
+
+.result-icon.red {
+  background: #fff0f0;
+  color: #d83b3b;
+}
+
+.result-icon.orange {
+  background: #fff5e5;
+  color: #d58a08;
+}
+
+/* =====================================================
+   PROBABILITY
+===================================================== */
+
+.risk-score {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.risk-score strong {
+  font-size: 38px;
+  line-height: 1;
+  font-weight: 700;
+  color: #092957;
+}
+
+/* =====================================================
+   SCORE BAR
+===================================================== */
+
+.score-bar {
+  width: 100%;
+  height: 8px;
+
+  overflow: hidden;
+
+  border-radius: 10px;
+  background: #edf2f7;
+}
+
+.score-fill {
+  height: 100%;
+  border-radius: inherit;
+
+  transition: width 0.4s ease;
+}
+
+.score-fill.risk-high {
+  background: #e94a4a;
+}
+
+.score-fill.risk-medium {
+  background: #e8a629;
+}
+
+.score-fill.risk-low {
+  background: #24a86b;
+}
+
+/* =====================================================
+   RISK LEVEL
+===================================================== */
+
+.risk-level {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 12px;
+
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.risk-level.risk-high {
+  color: #d83b3b;
+}
+
+.risk-level.risk-medium {
+  color: #c98209;
+}
+
+.risk-level.risk-low {
+  color: #17865a;
+}
+
+.risk-dot {
+  width: 8px;
+  height: 8px;
+
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.risk-level-card > p {
+  margin: 0;
+
+  font-size: 11px;
+  line-height: 1.5;
+
+  color: #7187a5;
+}
+
+/* =====================================================
+   RISK FACTORS
+===================================================== */
+
+.risk-factors-card {
+  width: 100%;
+
+  padding: 20px;
+  margin-bottom: 14px;
+
+  background: #ffffff;
+  border: 1px solid #dce8f7;
+  border-radius: 12px;
+
+  box-sizing: border-box;
+}
+
+.factors-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-bottom: 16px;
+}
+
+.factors-header h2 {
+  margin: 0 0 3px;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  color: #092957;
+}
+
+.factors-header p {
+  margin: 0;
+
+  font-size: 11px;
+  color: #7b8fa8;
+}
+
+/* =====================================================
+   FACTORS LIST
+===================================================== */
+
+.risk-factors-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  gap: 9px;
+}
+
+.risk-factor {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 10px 12px;
+
+  border: 1px solid #e5edf7;
+  border-radius: 8px;
+
+  background: #f8fbff;
+
+  font-size: 11px;
+  color: #405f82;
+}
+
+.risk-factor svg {
+  width: 16px;
+  height: 16px;
+
+  flex-shrink: 0;
+
+  color: #1268d5;
+}
+
+/* =====================================================
+   CLINICAL NOTE
+===================================================== */
+
+.assessment-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+
+  width: 100%;
+
+  padding: 11px 13px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #dce8f7;
+  border-radius: 8px;
+
+  background: #f4f8fc;
+
+  color: #617994;
+}
+
+.assessment-note svg {
+  width: 15px;
+  height: 15px;
+
+  flex-shrink: 0;
+
+  margin-top: 1px;
+
+  color: #1268d5;
+}
+
+.assessment-note p {
+  margin: 0;
+
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* =====================================================
+   PATIENT NOT FOUND
+===================================================== */
+
+.patient-not-found {
+  padding: 40px;
+
+  background: #ffffff;
+  border: 1px solid #dce8f7;
+  border-radius: 12px;
+
+  text-align: center;
+}
+
+.patient-not-found h1 {
+  margin: 0 0 8px;
+
+  font-size: 22px;
+  color: #092957;
+}
+
+.patient-not-found p {
+  margin: 0 0 18px;
+
+  font-size: 13px;
+  color: #7187a5;
+}
+
+.patient-not-found button {
+  padding: 9px 15px;
+
+  border: none;
+  border-radius: 7px;
+
+  background: #1268d5;
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.patient-not-found button:hover {
+  background: #0d5dbf;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 900px) {
+  .risk-result-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .risk-factors-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .readmission-header h1 {
+    font-size: 25px;
+  }
+
+  .assessment-title {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .selected-patient-left {
+    align-items: flex-start;
+  }
+
+  .large-avatar {
+    width: 50px;
+    height: 50px;
+  }
+
+  .selected-patient-left h2 {
+    font-size: 18px;
+  }
+
+  .risk-score strong {
+    font-size: 32px;
+  }
+
+  .risk-score-card,
+  .risk-level-card,
+  .risk-factors-card {
+    padding: 16px;
+  }
+}

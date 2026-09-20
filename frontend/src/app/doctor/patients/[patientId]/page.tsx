@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import {
   ArrowLeft,
+  ArrowRight,
   User,
   FileText,
   Pill,
@@ -11,6 +12,9 @@ import {
   Mail,
   MapPin,
   Edit3,
+  Activity,
+  Lightbulb,
+  ShieldAlert,
 } from "lucide-react";
 
 import "./eachpatient.css";
@@ -69,31 +73,12 @@ type PageProps = {
 };
 
 export default async function PatientPage({ params }: PageProps) {
-  /* =====================================================
-     GET PATIENT ID FROM URL
-     
-     Example:
-     /doctor/patients/P001
-
-     patientId = "P001"
-  ===================================================== */
-
   const { patientId } = await params;
-
-  console.log("Patient ID from URL:", patientId);
-
-  /* =====================================================
-     FIND PATIENT
-  ===================================================== */
 
   const patient = patients.find(
     (item) =>
       item.id.toLowerCase() === patientId.toLowerCase()
   );
-
-  /* =====================================================
-     PATIENT NOT FOUND
-  ===================================================== */
 
   if (!patient) {
     return (
@@ -112,20 +97,12 @@ export default async function PatientPage({ params }: PageProps) {
     );
   }
 
-  /* =====================================================
-     INITIALS
-  ===================================================== */
-
   const initials = patient.name
     .split(" ")
     .map((word) => word[0])
     .join("")
     .substring(0, 2)
     .toUpperCase();
-
-  /* =====================================================
-     STATUS CLASS
-  ===================================================== */
 
   const statusClass =
     patient.status === "High Risk"
@@ -137,9 +114,9 @@ export default async function PatientPage({ params }: PageProps) {
   return (
     <div className="patient-page">
 
-      {/* =================================================
+      {/* =====================================================
           BACK TO PATIENTS
-      ================================================= */}
+      ===================================================== */}
 
       <Link
         href="/doctor/patients"
@@ -150,26 +127,19 @@ export default async function PatientPage({ params }: PageProps) {
       </Link>
 
 
-      {/* =================================================
+      {/* =====================================================
           PATIENT HEADER
-      ================================================= */}
+      ===================================================== */}
 
       <section className="patient-header">
 
         <div className="patient-header-left">
 
-          {/* Avatar */}
-
           <div className="patient-avatar">
             {initials}
           </div>
 
-
-          {/* Patient Details */}
-
           <div className="patient-details">
-
-            {/* Name + Status */}
 
             <div className="patient-name-line">
 
@@ -184,25 +154,13 @@ export default async function PatientPage({ params }: PageProps) {
 
             </div>
 
-
-            {/* Basic Information */}
-
             <div className="patient-basic-info">
-
               <span>{patient.id}</span>
-
               <span>•</span>
-
               <span>{patient.age} years</span>
-
               <span>•</span>
-
               <span>{patient.gender}</span>
-
             </div>
-
-
-            {/* Contact Information */}
 
             <div className="patient-contact">
 
@@ -232,27 +190,22 @@ export default async function PatientPage({ params }: PageProps) {
 
         </div>
 
-
-        {/* Edit Button */}
-
-        <button className="edit-details">
-
+        <button
+          type="button"
+          className="edit-details"
+        >
           <Edit3 size={15} />
-
           Edit Details
-
         </button>
 
       </section>
 
 
-      {/* =================================================
-          PATIENT TABS
-      ================================================= */}
+      {/* =====================================================
+          TABS
+      ===================================================== */}
 
       <nav className="patient-tabs">
-
-        {/* Overview */}
 
         <Link
           href={`/doctor/patients/${patient.id}`}
@@ -262,9 +215,6 @@ export default async function PatientPage({ params }: PageProps) {
           <span>Overview</span>
         </Link>
 
-
-        {/* Medical History */}
-
         <Link
           href={`/doctor/patients/${patient.id}/medical-history`}
           className="patient-tab"
@@ -273,9 +223,6 @@ export default async function PatientPage({ params }: PageProps) {
           <span>Medical History</span>
         </Link>
 
-
-        {/* Treatments */}
-
         <Link
           href={`/doctor/patients/${patient.id}/treatments`}
           className="patient-tab"
@@ -283,9 +230,6 @@ export default async function PatientPage({ params }: PageProps) {
           <Pill size={17} />
           <span>Treatments</span>
         </Link>
-
-
-        {/* Admissions */}
 
         <Link
           href={`/doctor/patients/${patient.id}/admissions`}
@@ -298,41 +242,52 @@ export default async function PatientPage({ params }: PageProps) {
       </nav>
 
 
-      {/* =================================================
-          OVERVIEW
-      ================================================= */}
+      {/* =====================================================
+          MAIN CONTENT
+      ===================================================== */}
 
       <main className="patient-content">
 
+        {/* =================================================
+            PAGE TITLE
+        ================================================= */}
+
         <div className="overview-heading">
 
-          <h2>Patient Overview</h2>
+          <div>
+            <h2>Patient Overview</h2>
 
-          <p>
-            View important information about the patient.
-          </p>
+            <p>
+              View important information about the patient.
+            </p>
+          </div>
+
+          <div className="last-updated">
+            <Calendar size={15} />
+            Last Updated: 15 Apr 2025
+          </div>
 
         </div>
 
 
-        <div className="overview-grid">
+        {/* =================================================
+            PATIENT INFORMATION
+        ================================================= */}
 
-          {/* =================================================
-              PATIENT INFORMATION
-          ================================================= */}
+        <section className="overview-card">
 
-          <section className="overview-card">
+          <div className="card-title">
 
-            <div className="card-title">
-
-              <div className="card-icon">
-                <User size={17} />
-              </div>
-
-              <h3>Patient Information</h3>
-
+            <div className="card-icon">
+              <User size={18} />
             </div>
 
+            <h3>Patient Information</h3>
+
+          </div>
+
+
+          <div className="two-column-info">
 
             <div className="information-list">
 
@@ -358,6 +313,11 @@ export default async function PatientPage({ params }: PageProps) {
                 <strong>12 Jan 1980</strong>
               </div>
 
+            </div>
+
+
+            <div className="information-list">
+
               <div className="info-row">
                 <span>Blood Group</span>
                 <strong>B+</strong>
@@ -380,25 +340,29 @@ export default async function PatientPage({ params }: PageProps) {
 
             </div>
 
-          </section>
+          </div>
+
+        </section>
 
 
-          {/* =================================================
-              CURRENT HEALTH STATUS
-          ================================================= */}
+        {/* =================================================
+            CURRENT HEALTH STATUS
+        ================================================= */}
 
-          <section className="overview-card">
+        <section className="overview-card">
 
-            <div className="card-title">
+          <div className="card-title">
 
-              <div className="card-icon">
-                <HeartPulse size={17} />
-              </div>
-
-              <h3>Current Health Status</h3>
-
+            <div className="card-icon health">
+              <HeartPulse size={18} />
             </div>
 
+            <h3>Current Health Status</h3>
+
+          </div>
+
+
+          <div className="two-column-info">
 
             <div className="information-list">
 
@@ -409,13 +373,21 @@ export default async function PatientPage({ params }: PageProps) {
 
               <div className="info-row">
                 <span>Status</span>
-                <strong>{patient.status}</strong>
+
+                <strong className="green-value">
+                  {patient.status}
+                </strong>
               </div>
 
               <div className="info-row">
                 <span>Last Visit</span>
                 <strong>15 Apr 2025</strong>
               </div>
+
+            </div>
+
+
+            <div className="information-list">
 
               <div className="info-row">
                 <span>Next Follow-up</span>
@@ -434,9 +406,134 @@ export default async function PatientPage({ params }: PageProps) {
 
             </div>
 
-          </section>
+          </div>
 
-        </div>
+        </section>
+
+
+        {/* =================================================
+            PATIENT INTELLIGENCE
+        ================================================= */}
+
+        <section className="patient-intelligence">
+
+          <div className="patient-intelligence-header">
+
+            <div>
+              <p className="patient-intelligence-label">
+                AI INTELLIGENCE
+              </p>
+
+              <h2>Patient Intelligence</h2>
+
+              <p>
+                View AI-powered assessments and recommendations for this patient.
+              </p>
+            </div>
+
+          </div>
+
+
+          <div className="patient-intelligence-grid">
+
+            {/* =================================================
+                RISK ASSESSMENT
+            ================================================= */}
+
+            <Link
+                   href={`/doctor/risk-assessment/${patient.id}?from=overview`}
+                   className="patient-intelligence-card"
+>  
+
+              <div className="patient-intelligence-icon blue">
+                <ShieldAlert size={20} />
+              </div>
+
+              <div className="patient-intelligence-content">
+
+                <h3>Risk Assessment</h3>
+
+                <p>
+                  View the patient's current risk score, risk level
+                  and contributing factors.
+                </p>
+
+                <span>
+                  View Risk Assessment
+                  <ArrowRight size={15} />
+                </span>
+
+              </div>
+
+            </Link>
+
+
+            {/* =================================================
+                READMISSION FORECAST
+            ================================================= */}
+
+            <Link
+                  href={`/doctor/readmission-forecast/${patient.id}?from=overview`}
+                   className="patient-intelligence-card"
+>
+
+              <div className="patient-intelligence-icon green">
+                <Activity size={20} />
+              </div>
+
+              <div className="patient-intelligence-content">
+
+                <h3>Readmission Forecast</h3>
+
+                <p>
+                  View the patient's predicted readmission
+                  probability and forecast period.
+                </p>
+
+                <span>
+                  View Readmission Forecast
+                  <ArrowRight size={15} />
+                </span>
+
+              </div>
+
+            </Link>
+
+
+            {/* =================================================
+                CLINICAL INSIGHTS
+            ================================================= */}
+
+            <Link
+                  href={`/doctor/clinical-insights/${patient.id}?from=overview`}
+                  className="patient-intelligence-card"
+>
+
+              <div className="patient-intelligence-icon purple">
+                <Lightbulb size={20} />
+              </div>
+
+              <div className="patient-intelligence-content">
+
+                <h3>Clinical Insights</h3>
+
+                <p>
+                  View AI-generated recommendations and
+                  suggested clinical actions.
+                </p>
+
+                <span>
+                  View Clinical Insights
+                  <ArrowRight size={15} />
+                </span>
+
+              </div>
+
+            </Link>
+
+          </div>
+
+        </section>
 
       </main>
 

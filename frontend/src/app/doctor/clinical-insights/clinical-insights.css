@@ -1,0 +1,521 @@
+/* =====================================================
+   CLINICAL INSIGHTS PAGE
+===================================================== */
+
+.clinical-insights-page {
+  width: 100%;
+  max-width: none;
+
+  margin: 0;
+  padding: 0;
+
+  color: #092957;
+}
+
+
+/* =====================================================
+   PAGE HEADER
+===================================================== */
+
+.clinical-insights-header {
+  margin: 0 0 25px;
+}
+
+.clinical-insights-eyebrow {
+  margin: 0 0 5px;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 1.2px;
+
+  color: #1268d5;
+}
+
+.clinical-insights-header h1 {
+  margin: 0;
+
+  font-size: 30px;
+  line-height: 1.2;
+
+  font-weight: 700;
+
+  color: #092957;
+}
+
+.clinical-insights-description {
+  margin: 7px 0 0;
+
+  font-size: 13px;
+  line-height: 1.4;
+
+  color: #7187a5;
+}
+
+
+/* =====================================================
+   RESULT SECTION
+===================================================== */
+
+.clinical-result {
+  width: 100%;
+}
+
+
+/* =====================================================
+   BACK BUTTON
+===================================================== */
+
+.clinical-back-button {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 0;
+  margin: 0 0 16px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #1268d5;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.clinical-back-button:hover {
+  color: #092957;
+}
+
+
+/* =====================================================
+   PATIENT CARD
+===================================================== */
+
+.clinical-patient-card {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 18px 22px;
+
+  margin-bottom: 25px;
+
+  background: #ffffff;
+
+  border: 1px solid #dce8f7;
+
+  border-radius: 12px;
+
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   PATIENT INFORMATION
+===================================================== */
+
+.clinical-patient-left {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  min-width: 0;
+}
+
+.clinical-patient-avatar {
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #e8f2ff;
+
+  color: #1268d5;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.clinical-patient-info {
+  min-width: 0;
+}
+
+.clinical-patient-info h2 {
+  margin: 0 0 4px;
+
+  font-size: 20px;
+  line-height: 1.2;
+
+  font-weight: 600;
+
+  color: #092957;
+}
+
+.clinical-patient-info p {
+  margin: 0 0 7px;
+
+  font-size: 12px;
+
+  color: #7187a5;
+}
+
+.clinical-condition {
+  display: inline-flex;
+
+  padding: 4px 9px;
+
+  border-radius: 14px;
+
+  background: #edf5ff;
+
+  color: #1268d5;
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+
+/* =====================================================
+   PATIENT RISK BADGE
+===================================================== */
+
+.clinical-risk-badge {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 6px 10px;
+
+  border-radius: 16px;
+
+  white-space: nowrap;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.clinical-risk-badge span {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: currentColor;
+}
+
+.insight-risk-high {
+  background: #fff0f0;
+  color: #d83b3b;
+}
+
+.insight-risk-medium {
+  background: #fff7e8;
+  color: #c98209;
+}
+
+.insight-risk-active {
+  background: #eaf8f1;
+  color: #17865a;
+}
+
+
+/* =====================================================
+   SECTION HEADING
+===================================================== */
+
+.clinical-section-heading {
+  margin-bottom: 14px;
+}
+
+.clinical-section-heading h2 {
+  margin: 0;
+
+  font-size: 20px;
+  line-height: 1.25;
+
+  font-weight: 600;
+
+  color: #092957;
+}
+
+.clinical-section-heading > div > p:last-child {
+  margin: 4px 0 0;
+
+  font-size: 12px;
+
+  color: #7187a5;
+}
+
+
+/* =====================================================
+   INSIGHTS GRID
+===================================================== */
+
+.clinical-insights-grid {
+  display: grid;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap: 14px;
+
+  margin-bottom: 15px;
+}
+
+
+/* =====================================================
+   INSIGHT CARD
+===================================================== */
+
+.clinical-insight-card {
+  min-width: 0;
+
+  padding: 18px;
+
+  background: #ffffff;
+
+  border: 1px solid #dce8f7;
+
+  border-radius: 12px;
+
+  box-sizing: border-box;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.clinical-insight-card:hover {
+  border-color: #cbdced;
+
+  box-shadow:
+    0 4px 14px rgba(18, 80, 130, 0.04);
+}
+
+
+/* =====================================================
+   CARD HEADER
+===================================================== */
+
+.clinical-card-header {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 14px;
+}
+
+.clinical-card-header h3 {
+  margin: 0 0 3px;
+
+  font-size: 14px;
+
+  line-height: 1.2;
+
+  font-weight: 600;
+
+  color: #092957;
+}
+
+.clinical-card-header span {
+  font-size: 10px;
+
+  color: #7b8fa8;
+}
+
+
+/* =====================================================
+   CARD ICONS
+===================================================== */
+
+.clinical-card-icon {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 9px;
+}
+
+.clinical-card-icon.blue {
+  background: #eaf4ff;
+  color: #1268d5;
+}
+
+.clinical-card-icon.green {
+  background: #eaf8f1;
+  color: #17865a;
+}
+
+.clinical-card-icon.purple {
+  background: #f2edff;
+  color: #7655c7;
+}
+
+.clinical-card-icon.orange {
+  background: #fff5e5;
+  color: #d58a08;
+}
+
+
+/* =====================================================
+   RECOMMENDATION
+===================================================== */
+
+.clinical-recommendation {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 9px;
+
+  padding: 11px 12px;
+
+  background: #f8fbff;
+
+  border: 1px solid #e6eef7;
+
+  border-radius: 8px;
+}
+
+.clinical-recommendation svg {
+  width: 16px;
+  height: 16px;
+
+  flex-shrink: 0;
+
+  margin-top: 1px;
+
+  color: #24a579;
+}
+
+.clinical-recommendation p {
+  margin: 0;
+
+  font-size: 11px;
+  line-height: 1.55;
+
+  color: #405f82;
+}
+
+
+/* =====================================================
+   AI NOTE
+===================================================== */
+
+.clinical-ai-note {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 9px;
+
+  padding: 11px 13px;
+
+  background: #f4f8fc;
+
+  border: 1px solid #dce8f7;
+
+  border-radius: 8px;
+
+  color: #617994;
+}
+
+.clinical-ai-note-icon {
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 7px;
+
+  background: #eaf4ff;
+
+  color: #1268d5;
+}
+
+.clinical-ai-note strong {
+  display: block;
+
+  margin-bottom: 3px;
+
+  font-size: 11px;
+
+  color: #092957;
+}
+
+.clinical-ai-note p {
+  margin: 0;
+
+  font-size: 10px;
+
+  line-height: 1.5;
+
+  color: #7187a5;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 900px) {
+
+  .clinical-insights-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .clinical-insights-header h1 {
+    font-size: 25px;
+  }
+
+  .clinical-patient-card {
+    align-items: flex-start;
+
+    gap: 14px;
+
+    flex-direction: column;
+  }
+
+  .clinical-patient-left {
+    align-items: flex-start;
+  }
+
+  .clinical-patient-avatar {
+    width: 52px;
+    height: 52px;
+  }
+
+  .clinical-patient-info h2 {
+    font-size: 18px;
+  }
+
+}

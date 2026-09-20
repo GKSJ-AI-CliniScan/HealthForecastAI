@@ -1,0 +1,444 @@
+/* =====================================================
+   PATIENT SELECTOR
+===================================================== */
+
+.patient-selector {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.patient-selector-header {
+  margin: 0 0 18px;
+}
+
+.patient-selector-label {
+  margin: 0 0 5px;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+
+  color: #1268d5;
+}
+
+.patient-selector-title {
+  margin: 0;
+
+  font-size: 24px;
+  line-height: 1.2;
+
+  font-weight: 700;
+
+  color: #092957;
+}
+
+.patient-selector-description {
+  margin: 6px 0 0;
+
+  font-size: 13px;
+  line-height: 1.4;
+
+  color: #667085;
+}
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+.patient-selector-search {
+  width: 100%;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 0 13px;
+  margin: 0 0 14px;
+
+  background: #ffffff;
+
+  border: 1px solid #d9e2ec;
+  border-radius: 8px;
+
+  color: #667085;
+
+  box-sizing: border-box;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.patient-selector-search:focus-within {
+  border-color: #1268d5;
+
+  box-shadow:
+    0 0 0 3px rgba(18, 104, 213, 0.07);
+}
+
+.patient-selector-search svg {
+  flex-shrink: 0;
+
+  width: 18px;
+  height: 18px;
+
+  color: #64748b;
+}
+
+.patient-selector-search input {
+  width: 100%;
+  min-width: 0;
+
+  padding: 0;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  font-size: 13px;
+
+  color: #1d2939;
+}
+
+.patient-selector-search input::placeholder {
+  color: #98a2b3;
+}
+
+
+/* =====================================================
+   PATIENT LIST
+===================================================== */
+
+.patient-selector-list {
+  width: 100%;
+
+  background: #ffffff;
+
+  border: 1px solid #e3eaf2;
+  border-radius: 10px;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+}
+
+
+/* =====================================================
+   PATIENT ROW
+===================================================== */
+
+.patient-selector-row {
+  width: 100%;
+  min-height: 72px;
+
+  display: grid;
+
+  grid-template-columns:
+    40px
+    minmax(0, 1fr)
+    auto
+    auto;
+
+  align-items: center;
+
+  gap: 14px;
+
+  padding: 13px 16px;
+
+  border-bottom: 1px solid #edf1f5;
+
+  box-sizing: border-box;
+
+  transition:
+    background-color 0.2s ease;
+}
+
+.patient-selector-row:last-child {
+  border-bottom: none;
+}
+
+.patient-selector-row:hover {
+  background: #f8fbff;
+}
+
+
+/* =====================================================
+   AVATAR
+===================================================== */
+
+.patient-selector-avatar {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #eaf3ff;
+
+  color: #1268d5;
+}
+
+.patient-selector-avatar svg {
+  width: 20px;
+  height: 20px;
+}
+
+
+/* =====================================================
+   PATIENT INFORMATION
+===================================================== */
+
+.patient-selector-info {
+  min-width: 0;
+}
+
+.patient-selector-name {
+  margin: 0 0 4px;
+
+  font-size: 14px;
+  line-height: 1.2;
+
+  font-weight: 600;
+
+  color: #092957;
+}
+
+.patient-selector-meta {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  min-width: 0;
+
+  font-size: 11px;
+  line-height: 1.3;
+
+  color: #667085;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.patient-selector-status-wrapper {
+  white-space: nowrap;
+}
+
+.patient-selector-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 5px 9px;
+
+  border-radius: 18px;
+
+  font-size: 10px;
+  line-height: 1;
+
+  font-weight: 600;
+}
+
+.patient-selector-status.active {
+  background: #eaf8f0;
+  color: #16804a;
+}
+
+.patient-selector-status.risk {
+  background: #fff0f0;
+  color: #c62828;
+}
+
+.patient-selector-status.monitoring {
+  background: #fff7e6;
+  color: #a15c00;
+}
+
+
+/* =====================================================
+   SELECT BUTTON
+===================================================== */
+
+.patient-selector-button {
+  height: 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  padding: 0 12px;
+
+  border: 1px solid #cbd8e6;
+  border-radius: 7px;
+
+  background: #ffffff;
+
+  color: #1268d5;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.patient-selector-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.patient-selector-button:hover {
+  background: #1268d5;
+
+  border-color: #1268d5;
+
+  color: #ffffff;
+}
+
+.patient-selector-button:active {
+  transform: translateY(1px);
+}
+
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.patient-selector-empty {
+  min-height: 160px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  color: #98a2b3;
+}
+
+.patient-selector-empty svg {
+  width: 22px;
+  height: 22px;
+
+  color: #b8c5d3;
+}
+
+.patient-selector-empty p {
+  margin: 3px 0 0;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  color: #475467;
+}
+
+.patient-selector-empty span {
+  font-size: 11px;
+
+  color: #98a2b3;
+}
+
+
+/* =====================================================
+   RESPONSIVE - TABLET
+===================================================== */
+
+@media (max-width: 900px) {
+
+  .patient-selector-row {
+    grid-template-columns:
+      40px
+      minmax(0, 1fr)
+      auto;
+
+    gap: 12px;
+  }
+
+  .patient-selector-button {
+    grid-column: 2 / -1;
+
+    justify-self: start;
+  }
+}
+
+
+/* =====================================================
+   RESPONSIVE - MOBILE
+===================================================== */
+
+@media (max-width: 600px) {
+
+  .patient-selector-title {
+    font-size: 21px;
+  }
+
+  .patient-selector-description {
+    font-size: 12px;
+  }
+
+  .patient-selector-row {
+    grid-template-columns:
+      40px
+      minmax(0, 1fr);
+
+    gap: 10px;
+
+    padding: 12px;
+  }
+
+  .patient-selector-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .patient-selector-status-wrapper {
+    grid-column: 2;
+  }
+
+  .patient-selector-button {
+    grid-column: 2;
+
+    justify-self: start;
+  }
+
+  .patient-selector-meta {
+    white-space: normal;
+
+    flex-wrap: wrap;
+  }
+}
