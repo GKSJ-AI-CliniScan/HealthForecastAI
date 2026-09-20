@@ -12,11 +12,11 @@ from app.db.base import Base
 from app.models import Admission, Patient, TreatmentOutcome
 from app.services.analytics_service import (
     get_hospital_summary,
+    get_medication_outcomes,
     get_population_health,
     get_readmission_trends,
     get_recovery_trends,
     get_treatment_effectiveness,
-    get_medication_outcomes,
 )
 
 
@@ -301,17 +301,9 @@ def test_medication_outcomes(
 
     assert len(results) == 2
 
-    changed = next(
-        item
-        for item in results
-        if item["medication_change"] is True
-    )
+    changed = next(item for item in results if item["medication_change"] is True)
 
-    unchanged = next(
-        item
-        for item in results
-        if item["medication_change"] is False
-    )
+    unchanged = next(item for item in results if item["medication_change"] is False)
 
     assert changed["patients_treated"] == 1
     assert changed["average_recovery_score"] == 80.0

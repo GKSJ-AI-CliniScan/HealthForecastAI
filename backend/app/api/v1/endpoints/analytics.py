@@ -1,6 +1,6 @@
 """Healthcare analytics dashboard endpoints."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -62,5 +62,5 @@ def population_health(
 
     return PopulationHealthResponse(
         cohorts=get_population_health(db),
-        generated_at=datetime.now(timezone.utc),
+        generated_at=datetime.now(UTC),
     )
