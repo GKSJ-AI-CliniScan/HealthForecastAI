@@ -1,35 +1,38 @@
-"""Shared FastAPI dependencies: authentication and permission guards."""
+"""Shared FastAPI dependencies: authentication and permission guards.
+
+Every protected endpoint resolves the caller through get_current_user, which
+loads the real user row - the scoping rules in patient_service need the user's
+id, not just the claims in the token.
+"""
 
 from collections.abc import Callable
-from dataclasses import dataclass
+from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy.orm import Session
 
 from app.core.rbac import Permission, Role, has_permission
 from app.core.security import decode_token
+from app.db.session import get_db
+from app.models.user import User
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
-
-@dataclass(frozen=True)
-class CurrentUser:
-    """The authenticated caller, reconstructed from JWT claims."""
-
-    subject: str
-    role: Role
+UNAUTHORISED = HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail="Not authenticated",
+    headers={"WWW-Authenticate": "Bearer"},
+)
 
 
 def get_current_user(
-    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
-) -> CurrentUser:
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer_scheme)],
+    db: Annotated[Session, Depends(get_db)],
+) -> User:
     """Resolve the caller from the Authorization header, or raise 401."""
     if credentials is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise UNAUTHORISED
 
     claims = decode_token(credentials.credentials)
     if claims is None or not claims.get("sub"):
@@ -40,18 +43,30 @@ def get_current_user(
         )
 
     try:
-        role = Role(claims.get("role", ""))
-    except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Unknown role") from exc
+        user_id = int(claims["sub"])
+    except (TypeError, ValueError) as exc:
+        raise UNAUTHORISED from exc
 
-    return CurrentUser(subject=str(claims["sub"]), role=role)
+    user = db.get(User, user_id)
+    if user is None:
+        raise UNAUTHORISED
+
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="This account is deactivated"
+        )
+
+    return user
 
 
-def require_permission(permission: Permission) -> Callable[[CurrentUser], CurrentUser]:
+CurrentUser = Annotated[User, Depends(get_current_user)]
+
+
+def require_permission(permission: Permission) -> Callable[[User], User]:
     """Build a dependency that rejects callers lacking the given permission."""
 
-    def guard(user: CurrentUser = Depends(get_current_user)) -> CurrentUser:
-        if not has_permission(user.role, permission):
+    def guard(user: CurrentUser) -> User:
+        if not has_permission(Role(user.role), permission):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Role '{user.role}' lacks permission '{permission}'",
@@ -61,12 +76,12 @@ def require_permission(permission: Permission) -> Callable[[CurrentUser], Curren
     return guard
 
 
-def require_role(*roles: Role) -> Callable[[CurrentUser], CurrentUser]:
+def require_role(*roles: Role) -> Callable[[User], User]:
     """Build a dependency that only allows the listed roles."""
 
-    allowed = frozenset(roles)
+    allowed = frozenset(str(role) for role in roles)
 
-    def guard(user: CurrentUser = Depends(get_current_user)) -> CurrentUser:
+    def guard(user: CurrentUser) -> User:
         if user.role not in allowed:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,

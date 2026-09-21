@@ -90,14 +90,37 @@ Running each service directly, without Docker, is covered in
 
 ## Milestones
 
-| Milestone | Weeks | Theme |
-|-----------|-------|-------|
-| 1 | 1-2 | Project initialization, design process and core setup |
-| 2 | 3-4 | Risk prediction and readmission forecasting |
-| 3 | 5-6 | Treatment effectiveness analysis and healthcare analytics |
-| 4 | 7-8 | Testing, deployment and documentation |
+| Milestone | Weeks | Theme | Status on `main` |
+|-----------|-------|-------|------------------|
+| 1 | 1-2 | Project initialization, design process and core setup | **Complete** |
+| 2 | 3-4 | Risk prediction and readmission forecasting | **Complete** |
+| 3 | 5-6 | Treatment effectiveness analysis and healthcare analytics | Not started |
+| 4 | 7-8 | Testing, deployment and documentation | Not started |
 
 Report templates and evaluation criteria: [`docs/06-milestones/`](docs/06-milestones/).
+
+### What works today
+
+`main` carries a working reference implementation of Milestones 1 and 2:
+
+- JWT authentication with bcrypt hashing, audited logins, and immediate session
+  revocation when an account is deactivated
+- The full access matrix enforced in code and pinned by tests, with scoping
+  applied inside the SQL query rather than after it
+- Patient management with search, pagination and admission history
+- Role-aware dashboards for all four roles, built from real aggregates
+- The Diabetes 130-US Hospitals dataset loaded: 101,766 raw encounters cleaned
+  to 69,990, an 8.98% 30-day readmission rate
+- 30-day readmission risk scoring: a calibrated model serving real-time and
+  batch predictions, risk banding, forecasting and global risk drivers.
+  ROC-AUC 0.65; the high band runs **2.86x** the baseline readmission rate, and
+  the forecast lands within **1.6%** of the observed count
+
+Treatment effectiveness and clinical decision support endpoints are routed and
+authorised but return placeholder data, tagged `TODO(milestone-3)`.
+
+Full write-ups: [milestone-1](docs/06-milestones/milestone-1.md) ·
+[milestone-2](docs/06-milestones/milestone-2.md).
 
 ## Continuous integration
 
@@ -109,7 +132,7 @@ so an early branch is not failed for work that has not started.
 | [CI](.github/workflows/ci.yml) | Every push and pull request | Repository checks, backend, frontend, ML, Docker |
 | [Branch guard](.github/workflows/branch-guard.yml) | Pull requests | Blocks pull requests into `main` |
 | [Security](.github/workflows/security.yml) | Every push, weekly | `pip-audit`, `npm audit`, CodeQL |
-| [Intern progress report](.github/workflows/intern-progress.yml) | Weekly, on demand | One table of every intern branch and its CI status |
+| [Cohort report](.github/workflows/cohort-report.yml) | Weekly, on demand | Every intern in the roster: branch, commits ahead, CI result, last push |
 | [Deploy](.github/workflows/deploy.yml) | Manual only | Milestone 4: verify, build images, release to your environment |
 
 The full list of checks and how to run them locally is in

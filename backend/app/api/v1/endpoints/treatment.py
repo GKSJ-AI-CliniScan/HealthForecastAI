@@ -1,31 +1,34 @@
-"""Treatment effectiveness endpoints - Module 4."""
+"""Treatment effectiveness endpoints - Module 4 (Milestone 3)."""
+
+from typing import Annotated
 
 from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
-from app.api.deps import CurrentUser, require_permission
+from app.api.deps import get_db, require_permission
 from app.core.rbac import Permission
+from app.models.user import User
 from app.schemas.analytics import TreatmentEffectivenessSummary
+from app.services import treatment_service
 
 router = APIRouter()
+
+CanReadTreatment = Annotated[User, Depends(require_permission(Permission.TREATMENT_REPORT_READ))]
 
 
 @router.get("", response_model=list[TreatmentEffectivenessSummary])
 def list_treatment_effectiveness(
-    user: CurrentUser = Depends(require_permission(Permission.TREATMENT_REPORT_READ)),
+    user: CanReadTreatment, db: Session = Depends(get_db)
 ) -> list[TreatmentEffectivenessSummary]:
-    """Return effectiveness rollups per treatment.
-
-    TODO(milestone-3): aggregate treatment_outcomes and compare cohorts.
-    """
-    return []
+    """Return effectiveness rollups per treatment regimen."""
+    return treatment_service.get_treatment_effectiveness_summary(db)
 
 
 @router.get("/recovery-trends", summary="Recovery trend series")
 def recovery_trends(
-    user: CurrentUser = Depends(require_permission(Permission.TREATMENT_REPORT_READ)),
-) -> list[dict[str, float]]:
-    """Return a recovery score time series.
+    user: CanReadTreatment, db: Session = Depends(get_db)
+) -> list[dict[str, object]]:
+    """Return a recovery score time series."""
+    return treatment_service.get_recovery_trends(db)
 
-    TODO(milestone-3): compute weekly recovery trends from treatment_outcomes.
-    """
-    return []
+
