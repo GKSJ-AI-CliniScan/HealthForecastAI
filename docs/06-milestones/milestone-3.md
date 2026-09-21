@@ -1,12 +1,5 @@
 # Milestone 3 report - Week 5 & 6 - Treatment Effectiveness Analysis & Healthcare Analytics
 
-> **How to use this file**
->
-> 1. Fill in every section below. Keep all five headings, even if an answer is short.
-> 2. Delete the `_Not started_` line once you begin - that line is what tells CI
->    the report is still a blank template.
-> 3. Commit it on your own branch. Do not open a pull request to `main`.
-
 * **Intern name:** Kaaluru Manjunath
 * **Branch:** `intern/26-kaaluru-manjunath`
 * **Submitted on:** 2026-09-20
