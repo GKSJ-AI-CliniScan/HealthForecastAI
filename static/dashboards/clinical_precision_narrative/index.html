@@ -136,6 +136,77 @@
 </head>
 
 <body class="h-screen flex flex-col overflow-hidden">
+  <!-- ==================== LOGIN SCREEN ==================== -->
+<div id="login-screen"
+     class="fixed inset-0 z-[200] flex items-center justify-center bg-slate-100">
+
+  <div class="w-full max-w-md mx-4 bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+
+    <div class="text-center mb-8">
+      <div class="mx-auto h-14 w-14 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg">
+        <span class="material-symbols-outlined text-3xl">health_and_safety</span>
+      </div>
+
+      <h1 class="mt-4 text-2xl font-bold text-slate-900">
+        HealthForecast<span class="text-blue-600">AI</span>
+      </h1>
+
+      <p class="mt-1 text-sm text-slate-500">
+        Clinical Decision Intelligence
+      </p>
+    </div>
+
+    <form id="login-form" class="space-y-5">
+
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2">
+          Email
+        </label>
+
+        <input
+          id="login-email"
+          type="email"
+          required
+          autocomplete="email"
+          placeholder="Enter your email"
+          class="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2">
+          Password
+        </label>
+
+        <input
+          id="login-password"
+          type="password"
+          required
+          autocomplete="current-password"
+          placeholder="Enter your password"
+          class="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <p id="login-error"
+         class="hidden text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+      </p>
+
+      <button
+        id="login-button"
+        type="submit"
+        class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
+        Sign In
+      </button>
+
+    </form>
+
+    <p class="text-center text-xs text-slate-400 mt-6">
+      Secure clinical access
+    </p>
+
+  </div>
+</div>
 
   <!-- Toast Notification Container -->
   <div id="toast-container" class="fixed top-20 right-6 z-[100] flex flex-col gap-2 pointer-events-none"></div>
@@ -682,6 +753,12 @@
 <header>
 <h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">System Administration</h1>
 <p class="font-body-lg text-body-lg text-on-surface-variant">Manage users, permissions, and system health.</p>
+<p class="text-sm">
+  Backend Status:
+  <span id="system-backend-status" class="text-slate-500 font-bold">
+    Checking...
+  </span>
+</p>
 </header>
 <!-- System Health Monitoring (Top Row) -->
 <section class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
@@ -971,7 +1048,12 @@
         <div>
           <label class="block font-medium text-slate-700 mb-1">Select Attending Physician</label>
           <select id="assign-doc-select" class="w-full border border-slate-300 rounded-lg p-2 text-xs bg-white focus:ring-blue-500 focus:border-blue-500">
-            <option value="Dr. Smith (Clinical Lead)">Dr. Smith (Clinical Lead - Internal Medicine)</option>
+            <option
+  value="Dr. Smith (Clinical Lead)"
+  data-doctor-id="1"
+>
+  Dr. Smith (Clinical Lead - Internal Medicine)
+</option>
             <option value="Dr. Rachel Chen (Endocrinology)">Dr. Rachel Chen (Endocrinology Specialist)</option>
             <option value="Dr. Vikram Patel (Cardiology)">Dr. Vikram Patel (Cardiology Lead)</option>
           </select>
@@ -1035,6 +1117,158 @@
 
   <!-- Client-side View Switcher & JavaScript Interactivity -->
   <script>
+    // ==================== LOGIN ====================
+
+const LOGIN_API = 'http://localhost:8000/api/v1/auth/login';
+
+function showLoginError(message) {
+  const errorBox = document.getElementById('login-error');
+
+  if (!errorBox) return;
+
+  errorBox.textContent = message;
+  errorBox.classList.remove('hidden');
+}
+
+function hideLoginError() {
+  const errorBox = document.getElementById('login-error');
+
+  if (!errorBox) return;
+
+  errorBox.textContent = '';
+  errorBox.classList.add('hidden');
+}
+
+function showDashboard() {
+
+  const loginScreen = document.getElementById('login-screen');
+
+  if (loginScreen) {
+    loginScreen.classList.add('hidden');
+  }
+
+  loadSystemHealth();
+}
+async function loadSystemHealth() {
+  try {
+    const response = await fetch('http://localhost:8000/health');
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    console.log('SYSTEM HEALTH:', data);
+
+    const statusElement =
+      document.getElementById('system-backend-status');
+
+    if (statusElement) {
+      statusElement.textContent = 'Healthy';
+      statusElement.className =
+        'text-emerald-600 font-bold';
+    }
+
+  } catch (error) {
+    console.error(
+      'System health API unavailable:',
+      error
+    );
+
+    const statusElement =
+      document.getElementById('system-backend-status');
+
+    if (statusElement) {
+      statusElement.textContent = 'Unavailable';
+      statusElement.className =
+        'text-rose-600 font-bold';
+    }
+  }
+}
+
+
+async function handleLogin(event) {
+  event.preventDefault();
+
+  hideLoginError();
+
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+
+  const button = document.getElementById('login-button');
+
+  button.disabled = true;
+  button.textContent = 'Signing in...';
+
+  try {
+    const response = await fetch(LOGIN_API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password
+      })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.detail || 'Invalid email or password'
+      );
+    }
+
+    // Save authentication information
+    localStorage.setItem('access_token', result.access_token);
+    localStorage.setItem('token_type', result.token_type || 'bearer');
+
+    if (result.role) {
+      localStorage.setItem('user_role', result.role);
+    }
+
+    if (result.permissions) {
+      localStorage.setItem(
+        'user_permissions',
+        JSON.stringify(result.permissions)
+      );
+    }
+
+    showDashboard();
+
+    // Load dashboard data after authentication
+    if (typeof loadHighRiskPatients === 'function') {
+      loadHighRiskPatients();
+    }
+
+    if (typeof loadReadmissionForecast === 'function') {
+      loadReadmissionForecast();
+    }
+
+  } catch (error) {
+    console.error('Login failed:', error);
+    showLoginError(error.message || 'Login failed');
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Sign In';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const loginForm = document.getElementById('login-form');
+
+  if (!loginForm) return;
+
+  const existingToken = localStorage.getItem('access_token');
+
+  if (existingToken) {
+    showDashboard();
+  } else {
+    loginForm.addEventListener('submit', handleLogin);
+  }
+});
     // ==================== MILESTONE 2 API INTEGRATION ====================
     const API_BASE = 'http://localhost:8000/api/v1';
     let doctorApiPatients = [];
@@ -1098,40 +1332,128 @@
         modelName: apiPatient.model_name,
         modelVersion: apiPatient.model_version,
         contributingFactors: apiPatient.contributing_factors || [],
-        recommendedActions: apiPatient.recommended_actions || []
+        recommendedActions: apiPatient.recommended_actions || [],
+        admission_id: apiPatient.admission_id,
       };
     }
-
     async function loadHighRiskPatients() {
-      try {
-        const data = await apiFetch('/risk/high-risk');
-        const list = Array.isArray(data) ? data : (data.items || data.results || []);
-        doctorApiPatients = list.map(mergeApiPatient);
-        renderDoctorWatchlist(doctorApiPatients);
-        updateDoctorRiskKpis(doctorApiPatients);
-        showToast(`Loaded ${doctorApiPatients.length} high-risk patients from Risk API`);
-      } catch (error) {
-        console.warn('High-risk API unavailable:', error.message);
-        doctorApiPatients = [...initialCohortDataset];
-        renderDoctorWatchlist(doctorApiPatients);
-        updateDoctorRiskKpis(doctorApiPatients);
-        console.info('Using local demonstration cohort until API authentication/availability is configured.');
-      }
+  try {
+    const data = await apiFetch('/patients/dashboard');
+
+    const list = Array.isArray(data)
+      ? data
+      : (data.items || data.results || []);
+
+    console.info(`Dashboard API returned ${list.length} patients.`);
+
+    if (list.length > 0) {
+      doctorApiPatients = list.slice(0, 50).map(patient => ({
+        id: patient.medical_record_number || patient.patient_id,
+
+        patient_id: patient.patient_id,
+        medical_record_number: patient.medical_record_number,
+
+        age: patient.age_group || '--',
+        ageGroup: patient.age_group || '--',
+        gender: patient.gender || '--',
+        race: patient.race || '--',
+
+        risk: Number(patient.readmission_probability || 0),
+        tier: String(patient.risk_category || 'LOW').toUpperCase(),
+
+        contributingFactors: patient.contributing_factors || [],
+        recommendedActions: patient.recommended_actions || [],
+
+        // Fields expected by the existing watchlist UI
+        diagnosis: patient.primary_diagnosis || 'Clinical Profile',
+        los: patient.time_in_hospital ?? '--',
+        hba1c: patient.A1Cresult
+          ? parseFloat(String(patient.A1Cresult).replace(/[^\d.]/g, ''))
+          : null,
+
+        admission_id: patient.admission_id
+      }));
+      const watchlistPatients = [...doctorApiPatients].sort(
+  (a, b) => Number(b.risk || 0) - Number(a.risk || 0)
+);
+
+renderDoctorWatchlist(watchlistPatients);
+
+updateDoctorRiskKpis(doctorApiPatients);
+
+      
+
+      showToast(
+        `Loaded ${list.length.toLocaleString()} patients with real risk data`
+      );
+
+      console.info('First dashboard patient:', doctorApiPatients[0]);
+
+    } else {
+      doctorApiPatients = [...initialCohortDataset];
+
+      renderDoctorWatchlist(doctorApiPatients);
+      updateDoctorRiskKpis(doctorApiPatients);
+
+      console.info(
+        'Dashboard API returned no patients. Using local demonstration cohort.'
+      );
     }
+
+  } catch (error) {
+    console.error('Dashboard patient API unavailable:', error);
+
+    doctorApiPatients = [...initialCohortDataset];
+
+    renderDoctorWatchlist(doctorApiPatients);
+    updateDoctorRiskKpis(doctorApiPatients);
+
+    console.info(
+      'Using demonstration cohort because Dashboard API is unavailable.'
+    );
+  }
+}
 
     function updateDoctorRiskKpis(patients) {
-      const highCount = patients.filter(p => Number(p.risk) >= 0.70).length;
-      const avg = patients.length
-        ? patients.reduce((sum, p) => sum + Number(p.risk || 0), 0) / patients.length
-        : 0;
+  const highCount = patients.filter(
+    p => Number(p.risk || 0) >= 0.70
+  ).length;
 
-      const highRiskKpi = document.querySelector('#view-doctor .font-display-lg');
-      if (highRiskKpi) highRiskKpi.innerText = highCount;
+  const avg = patients.length
+    ? patients.reduce(
+        (sum, p) => sum + Number(p.risk || 0),
+        0
+      ) / patients.length
+    : 0;
 
-      const probabilityKpi = document.querySelector('#view-doctor .font-headline-sm.text-on-surface.z-10');
-      if (probabilityKpi) probabilityKpi.innerText = (avg * 100).toFixed(1);
-    }
+  // High-risk KPI
+  const displayValues = document.querySelectorAll(
+    '#view-doctor .font-display-lg'
+  );
 
+  if (displayValues[0]) {
+    displayValues[0].textContent = highCount;
+  }
+
+  // Average readmission probability KPI
+  const averageRiskValue = document.querySelector(
+    '#view-doctor .font-headline-sm'
+  );
+
+  if (averageRiskValue) {
+    averageRiskValue.textContent =
+      `${(avg * 100).toFixed(1)}%`;
+  }
+
+  // Active Care Plans remains intentional demo data.
+  // Do not modify displayValues[1].
+
+  console.log('Doctor KPI values updated:', {
+    patients: patients.length,
+    highRisk: highCount,
+    averageRisk: `${(avg * 100).toFixed(1)}%`
+  });
+}
     async function loadReadmissionForecast() {
       if (forecastLoaded) return;
       forecastLoaded = true;
@@ -1173,16 +1495,35 @@
       };
 
       try {
-        const result = await apiFetch('/risk/predict', {
-          method: 'POST',
-          body: JSON.stringify(payload)
-        });
+        const response = await fetch('http://localhost:8000/api/v1/risk/predict', {
+    method: 'POST',
+    headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${getAccessToken()}`
+},
+    body: JSON.stringify({
+    patient_id: patient.patient_id || patient.id,
+    time_in_hospital: Number(patient.los ?? 1),
+    num_medications: Number(patient.num_medications ?? patient.meds ?? 1),
+    num_lab_procedures: Number(patient.num_lab_procedures ?? 0),
+    number_diagnoses: Number(patient.number_diagnoses ?? 1),
+    number_inpatient: Number(patient.number_inpatient ?? 0),
+    number_emergency: Number(patient.number_emergency ?? 0),
+    age_group: patient.ageGroup || patient.age || '',
+    A1Cresult: patient.hba1c != null
+    ? String(patient.hba1c)
+    : 'None'
+})
+});
 
-        const probability = Number(result.readmission_probability ?? patient.risk ?? 0);
-        const category = String(result.risk_category || patient.tier || 'LOW').toUpperCase();
+if (!response.ok) {
+    throw new Error(`API request failed: ${response.status}`);
+}
 
-        document.getElementById('pm-risk').innerText =
-          `${category.charAt(0) + category.slice(1).toLowerCase()} (${(probability * 100).toFixed(0)}%)`;
+const result = await response.json();
+
+        
+          
 
         if (factorsBox) {
           const factors = Array.isArray(result.contributing_factors)
@@ -1329,27 +1670,157 @@
     }
 
     // Patient Timeline Modal
-    function openPatientModal(name, adm, risk, los, hba1c, riskLevel, meds) {
-      document.getElementById('pm-name').innerText = name;
-      document.getElementById('pm-adm').innerText = 'Admission ID: ' + adm;
-      document.getElementById('pm-risk').innerText = risk;
-      document.getElementById('pm-los').innerText = los;
-      document.getElementById('pm-hba1c').innerText = hba1c;
-      document.getElementById('pm-avatar').innerText = name.split(' ').map(n=>n[0]).join('');
-      document.getElementById('pm-factors').innerHTML = '<li>Loading live AI risk explanation...</li>';
-      document.getElementById('pm-recommendation').innerText = 'Loading live clinical recommendation...';
+    function openPatientModal(
+  name,
+  adm,
+  risk,
+  los,
+  hba1c,
+  riskLevel,
+  meds,
+  contributingFactors = [],
+  recommendedActions = []
+) {
+  const admissionRef = String(adm || '').replace(/^ADM-/, '');
 
-      const medsBox = document.getElementById('pm-meds');
-      medsBox.innerHTML = '';
-      meds.forEach(m => {
-        const span = document.createElement('span');
-        span.className = 'px-2 py-1 bg-slate-100 text-slate-700 rounded-md text-[11px] font-mono border border-slate-200';
-        span.innerText = m;
-        medsBox.appendChild(span);
-      });
+  const patient = doctorApiPatients.find(p =>
+    String(p.admission_id) === admissionRef ||
+    String(p.id) === admissionRef ||
+    String(p.patient_id) === admissionRef ||
+    String(p.medical_record_number) === admissionRef
+  );
 
-      openModal('patient-modal');
+  if (patient) {
+    const realRisk = Number(patient.risk || 0);
+    const realTier = String(patient.tier || 'LOW').toUpperCase();
+
+    risk =
+      `${realTier.charAt(0) + realTier.slice(1).toLowerCase()} ` +
+      `(${(realRisk * 100).toFixed(0)}%)`;
+
+    los =
+      patient.los !== null &&
+      patient.los !== undefined &&
+      patient.los !== ''
+        ? `${patient.los} Days`
+        : 'Not available';
+
+    if (
+      patient.hba1c !== null &&
+      patient.hba1c !== undefined &&
+      !Number.isNaN(Number(patient.hba1c))
+    ) {
+      hba1c = `${Number(patient.hba1c).toFixed(1)}%`;
+    } else {
+      hba1c = 'Not available';
     }
+
+    adm = patient.admission_id
+      ? `ADM-${patient.admission_id}`
+      : adm;
+
+    // Use the real backend values from this patient
+    contributingFactors = Array.isArray(patient.contributingFactors)
+      ? patient.contributingFactors
+      : [];
+
+    recommendedActions = Array.isArray(patient.recommendedActions)
+      ? patient.recommendedActions
+      : [];
+
+    meds = Array.isArray(patient.medication_list)
+      ? patient.medication_list
+      : [];
+  }
+
+  document.getElementById('pm-name').innerText = name;
+  document.getElementById('pm-adm').innerText =
+    'Admission ID: ' + adm;
+
+  document.getElementById('pm-risk').innerText = risk;
+  document.getElementById('pm-los').innerText = los;
+  document.getElementById('pm-hba1c').innerText = hba1c;
+
+  document.getElementById('pm-avatar').innerText =
+    String(name || 'CP')
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+
+  // ================================
+  // REAL AI RISK EXPLANATIONS
+  // ================================
+  const factorsBox = document.getElementById('pm-factors');
+
+  factorsBox.innerHTML = '';
+
+  if (
+    Array.isArray(contributingFactors) &&
+    contributingFactors.length > 0
+  ) {
+    contributingFactors.forEach(factor => {
+      const li = document.createElement('li');
+      li.innerText = factor;
+      factorsBox.appendChild(li);
+    });
+  } else {
+    const li = document.createElement('li');
+    li.innerText = 'No specific risk factors identified.';
+    factorsBox.appendChild(li);
+  }
+
+  // ================================
+  // REAL CLINICAL RECOMMENDATION
+  // ================================
+  const recommendationBox =
+    document.getElementById('pm-recommendation');
+
+  if (
+    Array.isArray(recommendedActions) &&
+    recommendedActions.length > 0
+  ) {
+    recommendationBox.innerText =
+      recommendedActions.join(' ');
+  } else {
+    recommendationBox.innerText =
+      'No specific clinical recommendation available.';
+  }
+
+  // ================================
+  // REAL MEDICATIONS ONLY
+  // ================================
+  const medsBox = document.getElementById('pm-meds');
+
+  medsBox.innerHTML = '';
+
+  if (Array.isArray(meds) && meds.length > 0) {
+    meds.forEach(m => {
+      const span = document.createElement('span');
+
+      span.className =
+        'px-2 py-1 bg-slate-100 text-slate-700 rounded-md ' +
+        'text-[11px] font-mono border border-slate-200';
+
+      span.innerText = m;
+      medsBox.appendChild(span);
+    });
+  } else {
+    const span = document.createElement('span');
+
+    span.className =
+      'text-slate-400 text-[11px] font-mono';
+
+    span.innerText = 'No medication data available';
+
+    medsBox.appendChild(span);
+  }
+
+  // Keep the rest of your existing modal-opening code below this point.
+
+  openModal('patient-modal');
+}
 
     let currentAssignBtn = null;
     function openAssignModal(btn) {
@@ -1357,17 +1828,96 @@
       openModal('assign-modal');
     }
 
-    function confirmAssignment() {
-      const select = document.getElementById('assign-doc-select');
-      const docName = select.value.split(' ')[0] + ' ' + select.value.split(' ')[1];
-      if (currentAssignBtn) {
-        currentAssignBtn.className = 'px-sm py-xs bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-md font-label-md whitespace-nowrap font-bold';
-        currentAssignBtn.innerText = 'Assigned';
-      }
-      closeModal('assign-modal');
-      showToast(`Patient successfully assigned to ${docName}!`);
-    }
+    async function confirmAssignment() {
+  const select = document.getElementById('assign-doc-select');
 
+  const selectedOption =
+    select.options[select.selectedIndex];
+
+  const doctorId =
+    selectedOption.dataset.doctorId;
+
+  // We currently have doctor ID 1 confirmed in the database.
+  if (!doctorId) {
+    showToast(
+      'This physician is not available in the database yet.',
+      'error'
+    );
+    return;
+  }
+
+  if (!currentAssignBtn) {
+    showToast('Patient could not be identified.', 'error');
+    return;
+  }
+
+  // Find the patient row containing the Assign button
+  const row = currentAssignBtn.closest('tr');
+
+  if (!row) {
+    showToast('Patient row could not be identified.', 'error');
+    return;
+  }
+
+  // Extract the medical record number from the row
+  const patientText =
+    row.querySelector('.font-mono')?.textContent || '';
+
+  const medicalRecordNumber = patientText
+    .replace('Patient:', '')
+    .split('(')[0]
+    .trim();
+
+  // Find the corresponding API patient
+  const patient = doctorApiPatients.find(
+    p => String(p.medical_record_number) ===
+         String(medicalRecordNumber)
+  );
+
+  if (!patient) {
+    showToast('Patient record not found.', 'error');
+    return;
+  }
+
+  try {
+    const result = await apiFetch(
+      `/patients/${patient.patient_id}/assign`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({
+          doctor_id: Number(doctorId)
+        })
+      }
+    );
+
+    // Update button only after the database update succeeds
+    currentAssignBtn.className =
+      'px-sm py-xs bg-emerald-100 text-emerald-800 ' +
+      'border border-emerald-300 rounded-md ' +
+      'font-label-md whitespace-nowrap font-bold';
+
+    currentAssignBtn.innerText = 'Assigned';
+
+    closeModal('assign-modal');
+
+    const doctorName =
+      selectedOption.textContent.trim();
+
+    showToast(
+      `Patient successfully assigned to ${doctorName}!`
+    );
+
+    console.log('Patient assignment saved:', result);
+
+  } catch (error) {
+    console.error('Patient assignment failed:', error);
+
+    showToast(
+      `Assignment failed: ${error.message}`,
+      'error'
+    );
+  }
+}
     function assignDirectlyFromModal() {
       closeModal('patient-modal');
       showToast('Care protocol successfully initiated by Dr. Smith!');
@@ -1485,16 +2035,25 @@
         const tier = String(p.tier || '').toUpperCase();
         let riskBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-label-md text-[10px] uppercase font-bold tracking-wider">High (${(risk * 100).toFixed(0)}%)</span>`;
 
-        if (tier === 'MODERATE') {
-          riskBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-label-md text-[10px] uppercase font-bold tracking-wider">Moderate (${(risk * 100).toFixed(0)}%)</span>`;
-        } else if (tier === 'LOW') {
-          riskBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-label-md text-[10px] uppercase font-bold tracking-wider">Low (${(risk * 100).toFixed(0)}%)</span>`;
-        }
+        if (tier === 'MEDIUM') {
+  riskBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-label-md text-[10px] uppercase font-bold tracking-wider">Medium (${(risk * 100).toFixed(0)}%)</span>`;
+} else if (tier === 'LOW') {
+  riskBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-label-md text-[10px] uppercase font-bold tracking-wider">Low (${(risk * 100).toFixed(0)}%)</span>`;
+} else {
+  riskBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-label-md text-[10px] uppercase font-bold tracking-wider">High (${(risk * 100).toFixed(0)}%)</span>`;
+}
 
-        const hba1c = Number(p.hba1c ?? (risk >= 0.7 ? 8.4 : 6.2));
-        const hba1cText = hba1c >= 8
-          ? `<span class="text-rose-600 font-semibold">${hba1c.toFixed(1)}% (Elevated)</span>`
-          : `<span class="text-slate-700">${hba1c.toFixed(1)}% (Normal)</span>`;
+        const hba1c = p.hba1c;
+
+let hba1cText = '<span class="text-slate-400">Not available</span>';
+
+if (hba1c !== null && hba1c !== undefined && !Number.isNaN(Number(hba1c))) {
+  const value = Number(hba1c);
+
+  hba1cText = value >= 8
+    ? `<span class="text-rose-600 font-semibold">${value.toFixed(1)}% (Elevated)</span>`
+    : `<span class="text-slate-700">${value.toFixed(1)}% (Normal)</span>`;
+}
 
         return `
           <tr class="hover:bg-slate-50 transition-colors" data-risk="${risk}" data-tier="${tier}">
@@ -1505,7 +2064,9 @@
                 <div class="text-[11px] text-slate-500 font-mono">Patient: ${p.id} (${p.gender || '--'}, ${p.age || '--'}y)</div>
               </div>
             </td>
-            <td class="p-sm font-mono font-bold text-slate-800">ADM-${String(p.id).replace('PT-', '')}</td>
+            <td class="p-sm font-mono font-bold text-slate-800">
+  ${p.admission_id ? `ADM-${p.admission_id}` : '--'}
+</td>
             <td class="p-sm">${riskBadge}</td>
             <td class="p-sm">${p.los ?? '--'} Days</td>
             <td class="p-sm">${hba1cText}</td>
@@ -1519,26 +2080,73 @@
     }
 
     function openPatientModalById(patientId) {
-      const patient = doctorApiPatients.find(p => p.id === patientId)
-        || initialCohortDataset.find(p => p.id === patientId);
+  const patient =
+    doctorApiPatients.find(p => String(p.id) === String(patientId)) ||
+    initialCohortDataset.find(p => String(p.id) === String(patientId));
 
-      if (!patient) {
-        showToast('Patient record not found', 'error');
-        return;
-      }
+  if (!patient) {
+    showToast('Patient record not found', 'error');
+    return;
+  }
 
-      const hba1c = Number(patient.hba1c ?? (Number(patient.risk) >= 0.7 ? 8.4 : 6.2));
-      openPatientModal(
-        patient.diagnosis || patient.id,
-        `ADM-${String(patient.id).replace('PT-', '')}`,
-        `${(Number(patient.risk || 0) * 100).toFixed(0)}%`,
-        `${patient.los ?? '--'} Days`,
-        `${hba1c.toFixed(1)}%`,
-        patient.tier || 'LOW',
-        patient.medication_list || ['Metformin 1000mg', 'Lisinopril 20mg']
-      );
-      loadPatientPrediction(patient);
-    }
+  // Real HbA1c value from the API
+  const hba1cValue = Number(patient.hba1c);
+
+  const hba1cText =
+    patient.hba1c !== null &&
+    patient.hba1c !== undefined &&
+    !Number.isNaN(hba1cValue)
+      ? `${hba1cValue.toFixed(1)}%`
+      : 'Not available';
+
+  // Real admission ID from the API
+  const admissionId = patient.admission_id
+    ? `ADM-${patient.admission_id}`
+    : '--';
+
+  // Real risk percentage from the API
+  const riskPercentage =
+    `${(Number(patient.risk || 0) * 100).toFixed(0)}%`;
+
+  // Real length of stay from the API
+  const lengthOfStay =
+    patient.los !== null &&
+    patient.los !== undefined
+      ? `${patient.los} Days`
+      : '--';
+
+  // Real clinical factors from the backend
+  const contributingFactors =
+    Array.isArray(patient.contributingFactors)
+      ? patient.contributingFactors
+      : [];
+
+  // Real recommended actions from the backend
+  const recommendedActions =
+    Array.isArray(patient.recommendedActions)
+      ? patient.recommendedActions
+      : [];
+
+  // Do not use fake medications
+  const medications =
+    Array.isArray(patient.medication_list)
+      ? patient.medication_list
+      : [];
+
+  openPatientModal(
+    patient.diagnosis || patient.id,
+    admissionId,
+    riskPercentage,
+    lengthOfStay,
+    hba1cText,
+    patient.tier || 'LOW',
+    medications,
+    contributingFactors,
+    recommendedActions
+  );
+
+  loadPatientPrediction(patient);
+}
 
     function renderCohortTable(patients) {
       const tbody = document.getElementById('raw-cohort-tbody');
