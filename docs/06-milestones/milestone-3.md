@@ -83,8 +83,8 @@ An AI-assisted Clinical Decision Support (CDS) dashboard enabling attending phys
 
 ### C. Technical Implementation & API Readiness
 
-- **Strict TypeScript Architecture:** Standardized type definitions across [`frontend/src/types/analytics.ts`](file:///c:/Users/Kiruthika%20B/OneDrive/Documents/Infosys%20Project/HealthForecastAI/frontend/src/types/analytics.ts), [`frontend/src/types/clinicalSupport.ts`](file:///c:/Users/Kiruthika%20B/OneDrive/Documents/Infosys%20Project/HealthForecastAI/frontend/src/types/clinicalSupport.ts), and [`frontend/src/types/dashboard.ts`](file:///c:/Users/Kiruthika%20B/OneDrive/Documents/Infosys%20Project/HealthForecastAI/frontend/src/types/dashboard.ts) with zero `any` usage.
-- **Service Layer Abstraction:** Decoupled data fetching in [`analyticsService.ts`](file:///c:/Users/Kiruthika%20B/OneDrive/Documents/Infosys%20Project/HealthForecastAI/frontend/src/services/analyticsService.ts) and [`clinicalSupportService.ts`](file:///c:/Users/Kiruthika%20B/OneDrive/Documents/Infosys%20Project/HealthForecastAI/frontend/src/services/clinicalSupportService.ts), maintaining seamless fallback to mock data when backend services are offline.
+- **Strict TypeScript Architecture:** Standardized type definitions across [`frontend/src/types/analytics.ts`](../../frontend/src/types/analytics.ts), [`frontend/src/types/clinicalSupport.ts`](../../frontend/src/types/clinicalSupport.ts), and [`frontend/src/types/dashboard.ts`](../../frontend/src/types/dashboard.ts) with zero `any` usage.
+- **Service Layer Abstraction:** Decoupled data fetching in [`analyticsService.ts`](../../frontend/src/services/analyticsService.ts) and [`clinicalSupportService.ts`](../../frontend/src/services/clinicalSupportService.ts), maintaining seamless fallback to mock data when backend services are offline.
 - **Prepared Backend API Endpoints:**
   - `GET /analytics/summary` — Hospital overview KPIs
   - `GET /analytics/readmissions` — Monthly readmission rate time-series
