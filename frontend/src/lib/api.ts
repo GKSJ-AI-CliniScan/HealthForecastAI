@@ -1,10 +1,16 @@
 import type {
   CallerIdentity,
   DashboardStats,
+  DischargePlanApiResponse,
+  HospitalAnalyticsSummary,
   LoginResponse,
   Patient,
   PatientDetail,
+  ReadmissionTrendPoint,
+  RecommendationsApiResponse,
+  RecoveryTrendPoint,
   RoleInfo,
+  TreatmentEffectiveness,
 } from '@/types';
 
 const API_BASE_URL =
@@ -87,5 +93,43 @@ export const patients = {
 
   anonymised(token: string, limit = 100): Promise<Patient[]> {
     return apiFetch<Patient[]>(`/patients/anonymised?limit=${limit}`, {}, token);
+  },
+};
+
+export const analyticsApi = {
+  summary(token?: string): Promise<HospitalAnalyticsSummary> {
+    return apiFetch<HospitalAnalyticsSummary>('/analytics/summary', {}, token);
+  },
+
+  readmissions(token?: string): Promise<ReadmissionTrendPoint[]> {
+    return apiFetch<ReadmissionTrendPoint[]>('/analytics/readmissions', {}, token);
+  },
+};
+
+export const treatmentApi = {
+  list(token?: string): Promise<TreatmentEffectiveness[]> {
+    return apiFetch<TreatmentEffectiveness[]>('/treatment', {}, token);
+  },
+
+  recoveryTrends(token?: string): Promise<RecoveryTrendPoint[]> {
+    return apiFetch<RecoveryTrendPoint[]>('/treatment/recovery-trends', {}, token);
+  },
+};
+
+export const clinicalSupportApi = {
+  recommendations(patientId: number, token?: string): Promise<RecommendationsApiResponse> {
+    return apiFetch<RecommendationsApiResponse>(
+      `/clinical-support/recommendations/${patientId}`,
+      {},
+      token,
+    );
+  },
+
+  dischargePlan(patientId: number, token?: string): Promise<DischargePlanApiResponse> {
+    return apiFetch<DischargePlanApiResponse>(
+      `/clinical-support/discharge-plan/${patientId}`,
+      {},
+      token,
+    );
   },
 };

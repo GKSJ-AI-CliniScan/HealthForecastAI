@@ -54,16 +54,16 @@ export const ROLE_NAVIGATION: Record<Role, NavItem[]> = {
     {
       id: 'doc-treatment-reports',
       name: 'Treatment Reports',
-      href: '#treatment-reports',
+      href: '/analytics',
       icon: StethoscopeIcon,
-      isPlaceholder: true,
+      isPlaceholder: false,
     },
     {
-      id: 'doc-followup',
-      name: 'Follow-up Planning',
-      href: '#follow-up',
+      id: 'doc-clinical-support',
+      name: 'Clinical Support',
+      href: '/clinical-support',
       icon: ClockIcon,
-      isPlaceholder: true,
+      isPlaceholder: false,
     },
   ],
   hospital_admin: [
@@ -91,9 +91,9 @@ export const ROLE_NAVIGATION: Record<Role, NavItem[]> = {
     {
       id: 'admin-dept-performance',
       name: 'Department Performance',
-      href: '#department-performance',
+      href: '/analytics',
       icon: LayersIcon,
-      isPlaceholder: true,
+      isPlaceholder: false,
     },
     {
       id: 'admin-reports',
@@ -114,9 +114,9 @@ export const ROLE_NAVIGATION: Record<Role, NavItem[]> = {
     {
       id: 'res-analytics',
       name: 'Healthcare Analytics',
-      href: '#healthcare-analytics',
+      href: '/analytics',
       icon: BarChartIcon,
-      isPlaceholder: true,
+      isPlaceholder: false,
     },
     {
       id: 'res-readmission-trends',

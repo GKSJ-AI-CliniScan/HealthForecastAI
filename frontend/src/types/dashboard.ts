@@ -42,10 +42,22 @@ export interface MetricCardData {
   isUrgent?: boolean;
 }
 
+export interface DepartmentAnalytics {
+  department: string;
+  departmentKey: string;
+  totalAdmissions: number;
+  readmissionRate: number;
+  averageLos: number;
+  highRiskCount: number;
+  trend: 'improving' | 'stable' | 'worsening';
+}
+
 export interface HospitalAnalyticsSummary {
   total_patients: number;
   total_admissions: number;
   readmission_rate: number;
   average_length_of_stay: number;
   risk_distribution: Record<RiskCategory, number>;
+  national_benchmark_rate?: number;
+  department_breakdown?: DepartmentAnalytics[];
 }
