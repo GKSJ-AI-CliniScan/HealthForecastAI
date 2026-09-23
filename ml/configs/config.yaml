@@ -1,36 +1,99 @@
 # HealthForecast AI - modelling configuration
 # Every experiment must be reproducible from this file alone.
+#
+# `dataset.active` selects which profile trains today.
+#
+# india_hospital_readmission is the PRIMARY/production dataset (2015-2024,
+# per HealthForecastAI_ML_Design.md section 3). diabetes_130_us is kept as a
+# fallback/bootstrap profile for local development when the India export is
+# not available - both profiles run through the same pipeline code, the same
+# way backend/app/services/dataset_import_service.py already supports both
+# for the Postgres import path.
+#
+# SCHEMA CAVEAT: no copy of the India Hospital Readmission export has ever
+# been available in this repository or its CI. The column names and the
+# readmitted vocabulary ("<30" / ">30" / "NO") below are taken from the only
+# executable, tested definition of this dataset's shape that exists in the
+# codebase - the india_hospital_readmission profile and its fixtures in
+# backend/app/services/dataset_import_service.py and
+# backend/tests/test_dataset_import.py - not from a verified real file. If
+# the real Kaggle export differs, update this profile and re-run the tests
+# in ml/tests/ before trusting a trained model.
 
 dataset:
-  name: diabetes_130_us_hospitals
-  source_url: https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008
-  raw_path: ml/data/raw/diabetic_data.csv
-  processed_path: ml/data/processed/admissions_features.parquet
-  target_column: readmitted
-  # The brief targets 30-day readmission: map "<30" -> 1, {">30", "NO"} -> 0
-  positive_label: "<30"
+  active: india_hospital_readmission
+  profiles:
+    india_hospital_readmission:
+      source_url: "https://www.kaggle.com/datasets/digutlaranjithkumar/india-hospital-readmission-dataset-20152024"
+      # Relative to the ml/ directory - every module here imports as
+      # `from src....` and is only importable with CWD=ml/ (see
+      # pyproject.toml's pythonpath=["."]), so this path is NOT repo-root
+      # relative even though the download instructions in data/README.md are.
+      raw_path: data/raw/india_hospital_readmission.csv
+      # Mirrors dataset_import_service.NA_TOKENS so the training pipeline and
+      # the Postgres importer treat the same cell as missing the same way.
+      na_values: ["?", "", "NA", "N/A", "nan", "None", "Unknown/Invalid"]
+      id_column: patient_id
+      date_column: admission_date
+      discharge_date_column: discharge_date
+      encounter_key: null  # no single encounter id column in this export
+      target_column: readmitted
+      readmission_positive_label: "<30"
+      risk_negative_label: "NO"
+      # No death/hospice disposition code is available for this export (its
+      # "department" field carries a different meaning - see the unmapped_note
+      # on dataset_import_service.INDIA_HOSPITAL_READMISSION). Known gap: this
+      # pipeline has no leakage-safe filter for expired/hospice encounters on
+      # the India profile.
+      leakage_disposition_column: null
+      drop_columns: [patient_id, admission_date, discharge_date]
+      collapse_columns: [diagnosis]
+      # No pre-aggregated visit-count columns in this export; prior-utilisation
+      # signal instead comes from add_history_features (admission_date based).
+      utilisation_columns: []
+    diabetes_130_us:
+      source_url: "https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008"
+      raw_path: data/raw/diabetic_data.csv
+      na_values: ["?"]
+      id_column: patient_nbr
+      date_column: null  # no real calendar dates in this export
+      discharge_date_column: null
+      encounter_key: encounter_id
+      target_column: readmitted
+      readmission_positive_label: "<30"
+      risk_negative_label: "NO"
+      leakage_disposition_column: discharge_disposition_id
+      drop_columns: [encounter_id, patient_nbr, weight, payer_code, medical_specialty]
+      collapse_columns: [diag_1, diag_2, diag_3]
+      utilisation_columns: [number_outpatient, number_emergency, number_inpatient]
 
 split:
   test_size: 0.2
   validation_size: 0.1
   random_state: 42
   stratify: true
+  # A temporal split (earliest admissions train, latest test) is used when the
+  # active profile has a real date_column - a stronger test of production
+  # readiness than a random split (ML Design section 6.10). Falls back to a
+  # stratified random split when there is no usable date (diabetes_130_us).
+  temporal_when_dated: true
 
 preprocessing:
-  drop_columns:
-    - encounter_id
-    - patient_nbr
-    - weight
-    - payer_code
-    - medical_specialty
-  missing_value_token: "?"
   numeric_imputation: median
   categorical_imputation: most_frequent
   scale_numeric: true
-  one_hot_encode: true
+  rare_category_threshold: 0.01
 
 imbalance:
-  strategy: class_weight   # one of: none | class_weight | smote
+  # class_weight: LogisticRegression and RandomForest use class_weight="balanced";
+  # XGBoost has no such parameter, so its equivalent - scale_pos_weight,
+  # computed as negatives/positives on the TRAINING split only - is used
+  # instead. "smote" is deferred: imbalanced-learn is already a pinned
+  # dependency for a future pass, but resampling needs an imblearn Pipeline
+  # in place of sklearn's, which is a larger change than this phase needs
+  # given class weighting is already sufficient per the ML Design doc's own
+  # risk mitigation table.
+  strategy: class_weight # one of: none | class_weight
 
 models:
   logistic_regression:
@@ -61,6 +124,8 @@ risk_bands:
   medium: 0.40
 
 artifacts:
-  output_dir: ml/artifacts
-  model_filename: readmission_model.joblib
-  metrics_filename: metrics.json
+  output_dir: artifacts # relative to ml/ - see the raw_path comment above
+  # {target} is "risk" or "readmission" - each training flow writes its own
+  # artefact and metrics file rather than overwriting a shared one.
+  model_filename: "{target}_model.joblib"
+  metrics_filename: "{target}_metrics.json"

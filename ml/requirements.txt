@@ -5,7 +5,11 @@ scipy==1.15.1
 
 # ---- Classical ML ----
 scikit-learn==1.6.0
-xgboost==2.1.3
+# 2.1.3 does not implement scikit-learn 1.6's __sklearn_tags__ API, so a
+# fitted XGBoost pipeline crashes on the first predict() call after this
+# version of scikit-learn - see check_is_fitted -> get_tags in the sklearn
+# traceback. 2.1.4 fixes it; verified end-to-end via src/models/train.py.
+xgboost==2.1.4
 imbalanced-learn==0.13.0
 joblib==1.4.2
 

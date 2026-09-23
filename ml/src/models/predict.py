@@ -10,7 +10,12 @@ from src.evaluation.metrics import categorise_risk
 
 
 def load_model(artifact_dir: str | Path, filename: str = "readmission_model.joblib") -> Any:
-    """Load a trained pipeline from disk."""
+    """Load a trained pipeline from disk.
+
+    src/models/train.py now writes one artefact per target - pass
+    filename="risk_model.joblib" to load the risk model instead of the
+    readmission model this default points at.
+    """
     model_path = Path(artifact_dir) / filename
     if not model_path.exists():
         raise FileNotFoundError(

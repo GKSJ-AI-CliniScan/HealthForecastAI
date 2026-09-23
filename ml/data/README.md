@@ -4,9 +4,46 @@
 in this tree. Committing a healthcare dataset - even a public one - to a shared
 repository is treated as a submission failure, and CI will reject the push.
 
-## Diabetes 130-US Hospitals (1999-2008)
+## India Hospital Readmission Dataset (2015-2024) - primary
 
-The dataset named in the project brief.
+The dataset named in the approved architecture
+(`docs/niyati/HealthForecastAI_ML_Design.md` section 3.1); `configs/config.yaml`
+sets `dataset.active: india_hospital_readmission`.
+
+- Source: <https://www.kaggle.com/datasets/digutlaranjithkumar/india-hospital-readmission-dataset-20152024>
+- Target column: `readmitted`
+
+**Schema caveat:** no copy of this export has ever been available in this
+repository or its CI - not for this pipeline, and not for the Postgres
+importer it shares a column profile with
+(`backend/app/services/dataset_import_service.py`). The column names and the
+assumed `<30` / `>30` / `NO` readmitted vocabulary in `configs/config.yaml`
+come from that importer's already-tested profile, not from a verified real
+file. Whoever downloads the real export first should diff its columns against
+`dataset.profiles.india_hospital_readmission` in `configs/config.yaml` and
+update both this pipeline and the importer together if they differ, then
+re-run `pytest` in both `ml/` and `backend/`.
+
+### Download
+
+Requires a Kaggle account and API token (`~/.kaggle/kaggle.json`):
+
+```bash
+mkdir -p ml/data/raw
+kaggle datasets download -d digutlaranjithkumar/india-hospital-readmission-dataset-20152024 \
+  -p ml/data/raw --unzip
+```
+
+Rename the resulting CSV to `ml/data/raw/india_hospital_readmission.csv` if
+Kaggle's export uses a different filename - `configs/config.yaml`'s
+`raw_path` expects that exact name.
+
+## Diabetes 130-US Hospitals (1999-2008) - fallback / bootstrap
+
+The dataset named in the project brief. Not the primary training source (see
+above) - kept as a working, verified-schema profile for local development
+when the India export is not available. Select it with
+`python -m src.models.train --dataset diabetes_130_us`.
 
 - Source: <https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008>
 - Records: 101,766 encounters, 50 features
