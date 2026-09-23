@@ -23,6 +23,7 @@ EXPECTED_TABLES = {
     "admissions",
     "audit_logs",
     "doctor_patient_map",
+    "model_metadata",
     "patients",
     "risk_predictions",
     "treatment_outcomes",
@@ -90,11 +91,54 @@ def test_doctor_patient_map_prevents_duplicate_assignments() -> None:
         ("doctor_patient_map", "idx_dpm_doctor"),
         ("doctor_patient_map", "idx_dpm_patient"),
         ("audit_logs", "idx_audit_actor_created"),
+        ("risk_predictions", "idx_risk_patient_created"),
+        ("risk_predictions", "idx_risk_predictions_type"),
+        ("model_metadata", "idx_model_metadata_status"),
     ],
 )
 def test_documented_indexes_exist(table: str, index: str) -> None:
     """Indexes named in the reference schema are declared on the models."""
     assert index in _index_names(table)
+
+
+def test_model_metadata_prevents_duplicate_name_version() -> None:
+    """Re-registering the same model_name + version must be rejected."""
+    assert "uq_model_metadata_name_version" in _constraint_names("model_metadata")
+
+
+def test_model_metadata_algorithm_is_constrained() -> None:
+    """Only the three selected algorithms may be registered."""
+    assert "model_metadata_algorithm_check" in _constraint_names("model_metadata")
+
+
+def test_model_metadata_status_is_constrained() -> None:
+    """The staged -> production -> retired/rejected lifecycle is enforced."""
+    assert "model_metadata_status_check" in _constraint_names("model_metadata")
+
+
+def test_model_metadata_promoted_by_is_a_real_foreign_key() -> None:
+    """Promotion is attributable to a real user account."""
+    column = Base.metadata.tables["model_metadata"].c.promoted_by
+    targets = {fk.target_fullname for fk in column.foreign_keys}
+    assert targets == {"users.id"}
+    assert all(fk.ondelete == "SET NULL" for fk in column.foreign_keys)
+
+
+def test_risk_predictions_type_is_constrained() -> None:
+    """A prediction row must be either a risk score or a readmission forecast."""
+    assert "risk_predictions_type_check" in _constraint_names("risk_predictions")
+
+
+def test_risk_predictions_readmission_requires_admission() -> None:
+    """A readmission forecast must be tied to the admission it forecasts."""
+    assert "risk_predictions_readmission_requires_admission_check" in _constraint_names(
+        "risk_predictions"
+    )
+
+
+def test_risk_predictions_window_is_constrained() -> None:
+    """Only the two supported forecast horizons (30/90 day) are valid."""
+    assert "risk_predictions_window_check" in _constraint_names("risk_predictions")
 
 
 @pytest.mark.parametrize(
@@ -108,6 +152,8 @@ def test_documented_indexes_exist(table: str, index: str) -> None:
         ("audit_logs", "outcome"),
         ("audit_logs", "created_at"),
         ("risk_predictions", "created_at"),
+        ("risk_predictions", "prediction_type"),
+        ("model_metadata", "status"),
     ],
 )
 def test_defaults_are_enforced_by_the_database(table: str, column: str) -> None:

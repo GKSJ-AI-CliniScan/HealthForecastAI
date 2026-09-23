@@ -19,13 +19,18 @@ class RiskPredictionRequest(BaseModel):
 
 
 class RiskPredictionRead(BaseModel):
-    """A readmission risk result."""
+    """A risk score or readmission forecast result for one patient/admission."""
 
     model_config = ConfigDict(from_attributes=True)
 
     patient_id: int
     readmission_probability: float = Field(ge=0.0, le=1.0)
     risk_category: str
+    prediction_type: str = "risk"
+    confidence_score: float | None = Field(default=None, ge=0.0, le=1.0)
+    readmission_window: str | None = None
+    actual_readmitted: bool | None = None
+    outcome_recorded_at: datetime | None = None
     model_name: str
     model_version: str
     created_at: datetime | None = None

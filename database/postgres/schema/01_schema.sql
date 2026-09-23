@@ -72,16 +72,67 @@ CREATE TABLE IF NOT EXISTS risk_predictions (
     admission_id             INTEGER REFERENCES admissions (id) ON DELETE SET NULL,
     readmission_probability  DOUBLE PRECISION NOT NULL,
     risk_category            VARCHAR(16) NOT NULL,
+    -- 'risk' (general patient risk score) or 'readmission' (readmission forecast).
+    -- Both prediction flavours share this table rather than two near-identical ones.
+    prediction_type          VARCHAR(20) NOT NULL DEFAULT 'risk',
+    confidence_score         DOUBLE PRECISION,
+    readmission_window       VARCHAR(10),
+    actual_readmitted        BOOLEAN,
+    outcome_recorded_at      TIMESTAMPTZ,
     model_name               VARCHAR(128) NOT NULL,
     model_version            VARCHAR(32)  NOT NULL,
     created_at               TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
     CONSTRAINT risk_probability_range_check
         CHECK (readmission_probability >= 0 AND readmission_probability <= 1),
     CONSTRAINT risk_category_check
-        CHECK (risk_category IN ('low', 'medium', 'high'))
+        CHECK (risk_category IN ('low', 'medium', 'high')),
+    CONSTRAINT risk_predictions_type_check
+        CHECK (prediction_type IN ('risk', 'readmission')),
+    CONSTRAINT risk_predictions_confidence_range_check
+        CHECK (confidence_score IS NULL OR (confidence_score >= 0 AND confidence_score <= 1)),
+    CONSTRAINT risk_predictions_window_check
+        CHECK (readmission_window IS NULL OR readmission_window IN ('30_day', '90_day')),
+    CONSTRAINT risk_predictions_readmission_requires_admission_check
+        CHECK (prediction_type != 'readmission' OR admission_id IS NOT NULL)
 );
 
 CREATE INDEX IF NOT EXISTS idx_risk_patient_created ON risk_predictions (patient_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_risk_predictions_type ON risk_predictions (prediction_type, created_at DESC);
+
+-- Registry of every trained/deployed ML model artefact (Milestone 2).
+CREATE TABLE IF NOT EXISTS model_metadata (
+    id               SERIAL PRIMARY KEY,
+    model_name       VARCHAR(100) NOT NULL,
+    version          VARCHAR(50)  NOT NULL,
+    algorithm        VARCHAR(50)  NOT NULL,
+    accuracy         DOUBLE PRECISION,
+    precision_score  DOUBLE PRECISION,
+    recall           DOUBLE PRECISION,
+    f1_score         DOUBLE PRECISION,
+    roc_auc          DOUBLE PRECISION,
+    artifact_path    VARCHAR(500) NOT NULL,
+    status           VARCHAR(20)  NOT NULL DEFAULT 'staged',
+    trained_at       TIMESTAMPTZ  NOT NULL,
+    promoted_at      TIMESTAMPTZ,
+    promoted_by      INTEGER REFERENCES users (id) ON DELETE SET NULL,
+    CONSTRAINT uq_model_metadata_name_version UNIQUE (model_name, version),
+    CONSTRAINT model_metadata_algorithm_check
+        CHECK (algorithm IN ('xgboost', 'random_forest', 'logistic_regression')),
+    CONSTRAINT model_metadata_status_check
+        CHECK (status IN ('staged', 'production', 'retired', 'rejected')),
+    CONSTRAINT model_metadata_accuracy_range_check
+        CHECK (accuracy IS NULL OR (accuracy >= 0 AND accuracy <= 1)),
+    CONSTRAINT model_metadata_precision_range_check
+        CHECK (precision_score IS NULL OR (precision_score >= 0 AND precision_score <= 1)),
+    CONSTRAINT model_metadata_recall_range_check
+        CHECK (recall IS NULL OR (recall >= 0 AND recall <= 1)),
+    CONSTRAINT model_metadata_f1_range_check
+        CHECK (f1_score IS NULL OR (f1_score >= 0 AND f1_score <= 1)),
+    CONSTRAINT model_metadata_roc_auc_range_check
+        CHECK (roc_auc IS NULL OR (roc_auc >= 0 AND roc_auc <= 1))
+);
+
+CREATE INDEX IF NOT EXISTS idx_model_metadata_status ON model_metadata (model_name, status);
 
 CREATE TABLE IF NOT EXISTS treatment_outcomes (
     id                   SERIAL PRIMARY KEY,
