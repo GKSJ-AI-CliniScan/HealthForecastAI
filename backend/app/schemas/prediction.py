@@ -6,16 +6,24 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class RiskPredictionRequest(BaseModel):
-    """Feature payload submitted for a single readmission risk prediction."""
+    """Request payload for a patient risk score.
+
+    Previously carried raw Diabetes-130-US-shaped feature fields
+    (time_in_hospital, num_lab_procedures, ...) that the /risk/predict stub
+    never actually read - it always returned a hardcoded probability. Real
+    inference builds the feature row itself from Postgres
+    (app/services/ml/feature_builder.py), so the caller only identifies the
+    patient; it does not - and should not - know the model's feature shape.
+    """
 
     patient_id: int
-    time_in_hospital: int = Field(ge=0, le=365)
-    num_medications: int = Field(ge=0)
-    num_lab_procedures: int = Field(ge=0)
-    number_diagnoses: int = Field(ge=0)
-    number_inpatient: int = Field(default=0, ge=0)
-    number_emergency: int = Field(default=0, ge=0)
-    age_group: str | None = None
+
+
+class ReadmissionPredictionRequest(BaseModel):
+    """Request payload for a 30-day readmission forecast on one admission."""
+
+    patient_id: int
+    admission_id: int
 
 
 class RiskPredictionRead(BaseModel):
@@ -23,7 +31,9 @@ class RiskPredictionRead(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+    id: int
     patient_id: int
+    admission_id: int | None = None
     readmission_probability: float = Field(ge=0.0, le=1.0)
     risk_category: str
     prediction_type: str = "risk"

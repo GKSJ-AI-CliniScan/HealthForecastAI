@@ -1,9 +1,12 @@
 import Link from 'next/link';
 
+import RiskScoreBar from '@/components/charts/RiskScoreBar';
+import ForecastReadmissionButton from '@/components/risk/ForecastReadmissionButton';
+import ScoreRiskButton from '@/components/risk/ScoreRiskButton';
 import { Badge, Card, Cell, ErrorNote, Row, StatTile, Table } from '@/components/ui';
 import { apiFetch } from '@/lib/api';
-import { getToken, requireUser } from '@/lib/session';
-import type { Patient } from '@/types';
+import { can, getToken, requireUser } from '@/lib/session';
+import type { CareRecommendations, DischargePlan, Patient, RiskPrediction } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,7 +41,7 @@ export default async function PatientDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireUser();
+  const user = await requireUser();
   const token = await getToken();
   const { id } = await params;
 
@@ -71,6 +74,41 @@ export default async function PatientDetailPage({
         </Link>
       </div>
     );
+  }
+
+  // Risk scoring, readmission forecasting and CDS are Doctor + System
+  // Administrator only today (RISK_REPORT_READ / CARE_RECOMMENDATION_GENERATE
+  // in backend/app/core/rbac.py) - Hospital Administrator and Healthcare
+  // Researcher have no per-patient prediction endpoint yet, so this section is
+  // skipped for them rather than shown failing, matching the aggregate-only
+  // view those roles get elsewhere.
+  const canSeeRisk = can(user, 'risk_report:read');
+  const mostRecentAdmission = admissions[0] ?? null;
+
+  let riskScore: RiskPrediction | null = null;
+  let readmissionForecast: RiskPrediction | null = null;
+  let recommendations: CareRecommendations | null = null;
+  let dischargePlan: DischargePlan | null = null;
+
+  if (canSeeRisk) {
+    [riskScore, readmissionForecast, recommendations, dischargePlan] = await Promise.all([
+      apiFetch<RiskPrediction>(`/risk/${id}`, { cache: 'no-store' }, token).catch(() => null),
+      apiFetch<RiskPrediction>(
+        `/risk/${id}?type=readmission`,
+        { cache: 'no-store' },
+        token,
+      ).catch(() => null),
+      apiFetch<CareRecommendations>(
+        `/clinical-support/recommendations/${id}`,
+        { cache: 'no-store' },
+        token,
+      ).catch(() => null),
+      apiFetch<DischargePlan>(
+        `/clinical-support/discharge-plan/${id}`,
+        { cache: 'no-store' },
+        token,
+      ).catch(() => null),
+    ]);
   }
 
   return (
@@ -119,6 +157,118 @@ export default async function PatientDetailPage({
               </Badge>
             ))}
           </div>
+        </Card>
+      )}
+
+      {canSeeRisk && (
+        <Card title="Risk & recommendations">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-sm font-medium opacity-80">Patient risk score</h3>
+                <ScoreRiskButton patientId={patient.id} />
+              </div>
+              {riskScore ? (
+                <div className="space-y-2">
+                  <RiskScoreBar
+                    probability={riskScore.readmission_probability}
+                    category={riskScore.risk_category}
+                  />
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <Badge>{riskScore.risk_category.toUpperCase()}</Badge>
+                    <span className="opacity-70">
+                      {(riskScore.readmission_probability * 100).toFixed(0)}% probability
+                    </span>
+                  </div>
+                  <p className="text-xs opacity-60">
+                    {riskScore.model_name} v{riskScore.model_version}
+                    {riskScore.created_at
+                      ? ` · ${new Date(riskScore.created_at).toLocaleString()}`
+                      : ''}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-sm opacity-70">Not scored yet.</p>
+              )}
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-sm font-medium opacity-80">30-day readmission forecast</h3>
+                {mostRecentAdmission && (
+                  <ForecastReadmissionButton
+                    patientId={patient.id}
+                    admissionId={mostRecentAdmission.id}
+                  />
+                )}
+              </div>
+              {readmissionForecast ? (
+                <div className="space-y-2">
+                  <RiskScoreBar
+                    probability={readmissionForecast.readmission_probability}
+                    category={readmissionForecast.risk_category}
+                  />
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <Badge>{readmissionForecast.risk_category.toUpperCase()}</Badge>
+                    <span className="opacity-70">
+                      {(readmissionForecast.readmission_probability * 100).toFixed(0)}% ·{' '}
+                      {readmissionForecast.readmission_window ?? '30-day'} horizon
+                    </span>
+                  </div>
+                  {readmissionForecast.confidence_score !== null && (
+                    <p className="text-xs opacity-60">
+                      Confidence: {(readmissionForecast.confidence_score * 100).toFixed(0)}%
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm opacity-70">
+                  {mostRecentAdmission
+                    ? 'Not forecasted yet.'
+                    : 'No admission recorded to forecast.'}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {recommendations && recommendations.recommendations.length > 0 && (
+            <div className="mt-6 border-t border-[var(--border)] pt-4">
+              <h3 className="text-sm font-medium opacity-80">Care & follow-up recommendations</h3>
+              <ul className="mt-2 space-y-1 text-sm">
+                {recommendations.recommendations.map((item, index) => (
+                  <li key={index} className="flex gap-2">
+                    <Badge>{item.category}</Badge>
+                    <span>{item.text}</span>
+                  </li>
+                ))}
+              </ul>
+              {recommendations.follow_up_days != null && (
+                <p className="mt-2 text-xs opacity-60">
+                  Suggested follow-up: within {recommendations.follow_up_days} days.
+                </p>
+              )}
+            </div>
+          )}
+
+          {dischargePlan && (
+            <div className="mt-6 border-t border-[var(--border)] pt-4">
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-medium opacity-80">Discharge readiness</h3>
+                <Badge>
+                  {dischargePlan.ready_for_discharge === null
+                    ? 'Unknown'
+                    : dischargePlan.ready_for_discharge
+                      ? 'Ready'
+                      : 'Not ready'}
+                </Badge>
+              </div>
+              <ul className="mt-2 space-y-1 text-sm">
+                {dischargePlan.discharge_checklist.map((item, index) => (
+                  <li key={index}>• {item.text}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </Card>
       )}
 

@@ -1,9 +1,10 @@
 import Link from 'next/link';
 
-import { Card, StatTile } from '@/components/ui';
+import ForecastChart from '@/components/charts/ForecastChart';
+import { Badge, Card, Cell, Row, StatTile, Table } from '@/components/ui';
 import { apiFetch } from '@/lib/api';
 import { can, getToken, requireUser } from '@/lib/session';
-import type { Patient } from '@/types';
+import type { Patient, ReadmissionForecast, RiskPrediction } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,6 +33,20 @@ export default async function DashboardPage() {
       unreachable = true;
     }
   }
+
+  // Doctor + System Administrator only (RISK_REPORT_READ).
+  const highRiskPatients = can(user, 'risk_report:read')
+    ? await apiFetch<RiskPrediction[]>('/risk/high-risk', { cache: 'no-store' }, token).catch(
+        () => [] as RiskPrediction[],
+      )
+    : [];
+
+  // Doctor + Hospital Administrator + System Administrator (READMISSION_FORECAST_READ).
+  const forecast = can(user, 'readmission_forecast:read')
+    ? await apiFetch<ReadmissionForecast>('/risk/forecast', { cache: 'no-store' }, token).catch(
+        () => null,
+      )
+    : null;
 
   return (
     <div className="space-y-6">
@@ -62,6 +77,60 @@ export default async function DashboardPage() {
             <code className="rounded bg-black/10 px-1">uvicorn app.main:app --reload</code> in{' '}
             <code className="rounded bg-black/10 px-1">backend/</code>.
           </p>
+        </Card>
+      )}
+
+      {forecast && (
+        <Card title="30-day readmission forecast">
+          <div className="grid gap-4 sm:grid-cols-[auto,1fr]">
+            <div className="flex gap-4 sm:flex-col">
+              <StatTile label="Predicted readmissions" value={forecast.predicted_readmissions} />
+              <StatTile
+                label="Predicted rate"
+                value={`${(forecast.predicted_rate * 100).toFixed(0)}%`}
+              />
+            </div>
+            <ForecastChart
+              predicted={forecast.predicted_readmissions}
+              total={
+                forecast.predicted_rate > 0
+                  ? Math.round(forecast.predicted_readmissions / forecast.predicted_rate)
+                  : forecast.predicted_readmissions
+              }
+            />
+          </div>
+          <p className="mt-2 text-xs opacity-60">
+            Scope: {forecast.scope} · Horizon: {forecast.horizon_days} days
+          </p>
+        </Card>
+      )}
+
+      {can(user, 'risk_report:read') && (
+        <Card title="High-risk patients">
+          <Table
+            headers={['Patient', 'Risk', 'Probability', 'Scored']}
+            empty="No patients are currently in the high risk band."
+          >
+            {highRiskPatients.map((prediction) => (
+              <Row key={prediction.id}>
+                <Cell>
+                  <Link
+                    href={`/dashboard/patients/${prediction.patient_id}`}
+                    className="underline underline-offset-2"
+                  >
+                    #{prediction.patient_id}
+                  </Link>
+                </Cell>
+                <Cell>
+                  <Badge>{prediction.risk_category.toUpperCase()}</Badge>
+                </Cell>
+                <Cell>{(prediction.readmission_probability * 100).toFixed(0)}%</Cell>
+                <Cell>
+                  {prediction.created_at ? new Date(prediction.created_at).toLocaleDateString() : '-'}
+                </Cell>
+              </Row>
+            ))}
+          </Table>
         </Card>
       )}
 
