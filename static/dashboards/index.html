@@ -417,9 +417,124 @@
 <div class="w-full h-[300px]">
 <canvas id="dischargeChart"></canvas>
 </div>
+<!-- Milestone 3: Treatment Effectiveness & Medication Outcomes -->
+<div class="clinical-card p-lg clinical-shadow space-y-6">
+  <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 border-b border-outline-variant pb-4">
+    <div>
+      <h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">medication</span>
+        Treatment Effectiveness & Medication Outcome Analysis
+      </h2>
+      <p class="font-body-sm text-body-sm text-on-surface-variant">
+        Comparative cohort recovery scores, length of stay, and 30-day readmission rates across clinical regimens.
+      </p>
+    </div>
+    <span class="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-full border border-blue-200">
+      Module 4: Treatment Intelligence
+    </span>
+  </div>
+
+  <!-- Key Clinical Insight Callout -->
+  <div class="p-4 bg-emerald-50/80 border border-emerald-200 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined">trending_down</span>
+      </div>
+      <div>
+        <h4 class="text-sm font-bold text-emerald-950">Active Medication Titration: 28.9% Relative Risk Reduction</h4>
+        <p class="text-xs text-emerald-800">
+          Proactive medication adjustments correlate with +5.3 higher recovery scores (82.4 vs 77.1) and lower 30-day readmissions (8.1% vs 11.4%).
+        </p>
+      </div>
+    </div>
+    <div class="flex gap-4 shrink-0 font-mono text-xs">
+      <div class="text-center bg-white px-3 py-1.5 rounded-lg border border-emerald-200">
+        <div class="text-[10px] text-slate-500 uppercase">Adjusted Cohort</div>
+        <div class="text-sm font-bold text-emerald-700">8.1% Readmit</div>
+      </div>
+      <div class="text-center bg-white px-3 py-1.5 rounded-lg border border-emerald-200">
+        <div class="text-[10px] text-slate-500 uppercase">Maintained Cohort</div>
+        <div class="text-sm font-bold text-slate-700">11.4% Readmit</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Treatment Effectiveness Table -->
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-xs border border-outline-variant rounded-lg overflow-hidden">
+      <thead class="bg-slate-50 text-slate-700 font-bold border-b border-outline-variant">
+        <tr>
+          <th class="p-3">Treatment / Regimen</th>
+          <th class="p-3">Medication Class</th>
+          <th class="p-3">Patients Evaluated</th>
+          <th class="p-3">Avg Recovery Score</th>
+          <th class="p-3">30-Day Readmission Rate</th>
+          <th class="p-3">Avg Hospital Stay</th>
+          <th class="p-3">Clinical Status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-200 font-mono text-xs text-slate-800">
+        <tr class="hover:bg-slate-50/80">
+          <td class="p-3 font-semibold font-sans text-slate-900">Metformin + SGLT2i Combination</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-sans font-medium text-[11px]">Antidiabetic</span></td>
+          <td class="p-3">2,150</td>
+          <td class="p-3 text-emerald-600 font-bold">84.2 / 100</td>
+          <td class="p-3 text-emerald-700 font-bold">7.1%</td>
+          <td class="p-3">3.1 Days</td>
+          <td class="p-3 font-sans"><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Optimal Efficacy</span></td>
+        </tr>
+        <tr class="hover:bg-slate-50/80">
+          <td class="p-3 font-semibold font-sans text-slate-900">ACE Inhibitor + Statin Therapy</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded bg-purple-50 text-purple-700 font-sans font-medium text-[11px]">Cardiovascular</span></td>
+          <td class="p-3">1,890</td>
+          <td class="p-3 text-emerald-600 font-bold">86.4 / 100</td>
+          <td class="p-3 text-emerald-700 font-bold">6.4%</td>
+          <td class="p-3">3.8 Days</td>
+          <td class="p-3 font-sans"><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Optimal Efficacy</span></td>
+        </tr>
+        <tr class="hover:bg-slate-50/80">
+          <td class="p-3 font-semibold font-sans text-slate-900">Metformin Monotherapy</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-sans font-medium text-[11px]">Antidiabetic</span></td>
+          <td class="p-3">3,100</td>
+          <td class="p-3 text-blue-600 font-bold">82.0 / 100</td>
+          <td class="p-3 text-slate-700 font-bold">8.2%</td>
+          <td class="p-3">3.4 Days</td>
+          <td class="p-3 font-sans"><span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-bold">High Efficacy</span></td>
+        </tr>
+        <tr class="hover:bg-slate-50/80">
+          <td class="p-3 font-semibold font-sans text-slate-900">Insulin Intensive Therapy</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-sans font-medium text-[11px]">Antidiabetic</span></td>
+          <td class="p-3">1,420</td>
+          <td class="p-3 text-slate-700 font-bold">78.5 / 100</td>
+          <td class="p-3 text-amber-600 font-bold">9.8%</td>
+          <td class="p-3">4.2 Days</td>
+          <td class="p-3 font-sans"><span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">Requires Monitoring</span></td>
+        </tr>
+        <tr class="hover:bg-slate-50/80">
+          <td class="p-3 font-semibold font-sans text-slate-900">Beta-Blocker + ARB Regimen</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded bg-purple-50 text-purple-700 font-sans font-medium text-[11px]">Cardiovascular</span></td>
+          <td class="p-3">1,140</td>
+          <td class="p-3 text-slate-700 font-bold">79.1 / 100</td>
+          <td class="p-3 text-amber-600 font-bold">10.5%</td>
+          <td class="p-3">4.5 Days</td>
+          <td class="p-3 font-sans"><span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">Requires Monitoring</span></td>
+        </tr>
+        <tr class="hover:bg-slate-50/80">
+          <td class="p-3 font-semibold font-sans text-slate-900">Respiratory Corticosteroid Protocol</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded bg-cyan-50 text-cyan-700 font-sans font-medium text-[11px]">Respiratory</span></td>
+          <td class="p-3">980</td>
+          <td class="p-3 text-slate-700 font-bold">75.8 / 100</td>
+          <td class="p-3 text-rose-600 font-bold">11.8%</td>
+          <td class="p-3">4.8 Days</td>
+          <td class="p-3 font-sans"><span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-bold">Elevated Risk</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 </div>
 
+      </div>
       </div>
 
       <!-- 3. Researcher View Panel -->
