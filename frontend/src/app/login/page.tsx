@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+
 import {
   ArrowLeft,
   ArrowRight,
@@ -32,25 +33,101 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] =
     useState(false);
 
+  const [email, setEmail] =
+    useState("");
+
+  const [password, setPassword] =
+    useState("");
+
+  const [emailError, setEmailError] =
+    useState("");
+
+  const [passwordError, setPasswordError] =
+    useState("");
+
+  const [loginError, setLoginError] =
+    useState("");
+
+  /* =====================================================
+     LOGIN VALIDATION
+  ====================================================== */
+
   const handleLogin = () => {
-    /*
-      FRONTEND ONLY
+    // Clear previous errors
+    setEmailError("");
+    setPasswordError("");
+    setLoginError("");
 
-      Your backend is not connected yet.
-      Later replace this with your API login request.
-    */
-   const handleLogin = () => {
-  if (selectedRole === "doctor") {
-    window.location.href = "/doctor";
-  } else if (selectedRole === "hospital") {
-    window.location.href = "/admin";
-  } else if (selectedRole === "researcher") {
-    window.location.href = "/researcher";
-  } else if (selectedRole === "system") {
-    window.location.href = "/system-admin";
-  }
-};
+    const trimmedEmail = email.trim();
 
+    /* =================================================
+       EMPTY FIELD VALIDATION
+    ================================================= */
+
+    if (!trimmedEmail && !password) {
+      setLoginError(
+        "Please enter your email address and password."
+      );
+      return;
+    }
+
+    if (!trimmedEmail) {
+      setEmailError(
+        "Please enter your email address."
+      );
+      return;
+    }
+
+    if (!password) {
+      setPasswordError(
+        "Please enter your password."
+      );
+      return;
+    }
+
+    /* =================================================
+       EMAIL VALIDATION
+    ================================================= */
+
+    const emailPattern =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(trimmedEmail)) {
+      setEmailError(
+        "Please enter a valid email address."
+      );
+      return;
+    }
+
+    /* =================================================
+       FRONTEND DEMO PASSWORD
+       
+       This will be replaced by backend/JWT
+       authentication later.
+    ================================================= */
+
+    const demoPassword = "Health@123";
+
+    if (password !== demoPassword) {
+      setPasswordError(
+        "Incorrect password. Please try again."
+      );
+      return;
+    }
+
+    /* =================================================
+       LOGIN SUCCESS
+    ================================================= */
+
+    if (selectedRole === "doctor") {
+      window.location.href = "/doctor";
+    } else if (selectedRole === "hospital") {
+      window.location.href = "/admin";
+    } else if (selectedRole === "researcher") {
+      window.location.href = "/researcher";
+    } else if (selectedRole === "system") {
+      window.location.href = "/system-admin";
+    }
   };
 
   return (
@@ -63,6 +140,7 @@ export default function LoginPage() {
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
 
         {/* Large left circle */}
+
         <div
           className="
             absolute
@@ -76,6 +154,7 @@ export default function LoginPage() {
         />
 
         {/* Left inner circle */}
+
         <div
           className="
             absolute
@@ -90,6 +169,7 @@ export default function LoginPage() {
         />
 
         {/* Top right circle */}
+
         <div
           className="
             absolute
@@ -103,6 +183,7 @@ export default function LoginPage() {
         />
 
         {/* Bottom right circle */}
+
         <div
           className="
             absolute
@@ -116,6 +197,7 @@ export default function LoginPage() {
         />
 
         {/* Small center circle */}
+
         <div
           className="
             absolute
@@ -129,7 +211,6 @@ export default function LoginPage() {
         />
 
       </div>
-
 
       {/* =====================================================
           HEADER
@@ -156,6 +237,7 @@ export default function LoginPage() {
         {/* BRAND */}
 
         <button
+          type="button"
           onClick={() => {
             window.location.href = "/";
           }}
@@ -187,7 +269,6 @@ export default function LoginPage() {
               strokeWidth={2.5}
             />
           </div>
-
 
           {/* Brand text */}
 
@@ -224,10 +305,10 @@ export default function LoginPage() {
 
         </button>
 
-
         {/* BACK TO HOME */}
 
         <button
+          type="button"
           onClick={() => {
             window.location.href = "/";
           }}
@@ -242,15 +323,12 @@ export default function LoginPage() {
             hover:text-[#1268D5]
           "
         >
-
           <ArrowLeft size={14} />
 
           Back to Home
-
         </button>
 
       </header>
-
 
       {/* =====================================================
           MAIN
@@ -313,7 +391,6 @@ export default function LoginPage() {
 
               </div>
 
-
               {/* Main heading */}
 
               <h1
@@ -327,7 +404,6 @@ export default function LoginPage() {
                   text-[#092957]
                 "
               >
-
                 Smarter
                 <br />
 
@@ -340,9 +416,7 @@ export default function LoginPage() {
                 <span className="text-[#1268D5]">
                   Tomorrow.
                 </span>
-
               </h1>
-
 
               {/* Description */}
 
@@ -359,7 +433,6 @@ export default function LoginPage() {
                 identify patient risks, reduce readmissions,
                 and support better healthcare decisions.
               </p>
-
 
               {/* =================================================
                   FEATURES
@@ -390,7 +463,6 @@ export default function LoginPage() {
             </div>
 
           </div>
-
 
           {/* =================================================
               RIGHT LOGIN CARD
@@ -457,7 +529,6 @@ export default function LoginPage() {
 
               </div>
 
-
               {/* =================================================
                   EMAIL
               ================================================== */}
@@ -494,17 +565,21 @@ export default function LoginPage() {
                     <MailIcon />
                   </div>
 
-
                   <input
                     id="email"
                     type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      setEmailError("");
+                      setLoginError("");
+                    }}
                     placeholder="doctor@healthforecast.ai"
-                    className="
+                    className={`
                       h-[46px]
                       w-full
                       rounded-xl
                       border
-                      border-[#dce8f2]
                       bg-[#fcfeff]
                       pl-10
                       pr-4
@@ -516,13 +591,26 @@ export default function LoginPage() {
                       focus:border-[#1268D5]
                       focus:ring-4
                       focus:ring-[#1268D5]/10
-                    "
+
+                      ${
+                        emailError
+                          ? "border-red-400 focus:border-red-500 focus:ring-red-500/10"
+                          : "border-[#dce8f2]"
+                      }
+                    `}
                   />
 
                 </div>
 
-              </div>
+                {/* Email error */}
 
+                {emailError && (
+                  <p className="mt-1.5 text-[10px] font-medium text-red-500">
+                    {emailError}
+                  </p>
+                )}
+
+              </div>
 
               {/* =================================================
                   PASSWORD
@@ -557,7 +645,6 @@ export default function LoginPage() {
 
                 </div>
 
-
                 <div className="relative">
 
                   <LockKeyhole
@@ -571,7 +658,6 @@ export default function LoginPage() {
                     "
                   />
 
-
                   <input
                     id="password"
                     type={
@@ -579,13 +665,18 @@ export default function LoginPage() {
                         ? "text"
                         : "password"
                     }
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setPasswordError("");
+                      setLoginError("");
+                    }}
                     placeholder="Enter your password"
-                    className="
+                    className={`
                       h-[46px]
                       w-full
                       rounded-xl
                       border
-                      border-[#dce8f2]
                       bg-[#fcfeff]
                       pl-10
                       pr-11
@@ -597,9 +688,14 @@ export default function LoginPage() {
                       focus:border-[#1268D5]
                       focus:ring-4
                       focus:ring-[#1268D5]/10
-                    "
-                  />
 
+                      ${
+                        passwordError
+                          ? "border-red-400 focus:border-red-500 focus:ring-red-500/10"
+                          : "border-[#dce8f2]"
+                      }
+                    `}
+                  />
 
                   <button
                     type="button"
@@ -621,19 +717,24 @@ export default function LoginPage() {
                         : "Show password"
                     }
                   >
-
                     {showPassword ? (
                       <EyeOff size={17} />
                     ) : (
                       <Eye size={17} />
                     )}
-
                   </button>
 
                 </div>
 
-              </div>
+                {/* Password error */}
 
+                {passwordError && (
+                  <p className="mt-1.5 text-[10px] font-medium text-red-500">
+                    {passwordError}
+                  </p>
+                )}
+
+              </div>
 
               {/* =================================================
                   ROLE SELECTION
@@ -652,7 +753,6 @@ export default function LoginPage() {
                 >
                   Sign in as
                 </label>
-
 
                 <div className="space-y-1.5">
 
@@ -696,7 +796,6 @@ export default function LoginPage() {
 
               </div>
 
-
               {/* =================================================
                   REMEMBER ME
               ================================================== */}
@@ -739,7 +838,6 @@ export default function LoginPage() {
 
                 </label>
 
-
                 <div
                   className="
                     flex
@@ -749,21 +847,42 @@ export default function LoginPage() {
                     text-[#8094aa]
                   "
                 >
-
                   <LockKeyhole size={12} />
 
                   Secure login
-
                 </div>
 
               </div>
 
+              {/* =================================================
+                  GENERAL LOGIN ERROR
+              ================================================== */}
+
+              {loginError && (
+                <div
+                  className="
+                    mt-4
+                    rounded-lg
+                    border
+                    border-red-200
+                    bg-red-50
+                    px-3
+                    py-2.5
+                    text-[10px]
+                    font-medium
+                    text-red-600
+                  "
+                >
+                  {loginError}
+                </div>
+              )}
 
               {/* =================================================
                   SIGN IN
               ================================================== */}
 
               <button
+                type="button"
                 onClick={handleLogin}
                 className="
                   mt-4
@@ -786,16 +905,13 @@ export default function LoginPage() {
                   hover:shadow-xl
                 "
               >
-
                 Sign in
 
                 <ArrowRight
                   size={16}
                   className="ml-2"
                 />
-
               </button>
-
 
               {/* =================================================
                   SECURITY NOTE
@@ -847,7 +963,6 @@ export default function LoginPage() {
     </main>
   );
 }
-
 
 /* =========================================================
    FEATURE COMPONENT
@@ -909,7 +1024,6 @@ function Feature({
   );
 }
 
-
 /* =========================================================
    ROLE CARD
 ========================================================= */
@@ -929,12 +1043,15 @@ function RoleCard({
   title: string;
   description: string;
 }) {
-  const selected = selectedRole === role;
+  const selected =
+    selectedRole === role;
 
   return (
     <button
       type="button"
-      onClick={() => setSelectedRole(role)}
+      onClick={() =>
+        setSelectedRole(role)
+      }
       className={`
         flex
         min-h-[53px]
@@ -979,7 +1096,6 @@ function RoleCard({
         {icon}
       </div>
 
-
       {/* TEXT */}
 
       <div className="min-w-0 flex-1">
@@ -1007,7 +1123,6 @@ function RoleCard({
         </p>
 
       </div>
-
 
       {/* RADIO */}
 
@@ -1046,7 +1161,6 @@ function RoleCard({
     </button>
   );
 }
-
 
 /* =========================================================
    EMAIL ICON
