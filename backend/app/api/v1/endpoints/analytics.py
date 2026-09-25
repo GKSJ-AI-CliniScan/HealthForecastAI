@@ -1,9 +1,12 @@
 """Analytics & Reporting API Endpoints."""
 
 from datetime import date
+from typing import Any
 
-from fastapi import APIRouter, Query, status
+from fastapi import APIRouter, Depends, Query, status
 
+from app.api.deps import get_current_user
+from app.models.user import User
 from app.schemas.analytics import (
     DepartmentPerformance,
     HospitalPerformanceResponse,
@@ -15,6 +18,26 @@ from app.schemas.analytics import (
 from app.services.analytics_service import AnalyticsService
 
 router = APIRouter()
+
+
+@router.get(
+    "/summary",
+    summary="Get analytics executive summary",
+    response_model=dict[str, Any],
+)
+def get_analytics_summary(
+    current_user: User = Depends(get_current_user),
+) -> dict[str, Any]:
+    """Protected executive summary for RBAC compliance."""
+    perf = AnalyticsService.get_hospital_performance()
+    outcomes = AnalyticsService.calculate_outcome_metrics()
+    return {
+        "status": "active",
+        "facility": perf.facility_name,
+        "readmission_rate_pct": outcomes.readmission_rate_pct,
+        "total_patients": outcomes.total_patients,
+        "departments_count": len(perf.departments),
+    }
 
 
 @router.get(
