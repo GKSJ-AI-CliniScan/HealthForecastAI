@@ -1,6 +1,7 @@
 import { MODULES } from '@/lib/modules';
 import TreatmentEffectiveness from '@/components/treatment/TreatmentEffectiveness';
 import OutcomeProfile from '@/components/treatment/OutcomeProfile';
+import RiskTreatmentProfile from '@/components/treatment/RiskTreatmentProfile';
 
 
 export default function Home() {
@@ -41,6 +42,9 @@ export default function Home() {
       <section className="mt-12">
         <OutcomeProfile />
       </section>
+      <section className="mt-12">
+  <RiskTreatmentProfile />
+</section>
     </main>
   );
 }
