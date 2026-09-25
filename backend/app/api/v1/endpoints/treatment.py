@@ -6,9 +6,11 @@ from sqlalchemy.orm import Session
 from app.api.deps import CurrentUser, require_permission
 from app.core.rbac import Permission
 from app.db.session import get_db
-from app.schemas.analytics import TreatmentEffectivenessSummary
+from app.schemas.analytics import OutcomeProfile, TreatmentEffectivenessSummary
+from app.services.outcome_service import get_outcome_profile
 from app.services.treatment_service import get_treatment_effectiveness
-
+from app.schemas.analytics import OutcomeProfile, TreatmentEffectivenessSummary
+from app.services.outcome_service import get_outcome_profile
 router = APIRouter()
 
 
@@ -43,3 +45,18 @@ def recovery_trends(
     """
 
     return []
+
+@router.get(
+    "/outcomes",
+    response_model=list[OutcomeProfile],
+    summary="Patient recovery and outcome profiles",
+)
+def patient_outcomes(
+    db: Session = Depends(get_db),
+    user: CurrentUser = Depends(
+        require_permission(Permission.TREATMENT_REPORT_READ)
+    ),
+) -> list[OutcomeProfile]:
+    """Return observed patient profiles grouped by readmission outcome."""
+
+    return get_outcome_profile(db)
