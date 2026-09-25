@@ -1,0 +1,23 @@
+[
+  {
+    "risk_band": "High",
+    "readmitted_under_30": 43.8,
+    "readmitted_after_30": 37.25,
+    "no_readmission": 18.95,
+    "patients": 3667
+  },
+  {
+    "risk_band": "Low",
+    "readmitted_under_30": 4.43,
+    "readmitted_after_30": 28.36,
+    "no_readmission": 67.21,
+    "patients": 37664
+  },
+  {
+    "risk_band": "Medium",
+    "readmitted_under_30": 13.37,
+    "readmitted_after_30": 38.88,
+    "no_readmission": 47.75,
+    "patients": 60435
+  }
+]

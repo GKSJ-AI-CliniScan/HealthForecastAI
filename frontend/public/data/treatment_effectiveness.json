@@ -1,0 +1,90 @@
+[
+  {
+    "treatment_name": "metformin",
+    "patients_treated": 19988,
+    "no_readmission_rate": 56.749049429657795,
+    "readmission_after_30_rate": 33.55013007804683,
+    "readmission_under_30_rate": 9.700820492295376,
+    "baseline_gap": 2.8371338586419412
+  },
+  {
+    "treatment_name": "glyburide",
+    "patients_treated": 10650,
+    "no_readmission_rate": 54.460093896713616,
+    "readmission_after_30_rate": 34.91079812206573,
+    "readmission_under_30_rate": 10.629107981220658,
+    "baseline_gap": 0.5481783256977621
+  },
+  {
+    "treatment_name": "glimepiride",
+    "patients_treated": 5191,
+    "no_readmission_rate": 53.053361587362744,
+    "readmission_after_30_rate": 36.73665960315932,
+    "readmission_under_30_rate": 10.209978809477944,
+    "baseline_gap": -0.8585539836531098
+  },
+  {
+    "treatment_name": "glyburide-metformin",
+    "patients_treated": 706,
+    "no_readmission_rate": 52.40793201133145,
+    "readmission_after_30_rate": 36.54390934844193,
+    "readmission_under_30_rate": 11.048158640226628,
+    "baseline_gap": -1.5039835596844071
+  },
+  {
+    "treatment_name": "insulin",
+    "patients_treated": 54383,
+    "no_readmission_rate": 51.82869646764614,
+    "readmission_after_30_rate": 36.03331923579059,
+    "readmission_under_30_rate": 12.137984296563264,
+    "baseline_gap": -2.0832191033697143
+  },
+  {
+    "treatment_name": "pioglitazone",
+    "patients_treated": 7328,
+    "no_readmission_rate": 51.814956331877724,
+    "readmission_after_30_rate": 37.62281659388647,
+    "readmission_under_30_rate": 10.562227074235809,
+    "baseline_gap": -2.0969592391381298
+  },
+  {
+    "treatment_name": "rosiglitazone",
+    "patients_treated": 6365,
+    "no_readmission_rate": 51.704634721131185,
+    "readmission_after_30_rate": 37.84760408483896,
+    "readmission_under_30_rate": 10.44776119402985,
+    "baseline_gap": -2.2072808498846683
+  },
+  {
+    "treatment_name": "nateglinide",
+    "patients_treated": 703,
+    "no_readmission_rate": 51.35135135135135,
+    "readmission_after_30_rate": 37.26884779516359,
+    "readmission_under_30_rate": 11.379800853485063,
+    "baseline_gap": -2.5605642196645064
+  },
+  {
+    "treatment_name": "glipizide",
+    "patients_treated": 12686,
+    "no_readmission_rate": 51.26911556046036,
+    "readmission_after_30_rate": 37.28519627936308,
+    "readmission_under_30_rate": 11.445688160176573,
+    "baseline_gap": -2.642800010555497
+  },
+  {
+    "treatment_name": "repaglinide",
+    "patients_treated": 1539,
+    "no_readmission_rate": 45.09421702404158,
+    "readmission_after_30_rate": 41.58544509421702,
+    "readmission_under_30_rate": 13.32033788174139,
+    "baseline_gap": -8.81769854697427
+  },
+  {
+    "treatment_name": "acarbose",
+    "patients_treated": 308,
+    "no_readmission_rate": 40.58441558441558,
+    "readmission_after_30_rate": 50.324675324675326,
+    "readmission_under_30_rate": 9.090909090909092,
+    "baseline_gap": -13.327499986600273
+  }
+]

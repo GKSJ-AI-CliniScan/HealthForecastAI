@@ -2,7 +2,7 @@ import { MODULES } from '@/lib/modules';
 import TreatmentEffectiveness from '@/components/treatment/TreatmentEffectiveness';
 import OutcomeProfile from '@/components/treatment/OutcomeProfile';
 import RiskTreatmentProfile from '@/components/treatment/RiskTreatmentProfile';
-
+import HealthcareAnalytics from '@/components/analytics/HealthcareAnalytics';
 
 export default function Home() {
   return (
@@ -44,6 +44,9 @@ export default function Home() {
       </section>
       <section className="mt-12">
   <RiskTreatmentProfile />
+</section>
+<section className="mt-12">
+  <HealthcareAnalytics />
 </section>
     </main>
   );

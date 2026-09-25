@@ -1,0 +1,86 @@
+[
+  {
+    "time_in_hospital": 1,
+    "patients": 14208,
+    "readmission_rate": 39.65,
+    "readmitted_under_30": 8.18
+  },
+  {
+    "time_in_hospital": 2,
+    "patients": 17224,
+    "readmission_rate": 44.3,
+    "readmitted_under_30": 9.94
+  },
+  {
+    "time_in_hospital": 3,
+    "patients": 17756,
+    "readmission_rate": 44.94,
+    "readmitted_under_30": 10.67
+  },
+  {
+    "time_in_hospital": 4,
+    "patients": 13924,
+    "readmission_rate": 48.18,
+    "readmitted_under_30": 11.81
+  },
+  {
+    "time_in_hospital": 5,
+    "patients": 9966,
+    "readmission_rate": 48.01,
+    "readmitted_under_30": 12.03
+  },
+  {
+    "time_in_hospital": 6,
+    "patients": 7539,
+    "readmission_rate": 49.13,
+    "readmitted_under_30": 12.59
+  },
+  {
+    "time_in_hospital": 7,
+    "patients": 5859,
+    "readmission_rate": 49.07,
+    "readmitted_under_30": 12.83
+  },
+  {
+    "time_in_hospital": 8,
+    "patients": 4391,
+    "readmission_rate": 50.42,
+    "readmitted_under_30": 14.23
+  },
+  {
+    "time_in_hospital": 9,
+    "patients": 3002,
+    "readmission_rate": 50.33,
+    "readmitted_under_30": 13.72
+  },
+  {
+    "time_in_hospital": 10,
+    "patients": 2342,
+    "readmission_rate": 50.13,
+    "readmitted_under_30": 14.35
+  },
+  {
+    "time_in_hospital": 11,
+    "patients": 1855,
+    "readmission_rate": 48.19,
+    "readmitted_under_30": 10.51
+  },
+  {
+    "time_in_hospital": 12,
+    "patients": 1448,
+    "readmission_rate": 49.1,
+    "readmitted_under_30": 13.33
+  },
+  {
+    "time_in_hospital": 13,
+    "patients": 1210,
+    "readmission_rate": 47.11,
+    "readmitted_under_30": 12.31
+  },
+  {
+    "time_in_hospital": 14,
+    "patients": 1042,
+    "readmission_rate": 49.23,
+    "readmitted_under_30": 12.96
+  }
+]

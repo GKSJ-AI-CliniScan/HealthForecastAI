@@ -1,0 +1,38 @@
+[
+  {
+    "outcome_status": "No Readmission",
+    "time_in_hospital": 4.25,
+    "number_inpatient": 0.38,
+    "number_emergency": 0.11,
+    "number_outpatient": 0.27,
+    "num_medications": 15.67,
+    "num_lab_procedures": 42.38,
+    "num_procedures": 1.41,
+    "number_diagnoses": 7.22,
+    "patients": 54864
+  },
+  {
+    "outcome_status": "Readmitted After 30 Days",
+    "time_in_hospital": 4.5,
+    "number_inpatient": 0.84,
+    "number_emergency": 0.28,
+    "number_outpatient": 0.5,
+    "num_medications": 16.28,
+    "num_lab_procedures": 43.84,
+    "num_procedures": 1.25,
+    "number_diagnoses": 7.65,
+    "patients": 35545
+  },
+  {
+    "outcome_status": "Readmitted Within 30 Days",
+    "time_in_hospital": 4.77,
+    "number_inpatient": 1.22,
+    "number_emergency": 0.36,
+    "number_outpatient": 0.44,
+    "num_medications": 16.9,
+    "num_lab_procedures": 44.23,
+    "num_procedures": 1.28,
+    "number_diagnoses": 7.69,
+    "patients": 11357
+  }
+]
