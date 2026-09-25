@@ -35,3 +35,23 @@ export interface HospitalAnalyticsSummary {
   average_length_of_stay: number;
   risk_distribution: Record<RiskCategory, number>;
 }
+
+export interface TreatmentEffectiveness {
+  treatment_name: string;
+  patients_treated: number;
+  average_recovery_score: number;
+  readmission_rate: number;
+}
+
+export interface OutcomeProfile {
+  outcome_status: string;
+  patients: number;
+  average_time_in_hospital: number;
+  average_number_inpatient: number;
+  average_number_emergency: number;
+  average_number_outpatient: number;
+  average_num_medications: number;
+  average_num_lab_procedures: number;
+  average_num_procedures: number;
+  average_number_diagnoses: number;
+}
