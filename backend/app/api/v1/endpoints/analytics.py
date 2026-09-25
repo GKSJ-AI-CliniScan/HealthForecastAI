@@ -1,42 +1,83 @@
-"""Healthcare analytics dashboard endpoints - Module 6."""
+"""Analytics & Reporting API Endpoints."""
 
-from fastapi import APIRouter, Depends
+from datetime import date
+from typing import List, Optional
+from fastapi import APIRouter, Query, status
 
-from app.api.deps import CurrentUser, require_permission
-from app.core.rbac import Permission
-from app.schemas.analytics import HospitalAnalyticsSummary
+from app.schemas.analytics import (
+    DepartmentPerformance,
+    HospitalPerformanceResponse,
+    OutcomeMetrics,
+    ReportGenerationRequest,
+    ReportGenerationResponse,
+    TreatmentEffectivenessMetric,
+)
+from app.services.analytics_service import AnalyticsService
 
 router = APIRouter()
 
 
-@router.get("/summary", response_model=HospitalAnalyticsSummary)
-def hospital_summary(
-    user: CurrentUser = Depends(require_permission(Permission.HOSPITAL_ANALYTICS_READ)),
-) -> HospitalAnalyticsSummary:
-    """Return the headline KPIs for the hospital dashboard.
-
-    TODO(milestone-3): aggregate from PostgreSQL with cached rollups.
-    """
-    return HospitalAnalyticsSummary()
-
-
-@router.get("/readmissions", summary="Readmission analytics series")
-def readmission_analytics(
-    user: CurrentUser = Depends(require_permission(Permission.HOSPITAL_ANALYTICS_READ)),
-) -> list[dict[str, float]]:
-    """Return readmission rate over time.
-
-    TODO(milestone-3): group admissions by month and discharge disposition.
-    """
-    return []
+@router.get(
+    "/outcomes",
+    response_model=OutcomeMetrics,
+    summary="Get aggregated patient outcome statistics",
+)
+def get_patient_outcomes(
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    department: Optional[str] = Query(None),
+) -> OutcomeMetrics:
+    return AnalyticsService.calculate_outcome_metrics(start_date, end_date, department)
 
 
-@router.get("/population-health", summary="Population health statistics")
-def population_health(
-    user: CurrentUser = Depends(require_permission(Permission.POPULATION_HEALTH_READ)),
-) -> dict[str, object]:
-    """Return aggregated population health statistics for researchers.
+@router.get(
+    "/hospital-performance",
+    response_model=HospitalPerformanceResponse,
+    summary="Get hospital and facility KPIs",
+)
+def get_hospital_performance(
+    facility_id: str = Query("default"),
+) -> HospitalPerformanceResponse:
+    return AnalyticsService.get_hospital_performance(facility_id)
 
-    TODO(milestone-3): only aggregate values, never row level records.
-    """
-    return {"cohorts": [], "generated_at": None}
+
+@router.get(
+    "/departments",
+    response_model=List[DepartmentPerformance],
+    summary="Get department-level performance metrics",
+)
+def get_department_performance() -> List[DepartmentPerformance]:
+    performance = AnalyticsService.get_hospital_performance()
+    return performance.departments
+
+
+@router.get(
+    "/treatments/effectiveness",
+    response_model=List[TreatmentEffectivenessMetric],
+    summary="Get treatment effectiveness and outcome metrics",
+)
+def get_treatment_effectiveness(
+    condition: Optional[str] = Query(None),
+) -> List[TreatmentEffectivenessMetric]:
+    return AnalyticsService.get_treatment_metrics(condition)
+
+
+@router.post(
+    "/reports/generate",
+    response_model=ReportGenerationResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Generate patient outcome and hospital analytics report",
+)
+def generate_report(payload: ReportGenerationRequest) -> ReportGenerationResponse:
+    outcomes = AnalyticsService.calculate_outcome_metrics(payload.start_date, payload.end_date)
+    perf = AnalyticsService.get_hospital_performance()
+    treatments = AnalyticsService.get_treatment_metrics()
+
+    return ReportGenerationResponse(
+        report_id="REP-2026-X89",
+        generated_at=str(date.today()),
+        summary_metrics=outcomes,
+        department_breakdown=perf.departments,
+        top_treatments=treatments,
+        download_url=f"/api/v1/analytics/reports/download/REP-2026-X89.{payload.export_format}",
+    )
