@@ -1,7 +1,7 @@
 """Pydantic schemas for Patient Outcome & Hospital Analytics."""
 
 from datetime import date
-from typing import List, Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -27,7 +27,7 @@ class HospitalPerformanceResponse(BaseModel):
     overall_readmission_rate: float
     average_los_days: float
     bed_occupancy_rate_pct: float
-    departments: List[DepartmentPerformance]
+    departments: list[DepartmentPerformance]
 
 
 class TreatmentEffectivenessMetric(BaseModel):
@@ -39,11 +39,15 @@ class TreatmentEffectivenessMetric(BaseModel):
     avg_recovery_days: float
 
 
+# Required export for treatment endpoint compatibility
+TreatmentEffectivenessSummary = TreatmentEffectivenessMetric
+
+
 class ReportGenerationRequest(BaseModel):
     title: str = "Hospital Performance & Patient Outcome Report"
     start_date: date
     end_date: date
-    departments: Optional[List[str]] = None
+    departments: list[str] | None = None
     include_treatments: bool = True
     export_format: str = Field("json", description="json or pdf")
 
@@ -52,6 +56,6 @@ class ReportGenerationResponse(BaseModel):
     report_id: str
     generated_at: str
     summary_metrics: OutcomeMetrics
-    department_breakdown: List[DepartmentPerformance]
-    top_treatments: List[TreatmentEffectivenessMetric]
-    download_url: Optional[str] = None
+    department_breakdown: list[DepartmentPerformance]
+    top_treatments: list[TreatmentEffectivenessMetric]
+    download_url: str | None = None

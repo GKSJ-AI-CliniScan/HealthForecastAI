@@ -1,7 +1,7 @@
 """Analytics & Reporting API Endpoints."""
 
 from datetime import date
-from typing import List, Optional
+
 from fastapi import APIRouter, Query, status
 
 from app.schemas.analytics import (
@@ -23,9 +23,9 @@ router = APIRouter()
     summary="Get aggregated patient outcome statistics",
 )
 def get_patient_outcomes(
-    start_date: Optional[date] = Query(None),
-    end_date: Optional[date] = Query(None),
-    department: Optional[str] = Query(None),
+    start_date: date | None = Query(None),
+    end_date: date | None = Query(None),
+    department: str | None = Query(None),
 ) -> OutcomeMetrics:
     return AnalyticsService.calculate_outcome_metrics(start_date, end_date, department)
 
@@ -43,22 +43,22 @@ def get_hospital_performance(
 
 @router.get(
     "/departments",
-    response_model=List[DepartmentPerformance],
+    response_model=list[DepartmentPerformance],
     summary="Get department-level performance metrics",
 )
-def get_department_performance() -> List[DepartmentPerformance]:
+def get_department_performance() -> list[DepartmentPerformance]:
     performance = AnalyticsService.get_hospital_performance()
     return performance.departments
 
 
 @router.get(
     "/treatments/effectiveness",
-    response_model=List[TreatmentEffectivenessMetric],
+    response_model=list[TreatmentEffectivenessMetric],
     summary="Get treatment effectiveness and outcome metrics",
 )
 def get_treatment_effectiveness(
-    condition: Optional[str] = Query(None),
-) -> List[TreatmentEffectivenessMetric]:
+    condition: str | None = Query(None),
+) -> list[TreatmentEffectivenessMetric]:
     return AnalyticsService.get_treatment_metrics(condition)
 
 

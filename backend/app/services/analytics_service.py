@@ -1,7 +1,7 @@
 """Analytics Service: Aggregates patient outcomes and hospital KPIs."""
 
 from datetime import date
-from typing import List, Optional
+
 from app.schemas.analytics import (
     DepartmentPerformance,
     HospitalPerformanceResponse,
@@ -11,12 +11,11 @@ from app.schemas.analytics import (
 
 
 class AnalyticsService:
-
     @staticmethod
     def calculate_outcome_metrics(
-        start_date: Optional[date] = None,
-        end_date: Optional[date] = None,
-        department: Optional[str] = None,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        department: str | None = None,
     ) -> OutcomeMetrics:
         return OutcomeMetrics(
             total_patients=1240,
@@ -62,8 +61,8 @@ class AnalyticsService:
 
     @staticmethod
     def get_treatment_metrics(
-        condition: Optional[str] = None,
-    ) -> List[TreatmentEffectivenessMetric]:
+        condition: str | None = None,
+    ) -> list[TreatmentEffectivenessMetric]:
         return [
             TreatmentEffectivenessMetric(
                 treatment_name="ACE Inhibitors + Beta Blockers",
