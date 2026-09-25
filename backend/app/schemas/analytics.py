@@ -39,7 +39,7 @@ class TreatmentEffectivenessMetric(BaseModel):
     avg_recovery_days: float
 
 
-# Required export for treatment endpoint compatibility
+# Required export for app.api.v1.endpoints.treatment import
 TreatmentEffectivenessSummary = TreatmentEffectivenessMetric
 
 
