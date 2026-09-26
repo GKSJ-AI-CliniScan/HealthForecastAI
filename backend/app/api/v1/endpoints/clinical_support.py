@@ -36,4 +36,3 @@ def discharge_plan(
     if not patient:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
     return cds_service.generate_discharge_plan(db, patient_id)
-

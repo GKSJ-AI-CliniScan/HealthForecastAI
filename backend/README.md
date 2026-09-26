@@ -40,6 +40,10 @@ SEED_PASSWORD='ChooseSomething#Strong1' python -m app.db.init_db
 uvicorn app.main:app --reload
 ```
 
+Seeding is idempotent and only ever creates demo accounts. The login page's
+role buttons prefill `password123`, so to click straight through from the UI run
+`SEED_PASSWORD='password123' python -m app.db.init_db` instead.
+
 Then load the dataset so the dashboards have something to show - see
 [`../ml/README.md`](../ml/README.md).
 

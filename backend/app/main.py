@@ -34,8 +34,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-from fastapi.responses import JSONResponse
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -54,7 +52,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-<<<<<<< HEAD
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
@@ -66,12 +63,6 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
         headers={"Access-Control-Allow-Origin": request.headers.get("origin", "*")},
     )
 
-=======
-@app.exception_handler(Exception)
-async def custom_exception_handler(request, exc):
-    logger.exception("Unhandled error on %s: %s", request.url, exc)
-    return JSONResponse(status_code=500, content={"detail": f"{type(exc).__name__}: {exc}"})
->>>>>>> origin/intern/10-saumya-s
 
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 

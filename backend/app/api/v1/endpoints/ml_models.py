@@ -8,7 +8,7 @@ import os
 import subprocess
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 
 from app.api.deps import CurrentUser, require_permission
 from app.core.rbac import Permission
@@ -92,4 +92,3 @@ def retrain_models(user: CurrentUser, background_tasks: BackgroundTasks) -> dict
         "status": "started",
         "message": "Model training initiated for Random Forest and XGBoost on Diabetes dataset.",
     }
-
