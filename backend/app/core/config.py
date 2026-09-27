@@ -36,6 +36,12 @@ class Settings(BaseSettings):
     RISK_THRESHOLD_HIGH: float = 0.70
     RISK_THRESHOLD_MEDIUM: float = 0.40
 
+    # Research analytics - salt for app.utils.anonymisation.pseudonymise().
+    # Must be overridden via environment/.env in any real deployment; kept
+    # separate from SECRET_KEY so rotating one never invalidates the other.
+    ANONYMISATION_SALT: str = "change-me-do-not-use-in-production"
+    RESEARCH_MIN_COHORT_SIZE: int = 10
+
     @property
     def cors_origins(self) -> list[str]:
         """Return CORS origins as a list."""

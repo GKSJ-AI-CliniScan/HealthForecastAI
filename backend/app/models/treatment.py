@@ -1,16 +1,24 @@
 """Treatment outcome ORM model."""
 
-from sqlalchemy import Float, ForeignKey, Index, Integer, String
+from sqlalchemy import CheckConstraint, Float, ForeignKey, Index, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
+
+OUTCOME_VALUES = ("improved", "unchanged", "worsened", "unknown")
 
 
 class TreatmentOutcome(Base):
     """Effectiveness of a treatment or medication regimen for one admission."""
 
     __tablename__ = "treatment_outcomes"
-    __table_args__ = (Index("idx_treatment_admission", "admission_id"),)
+    __table_args__ = (
+        Index("idx_treatment_admission", "admission_id"),
+        CheckConstraint(
+            "outcome IS NULL OR outcome IN ('improved', 'unchanged', 'worsened', 'unknown')",
+            name="treatment_outcomes_outcome_check",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     admission_id: Mapped[int] = mapped_column(

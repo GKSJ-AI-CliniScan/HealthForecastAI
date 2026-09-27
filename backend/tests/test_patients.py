@@ -142,10 +142,18 @@ def test_read_returns_404_for_a_missing_patient(client: TestClient, auth_header)
 
 
 def test_anonymised_route_is_not_shadowed_by_the_id_route(client: TestClient, auth_header) -> None:
-    """/patients/anonymised must not be parsed as /patients/{patient_id}."""
+    """/patients/anonymised must not be parsed as /patients/{patient_id}.
+
+    Seeds a cohort past the research minimum so the assertion below is about
+    routing, not the Milestone 3 cohort-size guard.
+    """
+    for i in range(10):
+        create_patient(client, auth_header, f"MRN-ANON-SEED-{i}")
+
     response = client.get("/api/v1/patients/anonymised", headers=auth_header(Role.RESEARCHER))
     assert response.status_code == 200
-    assert response.json() == []
+    assert len(response.json()) == 10
+    assert "medical_record_number" not in response.json()[0]
 
 
 # --------------------------------------------------------------------------

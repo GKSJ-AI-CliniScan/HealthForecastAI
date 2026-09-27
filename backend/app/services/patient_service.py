@@ -12,6 +12,7 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentUser, patient_scope_for
+from app.core.config import settings
 from app.models.patient import Patient
 from app.repositories.audit_repository import AuditRepository
 from app.repositories.patient_repository import PatientRepository
@@ -38,6 +39,15 @@ class DuplicateMedicalRecordNumberError(Exception):
 
 class UnknownFieldError(Exception):
     """Raised when an update names a field that is not updatable."""
+
+
+class CohortTooSmallError(Exception):
+    """Raised when a research export would be small enough to risk re-identification."""
+
+    def __init__(self, size: int, minimum: int) -> None:
+        self.size = size
+        self.minimum = minimum
+        super().__init__(f"Cohort of {size} is below the minimum of {minimum}")
 
 
 class PatientService:
@@ -158,3 +168,35 @@ class PatientService:
             resource=f"patient:{updated.id}",
         )
         return updated
+
+    def list_for_research(
+        self, user: CurrentUser, min_cohort_size: int | None = None
+    ) -> list[Patient]:
+        """Return the hospital-wide patient cohort for anonymised research export.
+
+        Never doctor-scoped: Researcher access is hospital-wide-but-anonymised
+        per the access matrix, unlike list_patients' doctor-narrowed view.
+        Raises CohortTooSmallError when the cohort is small enough that even
+        an anonymised export could re-identify someone.
+        """
+        minimum = (
+            min_cohort_size if min_cohort_size is not None else settings.RESEARCH_MIN_COHORT_SIZE
+        )
+        rows = self.patients.list_patients(limit=10_000, offset=0, doctor_id=None)
+        if len(rows) < minimum:
+            self.audit.record(
+                action="patient.research_export",
+                actor_id=user.user_id,
+                actor_role=str(user.role),
+                resource=f"cohort_size:{len(rows)}",
+                outcome="failure",
+            )
+            raise CohortTooSmallError(size=len(rows), minimum=minimum)
+
+        self.audit.record(
+            action="patient.research_export",
+            actor_id=user.user_id,
+            actor_role=str(user.role),
+            resource=f"cohort_size:{len(rows)}",
+        )
+        return rows

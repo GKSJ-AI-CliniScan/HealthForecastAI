@@ -4,15 +4,18 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentUser, get_current_active_user, require_permission
+from app.core.config import settings
 from app.core.rbac import Permission, Role
 from app.db.session import get_db
-from app.schemas.patient import PatientCreate, PatientRead, PatientUpdate
+from app.schemas.patient import PatientAnonymised, PatientCreate, PatientRead, PatientUpdate
 from app.services.patient_service import (
+    CohortTooSmallError,
     DuplicateMedicalRecordNumberError,
     PatientNotFoundError,
     PatientService,
     UnknownFieldError,
 )
+from app.utils.anonymisation import anonymise_patient
 
 router = APIRouter()
 
@@ -90,15 +93,32 @@ def create_patient(
     return PatientRead.model_validate(created)
 
 
-@router.get("/anonymised", summary="Anonymised patient cohort for researchers")
+@router.get(
+    "/anonymised",
+    response_model=list[PatientAnonymised],
+    summary="Anonymised patient cohort for researchers",
+)
 def list_anonymised_patients(
     user: CurrentUser = Depends(require_permission(Permission.PATIENT_READ_ANONYMIZED)),
-) -> list[dict[str, str]]:
-    """Return a de-identified cohort.
+    db: Session = Depends(get_db),
+) -> list[PatientAnonymised]:
+    """Return a de-identified cohort: no MRN, no name, a pseudonymous id.
 
-    TODO(milestone-3): pseudonymise the MRN and strip every direct identifier.
+    422 when the hospital-wide cohort is smaller than the configured minimum -
+    an anonymised export over a handful of patients can still re-identify
+    someone by elimination.
     """
-    return []
+    try:
+        patients = PatientService(db).list_for_research(user)
+    except CohortTooSmallError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail={"error": "cohort_too_small", "minimum": exc.minimum, "actual": exc.size},
+        ) from exc
+    return [
+        PatientAnonymised(**anonymise_patient(patient, settings.ANONYMISATION_SALT))
+        for patient in patients
+    ]
 
 
 @router.get("/{patient_id}", response_model=PatientRead, summary="Read one patient")

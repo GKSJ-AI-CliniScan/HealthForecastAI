@@ -60,11 +60,15 @@ CREATE TABLE IF NOT EXISTS admissions (
     num_lab_procedures     INTEGER,
     number_diagnoses       INTEGER,
     readmitted             VARCHAR(8),
+    -- Hospital department (e.g. Cardiology), distinct from admission_type
+    -- (Emergency/Elective). Milestone 3: department-level analytics.
+    department             VARCHAR(100),
     CONSTRAINT admissions_date_order_check
         CHECK (discharge_date IS NULL OR admission_date IS NULL OR discharge_date >= admission_date)
 );
 
 CREATE INDEX IF NOT EXISTS idx_admissions_patient ON admissions (patient_id);
+CREATE INDEX IF NOT EXISTS idx_admissions_department ON admissions (department);
 
 CREATE TABLE IF NOT EXISTS risk_predictions (
     id                       SERIAL PRIMARY KEY,
@@ -141,7 +145,9 @@ CREATE TABLE IF NOT EXISTS treatment_outcomes (
     medication_change    BOOLEAN,
     recovery_score       DOUBLE PRECISION,
     length_of_stay_days  INTEGER,
-    outcome              VARCHAR(64)
+    outcome              VARCHAR(64),
+    CONSTRAINT treatment_outcomes_outcome_check
+        CHECK (outcome IS NULL OR outcome IN ('improved', 'unchanged', 'worsened', 'unknown'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_treatment_admission ON treatment_outcomes (admission_id);

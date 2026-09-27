@@ -17,12 +17,14 @@ from app.schemas.admission import (
     AdmissionUpdate,
     ReadmissionSummary,
 )
+from app.schemas.treatment import TreatmentOutcomeCreate, TreatmentOutcomeRead
 from app.services.admission_service import (
     AdmissionNotFoundError,
     AdmissionService,
     UnknownFieldError,
 )
 from app.services.patient_service import PatientNotFoundError
+from app.services.treatment_service import TreatmentService
 
 router = APIRouter()
 
@@ -176,3 +178,51 @@ def update_admission(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
         ) from exc
     return AdmissionRead.model_validate(updated)
+
+
+@router.get(
+    "/{patient_id}/admissions/{admission_id}/treatments",
+    response_model=list[TreatmentOutcomeRead],
+    summary="Treatment outcomes recorded for an admission",
+)
+def list_treatment_outcomes(
+    patient_id: int,
+    admission_id: int,
+    user: CurrentUser = Depends(get_current_active_user),
+    db: Session = Depends(get_db),
+) -> list[TreatmentOutcomeRead]:
+    """Return every treatment outcome recorded for one admission."""
+    _reject_researchers(user)
+    try:
+        AdmissionService(db).get_admission(user, patient_id, admission_id)  # scope check
+    except PatientNotFoundError as exc:
+        raise _patient_not_found(patient_id) from exc
+    except AdmissionNotFoundError as exc:
+        raise _admission_not_found(admission_id) from exc
+    rows = TreatmentService(db).treatments.list_for_admission(admission_id)
+    return [TreatmentOutcomeRead.model_validate(row) for row in rows]
+
+
+@router.post(
+    "/{patient_id}/admissions/{admission_id}/treatments",
+    response_model=TreatmentOutcomeRead,
+    status_code=status.HTTP_201_CREATED,
+    summary="Record a treatment outcome",
+)
+def record_treatment_outcome(
+    patient_id: int,
+    admission_id: int,
+    payload: TreatmentOutcomeCreate,
+    user: CurrentUser = Depends(_write_patients),
+    db: Session = Depends(get_db),
+) -> TreatmentOutcomeRead:
+    """Record a treatment/medication outcome for an admission the caller may see."""
+    try:
+        created = TreatmentService(db).record_outcome(
+            user, patient_id, admission_id, payload.model_dump()
+        )
+    except PatientNotFoundError as exc:
+        raise _patient_not_found(patient_id) from exc
+    except AdmissionNotFoundError as exc:
+        raise _admission_not_found(admission_id) from exc
+    return TreatmentOutcomeRead.model_validate(created)

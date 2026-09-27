@@ -13,6 +13,7 @@ class AdmissionBase(BaseModel):
     time_in_hospital: int | None = Field(default=None, ge=0)
     admission_type: str | None = Field(default=None, max_length=64)
     discharge_disposition: str | None = Field(default=None, max_length=128)
+    department: str | None = Field(default=None, max_length=100)
     num_medications: int | None = Field(default=None, ge=0)
     num_lab_procedures: int | None = Field(default=None, ge=0)
     number_diagnoses: int | None = Field(default=None, ge=0)

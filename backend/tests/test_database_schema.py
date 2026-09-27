@@ -94,6 +94,7 @@ def test_doctor_patient_map_prevents_duplicate_assignments() -> None:
         ("risk_predictions", "idx_risk_patient_created"),
         ("risk_predictions", "idx_risk_predictions_type"),
         ("model_metadata", "idx_model_metadata_status"),
+        ("admissions", "idx_admissions_department"),
     ],
 )
 def test_documented_indexes_exist(table: str, index: str) -> None:
@@ -164,6 +165,16 @@ def test_defaults_are_enforced_by_the_database(table: str, column: str) -> None:
 def test_audit_log_actor_has_no_foreign_key() -> None:
     """An audit row must survive the deletion of the account that produced it."""
     assert not Base.metadata.tables["audit_logs"].c.actor_id.foreign_keys
+
+
+def test_admissions_has_a_department_column() -> None:
+    """Department-level analytics (Milestone 3) needs a real column, not admission_type."""
+    assert "department" in Base.metadata.tables["admissions"].c
+
+
+def test_treatment_outcomes_outcome_is_constrained() -> None:
+    """Only the four documented outcome values may be recorded."""
+    assert "treatment_outcomes_outcome_check" in _constraint_names("treatment_outcomes")
 
 
 def test_migration_upgrades_and_downgrades_cleanly(tmp_path: Path, monkeypatch) -> None:

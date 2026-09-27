@@ -18,6 +18,7 @@ class Admission(Base):
             name="admissions_date_order_check",
         ),
         Index("idx_admissions_patient", "patient_id"),
+        Index("idx_admissions_department", "department"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -33,3 +34,7 @@ class Admission(Base):
     num_lab_procedures: Mapped[int | None] = mapped_column(Integer, nullable=True)
     number_diagnoses: Mapped[int | None] = mapped_column(Integer, nullable=True)
     readmitted: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    # Hospital department (e.g. Cardiology), distinct from admission_type
+    # (Emergency/Elective) - Database Design doc's admissions.department,
+    # never migrated in Milestone 1. Needed for department-level analytics.
+    department: Mapped[str | None] = mapped_column(String(100), nullable=True)

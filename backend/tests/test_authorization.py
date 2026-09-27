@@ -14,6 +14,7 @@ from app.api.deps import CurrentUser, patient_scope_for
 from app.core.rbac import Role
 from app.core.security import create_access_token
 from app.main import app
+from app.repositories.patient_repository import PatientRepository
 from app.repositories.user_repository import UserRepository
 from app.services.auth_service import AuthService
 
@@ -164,9 +165,18 @@ def test_identifiable_patient_list_excludes_researchers(
     ],
 )
 def test_anonymised_cohort_matches_the_access_matrix(
-    client: TestClient, auth_header, role: Role, expected: int
+    client: TestClient, auth_header, db_session: Session, role: Role, expected: int
 ) -> None:
-    """Only roles holding patient:read_anonymized reach the cohort endpoint."""
+    """Only roles holding patient:read_anonymized reach the cohort endpoint.
+
+    Seeds enough patients that a 200 case cannot be confused with the
+    research cohort-size guard (Milestone 3) rejecting a too-small export -
+    this test is about the permission gate, not the guard.
+    """
+    repo = PatientRepository(db_session)
+    for i in range(10):
+        repo.create(medical_record_number=f"MRN-AUTHZ-SEED-{i}")
+
     response = client.get("/api/v1/patients/anonymised", headers=auth_header(role))
     assert response.status_code == expected
 

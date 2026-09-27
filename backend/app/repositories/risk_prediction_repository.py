@@ -74,9 +74,7 @@ class RiskPredictionRepository(BaseRepository[RiskPrediction]):
         stmt = stmt.order_by(RiskPrediction.created_at.desc()).limit(limit)
         return list(self.db.execute(stmt).scalars().all())
 
-    def readmission_forecast_summary(
-        self, doctor_id: int | None = None
-    ) -> tuple[int, int]:
+    def readmission_forecast_summary(self, doctor_id: int | None = None) -> tuple[int, int]:
         """Return (predicted_readmissions, total) among each patient's latest
         readmission forecast, using a 0.5 decision threshold on the stored
         probability. Scoped the same way list_high_risk is."""
@@ -94,3 +92,26 @@ class RiskPredictionRepository(BaseRepository[RiskPrediction]):
         total = len(rows)
         predicted = sum(1 for row in rows if row.readmission_probability >= 0.5)
         return predicted, total
+
+    def risk_category_distribution(self, doctor_id: int | None = None) -> dict[str, int]:
+        """Return {"low": n, "medium": n, "high": n} across each patient's
+        latest risk score - the Healthcare Analytics Dashboard's risk
+        distribution widget (Milestone 3)."""
+        latest_ids = (
+            select(func.max(RiskPrediction.id))
+            .where(RiskPrediction.prediction_type == "risk")
+            .group_by(RiskPrediction.patient_id)
+        )
+        stmt = select(RiskPrediction.risk_category, func.count()).where(
+            RiskPrediction.id.in_(latest_ids)
+        )
+        if doctor_id is not None:
+            stmt = stmt.join(Patient, Patient.id == RiskPrediction.patient_id).where(
+                PatientRepository.scope_clause(doctor_id)
+            )
+        stmt = stmt.group_by(RiskPrediction.risk_category)
+
+        distribution = {"low": 0, "medium": 0, "high": 0}
+        for category, count in self.db.execute(stmt).all():
+            distribution[category] = count
+        return distribution

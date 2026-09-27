@@ -29,6 +29,7 @@ UPDATABLE_FIELDS = frozenset(
         "num_lab_procedures",
         "number_diagnoses",
         "readmitted",
+        "department",
     }
 )
 
