@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { dashboardLinks } from './navigation';
+import { ROLE_PERMISSIONS } from '@/test-utils/permissions';
+
+import { analyticsTabs, dashboardLinks, insightLinks } from './navigation';
 
 /**
  * docs/07-testing: "test that a role only renders what it is allowed to see".
@@ -42,5 +44,52 @@ describe('dashboardLinks', () => {
   it('never links a section a role holds no permission for', () => {
     const hrefs = dashboardLinks({ permissions: DOCTOR }).map((link) => link.href);
     expect(hrefs).not.toContain('/dashboard/users');
+  });
+});
+
+describe('insightLinks (full rbac.py permission sets)', () => {
+  const insight = (role: keyof typeof ROLE_PERMISSIONS) =>
+    insightLinks({ permissions: ROLE_PERMISSIONS[role] }).map((link) => link.label);
+
+  it('gives a doctor treatment effectiveness only - no analytics, research or reports', () => {
+    expect(insight('doctor')).toEqual(['Treatment']);
+  });
+
+  it('gives a hospital administrator analytics, treatment and reports but not research', () => {
+    expect(insight('hospital_admin')).toEqual(['Analytics', 'Treatment', 'Reports']);
+  });
+
+  it('gives a researcher analytics, treatment, research and reports', () => {
+    expect(insight('researcher')).toEqual(['Analytics', 'Treatment', 'Research', 'Reports']);
+  });
+
+  it('gives a system administrator every section', () => {
+    expect(insight('system_admin')).toEqual(['Analytics', 'Treatment', 'Research', 'Reports']);
+  });
+
+  it('offers nothing without a permission', () => {
+    expect(insightLinks({ permissions: [] })).toEqual([]);
+  });
+});
+
+describe('analyticsTabs', () => {
+  it('shows dashboard tabs and population health to a hospital administrator', () => {
+    const tabs = analyticsTabs({ permissions: ROLE_PERMISSIONS.hospital_admin });
+    expect(tabs.map((tab) => tab.label)).toEqual([
+      'Readmissions',
+      'Patient outcomes',
+      'Risk distribution',
+      'Departments',
+      'Population health',
+    ]);
+  });
+
+  it('shows only population health to a role holding just that permission', () => {
+    const tabs = analyticsTabs({ permissions: ['population_health:read'] });
+    expect(tabs.map((tab) => tab.href)).toEqual(['/dashboard/analytics/population']);
+  });
+
+  it('shows no tab to a doctor', () => {
+    expect(analyticsTabs({ permissions: ROLE_PERMISSIONS.doctor })).toEqual([]);
   });
 });

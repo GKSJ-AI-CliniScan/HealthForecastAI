@@ -1,9 +1,16 @@
 import Link from 'next/link';
 
-import { Card, Cell, ErrorNote, Row, Table } from '@/components/ui';
-import { apiFetch } from '@/lib/api';
-import { getToken, requireUser } from '@/lib/session';
-import type { Patient } from '@/types';
+import AnonymisedCohortTable, {
+  COHORT_PAGE_SIZE,
+} from '@/components/research/AnonymisedCohortTable';
+import CohortFilterForm, { readCohortFilters } from '@/components/research/CohortFilterForm';
+import { Card, Cell, Row, Table } from '@/components/ui';
+import { LoadedCard, SectionError } from '@/components/ui/states';
+import { apiFetch, apiFetchPage } from '@/lib/api';
+import { load } from '@/lib/errors';
+import { pickPage, pickString, toQuery, type SearchParams } from '@/lib/params';
+import { can, getToken, requireUser } from '@/lib/session';
+import type { AnonymisedPatient, Patient } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,28 +24,30 @@ export const dynamic = 'force-dynamic';
 export default async function PatientsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<SearchParams>;
 }) {
   const user = await requireUser();
   const token = await getToken();
-  const { q } = await searchParams;
+  const params = await searchParams;
 
-  const query = q?.trim() ?? '';
+  // The identifiable list always answers 403 for a researcher, so they are
+  // shown the anonymised cohort they are entitled to instead of that error.
+  if (
+    !can(user, 'patient:read_assigned') &&
+    !can(user, 'patient:read_all') &&
+    can(user, 'patient:read_anonymized')
+  ) {
+    return renderAnonymisedPatients(token, params);
+  }
+
+  const query = pickString(params, 'q') ?? '';
   const path = query
     ? `/patients?limit=100&q=${encodeURIComponent(query)}`
     : '/patients?limit=100';
 
-  let patients: Patient[] = [];
-  let error: string | null = null;
-
-  try {
-    patients = await apiFetch<Patient[]>(path, { cache: 'no-store' }, token);
-  } catch {
-    error =
-      user.role === 'researcher'
-        ? 'Researchers may only read the anonymised cohort.'
-        : 'Could not load patients. Is the backend running?';
-  }
+  const result = await load(() => apiFetch<Patient[]>(path, { cache: 'no-store' }, token));
+  const patients = result.ok ? result.data : [];
+  const error = result.ok ? null : result.error;
 
   return (
     <div className="space-y-6">
@@ -71,7 +80,7 @@ export default async function PatientsPage({
       </div>
 
       {error ? (
-        <ErrorNote>{error}</ErrorNote>
+        <SectionError error={error} />
       ) : (
         <Card>
           <Table
@@ -97,6 +106,58 @@ export default async function PatientsPage({
           </Table>
         </Card>
       )}
+    </div>
+  );
+}
+
+/** Researcher view: the de-identified cohort, filterable and paged. */
+async function renderAnonymisedPatients(token: string | undefined, params: SearchParams) {
+  const filters = readCohortFilters((key) => pickString(params, key));
+  const page = pickPage(params);
+  const cohort = await load(() =>
+    apiFetchPage<AnonymisedPatient>(
+      `/patients/anonymised${toQuery({
+        ...filters,
+        limit: COHORT_PAGE_SIZE,
+        offset: (page - 1) * COHORT_PAGE_SIZE,
+      })}`,
+      { cache: 'no-store' },
+      token,
+    ),
+  );
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-xl font-semibold">Anonymised patient cohort</h1>
+        <p className="mt-1 text-sm opacity-70">
+          De-identified records only: a pseudonymous id, a 10-year age band, gender and primary
+          diagnosis. For statistics and export, use{' '}
+          <Link href="/dashboard/research" className="underline underline-offset-2">
+            Research
+          </Link>
+          .
+        </p>
+      </div>
+      <Card title="Filters">
+        <CohortFilterForm filters={filters} />
+      </Card>
+      <LoadedCard
+        title="Cohort"
+        result={cohort}
+        isEmpty={(data) => data.items.length === 0}
+        empty="No patients on this page."
+      >
+        {(data) => (
+          <AnonymisedCohortTable
+            rows={data.items}
+            total={data.total}
+            page={page}
+            filters={filters}
+            basePath="/dashboard/patients"
+          />
+        )}
+      </LoadedCard>
     </div>
   );
 }

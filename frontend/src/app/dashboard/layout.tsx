@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 
 import SignOutButton from '@/components/layout/SignOutButton';
 import { Badge } from '@/components/ui';
-import { dashboardLinks } from '@/lib/navigation';
+import { dashboardLinks, insightLinks } from '@/lib/navigation';
 import { requireUser } from '@/lib/session';
 
 const ROLE_LABELS: Record<string, string> = {
@@ -24,7 +24,7 @@ const ROLE_LABELS: Record<string, string> = {
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const user = await requireUser();
 
-  const links = dashboardLinks(user);
+  const links = [...dashboardLinks(user), ...insightLinks(user)];
 
   return (
     <div className="min-h-screen">
@@ -33,7 +33,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
           <Link href="/dashboard" className="font-semibold">
             HealthForecast AI
           </Link>
-          <nav className="flex gap-4 text-sm">
+          <nav className="flex flex-wrap gap-4 text-sm">
             {links.map((link) => (
               <Link key={link.href} href={link.href} className="opacity-80 hover:opacity-100">
                 {link.label}

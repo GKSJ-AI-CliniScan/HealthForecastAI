@@ -3,6 +3,7 @@ import Link from 'next/link';
 import ForecastChart from '@/components/charts/ForecastChart';
 import { Badge, Card, Cell, Row, StatTile, Table } from '@/components/ui';
 import { apiFetch } from '@/lib/api';
+import { insightLinks } from '@/lib/navigation';
 import { can, getToken, requireUser } from '@/lib/session';
 import type { Patient, ReadmissionForecast, RiskPrediction } from '@/types';
 
@@ -161,6 +162,15 @@ export default async function DashboardPage() {
             Manage users
           </Link>
         )}
+        {insightLinks(user).map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="rounded-md border border-[var(--border)] px-3 py-1.5"
+          >
+            {link.label}
+          </Link>
+        ))}
       </div>
     </div>
   );

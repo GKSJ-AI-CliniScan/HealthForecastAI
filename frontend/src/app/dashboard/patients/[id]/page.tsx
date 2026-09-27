@@ -1,33 +1,25 @@
 import Link from 'next/link';
 
 import RiskScoreBar from '@/components/charts/RiskScoreBar';
+import TrendLineChart from '@/components/charts/TrendLineChart';
 import ForecastReadmissionButton from '@/components/risk/ForecastReadmissionButton';
 import ScoreRiskButton from '@/components/risk/ScoreRiskButton';
 import { Badge, Card, Cell, ErrorNote, Row, StatTile, Table } from '@/components/ui';
+import { EmptyState } from '@/components/ui/states';
+import { formatDateTime, formatNumber, humanise } from '@/lib/format';
 import { apiFetch } from '@/lib/api';
 import { can, getToken, requireUser } from '@/lib/session';
-import type { CareRecommendations, DischargePlan, Patient, RiskPrediction } from '@/types';
+import type {
+  Admission,
+  CareRecommendations,
+  DischargePlan,
+  Patient,
+  ReadmissionSummary,
+  RiskPrediction,
+  TreatmentOutcome,
+} from '@/types';
 
 export const dynamic = 'force-dynamic';
-
-interface Admission {
-  id: number;
-  patient_id: number;
-  admission_date: string | null;
-  discharge_date: string | null;
-  time_in_hospital: number | null;
-  admission_type: string | null;
-  discharge_disposition: string | null;
-  num_medications: number | null;
-  readmitted: string | null;
-}
-
-interface ReadmissionSummary {
-  patient_id: number;
-  total_admissions: number;
-  readmitted_total: number;
-  by_label: Record<string, number>;
-}
 
 /**
  * Patient detail: demographics, readmission tracking and the admission timeline.
@@ -111,6 +103,57 @@ export default async function PatientDetailPage({
     ]);
   }
 
+  // Prediction history is readable by any role holding either prediction
+  // permission (backend _read_risk_or_readmission), which includes Hospital
+  // Administrators - wider than the scoring/CDS actions above.
+  const canReadPredictions = canSeeRisk || can(user, 'readmission_forecast:read');
+  const [riskHistory, forecastHistory, treatmentLists] = await Promise.all([
+    canReadPredictions
+      ? apiFetch<RiskPrediction[]>(`/risk/${id}/history`, { cache: 'no-store' }, token).catch(
+          () => null,
+        )
+      : Promise.resolve(null),
+    canReadPredictions
+      ? apiFetch<RiskPrediction[]>(
+          `/risk/${id}/history?type=readmission`,
+          { cache: 'no-store' },
+          token,
+        ).catch(() => null)
+      : Promise.resolve(null),
+    Promise.all(
+      admissions.map((admission) =>
+        apiFetch<TreatmentOutcome[]>(
+          `/patients/${id}/admissions/${admission.id}/treatments`,
+          { cache: 'no-store' },
+          token,
+        ).catch(() => null),
+      ),
+    ),
+  ]);
+
+  const treatmentsFailed = treatmentLists.some((list) => list === null);
+  const treatments = admissions.flatMap((admission, index) =>
+    (treatmentLists[index] ?? []).map((outcome) => ({ admission, outcome })),
+  );
+  const recoverySeries = [...new Set(treatments.map(({ outcome }) => outcome.treatment_name))];
+  const recoveryRows = treatments
+    .filter(({ admission, outcome }) => admission.discharge_date && outcome.recovery_score !== null)
+    .sort((a, b) => (a.admission.discharge_date ?? '').localeCompare(b.admission.discharge_date ?? ''))
+    .map(({ admission, outcome }) => ({
+      date: admission.discharge_date,
+      [outcome.treatment_name]: outcome.recovery_score,
+    }));
+  const predictionRows = [
+    ...(riskHistory ?? []).map((row) => ({ at: row.created_at, risk: row.readmission_probability })),
+    ...(forecastHistory ?? []).map((row) => ({
+      at: row.created_at,
+      forecast: row.readmission_probability,
+    })),
+  ]
+    .filter((row) => row.at)
+    .sort((a, b) => (a.at ?? '').localeCompare(b.at ?? ''))
+    .map((row) => ({ ...row, at: formatDateTime(row.at) }));
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -149,7 +192,7 @@ export default async function PatientDetailPage({
       </Card>
 
       {summary && Object.keys(summary.by_label).length > 0 && (
-        <Card title="Readmission outcomes">
+        <Card title="Readmission history">
           <div className="flex flex-wrap gap-2">
             {Object.entries(summary.by_label).map(([label, count]) => (
               <Badge key={label}>
@@ -272,15 +315,89 @@ export default async function PatientDetailPage({
         </Card>
       )}
 
+      {canReadPredictions && (
+        <Card title="Risk history">
+          {riskHistory === null && forecastHistory === null ? (
+            <ErrorNote>Could not load the prediction history for this patient.</ErrorNote>
+          ) : predictionRows.length === 0 ? (
+            <EmptyState>No risk scores or readmission forecasts recorded yet.</EmptyState>
+          ) : (
+            <TrendLineChart
+              label="Risk score and readmission forecast over time"
+              data={predictionRows}
+              xKey="at"
+              series={[
+                { key: 'risk', label: 'Risk score', color: '#6366f1' },
+                { key: 'forecast', label: '30-day readmission forecast', color: '#ef4444' },
+              ]}
+              valueFormat="percent"
+            />
+          )}
+        </Card>
+      )}
+
+      <Card title="Treatment outcomes">
+        {treatmentsFailed && (
+          <div className="mb-3">
+            <ErrorNote>Some treatment outcomes could not be loaded.</ErrorNote>
+          </div>
+        )}
+        {treatments.length === 0 ? (
+          <EmptyState>No treatment outcomes recorded for this patient.</EmptyState>
+        ) : (
+          <div className="space-y-6">
+            {recoveryRows.length > 0 && (
+              <div>
+                <h3 className="mb-2 text-sm font-medium opacity-80">Recovery score by discharge date</h3>
+                <TrendLineChart
+                  label="Recovery score by discharge date"
+                  data={recoveryRows}
+                  xKey="date"
+                  series={recoverySeries.map((name) => ({ key: name, label: name }))}
+                  valueFormat="decimal"
+                />
+              </div>
+            )}
+            <Table
+              headers={['Admitted', 'Treatment', 'Outcome', 'Recovery score', 'Medication change', 'Stay (days)']}
+            >
+              {treatments.map(({ admission, outcome }) => (
+                <Row key={outcome.id}>
+                  <Cell>{admission.admission_date ?? '-'}</Cell>
+                  <Cell>{outcome.treatment_name}</Cell>
+                  <Cell>
+                    <Badge>{outcome.outcome ? humanise(outcome.outcome) : 'Not recorded'}</Badge>
+                  </Cell>
+                  <Cell>{formatNumber(outcome.recovery_score, 2)}</Cell>
+                  <Cell>
+                    {outcome.medication_change === null ? '-' : outcome.medication_change ? 'Yes' : 'No'}
+                  </Cell>
+                  <Cell>{outcome.length_of_stay_days ?? '-'}</Cell>
+                </Row>
+              ))}
+            </Table>
+          </div>
+        )}
+      </Card>
+
       <Card title="Admission history">
         <Table
-          headers={['Admitted', 'Discharged', 'Stay (days)', 'Type', 'Medications', 'Readmitted']}
+          headers={[
+            'Admitted',
+            'Discharged',
+            'Department',
+            'Stay (days)',
+            'Type',
+            'Medications',
+            'Readmitted',
+          ]}
           empty="No admissions recorded for this patient."
         >
           {admissions.map((admission) => (
             <Row key={admission.id}>
               <Cell>{admission.admission_date ?? '-'}</Cell>
               <Cell>{admission.discharge_date ?? '-'}</Cell>
+              <Cell>{admission.department ?? '-'}</Cell>
               <Cell>{admission.time_in_hospital ?? '-'}</Cell>
               <Cell>{admission.admission_type ?? '-'}</Cell>
               <Cell>{admission.num_medications ?? '-'}</Cell>
