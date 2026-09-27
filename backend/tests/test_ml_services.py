@@ -102,9 +102,7 @@ def _tiny_pipeline() -> Pipeline:
     return pipeline
 
 
-def _register(
-    db_session: Session, tmp_path, model_name: str, **overrides
-) -> ModelMetadata:
+def _register(db_session: Session, tmp_path, model_name: str, **overrides) -> ModelMetadata:
     model_path = tmp_path / f"{model_name}-{overrides.get('version', 'v1')}.joblib"
     joblib.dump(_tiny_pipeline(), model_path)
     defaults = {
@@ -201,9 +199,7 @@ def test_model_loader_loads_a_real_pipeline(db_session: Session, tmp_path) -> No
     assert hasattr(pipeline, "predict_proba")
 
 
-def test_model_loader_caches_by_resolved_artifact_path(
-    db_session: Session, tmp_path
-) -> None:
+def test_model_loader_caches_by_resolved_artifact_path(db_session: Session, tmp_path) -> None:
     _register(db_session, tmp_path, "risk")
     loader = ModelLoader(db_session)
     first, _ = loader.get_production_pipeline("risk")
@@ -268,9 +264,7 @@ def test_feature_row_uses_the_most_recent_admission_when_none_is_given(
 ) -> None:
     patient = _make_patient(db_session)
     _make_admission(db_session, patient.id, admission_date=datetime(2024, 1, 1).date())
-    later = _make_admission(
-        db_session, patient.id, admission_date=datetime(2024, 6, 1).date()
-    )
+    later = _make_admission(db_session, patient.id, admission_date=datetime(2024, 6, 1).date())
 
     row = FeatureBuilder(db_session).build_for_patient(patient)
 
@@ -282,16 +276,12 @@ def test_feature_row_for_a_specific_admission_reflects_its_position_in_history(
     db_session: Session,
 ) -> None:
     patient = _make_patient(db_session)
-    first = _make_admission(
-        db_session, patient.id, admission_date=datetime(2024, 1, 1).date()
-    )
+    first = _make_admission(db_session, patient.id, admission_date=datetime(2024, 1, 1).date())
     _make_admission(db_session, patient.id, admission_date=datetime(2024, 6, 1).date())
 
     row = FeatureBuilder(db_session).build_for_patient(patient, admission=first)
 
-    assert (
-        row["prior_admission_count"].iloc[0] == 0
-    )  # the FIRST admission, not the latest
+    assert row["prior_admission_count"].iloc[0] == 0  # the FIRST admission, not the latest
 
 
 def test_feature_row_raises_when_the_patient_has_no_admissions(

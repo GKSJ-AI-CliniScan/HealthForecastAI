@@ -21,9 +21,7 @@ _manage_models = require_permission(Permission.MODEL_MANAGE)
 _TRACKED_MODEL_NAMES = (RISK_MODEL_NAME, READMISSION_MODEL_NAME)
 
 
-@router.get(
-    "", response_model=list[ModelMetadataRead], summary="List registered models"
-)
+@router.get("", response_model=list[ModelMetadataRead], summary="List registered models")
 def list_models(
     user: CurrentUser = Depends(_manage_models), db: Session = Depends(get_db)
 ) -> list[ModelMetadataRead]:
@@ -43,11 +41,7 @@ def active_models(
     """Return the production version of each tracked model family, if registered."""
     repo = ModelMetadataRepository(db)
     records = [repo.get_production(name) for name in _TRACKED_MODEL_NAMES]
-    return [
-        ModelMetadataRead.model_validate(record)
-        for record in records
-        if record is not None
-    ]
+    return [ModelMetadataRead.model_validate(record) for record in records if record is not None]
 
 
 @router.get(

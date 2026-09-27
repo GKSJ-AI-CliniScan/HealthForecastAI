@@ -1,6 +1,9 @@
 """Helpers for producing researcher safe, de-identified records."""
 
+import csv
 import hashlib
+import io
+from collections.abc import Iterable
 from typing import TYPE_CHECKING, TypedDict
 
 if TYPE_CHECKING:
@@ -64,3 +67,33 @@ def anonymise_patient(patient: "Patient", salt: str) -> AnonymisedPatientFields:
         "gender": patient.gender,
         "primary_diagnosis": patient.primary_diagnosis,
     }
+
+
+RESEARCH_CSV_COLUMNS = ("pseudo_id", "age_group", "gender", "primary_diagnosis")
+
+# A cell starting with one of these is evaluated as a formula by Excel/Sheets
+# (CSV injection). Free-text fields such as primary_diagnosis come from
+# imported data, so they are neutralised with a leading apostrophe.
+_FORMULA_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
+
+
+def _csv_safe(value: str | None) -> str:
+    if value is None:
+        return ""
+    return f"'{value}" if value.startswith(_FORMULA_PREFIXES) else value
+
+
+def research_csv(records: Iterable[AnonymisedPatientFields]) -> str:
+    """Render anonymised records as CSV. Only RESEARCH_CSV_COLUMNS are ever written."""
+    buffer = io.StringIO()
+    writer = csv.writer(buffer, lineterminator="\n")
+    writer.writerow(RESEARCH_CSV_COLUMNS)
+    for record in records:
+        values = (
+            record["pseudo_id"],
+            record["age_group"],
+            record["gender"],
+            record["primary_diagnosis"],
+        )
+        writer.writerow([_csv_safe(value) for value in values])
+    return buffer.getvalue()

@@ -180,9 +180,7 @@ def test_recommendations_requires_care_recommendation_generate_permission(
         "/api/v1/clinical-support/recommendations/1",
         headers=auth_header(Role.HOSPITAL_ADMIN),
     )
-    assert (
-        response.status_code == 403
-    )  # hospital_admin lacks CARE_RECOMMENDATION_GENERATE
+    assert response.status_code == 403  # hospital_admin lacks CARE_RECOMMENDATION_GENERATE
 
 
 # --------------------------------------------------------------------------
@@ -296,9 +294,7 @@ def _biased_pipeline(bias_high: bool) -> Pipeline:
     return pipeline
 
 
-def _register(
-    db_session: Session, tmp_path, model_name: str, pipeline: Pipeline
-) -> None:
+def _register(db_session: Session, tmp_path, model_name: str, pipeline: Pipeline) -> None:
     model_path = tmp_path / f"{model_name}_model.joblib"
     joblib.dump(pipeline, model_path)
     db_session.add(

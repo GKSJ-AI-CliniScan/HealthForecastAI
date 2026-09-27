@@ -8,6 +8,7 @@ never redefined a second time.
 """
 
 from collections import Counter
+from datetime import date
 from typing import Any
 
 from sqlalchemy import Select, func, select
@@ -103,6 +104,44 @@ class AnalyticsRepository(BaseRepository[Admission]):
         for row in self.db.execute(stmt).scalars().all():
             counts[row.discharge_disposition or "unknown"] += 1
         return dict(counts)
+
+    def department_stats(
+        self,
+        doctor_id: int | None = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
+    ) -> list[dict[str, Any]]:
+        """Per-department admission volume, distinct patients, average stay and
+        readmission rate. Admissions with no department are grouped as
+        "unassigned" rather than dropped, so totals still reconcile."""
+        stmt = self._scoped_admissions(doctor_id)
+        if date_from is not None:
+            stmt = stmt.where(Admission.admission_date >= date_from)
+        if date_to is not None:
+            stmt = stmt.where(Admission.admission_date <= date_to)
+
+        groups: dict[str, list[Admission]] = {}
+        for row in self.db.execute(stmt).scalars().all():
+            groups.setdefault(row.department or "unassigned", []).append(row)
+
+        results = []
+        for department, rows in groups.items():
+            stays = [row.time_in_hospital for row in rows if row.time_in_hospital is not None]
+            readmitted = sum(
+                1
+                for row in rows
+                if row.readmitted is not None and row.readmitted not in NOT_READMITTED
+            )
+            results.append(
+                {
+                    "department": department,
+                    "total_patients": len({row.patient_id for row in rows}),
+                    "total_admissions": len(rows),
+                    "average_length_of_stay": sum(stays) / len(stays) if stays else 0.0,
+                    "readmission_rate": readmitted / len(rows),
+                }
+            )
+        return results
 
     def total_patient_count(self) -> int:
         """Hospital-wide patient count - the research cohort-size guard's denominator."""

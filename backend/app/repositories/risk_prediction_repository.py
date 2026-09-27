@@ -1,5 +1,7 @@
 """Data access for risk scores and readmission forecasts."""
 
+from typing import Any
+
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -115,3 +117,27 @@ class RiskPredictionRepository(BaseRepository[RiskPrediction]):
         for category, count in self.db.execute(stmt).all():
             distribution[category] = count
         return distribution
+
+    def risk_category_trend(
+        self, months: int = 12, doctor_id: int | None = None
+    ) -> list[dict[str, Any]]:
+        """Monthly count of risk scores issued per category, most recent
+        ``months`` with data. Every score counts (not only each patient's
+        latest), since the trend is about scoring activity over time.
+        Bucketed in Python for SQLite/PostgreSQL parity."""
+        stmt = select(RiskPrediction.created_at, RiskPrediction.risk_category).where(
+            RiskPrediction.prediction_type == "risk"
+        )
+        if doctor_id is not None:
+            stmt = stmt.join(Patient, Patient.id == RiskPrediction.patient_id).where(
+                PatientRepository.scope_clause(doctor_id)
+            )
+        buckets: dict[str, dict[str, int]] = {}
+        for created_at, category in self.db.execute(stmt).all():
+            key = f"{created_at.year:04d}-{created_at.month:02d}"
+            breakdown = buckets.setdefault(key, {"low": 0, "medium": 0, "high": 0})
+            breakdown[category] = breakdown.get(category, 0) + 1
+        return [
+            {"period": key, "total": sum(buckets[key].values()), "breakdown": buckets[key]}
+            for key in sorted(buckets)[-months:]
+        ]

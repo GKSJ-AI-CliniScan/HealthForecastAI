@@ -251,3 +251,181 @@ def test_population_health_endpoint_requires_permission(client: TestClient, auth
 def test_analytics_endpoints_require_authentication(client: TestClient) -> None:
     for path in ("/api/v1/analytics/summary", "/api/v1/analytics/readmissions"):
         assert client.get(path).status_code == 401
+
+
+# --------------------------------------------------------------------------
+# Department analytics
+# --------------------------------------------------------------------------
+
+
+def _seed_departments(db_session: Session) -> None:
+    first = _make_patient(db_session, "MRN-ANL-DEP-1")
+    second = _make_patient(db_session, "MRN-ANL-DEP-2")
+    _make_admission(
+        db_session,
+        first.id,
+        department="Cardiology",
+        admission_date=date(2026, 1, 5),
+        time_in_hospital=4,
+        readmitted="<30",
+    )
+    _make_admission(
+        db_session,
+        second.id,
+        department="Cardiology",
+        admission_date=date(2026, 2, 5),
+        time_in_hospital=6,
+        readmitted="NO",
+    )
+    _make_admission(db_session, first.id, admission_date=date(2026, 3, 5), readmitted="NO")
+
+
+def test_department_stats_groups_and_labels_unassigned(db_session: Session) -> None:
+    _seed_departments(db_session)
+    rows = {row["department"]: row for row in AnalyticsRepository(db_session).department_stats()}
+    assert rows["Cardiology"] == {
+        "department": "Cardiology",
+        "total_patients": 2,
+        "total_admissions": 2,
+        "average_length_of_stay": pytest.approx(5.0),
+        "readmission_rate": pytest.approx(0.5),
+    }
+    assert rows["unassigned"]["total_admissions"] == 1
+
+
+def test_departments_endpoint_applies_the_date_window(
+    client: TestClient, auth_header, db_session: Session
+) -> None:
+    _seed_departments(db_session)
+    response = client.get(
+        "/api/v1/analytics/departments?date_from=2026-02-01&date_to=2026-02-28",
+        headers=auth_header(Role.HOSPITAL_ADMIN),
+    )
+    assert response.status_code == 200
+    assert [(row["department"], row["total_admissions"]) for row in response.json()] == [
+        ("Cardiology", 1)
+    ]
+
+
+def test_departments_endpoint_sorts(client: TestClient, auth_header, db_session: Session) -> None:
+    _seed_departments(db_session)
+    response = client.get(
+        "/api/v1/analytics/departments?sort_by=total_admissions&order=desc",
+        headers=admin(auth_header),
+    )
+    assert [row["department"] for row in response.json()] == ["Cardiology", "unassigned"]
+
+
+def test_departments_endpoint_rejects_an_inverted_date_range(
+    client: TestClient, auth_header
+) -> None:
+    response = client.get(
+        "/api/v1/analytics/departments?date_from=2026-03-01&date_to=2026-01-01",
+        headers=admin(auth_header),
+    )
+    assert response.status_code == 422
+    error = response.json()["detail"][0]
+    assert error["loc"] == ["query", "date_from"]
+    assert "date_from must be on or before date_to" in error["msg"]
+
+
+@pytest.mark.parametrize(
+    "query",
+    ["sort_by=patient_name", "order=sideways", "date_from=not-a-date"],
+)
+def test_departments_endpoint_validates_sort_and_filters(
+    client: TestClient, auth_header, query: str
+) -> None:
+    response = client.get(f"/api/v1/analytics/departments?{query}", headers=admin(auth_header))
+    assert response.status_code == 422
+
+
+# --------------------------------------------------------------------------
+# Trends
+# --------------------------------------------------------------------------
+
+
+def test_outcome_trend_breaks_down_by_discharge_month(
+    client: TestClient, auth_header, db_session: Session
+) -> None:
+    from app.models.treatment import TreatmentOutcome
+
+    patient = _make_patient(db_session, "MRN-ANL-TR-1")
+    admission = _make_admission(db_session, patient.id, discharge_date=date(2026, 4, 10))
+    for outcome in ("improved", "improved", None):
+        db_session.add(
+            TreatmentOutcome(admission_id=admission.id, treatment_name="Insulin", outcome=outcome)
+        )
+    db_session.commit()
+
+    response = client.get("/api/v1/analytics/trends?metric=outcome", headers=admin(auth_header))
+    assert response.status_code == 200
+    assert response.json() == [
+        {"period": "2026-04", "total": 3, "breakdown": {"improved": 2, "unrecorded": 1}}
+    ]
+
+
+def test_risk_trend_counts_scores_per_month(
+    client: TestClient, auth_header, db_session: Session
+) -> None:
+    patient = _make_patient(db_session, "MRN-ANL-TR-2")
+    _make_prediction(db_session, patient.id, "low")
+    _make_prediction(db_session, patient.id, "high")
+
+    response = client.get("/api/v1/analytics/trends?metric=risk", headers=admin(auth_header))
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body) == 1
+    assert body[0]["total"] == 2
+    assert body[0]["breakdown"] == {"low": 1, "medium": 0, "high": 1}
+
+
+@pytest.mark.parametrize(
+    "query", ["", "metric=readmission", "metric=risk&months=0", "metric=risk&months=61"]
+)
+def test_trends_endpoint_validates_its_parameters(
+    client: TestClient, auth_header, query: str
+) -> None:
+    response = client.get(f"/api/v1/analytics/trends?{query}", headers=admin(auth_header))
+    assert response.status_code == 422
+
+
+# --------------------------------------------------------------------------
+# RBAC for the dashboard endpoints
+# --------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/api/v1/analytics/departments",
+        "/api/v1/analytics/trends?metric=risk",
+        "/api/v1/analytics/discharge-outcomes",
+    ],
+)
+def test_new_dashboard_endpoints_pin_the_doctor_rbac_gap(
+    client: TestClient, auth_header, path: str
+) -> None:
+    """Same documented gap as test_hospital_summary_endpoint_is_forbidden_for_a_doctor."""
+    assert client.get(path, headers=auth_header(Role.DOCTOR)).status_code == 403
+
+
+@pytest.mark.parametrize("role", [Role.HOSPITAL_ADMIN, Role.RESEARCHER, Role.SYSTEM_ADMIN])
+def test_new_dashboard_endpoints_allow_hospital_analytics_roles(
+    client: TestClient, auth_header, role: Role
+) -> None:
+    for path in ("/api/v1/analytics/departments", "/api/v1/analytics/trends?metric=outcome"):
+        assert client.get(path, headers=auth_header(role)).status_code == 200
+
+
+def test_population_health_is_available_to_a_hospital_admin(
+    client: TestClient, auth_header, db_session: Session
+) -> None:
+    """SRS section 9: "Population Health Reports - Hospital Administrator: Yes"."""
+    for i in range(10):
+        _make_patient(db_session, f"MRN-ANL-HA-{i}")
+    response = client.get(
+        "/api/v1/analytics/population-health", headers=auth_header(Role.HOSPITAL_ADMIN)
+    )
+    assert response.status_code == 200
+    assert response.json()["total_patients"] == 10

@@ -36,9 +36,7 @@ class ReadmissionService:
         self.loader = ModelLoader(db)
         self.audit = AuditRepository(db)
 
-    def predict(
-        self, user: CurrentUser, patient_id: int, admission_id: int
-    ) -> RiskPrediction:
+    def predict(self, user: CurrentUser, patient_id: int, admission_id: int) -> RiskPrediction:
         """Build features, run inference, persist and return the forecast.
 
         Raises PatientNotFoundError, AdmissionNotFoundError,
@@ -49,9 +47,7 @@ class ReadmissionService:
         patient = self.admissions.patients.get_patient(user, patient_id)
 
         feature_row = self.features.build_for_patient(patient, admission=admission)
-        pipeline, model_record = self.loader.get_production_pipeline(
-            READMISSION_MODEL_NAME
-        )
+        pipeline, model_record = self.loader.get_production_pipeline(READMISSION_MODEL_NAME)
 
         probability = float(pipeline.predict_proba(feature_row)[:, 1][0])
         confidence = float(max(probability, 1 - probability))
@@ -84,9 +80,7 @@ class ReadmissionService:
         same scoping rule PatientRepository.scope_clause applies elsewhere.
         """
         doctor_id = patient_scope_for(user)
-        predicted, total = self.predictions.readmission_forecast_summary(
-            doctor_id=doctor_id
-        )
+        predicted, total = self.predictions.readmission_forecast_summary(doctor_id=doctor_id)
         rate = predicted / total if total else 0.0
         return {
             "scope": "doctor" if doctor_id is not None else "hospital",

@@ -16,6 +16,8 @@ from app.core.config import settings
 from app.models.patient import Patient
 from app.repositories.audit_repository import AuditRepository
 from app.repositories.patient_repository import PatientRepository
+from app.schemas.analytics import ResearchCohortFilter
+from app.utils.anonymisation import generalise_age
 
 # Fields an authorised caller may change. medical_record_number is absent because
 # it identifies the record; re-pointing it would silently rewrite history.
@@ -169,34 +171,71 @@ class PatientService:
         )
         return updated
 
-    def list_for_research(
-        self, user: CurrentUser, min_cohort_size: int | None = None
+    def research_cohort(
+        self,
+        filters: ResearchCohortFilter | None = None,
+        min_cohort_size: int | None = None,
     ) -> list[Patient]:
-        """Return the hospital-wide patient cohort for anonymised research export.
+        """Return the full filtered research cohort, or raise CohortTooSmallError.
 
-        Never doctor-scoped: Researcher access is hospital-wide-but-anonymised
-        per the access matrix, unlike list_patients' doctor-narrowed view.
-        Raises CohortTooSmallError when the cohort is small enough that even
-        an anonymised export could re-identify someone.
+        The guard is applied to the cohort *after* every filter, so narrowing
+        filters can never be used to pull out a group smaller than the
+        minimum. Never doctor-scoped: Researcher access is
+        hospital-wide-but-anonymised per the access matrix.
         """
+        filters = filters or ResearchCohortFilter()
         minimum = (
             min_cohort_size if min_cohort_size is not None else settings.RESEARCH_MIN_COHORT_SIZE
         )
-        rows = self.patients.list_patients(limit=10_000, offset=0, doctor_id=None)
+        rows = self.patients.research_cohort(
+            diagnosis=filters.diagnosis,
+            gender=filters.gender,
+            admitted_from=filters.date_from,
+            admitted_to=filters.date_to,
+        )
+        if filters.age_band is not None:
+            # Matched on the generalised band - the only age value a researcher
+            # ever sees - so the filter cannot address a single raw age.
+            wanted = filters.age_band.strip()
+            rows = [row for row in rows if generalise_age(row.age_group) == wanted]
         if len(rows) < minimum:
+            raise CohortTooSmallError(size=len(rows), minimum=minimum)
+        return rows
+
+    def list_for_research(
+        self,
+        user: CurrentUser,
+        min_cohort_size: int | None = None,
+        filters: ResearchCohortFilter | None = None,
+    ) -> list[Patient]:
+        """research_cohort, audited as a research export (FR-AUD / SRS "export logged")."""
+        try:
+            rows = self.research_cohort(filters, min_cohort_size)
+        except CohortTooSmallError as exc:
             self.audit.record(
                 action="patient.research_export",
                 actor_id=user.user_id,
                 actor_role=str(user.role),
-                resource=f"cohort_size:{len(rows)}",
+                resource=research_audit_resource(exc.size, filters),
                 outcome="failure",
             )
-            raise CohortTooSmallError(size=len(rows), minimum=minimum)
+            raise
 
         self.audit.record(
             action="patient.research_export",
             actor_id=user.user_id,
             actor_role=str(user.role),
-            resource=f"cohort_size:{len(rows)}",
+            resource=research_audit_resource(len(rows), filters),
         )
         return rows
+
+
+# audit_logs.resource is VARCHAR(128); PostgreSQL rejects a longer value.
+_AUDIT_RESOURCE_MAX = 128
+
+
+def research_audit_resource(size: int, filters: ResearchCohortFilter | None) -> str:
+    """Cohort size plus the filters applied, truncated to fit audit_logs.resource."""
+    applied = filters.model_dump(exclude_none=True, mode="json") if filters else {}
+    rendered = ",".join(f"{key}={value}" for key, value in sorted(applied.items())) or "none"
+    return f"cohort_size:{size};filters:{rendered}"[:_AUDIT_RESOURCE_MAX]

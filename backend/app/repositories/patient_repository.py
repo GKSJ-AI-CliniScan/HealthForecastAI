@@ -1,8 +1,11 @@
 """Data access for patient records, including doctor scope enforcement."""
 
+from datetime import date
+
 from sqlalchemy import ColumnElement, Select, exists, func, or_, select
 from sqlalchemy.orm import Session
 
+from app.models.admission import Admission
 from app.models.doctor_patient_map import DoctorPatientMap
 from app.models.patient import Patient
 from app.repositories.base import BaseRepository
@@ -72,6 +75,35 @@ class PatientRepository(BaseRepository[Patient]):
         inner = self._scoped(doctor_id).subquery()
         stmt = select(func.count()).select_from(inner)
         return self.db.execute(stmt).scalar_one()
+
+    def research_cohort(
+        self,
+        diagnosis: str | None = None,
+        gender: str | None = None,
+        admitted_from: date | None = None,
+        admitted_to: date | None = None,
+    ) -> list[Patient]:
+        """Return the full hospital-wide cohort matching the filters, unpaged.
+
+        Deliberately never doctor-scoped and never truncated: the research
+        cohort-size guard has to judge the true size of the filtered cohort,
+        and a silently capped result would both under-report it and export an
+        incomplete dataset. Text filters match case-insensitively. A date
+        bound keeps patients with at least one admission inside the window.
+        """
+        stmt = select(Patient)
+        if diagnosis is not None:
+            stmt = stmt.where(func.lower(Patient.primary_diagnosis) == diagnosis.strip().lower())
+        if gender is not None:
+            stmt = stmt.where(func.lower(Patient.gender) == gender.strip().lower())
+        if admitted_from is not None or admitted_to is not None:
+            admitted = exists().where(Admission.patient_id == Patient.id)
+            if admitted_from is not None:
+                admitted = admitted.where(Admission.admission_date >= admitted_from)
+            if admitted_to is not None:
+                admitted = admitted.where(Admission.admission_date <= admitted_to)
+            stmt = stmt.where(admitted)
+        return list(self.db.execute(stmt.order_by(Patient.id)).scalars().all())
 
     def search(
         self,

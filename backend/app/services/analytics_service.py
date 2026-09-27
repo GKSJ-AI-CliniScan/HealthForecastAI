@@ -3,6 +3,7 @@
 Keep API handlers thin: routers validate and authorise, services do the work.
 """
 
+from collections import Counter
 from typing import Any
 
 from sqlalchemy.orm import Session
@@ -12,8 +13,22 @@ from app.core.config import settings
 from app.repositories.analytics_repository import AnalyticsRepository
 from app.repositories.audit_repository import AuditRepository
 from app.repositories.risk_prediction_repository import RiskPredictionRepository
-from app.schemas.analytics import HospitalAnalyticsSummary, RiskDistribution
-from app.services.patient_service import CohortTooSmallError
+from app.repositories.treatment_repository import TreatmentRepository
+from app.schemas.analytics import (
+    DateRange,
+    DepartmentSortField,
+    HospitalAnalyticsSummary,
+    ResearchCohortFilter,
+    RiskDistribution,
+    SortOrder,
+    TrendMetric,
+)
+from app.services.patient_service import (
+    CohortTooSmallError,
+    PatientService,
+    research_audit_resource,
+)
+from app.utils.anonymisation import generalise_age
 
 
 class AnalyticsService:
@@ -22,6 +37,8 @@ class AnalyticsService:
     def __init__(self, db: Session) -> None:
         self.analytics = AnalyticsRepository(db)
         self.risk_predictions = RiskPredictionRepository(db)
+        self.treatments = TreatmentRepository(db)
+        self.patients = PatientService(db)
         self.audit = AuditRepository(db)
 
     def hospital_summary(self, user: CurrentUser) -> HospitalAnalyticsSummary:
@@ -64,7 +81,77 @@ class AnalyticsService:
     def discharge_outcomes(self, user: CurrentUser) -> dict[str, int]:
         """Discharge-disposition distribution, scoped the same way hospital_summary is."""
         doctor_id = patient_scope_for(user)
+        self._audit(user, "analytics.discharge_outcomes")
         return self.analytics.discharge_outcome_distribution(doctor_id)
+
+    def department_analytics(
+        self,
+        user: CurrentUser,
+        date_range: DateRange | None = None,
+        sort_by: DepartmentSortField = "department",
+        order: SortOrder = "asc",
+    ) -> list[dict[str, Any]]:
+        """Per-department admission and readmission figures, sorted as requested."""
+        date_range = date_range or DateRange()
+        rows = self.analytics.department_stats(
+            patient_scope_for(user), date_range.date_from, date_range.date_to
+        )
+        self._audit(user, "analytics.departments")
+        return sorted(rows, key=lambda row: row[sort_by], reverse=order == "desc")
+
+    def trends(
+        self, user: CurrentUser, metric: TrendMetric, months: int = 12
+    ) -> list[dict[str, Any]]:
+        """One monthly {period, total, breakdown} series for outcome or risk trends."""
+        doctor_id = patient_scope_for(user)
+        self._audit(user, "analytics.trends", f"metric:{metric}")
+        if metric == "outcome":
+            return self.treatments.outcome_trend(months, doctor_id=doctor_id)
+        return self.risk_predictions.risk_category_trend(months, doctor_id=doctor_id)
+
+    def cohort_statistics(
+        self, user: CurrentUser, filters: ResearchCohortFilter | None = None
+    ) -> dict[str, Any]:
+        """Aggregate breakdown of a filtered research cohort.
+
+        Uses PatientService.research_cohort, so it is subject to exactly the
+        cohort-size guard the anonymised export is; distributions are built
+        from the same generalised values the export would show.
+        """
+        try:
+            patients = self.patients.research_cohort(filters)
+        except CohortTooSmallError as exc:
+            self._audit(
+                user,
+                "analytics.research_cohort",
+                research_audit_resource(exc.size, filters),
+                outcome="failure",
+            )
+            raise
+        self._audit(
+            user, "analytics.research_cohort", research_audit_resource(len(patients), filters)
+        )
+        return {
+            "cohort_size": len(patients),
+            "age_band_distribution": dict(
+                Counter(generalise_age(p.age_group) or "unknown" for p in patients)
+            ),
+            "gender_distribution": dict(Counter(p.gender or "unknown" for p in patients)),
+            "diagnosis_distribution": dict(
+                Counter(p.primary_diagnosis or "unknown" for p in patients)
+            ),
+        }
+
+    def _audit(
+        self, user: CurrentUser, action: str, resource: str | None = None, outcome: str = "success"
+    ) -> None:
+        self.audit.record(
+            action=action,
+            actor_id=user.user_id,
+            actor_role=str(user.role),
+            resource=resource,
+            outcome=outcome,
+        )
 
     def population_health(
         self, user: CurrentUser, min_cohort_size: int | None = None

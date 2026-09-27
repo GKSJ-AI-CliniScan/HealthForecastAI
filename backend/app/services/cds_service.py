@@ -54,25 +54,14 @@ def follow_up_recommendations(
     """Map a risk category (+ medication burden) onto a follow-up cadence."""
     items: list[Recommendation] = []
     if prediction.risk_category == "high":
-        items.append(
-            Recommendation(
-                "follow_up", "Schedule a 7-day post-discharge follow-up call."
-            )
-        )
-        items.append(
-            Recommendation("follow_up", "Schedule a 14-day in-person follow-up visit.")
-        )
+        items.append(Recommendation("follow_up", "Schedule a 7-day post-discharge follow-up call."))
+        items.append(Recommendation("follow_up", "Schedule a 14-day in-person follow-up visit."))
     elif prediction.risk_category == "medium":
         items.append(Recommendation("follow_up", "Schedule a 14-day follow-up call."))
     else:
-        items.append(
-            Recommendation("follow_up", "Standard follow-up per department protocol.")
-        )
+        items.append(Recommendation("follow_up", "Standard follow-up per department protocol."))
 
-    if (
-        admission is not None
-        and (admission.num_medications or 0) >= HIGH_MEDICATION_COUNT
-    ):
+    if admission is not None and (admission.num_medications or 0) >= HIGH_MEDICATION_COUNT:
         items.append(
             Recommendation(
                 "care",
@@ -88,9 +77,7 @@ def risk_mitigation_recommendations(prediction: RiskPrediction) -> list[Recommen
     items: list[Recommendation] = []
     if prediction.risk_category == "high":
         items.append(
-            Recommendation(
-                "risk_mitigation", "Priority clinical review before discharge."
-            )
+            Recommendation("risk_mitigation", "Priority clinical review before discharge.")
         )
         items.append(
             Recommendation(
@@ -100,9 +87,7 @@ def risk_mitigation_recommendations(prediction: RiskPrediction) -> list[Recommen
         )
     elif prediction.risk_category == "medium":
         items.append(
-            Recommendation(
-                "risk_mitigation", "Monitor for emerging risk drivers at next review."
-            )
+            Recommendation("risk_mitigation", "Monitor for emerging risk drivers at next review.")
         )
     return items
 
@@ -111,9 +96,7 @@ def discharge_checklist(prediction: RiskPrediction) -> list[Recommendation]:
     """Map a risk category onto a discharge checklist."""
     if prediction.risk_category == "high":
         return [
-            Recommendation(
-                "discharge_checklist", "Mandatory clinical review before discharge."
-            ),
+            Recommendation("discharge_checklist", "Mandatory clinical review before discharge."),
             Recommendation(
                 "discharge_checklist",
                 "Confirm a documented follow-up appointment before discharge.",
@@ -129,9 +112,7 @@ def discharge_checklist(prediction: RiskPrediction) -> list[Recommendation]:
                 "discharge_checklist",
                 "Confirm a documented follow-up appointment before discharge.",
             ),
-            Recommendation(
-                "discharge_checklist", "Provide written discharge instructions."
-            ),
+            Recommendation("discharge_checklist", "Provide written discharge instructions."),
         ]
     return [Recommendation("discharge_checklist", "Standard discharge instructions.")]
 
@@ -157,9 +138,7 @@ class CDSService:
         except NoPredictionError as exc:
             raise NoRiskPredictionError(str(patient_id)) from exc
 
-    def care_recommendations(
-        self, user: CurrentUser, patient_id: int
-    ) -> dict[str, Any]:
+    def care_recommendations(self, user: CurrentUser, patient_id: int) -> dict[str, Any]:
         """Return follow-up and care recommendations for a patient.
 
         Raises PatientNotFoundError or NoRiskPredictionError - the endpoint
@@ -175,8 +154,7 @@ class CDSService:
             "risk_category": prediction.risk_category,
             "based_on_prediction_id": prediction.id,
             "recommendations": [
-                {"category": item.category, "text": item.text}
-                for item in recommendations
+                {"category": item.category, "text": item.text} for item in recommendations
             ],
             "follow_up_days": FOLLOW_UP_DAYS_BY_CATEGORY[prediction.risk_category],
         }

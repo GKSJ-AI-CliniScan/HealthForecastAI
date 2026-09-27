@@ -58,6 +58,25 @@ class RecoveryTrendPoint(BaseModel):
     sample_size: int
 
 
+class TreatmentOutcomeDistribution(BaseModel):
+    """Outcome counts for one treatment - the outcome-vs-treatment cross-tab
+    of FR-ANL-02. "unrecorded" counts rows whose outcome is NULL."""
+
+    treatment_name: str
+    sample_size: int
+    outcomes: dict[str, int]
+
+
+class DepartmentEffectiveness(BaseModel):
+    """Treatment effectiveness figures for one hospital department."""
+
+    department: str
+    sample_size: int
+    average_recovery_score: float | None = None
+    success_rate: float = Field(ge=0.0, le=1.0)
+    readmission_rate: float = Field(ge=0.0, le=1.0)
+
+
 class ReadmissionReduction(BaseModel):
     """Readmission rate for one treatment vs. the hospital-wide baseline."""
 

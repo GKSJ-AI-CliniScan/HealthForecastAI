@@ -123,9 +123,7 @@ class FeatureBuilder:
             if row.empty:
                 raise InsufficientPatientDataError(["admission"])
         else:
-            row = engineered.sort_values("admission_date", na_position="first").iloc[
-                [-1]
-            ]
+            row = engineered.sort_values("admission_date", na_position="first").iloc[[-1]]
 
         age = _parse_age(patient.age_group)
         missing = [
@@ -150,9 +148,7 @@ class FeatureBuilder:
                     "admission_type": row["admission_type"].iloc[0],
                     "medication_count": row["medication_count"].iloc[0],
                     "prior_admission_count": row["prior_admission_count"].iloc[0],
-                    "days_since_last_discharge": row["days_since_last_discharge"].iloc[
-                        0
-                    ],
+                    "days_since_last_discharge": row["days_since_last_discharge"].iloc[0],
                 }
             ],
             columns=FEATURE_COLUMNS,

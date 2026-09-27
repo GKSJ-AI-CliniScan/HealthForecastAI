@@ -2,7 +2,10 @@
 
 from functools import lru_cache
 
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+PLACEHOLDER_ANONYMISATION_SALT = "change-me-do-not-use-in-production"
 
 
 class Settings(BaseSettings):
@@ -39,8 +42,19 @@ class Settings(BaseSettings):
     # Research analytics - salt for app.utils.anonymisation.pseudonymise().
     # Must be overridden via environment/.env in any real deployment; kept
     # separate from SECRET_KEY so rotating one never invalidates the other.
-    ANONYMISATION_SALT: str = "change-me-do-not-use-in-production"
-    RESEARCH_MIN_COHORT_SIZE: int = 10
+    ANONYMISATION_SALT: str = PLACEHOLDER_ANONYMISATION_SALT
+    RESEARCH_MIN_COHORT_SIZE: int = Field(default=10, ge=1)
+
+    @model_validator(mode="after")
+    def _require_real_salt_in_production(self) -> "Settings":
+        # Pseudonyms hash sequential integer ids, so anyone who knows the
+        # published placeholder salt can rebuild the id -> pseudonym table.
+        if (
+            self.ENVIRONMENT.lower() == "production"
+            and self.ANONYMISATION_SALT == PLACEHOLDER_ANONYMISATION_SALT
+        ):
+            raise ValueError("ANONYMISATION_SALT must be set to a secret value in production")
+        return self
 
     @property
     def cors_origins(self) -> list[str]:

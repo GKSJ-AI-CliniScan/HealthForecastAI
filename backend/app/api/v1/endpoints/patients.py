@@ -4,9 +4,12 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentUser, get_current_active_user, require_permission
+from app.api.errors import cohort_too_small
+from app.api.filters import research_cohort_filter
 from app.core.config import settings
 from app.core.rbac import Permission, Role
 from app.db.session import get_db
+from app.schemas.analytics import ResearchCohortFilter
 from app.schemas.patient import PatientAnonymised, PatientCreate, PatientRead, PatientUpdate
 from app.services.patient_service import (
     CohortTooSmallError,
@@ -97,27 +100,35 @@ def create_patient(
     "/anonymised",
     response_model=list[PatientAnonymised],
     summary="Anonymised patient cohort for researchers",
+    responses={
+        401: {"description": "Not authenticated"},
+        403: {"description": "Role lacks patient:read_anonymized"},
+        422: {"description": "Invalid filter, or cohort_too_small"},
+    },
 )
 def list_anonymised_patients(
+    response: Response,
+    filters: ResearchCohortFilter = Depends(research_cohort_filter),
+    limit: int = Query(default=100, ge=1, le=1000),
+    offset: int = Query(default=0, ge=0),
     user: CurrentUser = Depends(require_permission(Permission.PATIENT_READ_ANONYMIZED)),
     db: Session = Depends(get_db),
 ) -> list[PatientAnonymised]:
-    """Return a de-identified cohort: no MRN, no name, a pseudonymous id.
+    """Return a page of a de-identified cohort: no MRN, no name, a pseudonymous id.
 
-    422 when the hospital-wide cohort is smaller than the configured minimum -
-    an anonymised export over a handful of patients can still re-identify
-    someone by elimination.
+    422 cohort_too_small when the *filtered* cohort - not the page - is
+    smaller than the configured minimum: an anonymised export over a handful
+    of patients can still re-identify someone by elimination. X-Total-Count
+    carries the filtered cohort size.
     """
     try:
-        patients = PatientService(db).list_for_research(user)
+        patients = PatientService(db).list_for_research(user, filters=filters)
     except CohortTooSmallError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail={"error": "cohort_too_small", "minimum": exc.minimum, "actual": exc.size},
-        ) from exc
+        raise cohort_too_small(exc) from exc
+    response.headers["X-Total-Count"] = str(len(patients))
     return [
         PatientAnonymised(**anonymise_patient(patient, settings.ANONYMISATION_SALT))
-        for patient in patients
+        for patient in patients[offset : offset + limit]
     ]
 
 

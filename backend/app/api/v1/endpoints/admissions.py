@@ -194,12 +194,11 @@ def list_treatment_outcomes(
     """Return every treatment outcome recorded for one admission."""
     _reject_researchers(user)
     try:
-        AdmissionService(db).get_admission(user, patient_id, admission_id)  # scope check
+        rows = TreatmentService(db).list_outcomes(user, patient_id, admission_id)
     except PatientNotFoundError as exc:
         raise _patient_not_found(patient_id) from exc
     except AdmissionNotFoundError as exc:
         raise _admission_not_found(admission_id) from exc
-    rows = TreatmentService(db).treatments.list_for_admission(admission_id)
     return [TreatmentOutcomeRead.model_validate(row) for row in rows]
 
 

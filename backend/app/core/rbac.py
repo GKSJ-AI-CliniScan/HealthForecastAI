@@ -51,6 +51,12 @@ class Permission(StrEnum):
     SYSTEM_CONFIGURE = "system:configure"
 
 
+# Known gap, preserved deliberately: SRS section 9 lists "Hospital Analytics
+# Dashboard: Doctor - Limited", but no HOSPITAL_ANALYTICS_READ variant is
+# granted to doctors, so every /analytics dashboard endpoint returns 403 for
+# them. Defining what "Limited" means is a policy decision still to be made;
+# the analytics services already narrow figures via patient_scope_for, so
+# granting a limited permission later needs no service change.
 PERMISSIONS: dict[Role, frozenset[Permission]] = {
     Role.DOCTOR: frozenset(
         {
@@ -69,6 +75,8 @@ PERMISSIONS: dict[Role, frozenset[Permission]] = {
             Permission.READMISSION_FORECAST_READ,
             Permission.TREATMENT_REPORT_READ,
             Permission.HOSPITAL_ANALYTICS_READ,
+            # SRS section 9: "Population Health Reports - Hospital Administrator: Yes".
+            Permission.POPULATION_HEALTH_READ,
             Permission.ANALYTICS_EXPORT,
         }
     ),
