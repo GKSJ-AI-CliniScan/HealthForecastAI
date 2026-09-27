@@ -45,6 +45,13 @@ class Settings(BaseSettings):
     ANONYMISATION_SALT: str = PLACEHOLDER_ANONYMISATION_SALT
     RESEARCH_MIN_COHORT_SIZE: int = Field(default=10, ge=1)
 
+    # Reporting - generated export files live on local disk under this
+    # directory (relative paths resolve against the working directory, as
+    # MODEL_ARTIFACT_DIR does). Reports older than the retention window are
+    # removed by the purge endpoint.
+    REPORT_STORAGE_DIR: str = "storage/reports"
+    REPORT_RETENTION_DAYS: int = Field(default=30, ge=1)
+
     @model_validator(mode="after")
     def _require_real_salt_in_production(self) -> "Settings":
         # Pseudonyms hash sequential integer ids, so anyone who knows the

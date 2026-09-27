@@ -176,6 +176,13 @@ class AnalyticsService:
             raise CohortTooSmallError(size=total_patients, minimum=minimum)
 
         demographic_distribution = self.analytics.demographic_distribution()
+        # Raw stored ages (India profile: "61") are re-banded to the same
+        # 10-year bands the anonymised export shows, so per-exact-age counts
+        # never reach a researcher.
+        banded: Counter[str] = Counter()
+        for age_group, count in demographic_distribution["age_group"].items():
+            banded[generalise_age(age_group) or "unknown"] += count
+        demographic_distribution["age_group"] = dict(banded)
         disease_prevalence = dict(self.analytics.disease_prevalence(limit=20))
 
         self.audit.record(

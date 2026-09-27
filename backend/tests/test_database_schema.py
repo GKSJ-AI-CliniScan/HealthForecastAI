@@ -25,6 +25,7 @@ EXPECTED_TABLES = {
     "doctor_patient_map",
     "model_metadata",
     "patients",
+    "reports",
     "risk_predictions",
     "treatment_outcomes",
     "users",
@@ -95,6 +96,7 @@ def test_doctor_patient_map_prevents_duplicate_assignments() -> None:
         ("risk_predictions", "idx_risk_predictions_type"),
         ("model_metadata", "idx_model_metadata_status"),
         ("admissions", "idx_admissions_department"),
+        ("reports", "idx_reports_generated_by"),
     ],
 )
 def test_documented_indexes_exist(table: str, index: str) -> None:
@@ -155,6 +157,7 @@ def test_risk_predictions_window_is_constrained() -> None:
         ("risk_predictions", "created_at"),
         ("risk_predictions", "prediction_type"),
         ("model_metadata", "status"),
+        ("reports", "generated_at"),
     ],
 )
 def test_defaults_are_enforced_by_the_database(table: str, column: str) -> None:
@@ -175,6 +178,24 @@ def test_admissions_has_a_department_column() -> None:
 def test_treatment_outcomes_outcome_is_constrained() -> None:
     """Only the four documented outcome values may be recorded."""
     assert "treatment_outcomes_outcome_check" in _constraint_names("treatment_outcomes")
+
+
+def test_reports_type_and_format_are_constrained() -> None:
+    """Only the supported report types and export formats may be stored."""
+    names = _constraint_names("reports")
+    assert {"reports_type_check", "reports_format_check", "reports_file_size_check"} <= names
+
+
+def test_reports_generated_by_restricts_user_deletion() -> None:
+    """A user with report history cannot be deleted out from under it."""
+    column = Base.metadata.tables["reports"].c.generated_by
+    assert {fk.target_fullname for fk in column.foreign_keys} == {"users.id"}
+    assert all(fk.ondelete == "RESTRICT" for fk in column.foreign_keys)
+
+
+def test_reports_file_path_is_unique() -> None:
+    """Two report rows can never point at the same stored file."""
+    assert Base.metadata.tables["reports"].c.file_path.unique
 
 
 def test_migration_upgrades_and_downgrades_cleanly(tmp_path: Path, monkeypatch) -> None:

@@ -6,6 +6,7 @@ from app.models.doctor_patient_map import DoctorPatientMap
 from app.models.model_metadata import ModelMetadata
 from app.models.patient import Patient
 from app.models.prediction import RiskPrediction
+from app.models.report import Report
 from app.models.treatment import TreatmentOutcome
 from app.models.user import User
 
@@ -15,6 +16,7 @@ __all__ = [
     "DoctorPatientMap",
     "ModelMetadata",
     "Patient",
+    "Report",
     "RiskPrediction",
     "TreatmentOutcome",
     "User",

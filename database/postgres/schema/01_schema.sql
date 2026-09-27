@@ -152,6 +152,28 @@ CREATE TABLE IF NOT EXISTS treatment_outcomes (
 
 CREATE INDEX IF NOT EXISTS idx_treatment_admission ON treatment_outcomes (admission_id);
 
+-- Generated analytics exports. file_path is a server-generated file name inside
+-- the report storage directory, never a caller-supplied path.
+CREATE TABLE IF NOT EXISTS reports (
+    id               SERIAL PRIMARY KEY,
+    report_type      VARCHAR(50) NOT NULL,
+    format           VARCHAR(10) NOT NULL,
+    generated_by     INTEGER NOT NULL REFERENCES users (id) ON DELETE RESTRICT,
+    filters          JSONB,
+    file_path        VARCHAR(500) NOT NULL UNIQUE,
+    file_size_bytes  INTEGER NOT NULL,
+    generated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT reports_type_check CHECK (report_type IN (
+        'treatment_effectiveness', 'patient_outcomes', 'department_performance',
+        'population_health', 'risk_distribution', 'readmission_analytics',
+        'research_cohort'
+    )),
+    CONSTRAINT reports_format_check CHECK (format IN ('csv', 'xlsx', 'pdf')),
+    CONSTRAINT reports_file_size_check CHECK (file_size_bytes >= 0)
+);
+
+CREATE INDEX IF NOT EXISTS idx_reports_generated_by ON reports (generated_by, generated_at DESC);
+
 -- Append only. Every privileged action must land here.
 CREATE TABLE IF NOT EXISTS audit_logs (
     id          SERIAL PRIMARY KEY,

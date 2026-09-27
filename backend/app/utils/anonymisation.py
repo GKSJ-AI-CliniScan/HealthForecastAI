@@ -6,6 +6,8 @@ import io
 from collections.abc import Iterable
 from typing import TYPE_CHECKING, TypedDict
 
+from app.utils.formula_safety import neutralise_formula
+
 if TYPE_CHECKING:
     from app.models.patient import Patient
 
@@ -71,16 +73,10 @@ def anonymise_patient(patient: "Patient", salt: str) -> AnonymisedPatientFields:
 
 RESEARCH_CSV_COLUMNS = ("pseudo_id", "age_group", "gender", "primary_diagnosis")
 
-# A cell starting with one of these is evaluated as a formula by Excel/Sheets
-# (CSV injection). Free-text fields such as primary_diagnosis come from
-# imported data, so they are neutralised with a leading apostrophe.
-_FORMULA_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
-
 
 def _csv_safe(value: str | None) -> str:
-    if value is None:
-        return ""
-    return f"'{value}" if value.startswith(_FORMULA_PREFIXES) else value
+    # Free-text fields such as primary_diagnosis come from imported data.
+    return "" if value is None else neutralise_formula(value)
 
 
 def research_csv(records: Iterable[AnonymisedPatientFields]) -> str:

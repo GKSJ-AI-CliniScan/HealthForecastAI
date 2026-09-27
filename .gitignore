@@ -64,6 +64,10 @@ ml/data/external/*
 *.sqlite3
 !database/**/*.sql
 
+# ---------- Generated reports (REPORT_STORAGE_DIR) ----------
+storage/
+backend/storage/
+
 # ---------- Model artifacts ----------
 ml/artifacts/*
 !ml/artifacts/.gitkeep
