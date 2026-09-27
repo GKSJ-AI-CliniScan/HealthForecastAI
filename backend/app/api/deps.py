@@ -76,6 +76,33 @@ def require_permission(permission: Permission) -> Callable[[User], User]:
     return guard
 
 
+def require_any_permission(*permissions: Permission) -> Callable[[User], User]:
+    """Build a dependency accepting a caller who holds at least one permission.
+
+    Used where the access matrix offers a scoped variant alongside the full one -
+    a doctor's "limited" treatment access is the same report narrowed to their own
+    caseload, not a different endpoint, so the guard admits both and the caller
+    narrows the query.
+    """
+
+    def guard(user: CurrentUser) -> User:
+        role = Role(user.role)
+        if not any(has_permission(role, permission) for permission in permissions):
+            names = " or ".join(str(permission) for permission in permissions)
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Role '{user.role}' lacks permission '{names}'",
+            )
+        return user
+
+    return guard
+
+
+def holds_permission(user: User, permission: Permission) -> bool:
+    """Return True when the caller's role carries the permission."""
+    return has_permission(Role(user.role), permission)
+
+
 def require_role(*roles: Role) -> Callable[[User], User]:
     """Build a dependency that only allows the listed roles."""
 

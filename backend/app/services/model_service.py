@@ -149,6 +149,7 @@ def load_metrics_summary() -> dict[str, Any] | None:
 
     try:
         import json
+
         return json.loads(path.read_text(encoding="utf-8"))
     except Exception:
         logger.exception("Failed to read metrics summary at %s", path)
@@ -183,4 +184,3 @@ def model_info() -> dict[str, Any]:
         "artifact_path": str(artifact_path()),
         "metrics_summary": summary,
     }
-
