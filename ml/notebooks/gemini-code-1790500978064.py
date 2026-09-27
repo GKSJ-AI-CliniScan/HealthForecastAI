@@ -7,10 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/11I_Cvl2q6l6PNgQB5bxjfiHsVoXLaiqp
 """
 
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-
 risk_scores = pipeline.predict_proba(features)[:, 1]
 results = features.copy()
 results["risk_score"] = risk_scores
@@ -125,6 +121,8 @@ plt.xlabel("Risk Level")
 plt.ylabel("Time in Hospital (days)")
 plt.show()
 
+import pandas as pd
+
 med_bins = pd.cut(analysis_df["num_medications"], bins=[0, 10, 20, 30, 100])
 trend = analysis_df.groupby(med_bins)[config["dataset"]["target_column"]].apply(
     lambda x: (x == "<30").mean() * 100
@@ -136,6 +134,7 @@ plt.title("30-Day Readmission Rate by Medication Count")
 plt.xlabel("Number of Medications (binned)")
 plt.ylabel("Readmission Rate (%)")
 plt.show()
+
 
 report_cols = [
     "risk_score",
