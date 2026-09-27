@@ -75,10 +75,7 @@ performance_dashboard = {
     "high_risk_pct": (analysis_df["risk_level"] == "High").mean() * 100,
     "avg_time_in_hospital": analysis_df["time_in_hospital"].mean(),
     "avg_medications": analysis_df["num_medications"].mean(),
-    "readmission_rate_30d": (
-        analysis_df[config["dataset"]["target_column"]] == "<30"
-    ).mean()
-    * 100,
+    "readmission_rate_30d": (analysis_df[config["dataset"]["target_column"]] == "<30").mean() * 100,
 }
 
 print("Healthcare Performance Dashboard:")
