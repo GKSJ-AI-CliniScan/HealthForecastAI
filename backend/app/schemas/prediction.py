@@ -44,7 +44,8 @@ class RiskPredictionRead(BaseModel):
     model_name: str
     model_version: str
     created_at: datetime | None = None
-    risk_factors: list[str] = []   # NEW
+    risk_factors: list[str] = []  # NEW
+
 
 class ReadmissionForecast(BaseModel):
     """Aggregated readmission forecast for a department or hospital."""

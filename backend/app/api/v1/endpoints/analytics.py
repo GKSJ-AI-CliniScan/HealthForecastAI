@@ -1,11 +1,12 @@
 """Healthcare analytics endpoints - Module 6."""
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-
-from fastapi.responses import StreamingResponse
 import csv
 import io
+
+from fastapi import APIRouter, Depends
+from fastapi.responses import StreamingResponse
+from sqlalchemy.orm import Session
+
 from app.api.deps import CurrentUser, require_permission
 from app.core.rbac import Permission
 from app.db.session import get_db
@@ -36,7 +37,6 @@ def population_health(
     user: CurrentUser = Depends(require_permission(Permission.POPULATION_HEALTH_READ)),
 ) -> dict:
     return analytics_service.get_population_health(db)
-
 
 
 @router.get("/export/readmissions.csv", summary="Export readmission report as CSV")

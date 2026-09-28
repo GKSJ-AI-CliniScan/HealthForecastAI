@@ -30,6 +30,8 @@ def get_visible_patients(db: Session, user: CurrentUser) -> list[Patient]:
         return []
 
     return query.order_by(Patient.id).all()
+
+
 def get_anonymised_cohort(db: Session) -> list[dict]:
     """Return a de-identified patient cohort for researchers.
 
@@ -37,8 +39,9 @@ def get_anonymised_cohort(db: Session) -> list[dict]:
     replaces the id with a pseudonymous label, joined with each patient's
     latest risk category where available.
     """
-    from app.models.prediction import RiskPrediction
     from sqlalchemy import func
+
+    from app.models.prediction import RiskPrediction
 
     latest_ids = (
         db.query(
@@ -64,11 +67,13 @@ def get_anonymised_cohort(db: Session) -> list[dict]:
 
     cohort = []
     for index, p in enumerate(patients, start=1):
-        cohort.append({
-            "pseudo_id": f"RSCH-{index:04d}",  # sequential, not the real db id
-            "age_group": p.age_group,
-            "gender": p.gender,
-            "primary_diagnosis": p.primary_diagnosis,
-            "risk_category": risk_by_patient.get(p.id, "not_scored"),
-        })
+        cohort.append(
+            {
+                "pseudo_id": f"RSCH-{index:04d}",  # sequential, not the real db id
+                "age_group": p.age_group,
+                "gender": p.gender,
+                "primary_diagnosis": p.primary_diagnosis,
+                "risk_category": risk_by_patient.get(p.id, "not_scored"),
+            }
+        )
     return cohort

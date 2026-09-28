@@ -34,7 +34,9 @@ def get_readmission_analytics(db: Session) -> dict:
     total_predictions_ever_run = db.query(func.count(RiskPrediction.id)).scalar() or 0
 
     return {
-        "current_distribution": [{"risk_category": r.risk_category, "count": r.count} for r in current_distribution],
+        "current_distribution": [
+            {"risk_category": r.risk_category, "count": r.count} for r in current_distribution
+        ],
         "total_predictions_ever_run": total_predictions_ever_run,
     }
 

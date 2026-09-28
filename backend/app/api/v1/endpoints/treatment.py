@@ -1,9 +1,12 @@
 """Treatment effectiveness endpoints - Module 4."""
 
+import csv
+import io
+
 from fastapi import APIRouter, Depends, Query, status
-from sqlalchemy.orm import Session
 from fastapi.responses import StreamingResponse
-import csv, io
+from sqlalchemy.orm import Session
+
 from app.api.deps import CurrentUser, require_permission
 from app.core.rbac import Permission
 from app.db.session import get_db
@@ -18,7 +21,9 @@ from app.services import treatment_service
 router = APIRouter()
 
 
-@router.get("", response_model=TreatmentEffectivenessSummary, summary="List Treatment Effectiveness")
+@router.get(
+    "", response_model=TreatmentEffectivenessSummary, summary="List Treatment Effectiveness"
+)
 def list_treatment_effectiveness(
     treatment_type: str | None = Query(default=None),
     db: Session = Depends(get_db),
@@ -40,7 +45,9 @@ def create_treatment_outcome(
     return TreatmentOutcomeRead.model_validate(outcome)
 
 
-@router.get("/recovery-trends", response_model=list[RecoveryTrendPoint], summary="Recovery trend series")
+@router.get(
+    "/recovery-trends", response_model=list[RecoveryTrendPoint], summary="Recovery trend series"
+)
 def recovery_trends(
     db: Session = Depends(get_db),
     user: CurrentUser = Depends(require_permission(Permission.TREATMENT_REPORT_READ)),
@@ -49,6 +56,7 @@ def recovery_trends(
     results = treatment_service.get_recovery_trends(db)
     return [RecoveryTrendPoint(**r) for r in results]
 
+
 @router.get("/patient/{patient_id}", response_model=list[TreatmentOutcomeRead])
 def patient_treatment_history(
     patient_id: int,
@@ -56,6 +64,8 @@ def patient_treatment_history(
     user: CurrentUser = Depends(require_permission(Permission.TREATMENT_REPORT_READ)),
 ) -> list[TreatmentOutcomeRead]:
     return treatment_service.get_patient_treatment_history(db, patient_id)
+
+
 # backend/app/api/v1/endpoints/treatment.py — add this
 @router.get("/export/effectiveness.csv", summary="Export treatment effectiveness report as CSV")
 def export_treatment_csv(

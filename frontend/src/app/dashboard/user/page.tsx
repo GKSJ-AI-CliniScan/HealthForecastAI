@@ -3,7 +3,7 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { apiFetch, ApiError } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 
 interface AppUser {
   id: number;

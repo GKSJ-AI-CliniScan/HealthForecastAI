@@ -73,6 +73,8 @@ def get_recovery_trends(db: Session) -> list[dict]:
         }
         for row in rows
     ]
+
+
 # Add to treatment_service.py
 def get_patient_treatment_history(db: Session, patient_id: int) -> list[TreatmentOutcome]:
     return (

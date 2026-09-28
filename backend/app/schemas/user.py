@@ -37,8 +37,11 @@ class UserRead(UserBase):
     id: int
     is_active: bool
     created_at: datetime | None = None
+
+
 class UserUpdate(BaseModel):
     """Fields an admin can change on an existing user."""
+
     full_name: str | None = None
     role: Role | None = None
     department: str | None = None

@@ -6,8 +6,8 @@ from app.core.rbac import Permission, Role
 from app.db.session import get_db
 from app.models.audit_log import AuditLog
 from app.models.patient import Patient
-from app.schemas.patient import PatientCreate, PatientRead,PatientAnonymised
-from app.services.patient_service import get_visible_patients,get_anonymised_cohort
+from app.schemas.patient import PatientAnonymised, PatientCreate, PatientRead
+from app.services.patient_service import get_anonymised_cohort, get_visible_patients
 
 router = APIRouter()
 
@@ -77,7 +77,11 @@ def create_patient(
     return new_patient
 
 
-@router.get("/anonymised", response_model=list[PatientAnonymised], summary="Anonymised patient cohort for researchers")
+@router.get(
+    "/anonymised",
+    response_model=list[PatientAnonymised],
+    summary="Anonymised patient cohort for researchers",
+)
 def list_anonymised_patients(
     db: Session = Depends(get_db),
     user: CurrentUser = Depends(require_permission(Permission.PATIENT_READ_ANONYMIZED)),

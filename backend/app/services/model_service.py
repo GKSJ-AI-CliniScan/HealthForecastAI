@@ -36,15 +36,19 @@ def predict_readmission(
 
     # Build a row with EXACTLY the 7 fields the model was trained on —
     # no padding with NaN for columns that don't exist here.
-    row = pd.DataFrame([{
-        "time_in_hospital": time_in_hospital,
-        "num_medications": num_medications,
-        "num_lab_procedures": num_lab_procedures,
-        "number_diagnoses": number_diagnoses,
-        "number_inpatient": number_inpatient,
-        "number_emergency": number_emergency,
-        "age_group": age_group,
-    }])
+    row = pd.DataFrame(
+        [
+            {
+                "time_in_hospital": time_in_hospital,
+                "num_medications": num_medications,
+                "num_lab_procedures": num_lab_procedures,
+                "number_diagnoses": number_diagnoses,
+                "number_inpatient": number_inpatient,
+                "number_emergency": number_emergency,
+                "age_group": age_group,
+            }
+        ]
+    )
 
     probability = model.predict_proba(row)[0, 1]
     return float(probability)

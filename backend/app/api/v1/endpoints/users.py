@@ -9,7 +9,7 @@ from app.core.security import hash_password
 from app.db.session import get_db
 from app.models.audit_log import AuditLog
 from app.models.user import User
-from app.schemas.user import UserCreate, UserRead,UserUpdate
+from app.schemas.user import UserCreate, UserRead, UserUpdate
 
 router = APIRouter()
 
@@ -68,6 +68,8 @@ def create_user(
     db.commit()
 
     return new_user
+
+
 @router.patch("/{user_id}", response_model=UserRead)
 def update_user(
     user_id: int,
@@ -87,13 +89,15 @@ def update_user(
     db.commit()
     db.refresh(target)
 
-    db.add(AuditLog(
-        actor_id=int(user.subject) if user.subject.isdigit() else None,
-        actor_role=str(user.role),
-        action="user:update",
-        resource=target.email,
-        outcome="success",
-    ))
+    db.add(
+        AuditLog(
+            actor_id=int(user.subject) if user.subject.isdigit() else None,
+            actor_role=str(user.role),
+            action="user:update",
+            resource=target.email,
+            outcome="success",
+        )
+    )
     db.commit()
     return target
 
@@ -112,11 +116,13 @@ def deactivate_user(
     target.is_active = False
     db.commit()
 
-    db.add(AuditLog(
-        actor_id=int(user.subject) if user.subject.isdigit() else None,
-        actor_role=str(user.role),
-        action="user:deactivate",
-        resource=target.email,
-        outcome="success",
-    ))
+    db.add(
+        AuditLog(
+            actor_id=int(user.subject) if user.subject.isdigit() else None,
+            actor_role=str(user.role),
+            action="user:deactivate",
+            resource=target.email,
+            outcome="success",
+        )
+    )
     db.commit()
