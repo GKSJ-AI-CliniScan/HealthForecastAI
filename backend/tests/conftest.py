@@ -4,8 +4,15 @@ The suite runs against an in-memory SQLite database so it needs no PostgreSQL
 server and leaves nothing behind. The database dependency is overridden rather
 than the auth dependency, so requests exercise the real JWT and permission path.
 """
+import sys
+from pathlib import Path
+
+ML_ROOT = Path(__file__).resolve().parents[2] / "ml"
+if str(ML_ROOT) not in sys.path:
+    sys.path.insert(0, str(ML_ROOT))
 
 from collections.abc import Generator
+from datetime import date
 
 import pytest
 from fastapi.testclient import TestClient
@@ -92,6 +99,7 @@ def patients_fixture(db_session: Session, users: dict[Role, User]) -> list[Patie
             Admission(
                 patient_id=assigned.id,
                 encounter_id=5001,
+                admission_date=date(2026, 9, 1),
                 time_in_hospital=6,
                 readmitted="<30",
                 readmitted_within_30=True,
@@ -99,6 +107,7 @@ def patients_fixture(db_session: Session, users: dict[Role, User]) -> list[Patie
             Admission(
                 patient_id=unassigned.id,
                 encounter_id=5002,
+                admission_date=date(2026, 9, 8),
                 time_in_hospital=2,
                 readmitted="NO",
                 readmitted_within_30=False,

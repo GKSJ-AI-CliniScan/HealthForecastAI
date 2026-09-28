@@ -27,4 +27,5 @@ class TreatmentEffectivenessSummary(BaseModel):
     treatment_name: str
     patients_treated: int = 0
     average_recovery_score: float = 0.0
+    average_length_of_stay_days: float = 0.0
     readmission_rate: float = 0.0
