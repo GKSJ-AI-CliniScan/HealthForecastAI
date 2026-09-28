@@ -2,7 +2,7 @@
 
 ---
 
-**Intern name:** Amit Kumar Shaw
+**Intern name:** Deepak Rajak
 
 **Branch:** `intern/16-deepak-rajak`
 
