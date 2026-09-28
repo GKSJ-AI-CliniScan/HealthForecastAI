@@ -114,3 +114,14 @@ def get_readmission_forecast(db: Session, horizon_days: int) -> dict:
         "predicted_readmissions": predicted_readmissions,
         "predicted_rate": round(predicted_rate, 4),
     }
+def get_all_risk_scores(db: Session, user: CurrentUser) -> list[RiskPrediction]:
+    """Return each patient's most recent prediction, any category, scoped by role."""
+    query = _latest_predictions(db)
+
+    if user.role is Role.DOCTOR:
+        from app.models.patient import Patient
+        query = query.join(Patient, Patient.id == RiskPrediction.patient_id).filter(
+            Patient.assigned_doctor_id == int(user.subject)
+        )
+
+    return query.order_by(RiskPrediction.readmission_probability.desc()).all()

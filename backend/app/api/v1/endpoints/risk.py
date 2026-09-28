@@ -24,7 +24,9 @@ def predict_risk(
 ) -> RiskPredictionRead:
     """Run the trained model on one admission, persist it, and return the result."""
     record = risk_service.score_and_save(db, payload)
-    return RiskPredictionRead.model_validate(record)
+    result = RiskPredictionRead.model_validate(record)
+    result.risk_factors = explain_risk_factors(payload)  # NEW — reuses existing function
+    return result
 
 
 @router.get("/high-risk", summary="List patients currently in the high risk band")
@@ -66,3 +68,11 @@ def explain_risk_factors(payload: RiskPredictionRequest) -> list[str]:
     if payload.age_group in {"[70-80)", "[80-90)", "[90-100)"}:
         factors.append("Advanced age group")
     return factors or ["No major risk factors identified from the submitted data"]
+@router.get("/scores", summary="Latest risk score for every scored patient")
+def list_all_risk_scores(
+    db: Session = Depends(get_db),
+    user: CurrentUser = Depends(require_permission(Permission.RISK_REPORT_READ)),
+) -> list[RiskPredictionRead]:
+    """Return every patient's latest score, low/medium/high, scoped to the caller's role."""
+    records = risk_service.get_all_risk_scores(db, user)
+    return [RiskPredictionRead.model_validate(r) for r in records]

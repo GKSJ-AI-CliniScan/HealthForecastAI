@@ -9,7 +9,7 @@ from app.core.security import hash_password
 from app.db.session import get_db
 from app.models.audit_log import AuditLog
 from app.models.user import User
-from app.schemas.user import UserCreate, UserRead
+from app.schemas.user import UserCreate, UserRead,UserUpdate
 
 router = APIRouter()
 
@@ -68,3 +68,55 @@ def create_user(
     db.commit()
 
     return new_user
+@router.patch("/{user_id}", response_model=UserRead)
+def update_user(
+    user_id: int,
+    payload: UserUpdate,
+    db: Session = Depends(get_db),
+    user: CurrentUser = Depends(_manage_users),
+) -> UserRead:
+    """Update an existing user's role, department, or active status."""
+    target = db.query(User).filter(User.id == user_id).first()
+    if target is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    update_data = payload.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(target, field, value)
+
+    db.commit()
+    db.refresh(target)
+
+    db.add(AuditLog(
+        actor_id=int(user.subject) if user.subject.isdigit() else None,
+        actor_role=str(user.role),
+        action="user:update",
+        resource=target.email,
+        outcome="success",
+    ))
+    db.commit()
+    return target
+
+
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+def deactivate_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    user: CurrentUser = Depends(_manage_users),
+) -> None:
+    """Deactivate a user (soft delete - preserves audit history)."""
+    target = db.query(User).filter(User.id == user_id).first()
+    if target is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    target.is_active = False
+    db.commit()
+
+    db.add(AuditLog(
+        actor_id=int(user.subject) if user.subject.isdigit() else None,
+        actor_role=str(user.role),
+        action="user:deactivate",
+        resource=target.email,
+        outcome="success",
+    ))
+    db.commit()

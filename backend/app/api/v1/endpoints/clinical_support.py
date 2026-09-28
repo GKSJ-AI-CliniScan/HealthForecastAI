@@ -1,9 +1,12 @@
 """Clinical decision support endpoints - Module 5."""
 
 from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentUser, require_permission
 from app.core.rbac import Permission
+from app.db.session import get_db
+from app.services import cds_service
 
 router = APIRouter()
 
@@ -11,23 +14,16 @@ router = APIRouter()
 @router.get("/recommendations/{patient_id}", summary="Care recommendations for a patient")
 def care_recommendations(
     patient_id: int,
+    db: Session = Depends(get_db),
     user: CurrentUser = Depends(require_permission(Permission.CARE_RECOMMENDATION_GENERATE)),
-) -> dict[str, object]:
-    """Return care and follow-up recommendations.
-
-    TODO(milestone-3): derive recommendations from the risk drivers returned by
-    the model explainer, never from raw model output alone.
-    """
-    return {"patient_id": patient_id, "recommendations": [], "follow_up_days": None}
+) -> list[str]:
+    return cds_service.get_care_recommendations(db, patient_id)
 
 
 @router.get("/discharge-plan/{patient_id}", summary="Discharge support plan")
 def discharge_plan(
     patient_id: int,
+    db: Session = Depends(get_db),
     user: CurrentUser = Depends(require_permission(Permission.CARE_RECOMMENDATION_GENERATE)),
-) -> dict[str, object]:
-    """Return a discharge readiness assessment and mitigation steps.
-
-    TODO(milestone-3): combine risk band, length of stay and treatment response.
-    """
-    return {"patient_id": patient_id, "risk_mitigation": [], "ready_for_discharge": None}
+) -> dict:
+    return cds_service.get_discharge_plan(db, patient_id)
