@@ -126,6 +126,7 @@ def get_cohort_metrics(cohort_type: str) -> list[dict[str, Any]]:
         )
     return _load(TREATMENT_FILENAME)["cohorts"][cohort_type]
 
+
 def get_model_version() -> str:
     """Return the model version associated with the feature importance artifact."""
     return _load(IMPORTANCE_FILENAME)["model_version"]
