@@ -19,9 +19,7 @@ def list_treatment_effectiveness(
             TreatmentOutcome.treatment_name,
             func.count(func.distinct(Admission.patient_id)).label("patients_treated"),
             func.avg(TreatmentOutcome.recovery_score).label("average_recovery_score"),
-            func.avg(TreatmentOutcome.length_of_stay_days).label(
-                "average_length_of_stay_days"
-            ),
+            func.avg(TreatmentOutcome.length_of_stay_days).label("average_length_of_stay_days"),
             (
                 func.count(
                     func.distinct(
@@ -48,9 +46,7 @@ def list_treatment_effectiveness(
             "treatment_name": row.treatment_name,
             "patients_treated": row.patients_treated,
             "average_recovery_score": round(float(row.average_recovery_score or 0), 2),
-            "average_length_of_stay_days": round(
-                float(row.average_length_of_stay_days or 0), 2
-            ),
+            "average_length_of_stay_days": round(float(row.average_length_of_stay_days or 0), 2),
             "readmission_rate": round(float(row.readmission_rate or 0), 2),
         }
         for row in rows

@@ -34,10 +34,8 @@ def recovery_trends(
     return get_recovery_trends(db)
 
 
+# docker exec healthforecast-backend python -c "from app.core.security import create_access_token; print(create_access_token(subject='doctor@hospital.example', role='hospital_admin'))"
 
+# http://localhost:8000/api/v1/treatment
 
-#docker exec healthforecast-backend python -c "from app.core.security import create_access_token; print(create_access_token(subject='doctor@hospital.example', role='hospital_admin'))"
-
-#http://localhost:8000/api/v1/treatment
-
-#http://localhost:8000/api/v1/treatment/recovery-trends
+# http://localhost:8000/api/v1/treatment/recovery-trends

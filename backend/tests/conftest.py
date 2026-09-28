@@ -1,9 +1,12 @@
+# ruff: noqa: E402
+
 """Shared test fixtures.
 
 The suite runs against an in-memory SQLite database so it needs no PostgreSQL
 server and leaves nothing behind. The database dependency is overridden rather
 than the auth dependency, so requests exercise the real JWT and permission path.
 """
+
 import sys
 from pathlib import Path
 

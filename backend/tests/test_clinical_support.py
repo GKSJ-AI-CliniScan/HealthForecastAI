@@ -33,9 +33,7 @@ def test_care_recommendations_for_high_risk_patient(
     assert data["follow_up_days"] == 7
 
 
-def test_discharge_plan_for_patient_with_good_recovery(
-    client, db_session, patients, auth_header
-):
+def test_discharge_plan_for_patient_with_good_recovery(client, db_session, patients, auth_header):
     patient = patients[0]
 
     admission = patient.admissions[0]

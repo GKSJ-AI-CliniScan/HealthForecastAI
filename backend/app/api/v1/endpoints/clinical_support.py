@@ -20,17 +20,13 @@ router = APIRouter()
 )
 def care_recommendations(
     patient_id: int,
-    user: CurrentUser = Depends(
-        require_permission(Permission.CARE_RECOMMENDATION_GENERATE)
-    ),
+    user: CurrentUser = Depends(require_permission(Permission.CARE_RECOMMENDATION_GENERATE)),
     db=Depends(get_db),
 ) -> dict[str, object]:
     """Return care and follow-up recommendations."""
 
     recommendations, follow_up_days = get_care_recommendations(db, patient_id)
-    risk_drivers, drivers_source, model_version = get_risk_drivers(
-        db, patient_id
-    )
+    risk_drivers, drivers_source, model_version = get_risk_drivers(db, patient_id)
 
     if not recommendations:
         raise HTTPException(status_code=404, detail="Patient not found")
@@ -51,9 +47,7 @@ def care_recommendations(
 )
 def discharge_plan(
     patient_id: int,
-    user: CurrentUser = Depends(
-        require_permission(Permission.CARE_RECOMMENDATION_GENERATE)
-    ),
+    user: CurrentUser = Depends(require_permission(Permission.CARE_RECOMMENDATION_GENERATE)),
     db=Depends(get_db),
 ) -> dict[str, object]:
     """Return discharge readiness assessment and mitigation steps."""

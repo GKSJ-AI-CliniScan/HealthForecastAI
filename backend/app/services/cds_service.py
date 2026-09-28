@@ -1,8 +1,6 @@
-"""cds service - business logic layer.
+# ruff: noqa: E402
 
-Keep API handlers thin: routers validate and authorise, services do the work.
-TODO: implement during the milestone that owns this module.
-"""
+
 """Clinical decision support business logic."""
 
 from sqlalchemy.orm import Session
@@ -14,9 +12,7 @@ from app.models.prediction import RiskPrediction
 from app.models.treatment import TreatmentOutcome
 
 
-def get_care_recommendations(
-    db: Session, patient_id: int
-) -> tuple[list[str], int | None]:
+def get_care_recommendations(db: Session, patient_id: int) -> tuple[list[str], int | None]:
     """Generate care and follow-up recommendations for a patient."""
 
     patient = db.query(Patient).filter(Patient.id == patient_id).one_or_none()
@@ -60,9 +56,7 @@ def get_care_recommendations(
                 "Continue routine monitoring because the patient is in the low-risk band."
             )
 
-    recent_readmission = any(
-        admission.readmitted == "<30" for admission in admissions
-    )
+    recent_readmission = any(admission.readmitted == "<30" for admission in admissions)
 
     if recent_readmission:
         recommendations.append(
@@ -89,9 +83,7 @@ def get_care_recommendations(
     return recommendations, follow_up_days
 
 
-def get_discharge_plan(
-    db: Session, patient_id: int
-) -> tuple[list[str], bool | None]:
+def get_discharge_plan(db: Session, patient_id: int) -> tuple[list[str], bool | None]:
     """Assess discharge readiness using risk, length of stay and treatment response."""
 
     patient = db.query(Patient).filter(Patient.id == patient_id).one_or_none()
@@ -121,12 +113,13 @@ def get_discharge_plan(
         )
         ready_for_discharge = False
 
-    if latest_admission is not None and latest_admission.time_in_hospital is not None:
-        if latest_admission.time_in_hospital > 7:
-            risk_mitigation.append(
-                "Review the prolonged hospital stay before discharge."
-            )
-            ready_for_discharge = False
+    if (
+        latest_admission is not None
+        and latest_admission.time_in_hospital is not None
+        and latest_admission.time_in_hospital > 7
+    ):
+        risk_mitigation.append("Review the prolonged hospital stay before discharge.")
+        ready_for_discharge = False
 
     treatments = (
         db.query(TreatmentOutcome)
@@ -136,9 +129,7 @@ def get_discharge_plan(
     )
 
     recovery_scores = [
-        treatment.recovery_score
-        for treatment in treatments
-        if treatment.recovery_score is not None
+        treatment.recovery_score for treatment in treatments if treatment.recovery_score is not None
     ]
 
     if recovery_scores:
@@ -156,9 +147,9 @@ def get_discharge_plan(
         )
 
     return risk_mitigation, ready_for_discharge
-def get_risk_drivers(
-    db: Session, patient_id: int
-) -> tuple[list[dict], str, str]:
+
+
+def get_risk_drivers(db: Session, patient_id: int) -> tuple[list[dict], str, str]:
     """Return ML risk drivers for a patient.
 
     Patient-specific SHAP drivers are used when available.
@@ -192,7 +183,6 @@ def get_risk_drivers(
         drivers = insights_loader.get_global_drivers(5)
         source = "population-level"
 
-    artifact = insights_loader._load("feature_importance.json")
     model_version = insights_loader.get_model_version()
 
     return drivers, source, model_version
