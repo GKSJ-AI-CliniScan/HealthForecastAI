@@ -61,7 +61,7 @@ def get_anonymised_cohort(db: Session) -> list[dict]:
         )
         .all()
     )
-    risk_by_patient = {pid: category for pid, category in latest_risk}
+    risk_by_patient = dict(latest_risk)
 
     patients = db.query(Patient).order_by(Patient.id).all()
 

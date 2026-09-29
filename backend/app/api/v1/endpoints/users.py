@@ -22,13 +22,13 @@ def list_users(
     limit: int = Query(default=50, ge=1, le=200),
     role: Role | None = Query(default=None),
     db: Session = Depends(get_db),
-    user: CurrentUser = Depends(_manage_users),
+    usser: CurrentUser = Depends(_manage_users),
 ) -> list[UserRead]:
     """Return platform users, with optional role filtering and pagination."""
     query = db.query(User)
     if role is not None:
         query = query.filter(User.role == role)
-    return query.order_by(User.id).offset(skip).limit(limit).all()
+    return query.order_by(UserRead.id).offset(skip).limit(limit).all()
 
 
 @router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
