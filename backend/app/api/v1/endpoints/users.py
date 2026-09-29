@@ -28,7 +28,7 @@ def list_users(
     query = db.query(User)
     if role is not None:
         query = query.filter(User.role == role)
-    return query.order_by(UserRead.id).offset(skip).limit(limit).all()
+    return query.order_by(User.id).offset(skip).limit(limit).all()
 
 
 @router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
