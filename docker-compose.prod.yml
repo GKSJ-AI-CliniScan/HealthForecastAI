@@ -2,8 +2,10 @@
 #
 #   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 #
-# What changes: nginx is the only published port, the databases and the app
-# containers are reachable only on the internal network, secrets are required
+# What changes: nginx is the only published port (the base file publishes nothing;
+# development ports live in docker-compose.override.yml, which is loaded
+# automatically by a plain `docker compose up` but not when -f is given), the
+# databases and app containers are reachable only on the internal network, secrets are required
 # (compose refuses to start without them) and the API refuses to start with a
 # development configuration.
 #
@@ -14,12 +16,8 @@
 
 services:
   postgres:
-    ports: !reset []
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
-
-  mongodb:
-    ports: !reset []
 
   migrate:
     environment: &prod-backend-env
@@ -32,11 +30,9 @@ services:
       BACKEND_CORS_ORIGINS: ${PUBLIC_ORIGIN:?set PUBLIC_ORIGIN}
 
   backend:
-    ports: !reset []
     environment: *prod-backend-env
 
   frontend:
-    ports: !reset []
     build:
       args:
         # Same origin as the page: nginx routes /api to the backend, so no CORS is needed.

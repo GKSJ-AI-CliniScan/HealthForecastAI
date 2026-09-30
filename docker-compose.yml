@@ -9,8 +9,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-healthforecast}
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/postgres/schema:/docker-entrypoint-initdb.d:ro
@@ -24,8 +22,6 @@ services:
     image: mongo:7
     container_name: healthforecast-mongodb
     restart: unless-stopped
-    ports:
-      - "27017:27017"
     volumes:
       - mongo_data:/data/db
     healthcheck:
@@ -64,8 +60,6 @@ services:
     volumes:
       # The trained model is an artifact, not source: it is never in the image.
       - ./ml/artifacts:/models:ro
-    ports:
-      - "8000:8000"
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -83,8 +77,6 @@ services:
         NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000/api/v1}
     container_name: healthforecast-frontend
     restart: unless-stopped
-    ports:
-      - "3000:3000"
     depends_on:
       - backend
 
