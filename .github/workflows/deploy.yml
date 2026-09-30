@@ -1,0 +1,210 @@
+name: Deploy
+
+# The CD half of the pipeline, for Milestone 4.
+#
+# Manual only. Nothing deploys on a push, because 26 branches pushing to one
+# environment would fight each other. You run this yourself, against your own
+# branch, when you are ready to demonstrate.
+#
+# By default it only *builds* the images and proves your branch is deployable.
+# Set "push_images" to true to publish them to the GitHub Container Registry
+# under your branch name.
+on:
+  workflow_dispatch:
+    inputs:
+      push_images:
+        description: 'Publish images to GHCR (otherwise build only)'
+        type: boolean
+        default: false
+      environment:
+        description: 'Target environment name, for your own records'
+        type: choice
+        options: [development, staging, production]
+        default: development
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  # --------------------------------------------------------------------------
+  # Never deploy a branch that is not passing its own tests.
+  # --------------------------------------------------------------------------
+  verify:
+    name: Pre-deploy verification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Repository checks
+        run: |
+          python scripts/ci/check_structure.py
+          python scripts/ci/check_files.py
+          python scripts/ci/check_secrets.py
+
+      - name: Backend tests
+        working-directory: backend
+        env:
+          SECRET_KEY: ci-only-secret-not-used-anywhere-else
+          ENVIRONMENT: test
+        run: |
+          pip install -r requirements-dev.txt
+          pytest
+
+      - name: Deployment readiness checklist
+        run: |
+          {
+            echo "## Pre-deploy checklist"
+            echo ""
+            echo "Confirm each of these in your target environment before you demo:"
+            echo ""
+            echo "- [ ] \`DEBUG=false\`"
+            echo "- [ ] \`SECRET_KEY\` is a fresh random value from the secret store"
+            echo "- [ ] The database is not publicly reachable"
+            echo "- [ ] CORS lists your real frontend origin, not \`*\`"
+            echo "- [ ] \`GET /health\` returns 200 through the load balancer"
+            echo "- [ ] No credential is in the image, the repository or a build log"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # --------------------------------------------------------------------------
+  # Build, and optionally publish, the container images.
+  # --------------------------------------------------------------------------
+  images:
+    name: Build images
+    needs: verify
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: backend
+            context: ./backend
+          - service: frontend
+            context: ./frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Derive an image tag from the branch
+        id: tag
+        run: |
+          slug=$(printf '%s' "${{ github.ref_name }}" | tr '[:upper:]/' '[:lower:]-' \
+                 | sed 's/[^a-z0-9._-]/-/g' | cut -c1-100)
+          echo "slug=$slug" >> "$GITHUB_OUTPUT"
+          echo "Image tag: $slug"
+
+      - name: Log in to GHCR
+        if: inputs.push_images
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build${{ inputs.push_images && ' and push' || '' }} ${{ matrix.service }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          push: ${{ inputs.push_images }}
+          tags: |
+            ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ steps.tag.outputs.slug }}
+            ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Record the result
+        run: |
+          {
+            echo "### ${{ matrix.service }}"
+            if [ "${{ inputs.push_images }}" = "true" ]; then
+              echo ""
+              echo "Published:"
+              echo ""
+              echo "\`\`\`"
+              echo "ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ steps.tag.outputs.slug }}"
+              echo "\`\`\`"
+            else
+              echo ""
+              echo "Built successfully. Re-run with **push_images** enabled to publish it."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # --------------------------------------------------------------------------
+  # Release to a single Linux host that runs Docker Compose (any cloud VM).
+  #
+  # Runs only when the host is configured. With no secrets set it explains what
+  # to add and exits cleanly, so the workflow stays green on a fork with no cloud
+  # account. The host needs Docker, a clone of this repository at DEPLOY_PATH, and
+  # a .env holding SECRET_KEY, POSTGRES_PASSWORD and PUBLIC_ORIGIN - see
+  # docs/08-deployment/README.md.
+  #
+  # Secrets (repository settings > Secrets and variables > Actions):
+  #   DEPLOY_HOST         hostname or IP of the VM
+  #   DEPLOY_USER         SSH user that can run docker
+  #   DEPLOY_SSH_KEY      private key for that user (a deploy-only key)
+  #   DEPLOY_KNOWN_HOSTS  output of: ssh-keyscan -t ed25519 <host>
+  # Variables:
+  #   DEPLOY_PATH         path of the clone on the host, default /opt/healthforecast
+  #   PUBLIC_URL          address users open, used for the post-deploy health check
+  # --------------------------------------------------------------------------
+  release:
+    name: Release to ${{ inputs.environment }}
+    needs: images
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/opt/healthforecast' }}
+      PUBLIC_URL: ${{ vars.PUBLIC_URL }}
+    steps:
+      - name: Check the target is configured
+        id: gate
+        run: |
+          if [ -z "$DEPLOY_HOST" ] || [ -z "$DEPLOY_USER" ]; then
+            {
+              echo "## Release skipped"
+              echo ""
+              echo "No deployment target is configured, so nothing was released."
+              echo "Add the secrets listed at the top of this workflow file, then re-run."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy over SSH
+        if: steps.gate.outputs.configured == 'true'
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          REF: ${{ github.sha }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST" \
+            "set -e; cd '$DEPLOY_PATH'; git fetch --all --prune; git checkout --detach '$REF'; \
+             docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build; \
+             docker compose ps"
+          rm -f ~/.ssh/deploy_key
+
+      - name: Health check
+        if: steps.gate.outputs.configured == 'true' && env.PUBLIC_URL != ''
+        run: |
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -fsS "$PUBLIC_URL/health"; then echo; echo "healthy"; exit 0; fi
+            sleep 6
+          done
+          echo "::error::$PUBLIC_URL/health did not return 200 after the deploy"
+          exit 1
