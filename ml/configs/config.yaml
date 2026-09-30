@@ -31,12 +31,51 @@ preprocessing:
   # 0.6502 to 0.6466 and nothing cleared the promotion gate. The raw codes carry
   # signal the 10-way grouping loses. See docs/06-milestones/milestone-2.md.
   deduplicate_patients: true
+
+  # Set aside the newest fraction of encounters (by source encounter id), whose
+  # 30-day outcome has not had time to be observed. Found by the trend monitor in
+  # Milestone 3: keeping each patient's first encounter makes the newest ones look
+  # far healthier than they were (4.2% readmitted against ~9.7% elsewhere), simply
+  # because there was no time left in the collection window for a readmission.
+  #
+  #   newest set aside   rows     centre   cohorts beyond 3 sigma   worst |z|
+  #   0%                 69,990   8.98%    4 of 10                  9.9
+  #   10%                62,991   9.36%    2 of 10                  4.3   <- chosen
+  #   15%                59,491   9.46%    1 of 10                  4.2
+  #   20%                55,992   9.54%    1 of 10                  3.8
+  #
+  # 10% removes the cliff. The truncation is gradual, so no cut is perfectly
+  # clean and the monitor still flags a mild residual decline; a larger buffer buys
+  # little and discards a fifth of the data.
+  follow_up_buffer_fraction: 0.10
   drop_non_readmittable: true
   missing_value_token: "?"
   numeric_imputation: median
   categorical_imputation: most_frequent
   scale_numeric: true
   one_hot_encode: true
+
+# Columns the model must not see. They stay in the data - the fairness audit
+# needs race and gender to slice results - but the preprocessor never selects
+# them, so they cannot influence a prediction.
+#
+# Measured in Milestone 3 (src/evaluation/ablation.py, test split, n=13,998):
+#
+#   excluded          ROC-AUC   recall   precision
+#   (none)             0.6502   0.5147     0.1420
+#   race               0.6505   0.5123     0.1433
+#   race, gender       0.6504   0.5123     0.1425
+#
+# Removing them moves ROC-AUC by +0.0002, which is noise: neither attribute adds
+# predictive signal, so there is no accuracy case for feeding a model a patient's
+# race. Note what this does NOT do. The audit still finds a recall gap between
+# groups with the attribute removed (0.43 African American vs 0.53 Caucasian),
+# because other features carry the same information. Removing an input is hygiene,
+# not a fairness fix - see docs/07-testing/fairness-audit.md.
+features:
+  exclude:
+    - race
+    - gender
 
 imbalance:
   strategy: class_weight   # one of: none | class_weight | smote
@@ -90,6 +129,12 @@ models:
 
 evaluation:
   primary_metric: roc_auc
+
+  # Prefer a model that can explain an individual patient when it is within this
+  # much ROC-AUC of the best one. 0.01 is well inside the sampling noise at this
+  # test size (about +/-0.017), so giving up less than that buys nothing real and
+  # costs the clinician the ability to see why a patient scored what they did.
+  prefer_explainable_within: 0.01
 
   # Minimum bar for a model to be promoted to the API.
   #

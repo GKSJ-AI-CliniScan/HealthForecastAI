@@ -92,8 +92,11 @@ migration every time a model gains a parameter.
 bug would expose the token. Moving to an httpOnly cookie set by the backend is
 the Milestone 4 hardening task.
 
-## What Milestone 1 does not include
+## Milestone 3 additions
 
-Risk prediction, readmission forecasting, treatment effectiveness and clinical
-decision support endpoints exist and are authorised, but return placeholder
-data. They are marked `TODO(milestone-2)` and `TODO(milestone-3)`.
+Treatment analysis, performance and trend monitoring, clinical decision support
+and reports are all implemented. The analytics live in `backend/app/services/`
+(`stats.py` holds the statistics, tested against statsmodels), the per-patient
+explanation is computed at scoring time and stored with each prediction, and
+every read of patient data and every export is written to the audit log. See
+`docs/06-milestones/milestone-3.md`.

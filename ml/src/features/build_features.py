@@ -1,5 +1,6 @@
 """Feature engineering for readmission risk."""
 
+from collections.abc import Sequence
 from typing import Any
 
 import pandas as pd
@@ -11,14 +12,21 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from src.data.preprocess import split_feature_types
 
 
-def build_preprocessor(frame: pd.DataFrame, config: dict[str, Any]) -> ColumnTransformer:
+def build_preprocessor(
+    frame: pd.DataFrame, config: dict[str, Any], exclude: Sequence[str] = ()
+) -> ColumnTransformer:
     """Build the fitted-at-train-time preprocessing pipeline.
 
     Returning a ColumnTransformer (rather than transforming in place) keeps
     training and serving consistent - the same object is pickled with the model.
+
+    `exclude` names columns the model must not see. They stay in the frame - the
+    fairness audit still needs race and gender to slice results - but the
+    transformer never selects them, so they cannot influence a prediction.
     """
     preprocessing = config.get("preprocessing", {})
-    numeric, categorical = split_feature_types(frame)
+    kept = frame.drop(columns=[c for c in exclude if c in frame.columns])
+    numeric, categorical = split_feature_types(kept)
 
     numeric_steps: list[tuple[str, Any]] = [
         ("impute", SimpleImputer(strategy=preprocessing.get("numeric_imputation", "median")))

@@ -6,14 +6,14 @@ treatment effectiveness and trend monitoring.
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentUser, require_permission
 from app.core.rbac import Permission
 from app.db.session import get_db
 from app.models.user import User
-from app.services import analytics_service
+from app.services import analytics_service, performance_service
 
 router = APIRouter()
 
@@ -63,3 +63,44 @@ def population_health(user: CanReadPopulation, db: DbSession) -> dict[str, objec
     Aggregate values only - never a row level record.
     """
     return analytics_service.population_health_overview(db)
+
+
+@router.get("/performance", summary="Risk-adjusted performance by one dimension")
+def performance(
+    user: CanReadAnalytics,
+    db: DbSession,
+    dimension: str = Query(default="department", description="One of the listed dimensions"),
+) -> dict[str, object]:
+    """Observed against expected readmissions for every value of a dimension.
+
+    Expected comes from the risk model, so a department with sicker patients is
+    not penalised for them. The verdict only calls a group worse or better when
+    the interval excludes 1.
+    """
+    try:
+        return performance_service.performance(db, user, dimension)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
+        ) from exc
+
+
+@router.get("/performance-dimensions", summary="The dimensions performance can be cut by")
+def performance_dimensions(user: CanReadAnalytics) -> list[dict[str, str]]:
+    """List the available dimensions, for building a selector."""
+    return [
+        {"key": key, "title": title} for key, (title, _) in performance_service.DIMENSIONS.items()
+    ]
+
+
+@router.get("/trends", summary="Trend monitoring with control limits")
+def trends(
+    user: CanReadAnalytics, db: DbSession, buckets: int = Query(default=10, ge=4, le=20)
+) -> dict[str, object]:
+    """Readmission rate across equal cohorts with p-chart control limits.
+
+    The source data has no dates, so the axis is the encounter sequence; the
+    response says so. Only points outside the limits, or a run of eight on one
+    side of the centre line, are reported as signals.
+    """
+    return performance_service.sequence_trend(db, user, buckets)

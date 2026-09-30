@@ -8,6 +8,7 @@ from app.api.v1.endpoints import (
     clinical_support,
     ml_models,
     patients,
+    reports,
     risk,
     treatment,
     users,
@@ -24,4 +25,5 @@ api_router.include_router(
     clinical_support.router, prefix="/clinical-support", tags=["Clinical Decision Support"]
 )
 api_router.include_router(analytics.router, prefix="/analytics", tags=["Healthcare Analytics"])
+api_router.include_router(reports.router, prefix="/reports", tags=["Reports and Exports"])
 api_router.include_router(ml_models.router, prefix="/models", tags=["AI Model Management"])

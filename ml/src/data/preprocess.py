@@ -85,6 +85,32 @@ def deduplicate_patients(frame: pd.DataFrame) -> tuple[pd.DataFrame, int]:
     return deduped, before - len(deduped)
 
 
+def drop_incomplete_follow_up(frame: pd.DataFrame, fraction: float) -> tuple[pd.DataFrame, int]:
+    """Set aside the newest encounters, whose outcome has not had time to happen.
+
+    A 30-day readmission label needs a later encounter to exist. An index
+    encounter near the end of the collection window has had less time for one to
+    occur, so its label undercounts readmissions - and the shortfall grows the
+    closer to the end it sits. The trend monitor found this: after keeping each
+    patient's first encounter, the 30-day rate falls from about 9.7% to 4.2% across
+    the newest 5% of encounters, though it is flat across the raw data.
+
+    This is the same reasoning as removing patients who died: the outcome cannot
+    be observed, so the row cannot teach or test anything. The dataset carries no
+    dates, so "newest" is the highest source encounter id.
+
+    It is a pragmatic mitigation, not a correction: the truncation is gradual, so no
+    cut is perfectly clean. docs/06-milestones/milestone-3.md publishes how the
+    remaining cohorts behave at 0, 10, 15 and 20%.
+    """
+    if fraction <= 0 or "encounter_id" not in frame.columns:
+        return frame, 0
+
+    cutoff = frame["encounter_id"].quantile(1.0 - fraction)
+    keep = frame["encounter_id"] <= cutoff
+    return frame.loc[keep].copy(), int((~keep).sum())
+
+
 def engineer_columns(frame: pd.DataFrame) -> pd.DataFrame:
     """Add the derived columns the model and the dashboards both use."""
     result = frame.copy()
@@ -127,6 +153,10 @@ def basic_clean(
 
     if preprocessing.get("deduplicate_patients", True):
         cleaned, _ = deduplicate_patients(cleaned)
+
+    cleaned, _ = drop_incomplete_follow_up(
+        cleaned, float(preprocessing.get("follow_up_buffer_fraction", 0.0))
+    )
 
     cleaned = engineer_columns(cleaned)
 

@@ -25,7 +25,7 @@ from app.schemas.patient import (
     PatientRead,
     PatientUpdate,
 )
-from app.services import patient_service
+from app.services import auth_service, patient_service
 
 router = APIRouter()
 
@@ -50,6 +50,7 @@ def list_patients(
         )
 
     rows, total = patient_service.list_patients(db, user, limit=limit, offset=offset, search=search)
+    auth_service.audit_read(db, user, "patient.list", f"returned:{len(rows)}")
     return PatientPage(
         items=[PatientRead.model_validate(row) for row in rows],
         total=total,
@@ -71,6 +72,7 @@ def list_anonymised_patients(
     identifier is dropped before the record leaves this function.
     """
     rows, total = patient_service.list_patients(db, user, limit=limit, offset=offset)
+    auth_service.audit_read(db, user, "research.cohort_view", f"returned:{len(rows)}")
     return AnonymisedPage(
         items=[patient_service.to_anonymised(row) for row in rows],
         total=total,
@@ -108,6 +110,7 @@ def get_patient(patient_id: int, user: CurrentUser, db: DbSession) -> PatientDet
     if patient is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
 
+    auth_service.audit_read(db, user, "patient.read", f"patient:{patient_id}")
     admissions = patient_service.list_admissions(db, user, patient_id) or []
     detail = PatientDetail.model_validate(patient)
     detail.admissions = [AdmissionRead.model_validate(row) for row in admissions]

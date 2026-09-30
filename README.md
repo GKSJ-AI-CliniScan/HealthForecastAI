@@ -94,14 +94,14 @@ Running each service directly, without Docker, is covered in
 |-----------|-------|-------|------------------|
 | 1 | 1-2 | Project initialization, design process and core setup | **Complete** |
 | 2 | 3-4 | Risk prediction and readmission forecasting | **Complete** |
-| 3 | 5-6 | Treatment effectiveness analysis and healthcare analytics | Not started |
+| 3 | 5-6 | Treatment effectiveness analysis and healthcare analytics | **Complete** |
 | 4 | 7-8 | Testing, deployment and documentation | Not started |
 
 Report templates and evaluation criteria: [`docs/06-milestones/`](docs/06-milestones/).
 
 ### What works today
 
-`main` carries a working reference implementation of Milestones 1 and 2:
+`main` carries a working reference implementation of Milestones 1 to 3:
 
 - JWT authentication with bcrypt hashing, audited logins, and immediate session
   revocation when an account is deactivated
@@ -110,17 +110,22 @@ Report templates and evaluation criteria: [`docs/06-milestones/`](docs/06-milest
 - Patient management with search, pagination and admission history
 - Role-aware dashboards for all four roles, built from real aggregates
 - The Diabetes 130-US Hospitals dataset loaded: 101,766 raw encounters cleaned
-  to 69,990, an 8.98% 30-day readmission rate
+  to 62,991 (the newest 10% of encounters are held back because they have not had time to show a readmission), a 9.36% 30-day readmission rate
 - 30-day readmission risk scoring: a calibrated model serving real-time and
   batch predictions, risk banding, forecasting and global risk drivers.
-  ROC-AUC 0.65; the high band runs **2.86x** the baseline readmission rate, and
-  the forecast lands within **1.6%** of the observed count
-
-Treatment effectiveness and clinical decision support endpoints are routed and
-authorised but return placeholder data, tagged `TODO(milestone-3)`.
+  XGBoost, held-out ROC-AUC 0.63 (95% CI 0.62-0.65); on unseen patients the high
+  band runs **2.6x** the baseline readmission rate and its predicted rate matches
+  the observed one (24.6% against 24.7%)
+- Treatment effectiveness: confounder-adjusted medication outcomes, a labelled
+  recovery proxy, risk-adjusted hospital performance, control-chart trend
+  monitoring, and rule-based care recommendations with a discharge plan, all
+  audited and privacy-protected exports
+- A fairness audit that reports the gaps it finds:
+  [docs/07-testing/fairness-audit.md](docs/07-testing/fairness-audit.md)
 
 Full write-ups: [milestone-1](docs/06-milestones/milestone-1.md) ·
-[milestone-2](docs/06-milestones/milestone-2.md).
+[milestone-2](docs/06-milestones/milestone-2.md) ·
+[milestone-3](docs/06-milestones/milestone-3.md).
 
 ## Continuous integration
 

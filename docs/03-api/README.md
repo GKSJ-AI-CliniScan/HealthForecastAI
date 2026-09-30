@@ -6,8 +6,8 @@ The live, always-accurate reference is the generated OpenAPI schema:
 - ReDoc: <http://localhost:8000/redoc>
 - Raw schema: <http://localhost:8000/api/v1/openapi.json>
 
-39 operations across 8 routers. 35 are implemented; the 4 marked *(placeholder)*
-are routed and authorised but return empty values until their milestone.
+Every operation is implemented. Milestone 3 added the treatment, performance,
+trend, clinical-support and report endpoints below.
 
 ## Authentication — Module 1
 
@@ -76,14 +76,27 @@ from imputed values, and the response says so rather than hiding it.
 | GET | `/models/drivers` | `model:manage` | Global feature importance |
 | POST | `/models/reload` | `model:manage` | Pick up a retrained artifact without a restart |
 
-## Later milestones
+## Treatment and analytics — Milestone 3
 
-| Method | Path | Permission | Milestone |
+| Method | Path | Permission | Notes |
 |---|---|---|---|
-| GET | `/treatment` *(placeholder)* | `treatment_report:read` | 3 |
-| GET | `/treatment/recovery-trends` *(placeholder)* | `treatment_report:read` | 3 |
-| GET | `/clinical-support/recommendations/{id}` *(placeholder)* | `care_recommendation:generate` | 3 |
-| GET | `/clinical-support/discharge-plan/{id}` *(placeholder)* | `care_recommendation:generate` | 3 |
+| GET | `/treatment` | `treatment_report:read` or `:read_limited` | Medication outcomes, adjusted odds ratios; a doctor sees their own caseload |
+| GET | `/treatment/medications/{name}` | same | One medication in depth |
+| GET | `/treatment/care-processes` | same | HbA1c testing and regimen change |
+| GET | `/treatment/recovery` | same | Stable-recovery proxy by age and diagnosis |
+| GET | `/treatment/recovery-trends` | same | Recovery across the encounter sequence |
+| GET | `/analytics/performance?dimension=` | `hospital_analytics:read` | Observed against expected readmissions, by department or diagnosis |
+| GET | `/analytics/performance-dimensions` | `hospital_analytics:read` | Available dimensions |
+| GET | `/analytics/trends?buckets=` | `hospital_analytics:read` | p-chart with control limits and signals |
+| GET | `/clinical-support/recommendations/{id}` | `care_recommendation:generate` | Rules that fired, each with rationale and evidence, plus the score explanation |
+| GET | `/clinical-support/discharge-plan/{id}` | `care_recommendation:generate` | Actions grouped before, at and after discharge |
+| GET | `/clinical-support/rules` | `care_recommendation:generate` | The rule set and thresholds, for clinical review |
+| GET | `/reports/patients/{id}/outcome` | patient read | Patient outcome report; audited |
+| GET | `/reports/hospital-performance` | `analytics:export` | Aggregate CSV; audited |
+| GET | `/reports/research-dataset?k=` | `research_dataset:export` | k-anonymous (k >= 5, default 10), pseudonymised CSV; audited |
+
+Out-of-scope patients return **404, not 403**, so a response never confirms that
+a record exists. Small groups (fewer than 11) are suppressed in every aggregate.
 
 ## System
 

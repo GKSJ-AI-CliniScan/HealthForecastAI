@@ -19,12 +19,3 @@ class HospitalAnalyticsSummary(BaseModel):
     readmission_rate: float = 0.0
     average_length_of_stay: float = 0.0
     risk_distribution: RiskDistribution = RiskDistribution()
-
-
-class TreatmentEffectivenessSummary(BaseModel):
-    """Effectiveness rollup for one treatment."""
-
-    treatment_name: str
-    patients_treated: int = 0
-    average_recovery_score: float = 0.0
-    readmission_rate: float = 0.0

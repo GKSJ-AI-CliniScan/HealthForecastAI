@@ -40,6 +40,11 @@ class LoadedModel:
     metrics: dict[str, float] = field(default_factory=dict)
     top_drivers: list[dict[str, Any]] = field(default_factory=list)
     trained_at: str | None = None
+    explain_spec: dict[str, Any] | None = None
+    preprocessor: Any = None
+    excluded_features: list[str] = field(default_factory=list)
+    calibration_method: str | None = None
+    dataset_sha256: str | None = None
 
     def predict_proba(self, frame: Any) -> Any:
         """Return the positive-class probability for each row, clipped.
@@ -53,6 +58,27 @@ class LoadedModel:
         """
         probabilities = self.pipeline.predict_proba(frame)[:, 1]
         return probabilities.clip(PROBABILITY_FLOOR, PROBABILITY_CEILING)
+
+
+def find_preprocessor(estimator: Any) -> Any:
+    """Return the fitted preprocessor inside a (possibly calibrated) estimator.
+
+    A calibrated model nests: CalibratedClassifierCV -> _CalibratedClassifier ->
+    FrozenEstimator -> Pipeline. Walk down until the Pipeline turns up.
+    """
+    queue = [estimator]
+    for _ in range(12):
+        if not queue:
+            break
+        current = queue.pop(0)
+        steps = getattr(current, "named_steps", None)
+        if steps is not None:
+            return steps.get("preprocess")
+        queue.extend(getattr(current, "calibrated_classifiers_", None) or [])
+        inner = getattr(current, "estimator", None)
+        if inner is not None:
+            queue.append(inner)
+    return None
 
 
 def artifact_path() -> Path:
@@ -114,6 +140,11 @@ def load_model(force: bool = False) -> LoadedModel | None:
             metrics=payload.get("metrics", {}),
             top_drivers=payload.get("top_drivers", []),
             trained_at=payload.get("trained_at"),
+            explain_spec=payload.get("explain"),
+            preprocessor=find_preprocessor(payload["pipeline"]),
+            excluded_features=list(payload.get("excluded_features", [])),
+            calibration_method=payload.get("calibration_method"),
+            dataset_sha256=payload.get("dataset_sha256"),
         )
         logger.info(
             "Loaded model %s v%s (threshold %.4f)",
@@ -154,5 +185,9 @@ def model_info() -> dict[str, Any]:
         "trained_at": model.trained_at,
         "metrics": model.metrics,
         "feature_count": len(model.feature_columns),
+        "excluded_features": model.excluded_features,
+        "calibration_method": model.calibration_method,
+        "explanation_supported": model.explain_spec is not None,
+        "dataset_sha256": model.dataset_sha256,
         "artifact_path": str(artifact_path()),
     }

@@ -3,6 +3,9 @@
 - **Branch:** `main` (reference implementation)
 - **Submitted on:** 2026-09-05
 
+
+> **Update, 2026-09-30.** The cohort figures below (69,990 rows, 8.98%) are from the original build. Milestone 3 found that keeping each patient's first encounter biased the newest data (they had not had time to be readmitted) and now holds back the newest 10%: the cohort is 62,991 rows with a 9.36% readmission rate. See [milestone-3](milestone-3.md).
+
 ---
 
 ## Scope for this milestone

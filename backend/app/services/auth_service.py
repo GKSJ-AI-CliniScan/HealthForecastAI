@@ -40,6 +40,17 @@ def record_audit(
     )
 
 
+def audit_read(db: Session, actor: User, action: str, resource: str | None = None) -> None:
+    """Record that a user read patient data, and commit it.
+
+    A clinical system has to be able to answer "who looked at this record?" and
+    that cannot be reconstructed afterwards. Reads are logged at the point of
+    access, not inferred from web server logs that know nothing about patients.
+    """
+    record_audit(db, action, actor.id, actor.role, resource)
+    db.commit()
+
+
 def get_user_by_email(db: Session, email: str) -> User | None:
     """Look a user up by email, case-insensitively."""
     stmt = select(User).where(func.lower(User.email) == email.strip().lower())

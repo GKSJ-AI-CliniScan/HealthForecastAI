@@ -77,6 +77,18 @@ ENDPOINT_MATRIX: list[tuple[str, set[Role]]] = [
     ("/api/v1/analytics/population-health", {Role.RESEARCHER, Role.SYSTEM_ADMIN}),
     ("/api/v1/models", {Role.SYSTEM_ADMIN}),
     ("/api/v1/risk/high-risk", {Role.DOCTOR, Role.HOSPITAL_ADMIN, Role.SYSTEM_ADMIN}),
+    # Milestone 3: doctors read treatment reports under the "limited" permission,
+    # scoped to their caseload; everyone else with access reads the full ones.
+    ("/api/v1/treatment", set(Role)),
+    ("/api/v1/treatment/recovery", set(Role)),
+    ("/api/v1/analytics/performance", {Role.HOSPITAL_ADMIN, Role.RESEARCHER, Role.SYSTEM_ADMIN}),
+    ("/api/v1/analytics/trends", {Role.HOSPITAL_ADMIN, Role.RESEARCHER, Role.SYSTEM_ADMIN}),
+    (
+        "/api/v1/reports/hospital-performance",
+        {Role.HOSPITAL_ADMIN, Role.RESEARCHER, Role.SYSTEM_ADMIN},
+    ),
+    ("/api/v1/reports/research-dataset", {Role.RESEARCHER, Role.SYSTEM_ADMIN}),
+    ("/api/v1/clinical-support/rules", {Role.DOCTOR, Role.SYSTEM_ADMIN}),
 ]
 
 

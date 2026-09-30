@@ -6,7 +6,8 @@ import { KpiCard } from '@/components/ui/KpiCard';
 import { RiskBadge, RiskMeter } from '@/components/ui/RiskBadge';
 import { EmptyBlock, ErrorBlock, Loading } from '@/components/ui/StateBlock';
 import { useApi } from '@/hooks/useApi';
-import type { PatientDetail, PatientRiskScore } from '@/types';
+import { useAuth } from '@/lib/auth';
+import type { PatientDetail, PatientRiskScore, Recommendations } from '@/types';
 
 const READMISSION_LABEL: Record<string, string> = {
   '<30': 'Readmitted within 30 days',
@@ -20,17 +21,18 @@ export default function PatientDetailPage() {
   // A 404 here just means this patient has not been scored yet, which is a
   // normal state - the page renders without the risk panel.
   const risk = useApi<PatientRiskScore>(`/risk/patients/${params.id}`);
+  const { can } = useAuth();
+  // Care recommendations are a clinician feature; other roles never request them.
+  const care = useApi<Recommendations>(
+    can('care_recommendation:generate') ? `/clinical-support/recommendations/${params.id}` : null,
+  );
 
   if (loading) return <Loading />;
   if (error) {
     return (
       <div className="space-y-4">
         <ErrorBlock
-          message={
-            error.includes('not found')
-              ? 'This patient is not in your caseload.'
-              : error
-          }
+          message={error.includes('not found') ? 'This patient is not in your caseload.' : error}
         />
         <Link href="/patients" className="btn-ghost">
           Back to patients
@@ -55,9 +57,7 @@ export default function PatientDetailPage() {
         <Link href="/patients" className="muted text-sm">
           ← Patients
         </Link>
-        <h1 className="mt-2 text-2xl font-bold tracking-tight">
-          {data.medical_record_number}
-        </h1>
+        <h1 className="mt-2 text-2xl font-bold tracking-tight">{data.medical_record_number}</h1>
         <p className="muted mt-1 text-sm">
           {[data.age_group, data.gender, data.race].filter(Boolean).join(' · ') ||
             'No demographics recorded'}
@@ -89,9 +89,7 @@ export default function PatientDetailPage() {
 
           <div className="mt-4 flex flex-wrap items-center gap-6">
             <div>
-              <p className="muted text-xs font-semibold uppercase tracking-wide">
-                Probability
-              </p>
+              <p className="muted text-xs font-semibold uppercase tracking-wide">Probability</p>
               <p className="mt-1 text-3xl font-semibold">
                 {(risk.data.readmission_probability * 100).toFixed(1)}%
               </p>
@@ -115,8 +113,8 @@ export default function PatientDetailPage() {
           </div>
 
           <p className="muted mt-4 text-xs">
-            The baseline 30-day readmission rate across this record is 9.0%. A high-risk
-            patient runs roughly three times that.
+            The baseline 30-day readmission rate across this record is 9.0%. A high-risk patient
+            runs roughly three times that.
           </p>
         </section>
       ) : null}
@@ -131,9 +129,7 @@ export default function PatientDetailPage() {
             <dd className="mt-1 text-sm">{data.primary_diagnosis ?? '—'}</dd>
           </div>
           <div>
-            <dt className="muted text-xs font-semibold uppercase tracking-wide">
-              Assigned doctor
-            </dt>
+            <dt className="muted text-xs font-semibold uppercase tracking-wide">Assigned doctor</dt>
             <dd className="mt-1 text-sm">
               {data.assigned_doctor_id ? `User #${data.assigned_doctor_id}` : 'Unassigned'}
             </dd>
@@ -174,8 +170,7 @@ export default function PatientDetailPage() {
                         style={{
                           background:
                             admission.readmitted === '<30' ? '#fdecea' : 'var(--surface-muted)',
-                          color:
-                            admission.readmitted === '<30' ? '#8a1c12' : 'var(--muted)',
+                          color: admission.readmitted === '<30' ? '#8a1c12' : 'var(--muted)',
                         }}
                       >
                         {READMISSION_LABEL[admission.readmitted ?? ''] ?? '—'}
@@ -189,10 +184,66 @@ export default function PatientDetailPage() {
         )}
       </section>
 
-      <p className="muted text-xs">
-        Care recommendations and discharge planning for this patient arrive in
-        Milestone 3.
-      </p>
+      {care.data ? (
+        <section className="card space-y-4">
+          <div>
+            <h2 className="text-lg font-semibold">Suggested care actions</h2>
+            <p className="muted mt-1 text-sm">
+              {care.data.follow_up_days
+                ? `Suggested follow-up within ${care.data.follow_up_days} days. `
+                : ''}
+              {care.data.risk?.times_the_average_patient
+                ? `Predicted risk is ${care.data.risk.times_the_average_patient}x the average patient.`
+                : ''}
+            </p>
+          </div>
+          <ul className="space-y-3">
+            {care.data.recommendations.map((r) => (
+              <li
+                key={r.id}
+                className="rounded-xl border p-3"
+                style={{ borderColor: 'var(--border)' }}
+              >
+                <p className="text-sm font-medium">
+                  {r.action}{' '}
+                  <span className="muted text-xs font-normal">
+                    · {r.category} · {r.timing} · {r.priority}
+                  </span>
+                </p>
+                <p className="muted mt-1 text-xs">{r.rationale}</p>
+              </li>
+            ))}
+          </ul>
+          {care.data.explanation ? (
+            <div>
+              <h3 className="text-sm font-semibold">What drives this score</h3>
+              <p className="muted mt-1 text-xs">
+                Each factor is scored on its own: the change in this patient&apos;s score if only
+                that factor took a typical value. The figures do not add up to the total.
+              </p>
+              <div className="mt-2 grid gap-4 sm:grid-cols-2">
+                <ul className="space-y-1 text-sm">
+                  {care.data.explanation.up.map((f) => (
+                    <li key={f.feature} style={{ color: '#8a1c12' }}>
+                      ▲ {f.feature.replace(/_/g, ' ')}
+                      {f.value !== null && !f.imputed ? ` (${f.value})` : ''} · x{f.odds_ratio}
+                    </li>
+                  ))}
+                </ul>
+                <ul className="space-y-1 text-sm">
+                  {care.data.explanation.down.map((f) => (
+                    <li key={f.feature} style={{ color: '#0f7b39' }}>
+                      ▼ {f.feature.replace(/_/g, ' ')}
+                      {f.value !== null && !f.imputed ? ` (${f.value})` : ''} · x{f.odds_ratio}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ) : null}
+          <p className="muted text-xs">{care.data.disclaimer}</p>
+        </section>
+      ) : null}
     </div>
   );
 }

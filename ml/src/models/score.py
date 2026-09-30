@@ -26,6 +26,7 @@ from sqlalchemy.engine import Engine
 from src.data.load_data import binarise_target, load_raw
 from src.data.preprocess import basic_clean
 from src.features.build_features import add_utilisation_features
+from src.models import explain
 from src.utils.config import load_config, resolve_path
 
 DEFAULT_DATABASE_URL = "postgresql+psycopg://postgres:postgres@localhost:5432/healthforecast"
@@ -79,9 +80,9 @@ def write_predictions(
 
     statement = text(
         "INSERT INTO risk_predictions "
-        "(patient_id, readmission_probability, risk_category, model_name, model_version) "
+        "(patient_id, readmission_probability, risk_category, model_name, model_version, drivers) "
         "VALUES (:patient_id, :readmission_probability, :risk_category, "
-        " :model_name, :model_version)"
+        " :model_name, :model_version, CAST(:drivers AS JSON))"
     )
 
     written = 0
@@ -128,6 +129,21 @@ def run(
     # the API clips them - see backend/app/services/model_service.py.
     probabilities = pipeline.predict_proba(features)[:, 1].clip(0.001, 0.999)
 
+    # Why each patient scored what they did, from the same full record as the
+    # score. Skipped, not faked, when the promoted model cannot explain itself.
+    drivers: list[dict[str, Any] | None] = [None] * len(features)
+    spec = artifact.get("explain")
+    base_pipeline, _ = explain.unwrap(pipeline)
+    if spec and base_pipeline is not None:
+        drivers = list(
+            explain.explain_frame(
+                spec,
+                base_pipeline.named_steps["preprocess"],
+                features,
+                predict=pipeline.predict_proba,
+            )
+        )
+
     engine = get_engine(database_url)
     medical_record_numbers = "MRN-" + frame["patient_nbr"].astype(str)
     patient_ids = resolve_patient_ids(engine, medical_record_numbers)
@@ -140,9 +156,13 @@ def run(
             "risk_category": band(float(probability), bands["high"], bands["medium"]),
             "model_name": artifact.get("model_name", "unknown"),
             "model_version": artifact.get("model_version", "0.0.0"),
+            "drivers": json.dumps(driver) if driver is not None else None,
         }
-        for patient_id, probability in zip(
-            patient_ids[known], probabilities[known.to_numpy()], strict=True
+        for patient_id, probability, driver in zip(
+            patient_ids[known],
+            probabilities[known.to_numpy()],
+            [d for d, k in zip(drivers, known.to_numpy(), strict=True) if k],
+            strict=True,
         )
     ]
 
@@ -157,6 +177,7 @@ def run(
         "scored": int(len(probabilities)),
         "unmatched_patients": int((~known).sum()),
         "predictions_written": written,
+        "explanations_written": sum(1 for d in drivers if d is not None),
         "flagged_for_review": flagged,
         "risk_distribution": {k: int(v) for k, v in categories.items()},
         "mean_probability": round(float(np.mean(probabilities)), 4),

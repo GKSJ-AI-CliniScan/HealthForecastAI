@@ -3,6 +3,9 @@
 - **Branch:** `main` (reference implementation)
 - **Submitted on:** 2026-09-05
 
+
+> **Update, 2026-09-30.** The model figures below were measured on the original 69,990-row cohort. After the Milestone 3 cohort correction, race and gender were removed from the model's inputs, and the promoted model is now XGBoost (held-out ROC-AUC 0.633, recall 0.501). The reasoning in this report about gates, calibration and thresholds still applies; the current numbers are in [milestone-3](milestone-3.md) and [fairness-audit](../07-testing/fairness-audit.md).
+
 ---
 
 ## Scope for this milestone

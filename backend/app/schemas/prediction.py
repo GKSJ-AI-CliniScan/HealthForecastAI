@@ -25,8 +25,6 @@ class RiskPredictionRequest(BaseModel):
     number_emergency: int | None = Field(default=None, ge=0)
     number_outpatient: int | None = Field(default=None, ge=0)
     age_group: str | None = None
-    gender: str | None = None
-    race: str | None = None
     admission_type: str | None = None
     discharge_disposition: str | None = None
     admission_source: str | None = None
@@ -34,6 +32,33 @@ class RiskPredictionRequest(BaseModel):
     change: str | None = None
     diabetesMed: str | None = None  # noqa: N815 - matches the dataset column name
     insulin: str | None = None
+
+
+class DriverFactor(BaseModel):
+    """One factor that moved a patient's risk, compared with the average patient."""
+
+    feature: str
+    value: str | int | float | bool | None = None
+    imputed: bool = Field(
+        default=False,
+        description="The input was not supplied and was filled from the training data",
+    )
+    log_odds: float
+    odds_ratio: float
+
+
+class RiskExplanation(BaseModel):
+    """Why a patient scored what they did.
+
+    For a logistic regression this is exact: the baseline plus every factor's
+    log-odds reproduces the calibrated score. Factors are folded back from the
+    encoded columns into the original features.
+    """
+
+    baseline_probability: float
+    exact: bool = True
+    up: list[DriverFactor] = []
+    down: list[DriverFactor] = []
 
 
 class RiskPredictionRead(BaseModel):
@@ -50,6 +75,7 @@ class RiskPredictionRead(BaseModel):
     model_version: str
     features_supplied: int | None = None
     features_expected: int | None = None
+    explanation: RiskExplanation | None = None
     created_at: datetime | None = None
 
 

@@ -17,8 +17,26 @@ const NAV: NavItem[] = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/patients', label: 'Patients', permission: 'patient:read_assigned' },
   { href: '/risk', label: 'Risk', permission: 'risk_report:read' },
-  { href: '/analytics', label: 'Analytics', permission: 'hospital_analytics:read' },
-  { href: '/research', label: 'Research', permission: 'population_health:read' },
+  {
+    href: '/analytics',
+    label: 'Analytics',
+    permission: 'hospital_analytics:read',
+  },
+  {
+    href: '/treatment',
+    label: 'Treatment',
+    permission: 'treatment_report:any',
+  },
+  {
+    href: '/performance',
+    label: 'Performance',
+    permission: 'hospital_analytics:read',
+  },
+  {
+    href: '/research',
+    label: 'Research',
+    permission: 'population_health:read',
+  },
   { href: '/users', label: 'Users', permission: 'user:manage' },
 ];
 
@@ -47,6 +65,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     if (!item.permission) return true;
     if (item.permission === 'patient:read_assigned') {
       return can('patient:read_assigned') || can('patient:read_all');
+    }
+    if (item.permission === 'treatment_report:any') {
+      return can('treatment_report:read') || can('treatment_report:read_limited');
     }
     return can(item.permission);
   });
@@ -100,8 +121,8 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <footer className="mx-auto max-w-7xl px-6 pb-10">
         <p className="muted text-xs">
-          {permissions.length} permission{permissions.length === 1 ? '' : 's'} granted to this
-          role. Every patient record access is written to the audit log.
+          {permissions.length} permission{permissions.length === 1 ? '' : 's'} granted to this role.
+          Every patient record access is written to the audit log.
         </p>
       </footer>
     </div>

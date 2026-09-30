@@ -5,6 +5,7 @@ recall, F1 and ROC-AUC. Report all five - accuracy alone is misleading on an
 imbalanced readmission target.
 """
 
+import math
 from typing import Any
 
 import numpy as np
@@ -16,6 +17,24 @@ from sklearn.metrics import (
     recall_score,
     roc_auc_score,
 )
+
+
+def wilson_interval(
+    successes: int, total: int, z: float = 1.959963984540054
+) -> tuple[float, float]:
+    """Wilson score interval for a proportion.
+
+    Preferred over the normal approximation because it stays inside [0, 1] and
+    behaves at small n and at rates near 0 or 1 - which is where the small
+    subgroups in the fairness audit and the recall estimates here sit.
+    """
+    if total <= 0:
+        return 0.0, 1.0
+    p = successes / total
+    denominator = 1 + z**2 / total
+    centre = (p + z**2 / (2 * total)) / denominator
+    margin = z * math.sqrt(p * (1 - p) / total + z**2 / (4 * total**2)) / denominator
+    return max(0.0, centre - margin), min(1.0, centre + margin)
 
 
 def classification_metrics(

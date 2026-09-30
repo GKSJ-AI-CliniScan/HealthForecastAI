@@ -19,7 +19,7 @@ from app.schemas.prediction import (
     RiskPredictionRequest,
     ScoredPatientPage,
 )
-from app.services import model_service, patient_service, risk_service
+from app.services import auth_service, model_service, patient_service, risk_service
 
 router = APIRouter()
 
@@ -61,6 +61,7 @@ def predict_risk(
             probability=result["readmission_probability"],
             model_name=result["model_name"],
             model_version=result["model_version"],
+            drivers=result["explanation"],
         )
 
     return RiskPredictionRead(patient_id=payload.patient_id, **result)
@@ -83,6 +84,7 @@ def patient_risk(patient_id: int, user: CanReadRisk, db: DbSession) -> RiskPredi
             detail="This patient has not been scored yet. Run: python -m src.models.score",
         )
 
+    auth_service.audit_read(db, user, "risk.read", f"patient:{patient_id}")
     model = model_service.load_model()
     probability = float(prediction.readmission_probability)
     return RiskPredictionRead(
@@ -93,6 +95,7 @@ def patient_risk(patient_id: int, user: CanReadRisk, db: DbSession) -> RiskPredi
         decision_threshold=model.decision_threshold if model else 0.5,
         model_name=prediction.model_name,
         model_version=prediction.model_version,
+        explanation=prediction.drivers,
         created_at=prediction.created_at,
     )
 
