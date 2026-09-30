@@ -20,13 +20,14 @@ import pandas as pd
 from sqlalchemy import Float, case, cast, func, select
 from sqlalchemy.orm import Session
 
+from app.core.cache import ttl_cache
 from app.core.config import settings
 from app.core.rbac import Role
 from app.models.admission import Admission
 from app.models.patient import Patient
 from app.models.prediction import RiskPrediction
 from app.models.user import User
-from app.services import model_service
+from app.services import explain_service, model_service
 
 RISK_LOW = "low"
 RISK_MEDIUM = "medium"
@@ -46,21 +47,22 @@ def categorise_risk(probability: float) -> str:
 
 def build_feature_frame(
     supplied: dict[str, Any], feature_columns: list[str]
-) -> tuple[pd.DataFrame, int]:
-    """Return a one-row frame shaped like the training data, plus a coverage count.
+) -> tuple[pd.DataFrame, set[str]]:
+    """Return a one-row frame shaped like the training data, plus the columns supplied.
 
     Columns the caller did not supply are left as None so the pipeline's fitted
-    imputers fill them. The count is what the response reports as coverage.
+    imputers fill them. The set is what the response reports as coverage, and what
+    the explanation uses to tell a real finding from an imputed value.
     """
     row: dict[str, Any] = dict.fromkeys(feature_columns)
 
-    matched = 0
+    matched: set[str] = set()
     for key, value in supplied.items():
         if value is None:
             continue
         if key in row:
             row[key] = value
-            matched += 1
+            matched.add(key)
 
     return pd.DataFrame([row], columns=feature_columns), matched
 
@@ -71,8 +73,19 @@ def predict_one(supplied: dict[str, Any]) -> dict[str, Any] | None:
     if model is None:
         return None
 
-    frame, supplied_count = build_feature_frame(supplied, model.feature_columns)
+    frame, matched = build_feature_frame(supplied, model.feature_columns)
     probability = float(model.predict_proba(frame)[0])
+
+    # Why this score. Skipped, not faked, when the promoted model is not linear.
+    explanation = None
+    if model.explain_spec is not None and model.preprocessor is not None:
+        explanation = explain_service.explain_frame(
+            model.explain_spec,
+            model.preprocessor,
+            frame,
+            supplied=matched,
+            predict=model.pipeline.predict_proba,
+        )[0]
 
     return {
         "readmission_probability": round(probability, 6),
@@ -81,8 +94,9 @@ def predict_one(supplied: dict[str, Any]) -> dict[str, Any] | None:
         "decision_threshold": model.decision_threshold,
         "model_name": model.model_name,
         "model_version": model.model_version,
-        "features_supplied": supplied_count,
+        "features_supplied": len(matched),
         "features_expected": len(model.feature_columns),
+        "explanation": explanation,
     }
 
 
@@ -101,6 +115,7 @@ def store_prediction(
     model_name: str,
     model_version: str,
     admission_id: int | None = None,
+    drivers: dict[str, Any] | None = None,
 ) -> RiskPrediction:
     """Persist one prediction so it can be listed and trended later."""
     prediction = RiskPrediction(
@@ -110,6 +125,7 @@ def store_prediction(
         risk_category=categorise_risk(probability),
         model_name=model_name,
         model_version=model_version,
+        drivers=drivers,
     )
     db.add(prediction)
     db.commit()
@@ -117,7 +133,7 @@ def store_prediction(
     return prediction
 
 
-def _latest_prediction_subquery():
+def latest_prediction_subquery():
     """Subquery giving the most recent prediction id per patient."""
     return (
         select(
@@ -148,7 +164,7 @@ def high_risk_cohort(
     offset: int = 0,
 ) -> tuple[list[dict[str, Any]], int]:
     """Return the current high risk cohort, scoped to what the caller may see."""
-    latest = _latest_prediction_subquery()
+    latest = latest_prediction_subquery()
 
     base = (
         select(RiskPrediction, Patient)
@@ -182,9 +198,10 @@ def high_risk_cohort(
     return cohort, total
 
 
+@ttl_cache
 def risk_distribution(db: Session, actor: User) -> dict[str, int]:
     """Return how many patients sit in each risk band, scoped to the caller."""
-    latest = _latest_prediction_subquery()
+    latest = latest_prediction_subquery()
 
     stmt = (
         select(RiskPrediction.risk_category, func.count(RiskPrediction.id))
@@ -201,6 +218,7 @@ def risk_distribution(db: Session, actor: User) -> dict[str, int]:
     return counts
 
 
+@ttl_cache
 def forecast(db: Session, actor: User, horizon_days: int = 30) -> dict[str, Any]:
     """Forecast readmissions over a horizon from the stored predictions.
 
@@ -210,7 +228,7 @@ def forecast(db: Session, actor: User, horizon_days: int = 30) -> dict[str, Any]
     different question - who to review - and overstates the total, because the
     threshold is deliberately set to catch borderline cases.
     """
-    latest = _latest_prediction_subquery()
+    latest = latest_prediction_subquery()
 
     stmt = (
         select(
@@ -243,6 +261,7 @@ def forecast(db: Session, actor: User, horizon_days: int = 30) -> dict[str, Any]
     }
 
 
+@ttl_cache
 def observed_vs_expected(db: Session) -> dict[str, Any]:
     """Compare the forecast against what the record actually shows.
 
@@ -250,7 +269,7 @@ def observed_vs_expected(db: Session) -> dict[str, Any]:
     view: how the predicted rate compares with the observed 30-day readmission
     rate over the same population.
     """
-    latest = _latest_prediction_subquery()
+    latest = latest_prediction_subquery()
 
     # PostgreSQL will not cast a boolean straight to a numeric type, so count the
     # readmissions with a CASE rather than summing the comparison.
@@ -284,4 +303,13 @@ def observed_vs_expected(db: Session) -> dict[str, Any]:
 
     order = {RISK_HIGH: 0, RISK_MEDIUM: 1, RISK_LOW: 2}
     bands.sort(key=lambda item: order.get(str(item["risk_category"]), 9))
-    return {"bands": bands}
+    return {
+        "bands": bands,
+        "caveat": (
+            "This scores every patient in the record, including those the model was trained "
+            "on, so the observed rates look sharper than they will on new patients. The "
+            "held-out test figures are in artifacts/validation.json and the validation "
+            "report: there the high band ran 24.7% against 24.6% predicted (2.6x the "
+            "baseline)."
+        ),
+    }

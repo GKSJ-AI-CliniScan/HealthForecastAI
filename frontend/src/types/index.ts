@@ -146,6 +146,7 @@ export interface CalibrationBand {
 
 export interface CalibrationReport {
   bands: CalibrationBand[];
+  caveat?: string;
 }
 
 export interface PatientRiskScore {
@@ -159,4 +160,173 @@ export interface PatientRiskScore {
   features_supplied?: number | null;
   features_expected?: number | null;
   created_at?: string | null;
+}
+
+// ---------------------------------------------------------------- Milestone 3
+
+export interface RateWithInterval {
+  n: number;
+  events: number;
+  rate: number;
+  ci_low: number;
+  ci_high: number;
+}
+
+export interface TreatmentEffect {
+  crude_odds_ratio: number;
+  crude_ci: [number, number];
+  adjusted_odds_ratio: number;
+  adjusted_ci: [number, number];
+  strata_used: number;
+  significant: boolean;
+  interpretation: string;
+  confounding_flag: boolean;
+}
+
+export interface MedicationOutcome {
+  treatment_name: string;
+  patients_treated: number;
+  suppressed: boolean;
+  treated?: RateWithInterval;
+  not_treated?: RateWithInterval;
+  rate_difference_points?: number;
+  effect?: TreatmentEffect;
+  average_length_of_stay_treated?: number | null;
+  average_length_of_stay_not_treated?: number | null;
+  dose_changes?: Record<string, number>;
+}
+
+export interface TreatmentReport {
+  scope: string;
+  outcome: string;
+  adjusted_for: string[];
+  caveat: string;
+  medications: MedicationOutcome[];
+}
+
+export interface RecoveryGroup {
+  group: string;
+  n: number;
+  stable_recovery?: RateWithInterval;
+  no_readmission_rate?: number;
+  home_discharge_rate?: number;
+  average_length_of_stay?: number | null;
+  suppressed: boolean;
+}
+
+export interface RecoveryReport {
+  scope: string;
+  definition: string;
+  overall: RecoveryGroup;
+  by_age_group: RecoveryGroup[];
+  by_diagnosis_group: RecoveryGroup[];
+}
+
+export interface ObservedVsExpected {
+  observed: number;
+  expected: number;
+  ratio: number;
+  ci_low: number;
+  ci_high: number;
+  verdict: string;
+}
+
+export interface PerformanceRow {
+  group: string;
+  admissions: number;
+  readmissions?: number;
+  readmission_rate?: number;
+  average_length_of_stay?: number | null;
+  home_discharge_rate?: number;
+  observed_vs_expected?: ObservedVsExpected;
+  suppressed: boolean;
+}
+
+export interface PerformanceReport {
+  scope: string;
+  dimension: string;
+  dimension_title: string;
+  overall: {
+    admissions: number;
+    readmissions: number;
+    observed_vs_expected: ObservedVsExpected;
+  };
+  rows: PerformanceRow[];
+  caveat: string;
+}
+
+export interface TrendPoint {
+  cohort: number;
+  n: number;
+  rate: number;
+  lower_limit: number;
+  upper_limit: number;
+  out_of_control: boolean;
+  expected_rate: number | null;
+  stable_recovery_rate: number | null;
+  average_length_of_stay: number | null;
+}
+
+export interface TrendReport {
+  scope: string;
+  axis_note: string;
+  buckets: number;
+  centre_line: number;
+  points: TrendPoint[];
+  signals: { cohort: number; rule: string; detail: string }[];
+  reading: string;
+}
+
+export interface Recommendation {
+  id: string;
+  category: string;
+  priority: 'high' | 'medium' | 'routine';
+  timing: string;
+  action: string;
+  rationale: string;
+  evidence: Record<string, unknown>;
+}
+
+export interface Factor {
+  feature: string;
+  value: string | number | null;
+  imputed?: boolean;
+  log_odds: number;
+  odds_ratio: number;
+}
+
+export interface Recommendations {
+  patient_id: number;
+  risk: {
+    readmission_probability: number;
+    risk_category: RiskCategory;
+    baseline_probability: number | null;
+    times_the_average_patient: number | null;
+  } | null;
+  follow_up_days: number | null;
+  recommendations: Recommendation[];
+  explanation: {
+    baseline_probability: number;
+    exact: boolean;
+    up: Factor[];
+    down: Factor[];
+  } | null;
+  disclaimer: string;
+}
+
+export interface AuditEntry {
+  id: number;
+  created_at: string;
+  actor_id: number | null;
+  actor_role: string | null;
+  action: string;
+  resource: string | null;
+  outcome: string;
+}
+
+export interface AuditPage {
+  total: number;
+  limit: number;
+  offset: number;
+  items: AuditEntry[];
 }

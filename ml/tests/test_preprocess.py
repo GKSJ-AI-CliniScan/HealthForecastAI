@@ -18,6 +18,7 @@ from src.data.preprocess import (
     basic_clean,
     decode_id_columns,
     deduplicate_patients,
+    drop_incomplete_follow_up,
     drop_non_readmittable,
     engineer_columns,
     summarise,
@@ -139,6 +140,55 @@ def test_prior_utilisation_is_summed(raw_frame: pd.DataFrame) -> None:
     """Prior visits are the strongest readmission signal in this dataset."""
     engineered = engineer_columns(raw_frame)
     assert engineered["prior_visits_total"].tolist() == [3, 2, 0, 6, 0]
+
+
+def test_the_newest_encounters_are_set_aside_because_their_outcome_is_unobserved() -> None:
+    """An index encounter near the end of collection has had no time to be readmitted."""
+    frame = pd.DataFrame({"encounter_id": range(1, 101), "readmitted": ["NO"] * 100})
+
+    kept, removed = drop_incomplete_follow_up(frame, 0.10)
+
+    assert removed == 10
+    assert len(kept) == 90
+    assert kept["encounter_id"].max() == 90, "the newest ten are the ones that go"
+    assert kept["encounter_id"].min() == 1
+
+
+def test_a_zero_buffer_changes_nothing() -> None:
+    frame = pd.DataFrame({"encounter_id": range(1, 11)})
+    kept, removed = drop_incomplete_follow_up(frame, 0.0)
+    assert removed == 0 and len(kept) == 10
+
+
+def test_the_buffer_is_skipped_when_there_is_no_encounter_id() -> None:
+    """Without an ordering there is no honest way to call anything 'newest'."""
+    frame = pd.DataFrame({"age": ["[70-80)"] * 10})
+    kept, removed = drop_incomplete_follow_up(frame, 0.2)
+    assert removed == 0 and len(kept) == 10
+
+
+def test_the_buffer_is_applied_after_deduplication() -> None:
+    """It must act on first encounters - that is where the truncation bias appears."""
+    frame = pd.DataFrame(
+        {
+            "encounter_id": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "patient_nbr": [1, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            "discharge_disposition_id": [1] * 10,
+            "readmitted": ["NO"] * 10,
+        }
+    )
+    config = {
+        "preprocessing": {
+            "deduplicate_patients": True,
+            "follow_up_buffer_fraction": 0.2,
+            "drop_columns": [],
+        }
+    }
+    cleaned = basic_clean(frame, config, drop_columns=False)
+
+    # ten rows -> nine patients after deduplication -> the newest 20% are dropped
+    assert cleaned["patient_nbr"].is_unique
+    assert len(cleaned) < 9
 
 
 @pytest.mark.parametrize(

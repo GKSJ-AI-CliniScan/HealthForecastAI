@@ -110,8 +110,13 @@ export default function RiskPage() {
         <section className="space-y-3">
           <h2 className="text-lg font-semibold">Calibration: predicted against observed</h2>
           <p className="muted text-sm">
-            If these two columns drift apart, the model needs retraining.
+            If these two columns drift apart on new patients, the model needs retraining.
           </p>
+          {calibration.data.caveat ? (
+            <p className="text-sm" style={{ color: '#8a5300' }}>
+              {calibration.data.caveat}
+            </p>
+          ) : null}
           <div className="table-wrap">
             <table className="w-full border-collapse">
               <thead>

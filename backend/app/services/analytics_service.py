@@ -10,6 +10,7 @@ from __future__ import annotations
 from sqlalchemy import Float, case, cast, func, select
 from sqlalchemy.orm import Session
 
+from app.core.cache import ttl_cache
 from app.core.rbac import Role
 from app.models.admission import Admission
 from app.models.patient import Patient
@@ -25,6 +26,7 @@ def _readmission_case() -> case:
     return case((Admission.readmitted == READMITTED_WITHIN_30, 1), else_=0)
 
 
+@ttl_cache
 def dashboard_summary(db: Session, actor: User) -> dict[str, object]:
     """Return the headline KPIs for the caller's dashboard.
 
@@ -71,6 +73,7 @@ def dashboard_summary(db: Session, actor: User) -> dict[str, object]:
     }
 
 
+@ttl_cache
 def readmission_by_age_group(db: Session, limit: int = 20) -> list[dict[str, object]]:
     """Return the 30-day readmission rate per age band."""
     stmt = (
@@ -101,6 +104,7 @@ def readmission_by_age_group(db: Session, limit: int = 20) -> list[dict[str, obj
     return results
 
 
+@ttl_cache
 def readmission_by_admission_type(db: Session, limit: int = 20) -> list[dict[str, object]]:
     """Return the 30-day readmission rate per admission type."""
     stmt = (
@@ -130,6 +134,7 @@ def readmission_by_admission_type(db: Session, limit: int = 20) -> list[dict[str
     return results
 
 
+@ttl_cache
 def length_of_stay_distribution(db: Session) -> list[dict[str, int]]:
     """Return how many admissions lasted each number of days."""
     stmt = (
@@ -141,6 +146,7 @@ def length_of_stay_distribution(db: Session) -> list[dict[str, int]]:
     return [{"days": days, "admissions": count} for days, count in db.execute(stmt)]
 
 
+@ttl_cache
 def population_health_overview(db: Session) -> dict[str, object]:
     """Return aggregate-only statistics for the researcher role.
 

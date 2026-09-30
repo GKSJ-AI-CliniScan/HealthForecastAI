@@ -36,6 +36,8 @@ clinical decisions.
 
 **System Administrator** - platform administration, user management, security
 monitoring, system governance. No restrictions.
+The audit trail (`GET /audit`, permission `audit_log:read`) is readable by this role
+only; reading it is itself recorded.
 
 ## Implementing a new endpoint
 

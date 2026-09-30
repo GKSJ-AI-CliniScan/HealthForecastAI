@@ -146,6 +146,22 @@ jobs:
     needs: detect
     if: needs.detect.outputs.backend == 'true'
     runs-on: ubuntu-latest
+    # A real PostgreSQL, because the unit tests run on SQLite and the two differ
+    # (a boolean cannot be summed in PostgreSQL; ALTER behaves differently).
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: healthforecast
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     defaults:
       run:
         working-directory: backend
@@ -175,12 +191,32 @@ jobs:
         continue-on-error: true
         run: mypy app
 
-      - name: Tests (pytest)
+      - name: Migrations build the schema and match the models
+        if: always()
+        env:
+          SECRET_KEY: ci-only-secret-not-used-anywhere-else
+          ENVIRONMENT: test
+          DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/healthforecast
+        run: |
+          alembic upgrade head
+          alembic check
+
+      - name: Tests (pytest, SQLite)
         if: always()
         env:
           SECRET_KEY: ci-only-secret-not-used-anywhere-else
           ENVIRONMENT: test
         run: pytest --cov=app --cov-report=term-missing --cov-report=xml
+
+      - name: Tests (pytest, PostgreSQL)
+        if: always()
+        env:
+          SECRET_KEY: ci-only-secret-not-used-anywhere-else
+          ENVIRONMENT: test
+          TEST_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/healthforecast_tests
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE healthforecast_tests"
+          pytest -q
 
       - name: Upload coverage
         if: always()
@@ -261,7 +297,8 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install ruff==0.8.6 black==24.10.0 pytest==8.3.4 pyyaml==6.0.2 \
-                      numpy==2.2.1 pandas==2.2.3 scikit-learn==1.6.0
+                      numpy==2.2.1 pandas==2.2.3 scikit-learn==1.6.0 \
+                      xgboost==2.1.4 joblib==1.4.2
 
       - name: Lint (ruff)
         run: ruff check . --output-format=github

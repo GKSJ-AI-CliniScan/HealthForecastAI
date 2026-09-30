@@ -139,32 +139,72 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   # --------------------------------------------------------------------------
-  # The cloud step is yours to implement. See deployment/aws/ or deployment/azure/.
+  # Release to a single Linux host that runs Docker Compose (any cloud VM).
+  #
+  # Runs only when the host is configured. With no secrets set it explains what
+  # to add and exits cleanly, so the workflow stays green on a fork with no cloud
+  # account. The host needs Docker, a clone of this repository at DEPLOY_PATH, and
+  # a .env holding SECRET_KEY, POSTGRES_PASSWORD and PUBLIC_ORIGIN - see
+  # docs/08-deployment/README.md.
+  #
+  # Secrets (repository settings > Secrets and variables > Actions):
+  #   DEPLOY_HOST         hostname or IP of the VM
+  #   DEPLOY_USER         SSH user that can run docker
+  #   DEPLOY_SSH_KEY      private key for that user (a deploy-only key)
+  #   DEPLOY_KNOWN_HOSTS  output of: ssh-keyscan -t ed25519 <host>
+  # Variables:
+  #   DEPLOY_PATH         path of the clone on the host, default /opt/healthforecast
+  #   PUBLIC_URL          address users open, used for the post-deploy health check
   # --------------------------------------------------------------------------
   release:
     name: Release to ${{ inputs.environment }}
     needs: images
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/opt/healthforecast' }}
+      PUBLIC_URL: ${{ vars.PUBLIC_URL }}
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Deploy
+      - name: Check the target is configured
+        id: gate
         run: |
-          {
-            echo "## Release to \`${{ inputs.environment }}\`"
-            echo ""
-            echo "This job is a deliberate placeholder - the cloud deployment is your"
-            echo "Milestone 4 deliverable, and the provider is your choice."
-            echo ""
-            echo "**To implement it**"
-            echo ""
-            echo "1. Follow \`deployment/aws/README.md\` or \`deployment/azure/README.md\`."
-            echo "2. Add your cloud credentials as repository secrets. Never in a file."
-            echo "3. Replace this step with the real deploy command."
-            echo "4. Record the live URL in \`docs/06-milestones/milestone-4.md\` and"
-            echo "   \`docs/08-deployment/README.md\`."
-            echo ""
-            echo "**Do not** paste a cloud credential into this workflow file."
-            echo "Use \`\${{ secrets.YOUR_SECRET_NAME }}\`."
-          } >> "$GITHUB_STEP_SUMMARY"
-          echo "::notice::Cloud release step is not implemented yet - this is the Milestone 4 task."
+          if [ -z "$DEPLOY_HOST" ] || [ -z "$DEPLOY_USER" ]; then
+            {
+              echo "## Release skipped"
+              echo ""
+              echo "No deployment target is configured, so nothing was released."
+              echo "Add the secrets listed at the top of this workflow file, then re-run."
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy over SSH
+        if: steps.gate.outputs.configured == 'true'
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          REF: ${{ github.sha }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST" \
+            "set -e; cd '$DEPLOY_PATH'; git fetch --all --prune; git checkout --detach '$REF'; \
+             docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build; \
+             docker compose ps"
+          rm -f ~/.ssh/deploy_key
+
+      - name: Health check
+        if: steps.gate.outputs.configured == 'true' && env.PUBLIC_URL != ''
+        run: |
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -fsS "$PUBLIC_URL/health"; then echo; echo "healthy"; exit 0; fi
+            sleep 6
+          done
+          echo "::error::$PUBLIC_URL/health did not return 200 after the deploy"
+          exit 1

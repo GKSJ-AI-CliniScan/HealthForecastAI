@@ -9,8 +9,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-healthforecast}
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/postgres/schema:/docker-entrypoint-initdb.d:ro
@@ -24,8 +22,6 @@ services:
     image: mongo:7
     container_name: healthforecast-mongodb
     restart: unless-stopped
-    ports:
-      - "27017:27017"
     volumes:
       - mongo_data:/data/db
     healthcheck:
@@ -34,20 +30,39 @@ services:
       timeout: 5s
       retries: 5
 
-  backend:
+  # One-shot: bring the schema to the current revision before the API starts.
+  # The backend image is built once and shared.
+  migrate:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: healthforecast-backend
-    restart: unless-stopped
-    env_file:
-      - .env
-    environment:
+    image: healthforecast-backend:local
+    container_name: healthforecast-migrate
+    restart: "no"
+    command: ["alembic", "upgrade", "head"]
+    environment: &backend-env
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-healthforecast}
       MONGO_URI: mongodb://mongodb:27017
-    ports:
-      - "8000:8000"
+      SECRET_KEY: ${SECRET_KEY:-change-me-do-not-use-in-production}
+      MODEL_ARTIFACT_DIR: /models
     depends_on:
+      postgres:
+        condition: service_healthy
+
+  backend:
+    image: healthforecast-backend:local
+    container_name: healthforecast-backend
+    restart: unless-stopped
+    environment: *backend-env
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      # The trained model is an artifact, not source: it is never in the image.
+      - ./ml/artifacts:/models:ro
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       mongodb:
@@ -57,12 +72,11 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        # Next.js inlines NEXT_PUBLIC_* at build time; a runtime variable would be ignored.
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000/api/v1}
     container_name: healthforecast-frontend
     restart: unless-stopped
-    environment:
-      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api/v1
-    ports:
-      - "3000:3000"
     depends_on:
       - backend
 

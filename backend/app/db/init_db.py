@@ -1,7 +1,8 @@
-"""Create the schema and seed the demo accounts.
+"""Seed the demo accounts.
 
-Milestone 1. Run once against an empty database:
+Milestone 1. Run once, after the schema has been migrated:
 
+    alembic upgrade head
     python -m app.db.init_db
 
 Passwords come from SEED_PASSWORD, or are generated and printed if it is not
@@ -15,6 +16,7 @@ import os
 import secrets
 import sys
 
+from sqlalchemy import inspect
 from sqlalchemy.orm import Session
 
 from app.core.logging_config import logger
@@ -41,10 +43,24 @@ SEED_USERS: tuple[tuple[str, str, Role, str | None], ...] = (
 )
 
 
-def create_schema() -> None:
-    """Create every table that does not already exist."""
-    Base.metadata.create_all(bind=engine)
-    logger.info("Schema ready: %s", ", ".join(sorted(Base.metadata.tables)))
+def check_schema() -> None:
+    """Refuse to seed a database that Alembic has not migrated.
+
+    This used to call Base.metadata.create_all. That built tables straight from
+    the models, bypassing migrations: the database looked fine but carried no
+    alembic_version row and none of the CHECK constraints, and the first real
+    migration then failed with "relation already exists". Alembic owns the
+    schema; this only verifies it is there.
+    """
+    inspector = inspect(engine)
+    missing = [name for name in Base.metadata.tables if not inspector.has_table(name)]
+    if missing or not inspector.has_table("alembic_version"):
+        raise SystemExit(
+            "The database has not been migrated (missing: "
+            + (", ".join(missing) or "alembic_version")
+            + "). Run: cd backend && alembic upgrade head"
+        )
+    logger.info("Schema present: %s", ", ".join(sorted(Base.metadata.tables)))
 
 
 def seed_users(db: Session, password: str) -> list[User]:
@@ -73,13 +89,13 @@ def seed_users(db: Session, password: str) -> list[User]:
 
 
 def main() -> int:
-    """Create the schema and seed the demo accounts."""
+    """Verify the schema and seed the demo accounts."""
     password = os.environ.get("SEED_PASSWORD")
     generated = password is None
     if generated:
         password = secrets.token_urlsafe(16)
 
-    create_schema()
+    check_schema()
 
     with SessionLocal() as db:
         # Read the values inside the session: the ORM objects are detached once

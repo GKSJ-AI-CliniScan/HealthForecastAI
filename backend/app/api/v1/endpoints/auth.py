@@ -23,7 +23,14 @@ def login(payload: UserLogin, db: Annotated[Session, Depends(get_db)]) -> Token:
     Returns the same message for an unknown email and a wrong password, so the
     endpoint cannot be used to enumerate who has an account.
     """
-    user = auth_service.authenticate(db, payload.email, payload.password)
+    try:
+        user = auth_service.authenticate(db, payload.email, payload.password)
+    except auth_service.TooManyAttemptsError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many failed sign-in attempts. Try again later.",
+            headers={"Retry-After": str(exc.retry_after_seconds)},
+        ) from exc
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

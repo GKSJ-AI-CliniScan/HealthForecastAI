@@ -8,6 +8,10 @@ the same tests run against the real engine, which is what CI does.
 from __future__ import annotations
 
 import os
+
+# Tests must see their own writes at once, so the report cache is off unless a test
+# turns it on. Set before the application (and so its settings) is imported.
+os.environ.setdefault("CACHE_TTL_SECONDS", "0")
 from collections.abc import Callable, Iterator
 
 import pytest
@@ -22,6 +26,7 @@ from app.db.session import get_db
 from app.main import app
 from app.models.admission import Admission
 from app.models.patient import Patient
+from app.models.treatment import TreatmentOutcome
 from app.models.user import User
 from app.schemas.user import UserCreate
 from app.services import auth_service
@@ -152,27 +157,121 @@ def make_patient(db) -> Callable[..., Patient]:
 
 @pytest.fixture
 def make_admission(db) -> Callable[..., Admission]:
-    """Return a factory that creates an admission row."""
+    """Return a factory that creates an admission row. Any column can be overridden."""
+    counter = {"n": 0}
 
-    def _make(
-        patient_id: int,
-        readmitted: str = "NO",
-        time_in_hospital: int = 4,
-        admission_type: str = "Emergency",
-    ) -> Admission:
-        admission = Admission(
-            patient_id=patient_id,
-            time_in_hospital=time_in_hospital,
-            admission_type=admission_type,
-            discharge_disposition="Discharged to home",
-            num_medications=12,
-            num_lab_procedures=40,
-            number_diagnoses=8,
-            readmitted=readmitted,
-        )
+    def _make(patient_id: int, readmitted: str = "NO", **overrides: object) -> Admission:
+        counter["n"] += 1
+        values: dict[str, object] = {
+            "patient_id": patient_id,
+            "source_encounter_id": 1000 + counter["n"],
+            "time_in_hospital": 4,
+            "admission_type": "Emergency",
+            "department": "InternalMedicine",
+            "discharge_disposition": "Discharged to home",
+            "num_medications": 12,
+            "num_lab_procedures": 40,
+            "number_diagnoses": 8,
+            "number_inpatient": 0,
+            "number_emergency": 0,
+            "number_outpatient": 0,
+            "readmitted": readmitted,
+        }
+        values.update(overrides)
+        admission = Admission(**values)
         db.add(admission)
         db.commit()
         db.refresh(admission)
         return admission
+
+    return _make
+
+
+@pytest.fixture
+def make_treatment(db) -> Callable[..., TreatmentOutcome]:
+    """Return a factory that records one drug given during an admission."""
+
+    def _make(
+        admission_id: int, name: str = "insulin", dose_change: str = "Steady"
+    ) -> TreatmentOutcome:
+        row = TreatmentOutcome(
+            admission_id=admission_id,
+            treatment_name=name,
+            dose_change=dose_change,
+            medication_change=dose_change in ("Up", "Down"),
+        )
+        db.add(row)
+        db.commit()
+        return row
+
+    return _make
+
+
+@pytest.fixture
+def make_cohort(db) -> Callable[..., list[int]]:
+    """Bulk-create patients, admissions and treatments for statistical scenarios.
+
+    Row by row through the ORM is fine for a handful of patients but slow for the
+    hundreds a stratified comparison needs, so this inserts in one go.
+    """
+    counter = {"n": 0}
+
+    def _make(
+        count: int,
+        readmitted: int,
+        *,
+        age_group: str = "70-80",
+        diagnosis: str = "Circulatory",
+        number_inpatient: int = 0,
+        drug: str | None = None,
+        dose_change: str = "Steady",
+        doctor_id: int | None = None,
+        **admission_overrides: object,
+    ) -> list[int]:
+        patient_rows = []
+        for _ in range(count):
+            counter["n"] += 1
+            patient_rows.append(
+                Patient(
+                    medical_record_number=f"MRN-C-{counter['n']:06d}",
+                    age_group=age_group,
+                    gender="Female",
+                    race="Caucasian",
+                    primary_diagnosis=diagnosis,
+                    assigned_doctor_id=doctor_id,
+                )
+            )
+        db.add_all(patient_rows)
+        db.flush()
+
+        admissions = []
+        for index, patient in enumerate(patient_rows):
+            values: dict[str, object] = {
+                "patient_id": patient.id,
+                "source_encounter_id": 100000 + patient.id,
+                "time_in_hospital": 4,
+                "admission_type": "Emergency",
+                "department": "InternalMedicine",
+                "discharge_disposition": "Discharged to home",
+                "number_inpatient": number_inpatient,
+                "readmitted": "<30" if index < readmitted else "NO",
+            }
+            values.update(admission_overrides)
+            admissions.append(Admission(**values))
+        db.add_all(admissions)
+        db.flush()
+
+        if drug:
+            db.add_all(
+                TreatmentOutcome(
+                    admission_id=a.id,
+                    treatment_name=drug,
+                    dose_change=dose_change,
+                    medication_change=dose_change in ("Up", "Down"),
+                )
+                for a in admissions
+            )
+        db.commit()
+        return [p.id for p in patient_rows]
 
     return _make

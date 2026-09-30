@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -27,6 +28,9 @@ class Settings(BaseSettings):
     MONGO_URI: str = "mongodb://localhost:27017"
     MONGO_DB: str = "healthforecast"
 
+    # Seconds to cache whole-hospital aggregate reports. 0 disables the cache.
+    CACHE_TTL_SECONDS: int = 60
+
     # CORS - comma separated list of allowed origins
     BACKEND_CORS_ORIGINS: str = "http://localhost:3000"
 
@@ -35,6 +39,27 @@ class Settings(BaseSettings):
     ACTIVE_RISK_MODEL: str = "readmission_xgboost_v1"
     RISK_THRESHOLD_HIGH: float = 0.20
     RISK_THRESHOLD_MEDIUM: float = 0.12
+
+    @model_validator(mode="after")
+    def refuse_unsafe_production(self) -> "Settings":
+        """Refuse to start in production with a development configuration.
+
+        A default signing key means anyone who has read the repository can forge a
+        token for any role. Better a container that will not start than one that
+        starts and quietly accepts them.
+        """
+        if self.ENVIRONMENT.lower() != "production":
+            return self
+        problems = []
+        if self.DEBUG:
+            problems.append("DEBUG must be false")
+        if self.SECRET_KEY.startswith("change-me") or len(self.SECRET_KEY) < 32:
+            problems.append("SECRET_KEY must be a random value of at least 32 characters")
+        if "*" in self.cors_origins:
+            problems.append("BACKEND_CORS_ORIGINS must list real origins, not *")
+        if problems:
+            raise ValueError("Unsafe production configuration: " + "; ".join(problems))
+        return self
 
     @property
     def cors_origins(self) -> list[str]:

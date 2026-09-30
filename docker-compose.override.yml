@@ -1,0 +1,16 @@
+# Development conveniences, loaded automatically by `docker compose up`.
+# Not loaded when you name files with -f, so the production command never
+# publishes a database port.
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+  mongodb:
+    ports:
+      - "27017:27017"
+  backend:
+    ports:
+      - "8000:8000"
+  frontend:
+    ports:
+      - "3000:3000"
