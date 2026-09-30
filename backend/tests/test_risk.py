@@ -187,7 +187,7 @@ def test_only_the_latest_prediction_per_patient_counts(
     assert after["patients_scored"] == before["patients_scored"]
     # The new 0.90 replaces the old 0.03 rather than adding to it.
     assert after["expected_readmissions"] == pytest.approx(
-        before["expected_readmissions"] + 0.87, abs=0.05
+        before["expected_readmissions"] + 0.87, abs=0.11  # both sums are rounded to 0.1
     )
 
 

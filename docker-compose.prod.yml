@@ -1,0 +1,55 @@
+# Production overlay. Use together with the base file:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# What changes: nginx is the only published port, the databases and the app
+# containers are reachable only on the internal network, secrets are required
+# (compose refuses to start without them) and the API refuses to start with a
+# development configuration.
+#
+# Required in the environment or in .env - never in this file:
+#   SECRET_KEY         random, 32+ characters
+#   POSTGRES_PASSWORD  not "postgres"
+#   PUBLIC_ORIGIN      e.g. https://readmit.example.org (the address users type)
+
+services:
+  postgres:
+    ports: !reset []
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+
+  mongodb:
+    ports: !reset []
+
+  migrate:
+    environment: &prod-backend-env
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-healthforecast}
+      MONGO_URI: mongodb://mongodb:27017
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY}
+      MODEL_ARTIFACT_DIR: /models
+      ENVIRONMENT: production
+      DEBUG: "false"
+      BACKEND_CORS_ORIGINS: ${PUBLIC_ORIGIN:?set PUBLIC_ORIGIN}
+
+  backend:
+    ports: !reset []
+    environment: *prod-backend-env
+
+  frontend:
+    ports: !reset []
+    build:
+      args:
+        # Same origin as the page: nginx routes /api to the backend, so no CORS is needed.
+        NEXT_PUBLIC_API_BASE_URL: /api/v1
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: healthforecast-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./deployment/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+      - frontend

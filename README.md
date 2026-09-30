@@ -95,13 +95,13 @@ Running each service directly, without Docker, is covered in
 | 1 | 1-2 | Project initialization, design process and core setup | **Complete** |
 | 2 | 3-4 | Risk prediction and readmission forecasting | **Complete** |
 | 3 | 5-6 | Treatment effectiveness analysis and healthcare analytics | **Complete** |
-| 4 | 7-8 | Testing, deployment and documentation | Not started |
+| 4 | 7-8 | Testing, deployment and documentation | **Complete, except a live cloud deployment** |
 
 Report templates and evaluation criteria: [`docs/06-milestones/`](docs/06-milestones/).
 
 ### What works today
 
-`main` carries a working reference implementation of Milestones 1 to 3:
+`main` carries a working reference implementation of Milestones 1 to 4:
 
 - JWT authentication with bcrypt hashing, audited logins, and immediate session
   revocation when an account is deactivated
@@ -122,10 +122,17 @@ Report templates and evaluation criteria: [`docs/06-milestones/`](docs/06-milest
   audited and privacy-protected exports
 - A fairness audit that reports the gaps it finds:
   [docs/07-testing/fairness-audit.md](docs/07-testing/fairness-audit.md)
+- Validation, hardening and deployment: held-out accuracy report, sign-in lockout,
+  a readable audit trail, a load test (27.7 req/s at 20 users, 0 errors), end-to-end
+  tests, Docker Compose with a production overlay, and a gated release workflow.
+  **There is no live cloud deployment**: it needs the owner's cloud account. See
+  [docs/08-deployment](docs/08-deployment/README.md).
 
 Full write-ups: [milestone-1](docs/06-milestones/milestone-1.md) ·
 [milestone-2](docs/06-milestones/milestone-2.md) ·
-[milestone-3](docs/06-milestones/milestone-3.md).
+[milestone-3](docs/06-milestones/milestone-3.md) ·
+[milestone-4](docs/06-milestones/milestone-4.md) · [validation](docs/07-testing/validation-report.md) ·
+[presentation and demo script](docs/09-presentation/).
 
 ## Continuous integration
 

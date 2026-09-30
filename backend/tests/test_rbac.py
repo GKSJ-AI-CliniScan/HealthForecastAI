@@ -68,6 +68,7 @@ def test_permissions_for_returns_sorted_strings() -> None:
 # endpoint -> the roles that are allowed to reach it
 ENDPOINT_MATRIX: list[tuple[str, set[Role]]] = [
     ("/api/v1/users", {Role.SYSTEM_ADMIN}),
+    ("/api/v1/audit", {Role.SYSTEM_ADMIN}),
     ("/api/v1/patients", {Role.DOCTOR, Role.HOSPITAL_ADMIN, Role.SYSTEM_ADMIN}),
     ("/api/v1/patients/anonymised", {Role.RESEARCHER, Role.SYSTEM_ADMIN}),
     (

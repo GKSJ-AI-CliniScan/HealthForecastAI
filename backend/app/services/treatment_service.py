@@ -22,6 +22,7 @@ from typing import Any
 from sqlalchemy import String, case, cast, func, literal_column, select
 from sqlalchemy.orm import Session
 
+from app.core.cache import ttl_cache
 from app.core.rbac import Role
 from app.models.admission import Admission
 from app.models.patient import Patient
@@ -317,6 +318,7 @@ def _medication_effect(
     return result
 
 
+@ttl_cache
 def medication_report(db: Session, actor: User, diagnosis: str | None = None) -> dict[str, Any]:
     """Outcomes for every drug with enough patients to report, largest first."""
     extra = [Patient.primary_diagnosis == diagnosis] if diagnosis else []
@@ -361,6 +363,7 @@ def _contrast(
     }
 
 
+@ttl_cache
 def medication_detail(db: Session, actor: User, name: str) -> dict[str, Any] | None:
     """One drug in depth, including what raising or lowering the dose did."""
     totals = _admission_totals(db, actor, [])
@@ -458,6 +461,7 @@ def _process_effect(
     }
 
 
+@ttl_cache
 def care_process_report(db: Session, actor: User) -> dict[str, Any]:
     """The effect of HbA1c testing and of changing the regimen on readmission."""
     tested = Admission.a1c_result.is_not(None)
@@ -559,6 +563,7 @@ def _recovery_by(
     ]
 
 
+@ttl_cache
 def recovery_report(db: Session, actor: User) -> dict[str, Any]:
     """Recovery outcomes overall and by age, diagnosis and treatment."""
     overall_stmt = (

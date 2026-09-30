@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime
 
-from sqlalchemy import DateTime, Integer, String, func
+from sqlalchemy import DateTime, Index, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -12,6 +12,7 @@ class AuditLog(Base):
     """An immutable record of a security relevant action."""
 
     __tablename__ = "audit_logs"
+    __table_args__ = (Index("ix_audit_logs_created_at", "created_at"),)
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     actor_id: Mapped[int | None] = mapped_column(Integer, index=True, nullable=True)

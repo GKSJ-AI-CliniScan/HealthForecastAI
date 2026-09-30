@@ -313,3 +313,20 @@ export interface Recommendations {
   } | null;
   disclaimer: string;
 }
+
+export interface AuditEntry {
+  id: number;
+  created_at: string;
+  actor_id: number | null;
+  actor_role: string | null;
+  action: string;
+  resource: string | null;
+  outcome: string;
+}
+
+export interface AuditPage {
+  total: number;
+  limit: number;
+  offset: number;
+  items: AuditEntry[];
+}

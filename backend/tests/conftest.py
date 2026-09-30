@@ -8,6 +8,10 @@ the same tests run against the real engine, which is what CI does.
 from __future__ import annotations
 
 import os
+
+# Tests must see their own writes at once, so the report cache is off unless a test
+# turns it on. Set before the application (and so its settings) is imported.
+os.environ.setdefault("CACHE_TTL_SECONDS", "0")
 from collections.abc import Callable, Iterator
 
 import pytest

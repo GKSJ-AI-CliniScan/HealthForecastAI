@@ -20,6 +20,7 @@ import pandas as pd
 from sqlalchemy import Float, case, cast, func, select
 from sqlalchemy.orm import Session
 
+from app.core.cache import ttl_cache
 from app.core.config import settings
 from app.core.rbac import Role
 from app.models.admission import Admission
@@ -197,6 +198,7 @@ def high_risk_cohort(
     return cohort, total
 
 
+@ttl_cache
 def risk_distribution(db: Session, actor: User) -> dict[str, int]:
     """Return how many patients sit in each risk band, scoped to the caller."""
     latest = latest_prediction_subquery()
@@ -216,6 +218,7 @@ def risk_distribution(db: Session, actor: User) -> dict[str, int]:
     return counts
 
 
+@ttl_cache
 def forecast(db: Session, actor: User, horizon_days: int = 30) -> dict[str, Any]:
     """Forecast readmissions over a horizon from the stored predictions.
 
@@ -258,6 +261,7 @@ def forecast(db: Session, actor: User, horizon_days: int = 30) -> dict[str, Any]
     }
 
 
+@ttl_cache
 def observed_vs_expected(db: Session) -> dict[str, Any]:
     """Compare the forecast against what the record actually shows.
 

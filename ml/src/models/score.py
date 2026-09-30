@@ -70,6 +70,18 @@ def resolve_patient_ids(engine: Engine, medical_record_numbers: pd.Series) -> pd
     return medical_record_numbers.map(lookup)
 
 
+def analyse(engine: Engine) -> None:
+    """Refresh planner statistics after a bulk write (PostgreSQL only).
+
+    Without it the first dashboard queries after a load ran in seconds rather
+    than tenths of a second, because the planner still believed the table was empty.
+    """
+    if engine.dialect.name != "postgresql":
+        return
+    with engine.begin() as connection:
+        connection.execute(text("ANALYZE risk_predictions"))
+
+
 def write_predictions(
     engine: Engine, rows: list[dict[str, Any]], chunk_size: int, replace: bool
 ) -> int:
@@ -167,6 +179,7 @@ def run(
     ]
 
     written = write_predictions(engine, rows, chunk_size, replace)
+    analyse(engine)
 
     flagged = int((probabilities >= threshold).sum())
     categories = pd.Series([row["risk_category"] for row in rows]).value_counts().to_dict()

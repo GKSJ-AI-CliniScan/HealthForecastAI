@@ -2,7 +2,7 @@
 
 from datetime import UTC, datetime
 
-from sqlalchemy import JSON, CheckConstraint, DateTime, Float, ForeignKey, String, func
+from sqlalchemy import JSON, CheckConstraint, DateTime, Float, ForeignKey, Index, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
@@ -18,6 +18,8 @@ class RiskPrediction(Base):
             name="risk_probability_range_check",
         ),
         CheckConstraint("risk_category IN ('low', 'medium', 'high')", name="risk_category_check"),
+        # "Latest prediction per patient" is on nearly every dashboard query.
+        Index("ix_risk_predictions_patient_latest", "patient_id", "id"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)

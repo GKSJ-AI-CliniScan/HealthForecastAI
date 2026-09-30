@@ -6,6 +6,8 @@ the work and records what happened in the audit log.
 
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
+
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -62,12 +64,71 @@ def get_user(db: Session, user_id: int) -> User | None:
     return db.get(User, user_id)
 
 
+MAX_FAILED_LOGINS = 5
+LOCKOUT_WINDOW = timedelta(minutes=15)
+
+
+class TooManyAttemptsError(Exception):
+    """Raised when an account has had too many recent failed sign-ins."""
+
+    def __init__(self, retry_after_seconds: int) -> None:
+        super().__init__("Too many failed sign-in attempts")
+        self.retry_after_seconds = retry_after_seconds
+
+
+def check_lockout(db: Session, email: str) -> None:
+    """Refuse a sign-in attempt after too many recent failures for this address.
+
+    Counted from the audit log rather than process memory, so the limit holds
+    across several API instances and survives a restart. Failures before the most
+    recent success do not count. Unknown addresses are counted too: otherwise the
+    lockout itself would reveal which addresses have an account.
+
+    The trade-off is deliberate: anyone can lock a known address out for the
+    window. For a clinical system that is preferable to unlimited password
+    guessing, and the audit trail shows who was locked out and when.
+    """
+    address = email.strip().lower()
+    since = datetime.now(UTC) - LOCKOUT_WINDOW
+
+    last_success = db.execute(
+        select(func.max(AuditLog.created_at)).where(
+            AuditLog.action == "auth.login",
+            AuditLog.outcome == "success",
+            func.lower(AuditLog.resource) == address,
+        )
+    ).scalar_one()
+    if last_success is not None and last_success.replace(tzinfo=None) > since.replace(tzinfo=None):
+        since = last_success
+
+    failures = list(
+        db.execute(
+            select(AuditLog.created_at)
+            .where(
+                AuditLog.action == "auth.login",
+                AuditLog.outcome.in_(("failure", "inactive")),
+                func.lower(AuditLog.resource) == address,
+                AuditLog.created_at > since,
+            )
+            .order_by(AuditLog.created_at)
+        ).scalars()
+    )
+    if len(failures) >= MAX_FAILED_LOGINS:
+        oldest_counted = failures[-MAX_FAILED_LOGINS]
+        release = oldest_counted.replace(tzinfo=None) + LOCKOUT_WINDOW
+        wait = int((release - datetime.now(UTC).replace(tzinfo=None)).total_seconds())
+        record_audit(db, "auth.lockout", resource=address, outcome="failure")
+        db.commit()
+        raise TooManyAttemptsError(max(wait, 1))
+
+
 def authenticate(db: Session, email: str, password: str) -> User | None:
     """Return the user when the credentials are valid, otherwise None.
 
     Both the unknown-email and wrong-password paths run a hash comparison so the
     response time does not reveal whether an account exists.
     """
+    check_lockout(db, email)
     user = get_user_by_email(db, email)
 
     if user is None:

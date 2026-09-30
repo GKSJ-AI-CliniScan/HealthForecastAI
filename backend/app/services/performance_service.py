@@ -27,6 +27,7 @@ from typing import Any
 from sqlalchemy import Float, case, cast, func, literal_column, select
 from sqlalchemy.orm import Session
 
+from app.core.cache import ttl_cache
 from app.core.rbac import Role
 from app.models.admission import Admission
 from app.models.patient import Patient
@@ -93,6 +94,7 @@ def _oe(observed: int, expected: float) -> dict[str, Any] | None:
     }
 
 
+@ttl_cache
 def performance(db: Session, actor: User, dimension: str, limit: int = 25) -> dict[str, Any]:
     """Risk-adjusted performance for every value of one dimension."""
     if dimension not in DIMENSIONS:
@@ -212,6 +214,7 @@ def _signals(points: list[dict[str, Any]], centre: float) -> list[dict[str, Any]
     return signals
 
 
+@ttl_cache
 def sequence_trend(db: Session, actor: User, buckets: int = 10) -> dict[str, Any]:
     """Readmission, recovery, length of stay and predicted risk across the sequence."""
     latest = risk_service.latest_prediction_subquery()

@@ -46,14 +46,32 @@ def contribution_matrix(
     factor set to its typical value. Not additive; see ml/src/models/explain.py.
     """
     if spec["kind"] == "occlusion":
-        base = _logit(predict(frame)[:, 1])
         names = list(spec["groups"])
-        out = np.zeros((len(frame), len(names)))
+        average_logit = float(_logit(spec["average_probability"]))
+        n = len(frame)
+        if n * (len(names) + 1) <= 5000:
+            # One model call for the patient and every one-factor-at-typical variant.
+            # Scoring them separately ran the whole pipeline ~50 times per request,
+            # which made a single prediction the slowest call on the API.
+            variants = [frame]
+            for column in names:
+                altered = frame.copy()
+                altered[column] = spec["reference_values"][column]
+                variants.append(altered)
+            scores = _logit(predict(pd.concat(variants, ignore_index=True))[:, 1])
+            base = scores[:n]
+            out = np.column_stack(
+                [base - scores[(j + 1) * n : (j + 2) * n] for j in range(len(names))]
+            )
+            return average_logit, out, names
+
+        base = _logit(predict(frame)[:, 1])
+        out = np.zeros((n, len(names)))
         for j, column in enumerate(names):
             altered = frame.copy()
             altered[column] = spec["reference_values"][column]
             out[:, j] = base - _logit(predict(altered)[:, 1])
-        return float(_logit(spec["average_probability"])), out, names
+        return average_logit, out, names
 
     transformed = _dense(preprocessor.transform(frame))
     coef = np.asarray(spec["coef"], dtype=float)

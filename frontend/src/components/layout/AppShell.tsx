@@ -38,6 +38,7 @@ const NAV: NavItem[] = [
     permission: 'population_health:read',
   },
   { href: '/users', label: 'Users', permission: 'user:manage' },
+  { href: '/audit', label: 'Audit', permission: 'audit_log:read' },
 ];
 
 export function AppShell({ children }: { children: ReactNode }) {

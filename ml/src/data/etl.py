@@ -345,6 +345,10 @@ def run(
 
     treatments = build_treatment_frame(cleaned, admission_ids_by_encounter(engine))
     report["treatment_rows_written"] = insert_treatments(engine, treatments, chunk_size)
+    if engine.dialect.name == "postgresql":
+        with engine.begin() as connection:
+            for table in ("patients", "admissions", "treatment_outcomes"):
+                connection.execute(text(f"ANALYZE {table}"))
     report["treatment_rows_by_dose_change"] = {
         str(k): int(v) for k, v in treatments["dose_change"].value_counts().items()
     }
