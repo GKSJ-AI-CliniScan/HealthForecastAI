@@ -1,574 +1,936 @@
 "use client";
 
-import { HeartPulse } from "lucide-react";
+import Link from "next/link";
 
+import {
+  Activity,
+  ArrowRight,
+  BarChart3,
+  CheckCircle2,
+  FileText,
+  HeartPulse,
+  RefreshCw,
+  ShieldAlert,
+  Users,
+} from "lucide-react";
+
+
+/* =========================================================
+   MOCK DATA
+========================================================= */
 
 const departments = [
   {
     name: "Cardiology",
     patients: 38,
-    readmissions: 4,
-    performance: 92,
+    highRisk: 4,
+    recovery: 92,
   },
   {
     name: "General Medicine",
     patients: 46,
-    readmissions: 3,
-    performance: 88,
+    highRisk: 3,
+    recovery: 88,
   },
   {
     name: "Neurology",
     patients: 21,
-    readmissions: 2,
-    performance: 94,
+    highRisk: 2,
+    recovery: 94,
   },
   {
     name: "Orthopedics",
     patients: 15,
-    readmissions: 3,
-    performance: 84,
+    highRisk: 3,
+    recovery: 84,
   },
 ];
 
-const recentActivity = [
+
+const activities = [
   {
-    title: "Monthly hospital report generated",
-    description: "August 2026 performance report",
+    title: "Patient outcome report generated",
+    department: "Hospital Analytics",
     time: "10 min ago",
-    icon: "▤",
+    icon: <FileText size={16} />,
   },
   {
-    title: "Readmission rate updated",
-    description: "Current rate: 10.0%",
-    time: "32 min ago",
-    icon: "↗",
+    title: "Readmission analysis updated",
+    department: "Hospital Analytics",
+    time: "35 min ago",
+    icon: <BarChart3 size={16} />,
   },
   {
-    title: "Department metrics updated",
-    description: "General Medicine",
+    title: "Treatment effectiveness reviewed",
+    department: "Clinical Operations",
     time: "1 hour ago",
-    icon: "▣",
+    icon: <HeartPulse size={16} />,
   },
   {
-    title: "Treatment outcomes reviewed",
-    description: "34 active treatment records",
+    title: "Hospital performance data updated",
+    department: "Administration",
     time: "2 hours ago",
-    icon: "✓",
+    icon: <Activity size={16} />,
   },
 ];
+
 
 export default function AdminDashboard() {
+
   return (
-    <main className="admin-page">
-      {/* ================= HEADER ================= */}
-      <header className="admin-header">
-         <div className="admin-brand">
+    <div className="admin-dashboard">
 
-    {/* Blue Logo */}
-    <div className="admin-logo">
-      <HeartPulse size={24} strokeWidth={2.5} />
-    </div>
 
-    {/* Brand Name */}
-    <div>
-      <h1>
-        HealthForecast <span>AI</span>
-      </h1>
+      {/* =================================================
+          BREADCRUMB
+      ================================================= */}
 
-      <p>HEALTHCARE INTELLIGENCE</p>
-    </div>
+      <div className="admin-breadcrumb">
 
-  </div>
+        <span>
+          Hospital Admin
+        </span>
+
+        <span>/</span>
+
+        <strong>
+          Dashboard
+        </strong>
+
+      </div>
+
+
+      {/* =================================================
+          PAGE HEADER
+      ================================================= */}
+
+      <div className="admin-page-header">
+
+        <div>
+
+          <p className="admin-eyebrow">
+            HOSPITAL OVERVIEW
+          </p>
+
+          <h1>
+            Hospital Dashboard
+          </h1>
+
+          <p>
+            Monitor hospital performance, patient outcomes,
+            and readmission trends.
+          </p>
+
+        </div>
+
 
         <div className="admin-header-actions">
-          <button className="admin-icon-button">
-            🔔
-            <span className="admin-notification-dot" />
+
+          <button
+            type="button"
+            className="admin-secondary-button"
+          >
+            <RefreshCw size={15} />
+
+            Refresh
           </button>
 
-          <div className="admin-header-divider" />
 
-          <div className="admin-profile">
-            <div className="admin-avatar">A</div>
+          <Link
+            href="/admin/reports"
+            className="admin-primary-button"
+          >
+            <FileText size={15} />
+
+            Generate Report
+          </Link>
+
+        </div>
+
+      </div>
+
+
+      {/* =================================================
+          STAT CARDS
+      ================================================= */}
+
+      <div className="admin-stats">
+
+
+        {/* TOTAL PATIENTS */}
+
+        <div className="admin-stat-card">
+
+          <div className="admin-stat-card-content">
+
+            <div className="admin-stat-icon">
+              <Users size={21} />
+            </div>
 
             <div>
-              <strong>Hospital Admin</strong>
-              <span>Administrator</span>
-            </div>
 
-            <span className="admin-chevron">⌄</span>
-          </div>
-        </div>
-      </header>
+              <p>
+                Total Patients
+              </p>
 
-      <div className="admin-layout">
-        {/* ================= SIDEBAR ================= */}
-        <aside className="admin-sidebar">
-          <div>
-            <p className="admin-menu-title">Hospital Management</p>
+              <h2>
+                1,248
+              </h2>
 
-            <nav className="admin-navigation">
-              <a href="#" className="admin-nav active">
-                <span>⌂</span>
-                Dashboard
-              </a>
-
-              <a href="#" className="admin-nav">
-                <span>♙</span>
-                Patients
-                <b>120</b>
-              </a>
-
-              <a href="#" className="admin-nav">
-                <span>▣</span>
-                Departments
-              </a>
-
-              <a href="#" className="admin-nav">
-                <span>⌂</span>
-                Admissions
-              </a>
-
-              <a href="#" className="admin-nav">
-                <span>↗</span>
-                Readmissions
-              </a>
-
-              <a href="#" className="admin-nav">
-                <span>✓</span>
-                Treatments
-              </a>
-
-              <a href="#" className="admin-nav">
-                <span>◒</span>
-                Analytics
-              </a>
-
-              <a href="#" className="admin-nav">
-                <span>▤</span>
-                Reports
-              </a>
-            </nav>
-
-            <div className="admin-sidebar-line" />
-
-            <p className="admin-menu-title">System</p>
-
-            <nav className="admin-navigation">
-              <a href="#" className="admin-nav">
-                <span>⚙</span>
-                Settings
-              </a>
-
-              <a href="#" className="admin-nav">
-                <span>?</span>
-                Help & Support
-              </a>
-            </nav>
-          </div>
-
-          <div className="admin-sidebar-footer">
-            <div className="admin-secure-card">
-              <div className="admin-secure-icon">✓</div>
-
-              <div>
-                <strong>Secure Workspace</strong>
-                <p>Hospital administration portal</p>
-              </div>
-            </div>
-
-            <p>HealthForecast AI · v1.0</p>
-          </div>
-        </aside>
-
-        {/* ================= MAIN ================= */}
-        <section className="admin-main">
-          <div className="admin-content">
-            {/* Breadcrumb */}
-            <div className="admin-breadcrumb">
-              <span>Hospital Management</span>
-              <span>/</span>
-              <strong>Dashboard</strong>
-            </div>
-
-            {/* Heading */}
-            <div className="admin-heading-row">
-              <div>
-                <div className="admin-online">
-                  <span />
-                  Hospital system operational
-                </div>
-
-                <h2>Hospital Overview</h2>
-
-                <p>
-                  Monitor hospital performance, patient outcomes and
-                  operational activity.
-                </p>
-              </div>
-
-              <div className="admin-heading-actions">
-                <button className="admin-secondary-button">
-                  ↻ Refresh
-                </button>
-
-                <button className="admin-primary-button">
-                  + Generate Report
-                </button>
-              </div>
-            </div>
-
-            {/* ================= STATISTICS ================= */}
-            <div className="admin-stat-grid">
-              <div className="admin-stat-card">
-                <div className="admin-stat-top">
-                  <div className="admin-stat-icon blue">♙</div>
-                  <span className="admin-positive">+8.2%</span>
-                </div>
-
-                <p>Total Patients</p>
-
-                <strong>120</strong>
-
-                <span>Patients currently under care</span>
-              </div>
-
-              <div className="admin-stat-card">
-                <div className="admin-stat-top">
-                  <div className="admin-stat-icon red">↗</div>
-                  <span className="admin-negative">10.0%</span>
-                </div>
-
-                <p>Readmission Rate</p>
-
-                <strong>12</strong>
-
-                <span>Readmissions this period</span>
-              </div>
-
-              <div className="admin-stat-card">
-                <div className="admin-stat-top">
-                  <div className="admin-stat-icon green">✓</div>
-                  <span className="admin-positive">94%</span>
-                </div>
-
-                <p>Patient Outcomes</p>
-
-                <strong>94%</strong>
-
-                <span>Positive treatment outcomes</span>
-              </div>
-
-              <div className="admin-stat-card">
-                <div className="admin-stat-top">
-                  <div className="admin-stat-icon orange">▣</div>
-                  <span className="admin-neutral">4</span>
-                </div>
-
-                <p>Departments</p>
-
-                <strong>4</strong>
-
-                <span>Departments being monitored</span>
-              </div>
-            </div>
-
-            {/* ================= ANALYTICS ================= */}
-            <div className="admin-grid-two">
-              {/* Hospital performance */}
-              <div className="admin-card">
-                <div className="admin-card-header">
-                  <div>
-                    <h3>Hospital Performance</h3>
-                    <p>Key operational metrics</p>
-                  </div>
-
-                  <button className="admin-more">•••</button>
-                </div>
-
-                <div className="admin-performance-body">
-                  <div className="admin-performance-item">
-                    <div>
-                      <span>Patient satisfaction</span>
-                      <strong>91%</strong>
-                    </div>
-
-                    <div className="admin-progress">
-                      <span
-                        style={{
-                          width: "91%",
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="admin-performance-item">
-                    <div>
-                      <span>Treatment effectiveness</span>
-                      <strong>88%</strong>
-                    </div>
-
-                    <div className="admin-progress">
-                      <span
-                        style={{
-                          width: "88%",
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="admin-performance-item">
-                    <div>
-                      <span>Discharge efficiency</span>
-                      <strong>84%</strong>
-                    </div>
-
-                    <div className="admin-progress">
-                      <span
-                        style={{
-                          width: "84%",
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="admin-performance-item">
-                    <div>
-                      <span>Follow-up completion</span>
-                      <strong>96%</strong>
-                    </div>
-
-                    <div className="admin-progress">
-                      <span
-                        style={{
-                          width: "96%",
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Readmission */}
-              <div className="admin-card">
-                <div className="admin-card-header">
-                  <div>
-                    <h3>Readmission Overview</h3>
-                    <p>Recent hospital readmissions</p>
-                  </div>
-
-                  <button className="admin-outline-small">
-                    View Details
-                  </button>
-                </div>
-
-                <div className="readmission-body">
-                  <div className="readmission-number">
-                    <strong>12</strong>
-                    <span>readmissions</span>
-                  </div>
-
-                  <div className="readmission-change">
-                    <span>↓ 4.5%</span>
-                    <p>Compared with previous period</p>
-                  </div>
-
-                  <div className="readmission-chart">
-                    <div style={{ height: "45%" }} />
-                    <div style={{ height: "65%" }} />
-                    <div style={{ height: "50%" }} />
-                    <div style={{ height: "75%" }} />
-                    <div style={{ height: "58%" }} />
-                    <div style={{ height: "42%" }} />
-                    <div style={{ height: "35%" }} />
-                    <div style={{ height: "28%" }} />
-                  </div>
-
-                  <div className="chart-labels">
-                    <span>Week 1</span>
-                    <span>Week 2</span>
-                    <span>Week 3</span>
-                    <span>Week 4</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* ================= DEPARTMENTS ================= */}
-            <div className="admin-card admin-department-card">
-              <div className="admin-card-header">
-                <div>
-                  <h3>Department Performance</h3>
-                  <p>
-                    Patient activity and performance across departments
-                  </p>
-                </div>
-
-                <button className="admin-secondary-button">
-                  View all departments →
-                </button>
-              </div>
-
-              <div className="admin-department-grid">
-                {departments.map((department) => (
-                  <div
-                    className="admin-department"
-                    key={department.name}
-                  >
-                    <div className="department-icon">▣</div>
-
-                    <div className="department-title">
-                      <strong>{department.name}</strong>
-                      <span>
-                        {department.patients} active patients
-                      </span>
-                    </div>
-
-                    <div className="department-metric">
-                      <span>Readmissions</span>
-                      <strong>{department.readmissions}</strong>
-                    </div>
-
-                    <div className="department-metric">
-                      <span>Performance</span>
-                      <strong>{department.performance}%</strong>
-                    </div>
-
-                    <button className="department-arrow">
-                      →
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* ================= BOTTOM ROW ================= */}
-            <div className="admin-grid-two">
-              {/* Treatment effectiveness */}
-              <div className="admin-card">
-                <div className="admin-card-header">
-                  <div>
-                    <h3>Treatment Effectiveness</h3>
-                    <p>Current treatment outcome summary</p>
-                  </div>
-                </div>
-
-                <div className="treatment-summary">
-                  <div className="treatment-circle">
-                    <div>
-                      <strong>88%</strong>
-                      <span>Effective</span>
-                    </div>
-                  </div>
-
-                  <div className="treatment-legend">
-                    <div>
-                      <span className="legend-dot effective" />
-                      <p>Effective</p>
-                      <strong>88%</strong>
-                    </div>
-
-                    <div>
-                      <span className="legend-dot monitoring" />
-                      <p>Monitoring</p>
-                      <strong>8%</strong>
-                    </div>
-
-                    <div>
-                      <span className="legend-dot review" />
-                      <p>Needs review</p>
-                      <strong>4%</strong>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Activity */}
-              <div className="admin-card">
-                <div className="admin-card-header">
-                  <div>
-                    <h3>Recent Activity</h3>
-                    <p>Latest administrative updates</p>
-                  </div>
-
-                  <button className="admin-more">•••</button>
-                </div>
-
-                <div className="activity-list">
-                  {recentActivity.map((activity) => (
-                    <div className="activity-item" key={activity.title}>
-                      <div className="activity-icon">
-                        {activity.icon}
-                      </div>
-
-                      <div>
-                        <strong>{activity.title}</strong>
-                        <p>{activity.description}</p>
-                      </div>
-
-                      <time>{activity.time}</time>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* ================= QUICK ACTIONS ================= */}
-            <div className="admin-quick-section">
-              <div>
-                <h3>Quick Actions</h3>
-                <p>Frequently used hospital management tools</p>
-              </div>
-
-              <div className="admin-quick-grid">
-                <button>
-                  <span className="quick-action-icon blue">▤</span>
-                  <div>
-                    <strong>Generate Report</strong>
-                    <small>Create hospital performance report</small>
-                  </div>
-                  <b>→</b>
-                </button>
-
-                <button>
-                  <span className="quick-action-icon purple">◒</span>
-                  <div>
-                    <strong>View Analytics</strong>
-                    <small>Explore hospital analytics</small>
-                  </div>
-                  <b>→</b>
-                </button>
-
-                <button>
-                  <span className="quick-action-icon orange">▣</span>
-                  <div>
-                    <strong>Departments</strong>
-                    <small>Manage department metrics</small>
-                  </div>
-                  <b>→</b>
-                </button>
-
-                <button>
-                  <span className="quick-action-icon green">↗</span>
-                  <div>
-                    <strong>Readmissions</strong>
-                    <small>Review readmission trends</small>
-                  </div>
-                  <b>→</b>
-                </button>
-              </div>
-            </div>
-
-            <footer className="admin-footer">
               <span>
-                © 2026 HealthForecast AI · Hospital Administration
+                +8.4% this month
               </span>
 
-              <span>Secure clinical workspace</span>
-            </footer>
+            </div>
+
           </div>
-        </section>
+
+        </div>
+
+
+        {/* HIGH RISK */}
+
+        <div className="admin-stat-card">
+
+          <div className="admin-stat-card-content">
+
+            <div className="admin-stat-icon">
+              <ShieldAlert size={21} />
+            </div>
+
+            <div>
+
+              <p>
+                High Risk Patients
+              </p>
+
+              <h2>
+                84
+              </h2>
+
+              <span>
+                6.7% of total patients
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* READMISSION */}
+
+        <div className="admin-stat-card">
+
+          <div className="admin-stat-card-content">
+
+            <div className="admin-stat-icon">
+              <Activity size={21} />
+            </div>
+
+            <div>
+
+              <p>
+                Readmission Rate
+              </p>
+
+              <h2>
+                10.2%
+              </h2>
+
+              <span>
+                Based on recent admissions
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* RECOVERY */}
+
+        <div className="admin-stat-card">
+
+          <div className="admin-stat-card-content">
+
+            <div className="admin-stat-icon">
+              <CheckCircle2 size={21} />
+            </div>
+
+            <div>
+
+              <p>
+                Recovery Rate
+              </p>
+
+              <h2>
+                82%
+              </h2>
+
+              <span>
+                Across hospital departments
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
-    </main>
+
+
+      {/* =================================================
+          PERFORMANCE + READMISSION
+      ================================================= */}
+
+      <div className="admin-dashboard-grid">
+
+
+        {/* ================= PERFORMANCE ================= */}
+
+        <div className="admin-card">
+
+          <div className="admin-card-header">
+
+            <div>
+
+              <h2>
+                Hospital Performance
+              </h2>
+
+              <p>
+                Current hospital-wide performance indicators
+              </p>
+
+            </div>
+
+            <Link href="/admin/analytics">
+
+              View Analytics
+
+              <ArrowRight size={14} />
+
+            </Link>
+
+          </div>
+
+
+          <div className="admin-performance-content">
+
+
+            <div className="admin-performance-main">
+
+
+              {/* CIRCLE */}
+
+              <div className="admin-performance-circle">
+
+                <div className="admin-performance-circle-inner">
+
+                  <strong>
+                    86%
+                  </strong>
+
+                  <span>
+                    Overall
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              {/* DESCRIPTION */}
+
+              <div className="admin-performance-summary">
+
+                <h3>
+                  Hospital Performance
+                </h3>
+
+                <p>
+                  Overall performance based on patient outcomes,
+                  recovery, readmission, and treatment effectiveness.
+                </p>
+
+                <div className="admin-performance-status">
+
+                  <span className="admin-status-dot"></span>
+
+                  Performance is stable
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            {/* METRICS */}
+
+            <div className="admin-performance-metrics">
+
+              <div className="admin-performance-metric">
+
+                <span>
+                  Patient Outcomes
+                </span>
+
+                <strong>
+                  88%
+                </strong>
+
+              </div>
+
+
+              <div className="admin-performance-metric">
+
+                <span>
+                  Treatment Effectiveness
+                </span>
+
+                <strong>
+                  91%
+                </strong>
+
+              </div>
+
+
+              <div className="admin-performance-metric">
+
+                <span>
+                  Recovery Rate
+                </span>
+
+                <strong>
+                  82%
+                </strong>
+
+              </div>
+
+
+              <div className="admin-performance-metric">
+
+                <span>
+                  Readmission Control
+                </span>
+
+                <strong>
+                  79%
+                </strong>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* ================= READMISSION ================= */}
+
+        <div className="admin-card">
+
+          <div className="admin-card-header">
+
+            <div>
+
+              <h2>
+                Readmission Overview
+              </h2>
+
+              <p>
+                Recent hospital readmission trend
+              </p>
+
+            </div>
+
+            <BarChart3
+              size={19}
+              color="#092957"
+            />
+
+          </div>
+
+
+          <div className="admin-readmission-summary">
+
+            <div>
+
+              <span>
+                Current Rate
+              </span>
+
+              <strong>
+                10.2%
+              </strong>
+
+            </div>
+
+
+            <div className="admin-readmission-change">
+
+              <span>
+                Compared to last month
+              </span>
+
+              <strong>
+                ↓ 1.4%
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <div className="admin-readmission-chart">
+
+            <div className="admin-chart-y-axis">
+
+              <span>15%</span>
+              <span>10%</span>
+              <span>5%</span>
+              <span>0%</span>
+
+            </div>
+
+
+            <div className="admin-chart-area">
+
+              <div
+                className="admin-chart-bar-wrapper"
+              >
+
+                <div
+                  className="admin-chart-bar"
+                  style={{ height: "72%" }}
+                />
+
+                <span>
+                  May
+                </span>
+
+              </div>
+
+
+              <div
+                className="admin-chart-bar-wrapper"
+              >
+
+                <div
+                  className="admin-chart-bar"
+                  style={{ height: "64%" }}
+                />
+
+                <span>
+                  Jun
+                </span>
+
+              </div>
+
+
+              <div
+                className="admin-chart-bar-wrapper"
+              >
+
+                <div
+                  className="admin-chart-bar"
+                  style={{ height: "59%" }}
+                />
+
+                <span>
+                  Jul
+                </span>
+
+              </div>
+
+
+              <div
+                className="admin-chart-bar-wrapper"
+              >
+
+                <div
+                  className="admin-chart-bar"
+                  style={{ height: "53%" }}
+                />
+
+                <span>
+                  Aug
+                </span>
+
+              </div>
+
+
+              <div
+                className="admin-chart-bar-wrapper"
+              >
+
+                <div
+                  className="admin-chart-bar active"
+                  style={{ height: "48%" }}
+                />
+
+                <span>
+                  Sep
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* =================================================
+          DEPARTMENT PERFORMANCE
+      ================================================= */}
+
+      <div className="admin-card admin-department-card">
+
+        <div className="admin-card-header">
+
+          <div>
+
+            <h2>
+              Department Performance
+            </h2>
+
+            <p>
+              Overview of patient volume, risk levels,
+              and recovery across departments.
+            </p>
+
+          </div>
+
+          <Link href="/admin/analytics">
+
+            Full Analytics
+
+            <ArrowRight size={14} />
+
+          </Link>
+
+        </div>
+
+
+        <div className="admin-department-table-wrapper">
+
+          <table className="admin-department-table">
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Department
+                </th>
+
+                <th>
+                  Patients
+                </th>
+
+                <th>
+                  High Risk
+                </th>
+
+                <th>
+                  Recovery Rate
+                </th>
+
+                <th>
+                  Status
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              {departments.map((department) => (
+
+                <tr key={department.name}>
+
+                  <td>
+
+                    <div className="admin-department-name">
+
+                      <div className="admin-department-icon">
+                        <HeartPulse size={15} />
+                      </div>
+
+                      <strong>
+                        {department.name}
+                      </strong>
+
+                    </div>
+
+                  </td>
+
+
+                  <td>
+                    {department.patients}
+                  </td>
+
+
+                  <td>
+
+                    <span
+                      className={`admin-risk-badge ${
+                        department.highRisk >= 3
+                          ? "high"
+                          : "low"
+                      }`}
+                    >
+                      {department.highRisk}
+                    </span>
+
+                  </td>
+
+
+                  <td>
+
+                    <div className="admin-recovery">
+
+                      <div className="admin-recovery-bar">
+
+                        <span
+                          style={{
+                            width: `${department.recovery}%`,
+                          }}
+                        />
+
+                      </div>
+
+                      <strong>
+                        {department.recovery}%
+                      </strong>
+
+                    </div>
+
+                  </td>
+
+
+                  <td>
+
+                    <span className="admin-department-status">
+                      ● Stable
+                    </span>
+
+                  </td>
+
+                </tr>
+
+              ))}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+
+      {/* =================================================
+          BOTTOM SECTION
+      ================================================= */}
+
+      <div className="admin-bottom-grid">
+
+
+        {/* ================= RECENT ACTIVITY ================= */}
+
+        <div className="admin-card">
+
+          <div className="admin-card-header">
+
+            <div>
+
+              <h2>
+                Recent Activity
+              </h2>
+
+              <p>
+                Latest hospital administrative activity
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div className="admin-activity-list">
+
+            {activities.map((activity, index) => (
+
+              <div
+                className="admin-activity-item"
+                key={index}
+              >
+
+                <div className="admin-activity-icon">
+                  {activity.icon}
+                </div>
+
+                <div className="admin-activity-content">
+
+                  <strong>
+                    {activity.title}
+                  </strong>
+
+                  <span>
+                    {activity.department}
+                  </span>
+
+                </div>
+
+                <time>
+                  {activity.time}
+                </time>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
+
+        {/* ================= HOSPITAL SUMMARY ================= */}
+
+        <div className="admin-card">
+
+          <div className="admin-card-header">
+
+            <div>
+
+              <h2>
+                Hospital Summary
+              </h2>
+
+              <p>
+                Current operational overview
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div className="admin-summary-list">
+
+
+            <div className="admin-summary-row">
+
+              <div>
+
+                <span>
+                  Active Departments
+                </span>
+
+                <strong>
+                  4
+                </strong>
+
+              </div>
+
+              <CheckCircle2 size={18} />
+
+            </div>
+
+
+            <div className="admin-summary-row">
+
+              <div>
+
+                <span>
+                  Patients Under Treatment
+                </span>
+
+                <strong>
+                  120
+                </strong>
+
+              </div>
+
+              <Activity size={18} />
+
+            </div>
+
+
+            <div className="admin-summary-row">
+
+              <div>
+
+                <span>
+                  Patients Requiring Attention
+                </span>
+
+                <strong>
+                  18
+                </strong>
+
+              </div>
+
+              <ShieldAlert size={18} />
+
+            </div>
+
+
+            <div className="admin-summary-row">
+
+              <div>
+
+                <span>
+                  Reports This Month
+                </span>
+
+                <strong>
+                  8
+                </strong>
+
+              </div>
+
+              <FileText size={18} />
+
+            </div>
+
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* =================================================
+          FOOTER
+      ================================================= */}
+
+      <footer className="admin-dashboard-footer">
+
+        <span>
+          HealthForecast AI
+        </span>
+
+        <span>
+          Hospital Administration • Secure Healthcare Intelligence
+        </span>
+
+      </footer>
+
+    </div>
   );
 }
