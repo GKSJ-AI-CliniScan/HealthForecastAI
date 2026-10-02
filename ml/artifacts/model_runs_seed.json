@@ -12,9 +12,9 @@
       "framework": "scikit-learn",
       "framework_version": "1.6.0",
       "trained_at": "2026-10-02T08:18:07.931924+00:00",
-      "seeded_at": "2026-10-02T08:29:54.979983+00:00",
-      "git_commit": "aac0c2639b2a339d9acae7b8e23fbeade3898a35",
-      "git_dirty": true,
+      "seeded_at": "2026-10-02T08:39:58.539857+00:00",
+      "git_commit": "d71f347d6b1b91044a8df67b191def74f96e226a",
+      "git_dirty": false,
       "dataset_hash": "sha256:d00fe453ec6a4c7ff19df7a727d1ff1fd7d80c4c07979be9b58f4d522cc6af79",
       "dataset": {
         "name": "diabetes_130_us_hospitals",
@@ -75,8 +75,8 @@
       "promoted": false,
       "is_active": false,
       "serving_latency_ms": {
-        "median": 6.147,
-        "p95": 6.572,
+        "median": 6.171,
+        "p95": 6.567,
         "n_samples": 200,
         "method": "in-process predict_proba on one test row, after warm-up"
       }
@@ -89,9 +89,9 @@
       "framework": "scikit-learn",
       "framework_version": "1.6.0",
       "trained_at": "2026-10-02T08:19:08.137854+00:00",
-      "seeded_at": "2026-10-02T08:29:56.662717+00:00",
-      "git_commit": "aac0c2639b2a339d9acae7b8e23fbeade3898a35",
-      "git_dirty": true,
+      "seeded_at": "2026-10-02T08:40:00.225409+00:00",
+      "git_commit": "d71f347d6b1b91044a8df67b191def74f96e226a",
+      "git_dirty": false,
       "dataset_hash": "sha256:d00fe453ec6a4c7ff19df7a727d1ff1fd7d80c4c07979be9b58f4d522cc6af79",
       "dataset": {
         "name": "diabetes_130_us_hospitals",
@@ -155,8 +155,8 @@
       "promoted": false,
       "is_active": false,
       "serving_latency_ms": {
-        "median": 13.031,
-        "p95": 13.723,
+        "median": 12.872,
+        "p95": 13.655,
         "n_samples": 200,
         "method": "in-process predict_proba on one test row, after warm-up"
       }
@@ -169,9 +169,9 @@
       "framework": "xgboost",
       "framework_version": "2.1.4",
       "trained_at": "2026-09-30T17:03:41.506148+00:00",
-      "seeded_at": "2026-10-02T08:29:59.612125+00:00",
-      "git_commit": "aac0c2639b2a339d9acae7b8e23fbeade3898a35",
-      "git_dirty": true,
+      "seeded_at": "2026-10-02T08:40:03.124521+00:00",
+      "git_commit": "d71f347d6b1b91044a8df67b191def74f96e226a",
+      "git_dirty": false,
       "dataset_hash": "sha256:d00fe453ec6a4c7ff19df7a727d1ff1fd7d80c4c07979be9b58f4d522cc6af79",
       "dataset": {
         "name": "diabetes_130_us_hospitals",
@@ -230,8 +230,8 @@
       "promoted": true,
       "is_active": true,
       "serving_latency_ms": {
-        "median": 7.36,
-        "p95": 17.473,
+        "median": 7.325,
+        "p95": 17.713,
         "n_samples": 200,
         "method": "in-process predict_proba on one test row, after warm-up"
       }
