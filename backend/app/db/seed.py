@@ -4,6 +4,7 @@ from datetime import date
 
 from sqlalchemy.orm import Session
 
+from app.db.mongodb import get_mongo_db
 from app.db.session import SessionLocal
 from app.models.admission import Admission
 from app.models.patient import Patient
@@ -115,6 +116,50 @@ def seed_database(db: Session) -> None:
             )
             db.add(treat)
             db.commit()
+
+    # Seed MongoDB Model Registry
+    try:
+        mongo_db = get_mongo_db()
+        if mongo_db.model_runs.count_documents({}) == 0:
+            runs = [
+                {
+                    "model_name": "xgboost",
+                    "version": "1.0.0",
+                    "status": "promoted",
+                    "accuracy": 0.6868,
+                    "precision": 0.1454,
+                    "recall": 0.5099,
+                    "f1": 0.2263,
+                    "roc_auc": 0.6518,
+                    "decision_threshold": 0.1117,
+                },
+                {
+                    "model_name": "random_forest",
+                    "version": "1.0.0",
+                    "status": "archived",
+                    "accuracy": 0.6635,
+                    "precision": 0.1410,
+                    "recall": 0.5394,
+                    "f1": 0.2235,
+                    "roc_auc": 0.6459,
+                    "decision_threshold": 0.1000,
+                },
+                {
+                    "model_name": "logistic_regression",
+                    "version": "1.0.0",
+                    "status": "archived",
+                    "accuracy": 0.6070,
+                    "precision": 0.1268,
+                    "recall": 0.5736,
+                    "f1": 0.2077,
+                    "roc_auc": 0.6280,
+                    "decision_threshold": 0.0927,
+                },
+            ]
+            mongo_db.model_runs.insert_many(runs)
+            print("✅ Seeded MongoDB model_runs registry!")
+    except Exception as e:
+        print(f"MongoDB seed notice: {e}")
 
     print("✅ Database seeding completed successfully!")
 

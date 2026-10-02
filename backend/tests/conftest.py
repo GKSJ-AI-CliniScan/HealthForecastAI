@@ -12,6 +12,7 @@ import app.models  # noqa: F401 - registers all ORM models with Base.metadata
 from app.core.rbac import Role
 from app.core.security import create_access_token
 from app.db.base import Base
+from app.db.mongodb import close_mongo_connection
 from app.db.session import get_db
 from app.main import app
 
@@ -32,6 +33,7 @@ def setup_test_db() -> Generator[None, None, None]:
     Base.metadata.create_all(bind=test_engine)
     yield
     Base.metadata.drop_all(bind=test_engine)
+    close_mongo_connection()
 
 
 def override_get_db() -> Generator[Session, None, None]:
