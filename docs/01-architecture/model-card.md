@@ -12,7 +12,7 @@ Re-run those two scripts after any retraining and update this card from their ou
 | Task | Binary classification: will this diabetic inpatient be readmitted within 30 days of discharge? |
 | Active (production) model | **XGBoost** `XGBClassifier`, wrapped in isotonic calibration (`CalibratedClassifierCV` around a frozen `Pipeline[ColumnTransformer → XGBClassifier]`) |
 | Artifact | `ml/artifacts/readmission_model.joblib` — the file `backend/app/services/model_service.py` loads |
-| Registry entry | `model_runs` run_id **`xgboost-3b1d27b045bb`**, `model_version` `xgboost-202609301703`, `is_active: true` |
+| Registry entry | `model_runs` run_id **`xgboost-3b1d27b045bb`**, `model_version` `xgboost-202609301703`, `is_active: true`. **Dry-run only:** the document exists in `ml/artifacts/model_runs_seed.json` but has not been upserted into MongoDB yet (see §11) |
 | Framework | xgboost 2.1.4, scikit-learn 1.6.0, Python 3.12 |
 | Decision threshold | **0.1117478535** (probability ≥ threshold → flag for follow-up) |
 | Hyperparameters | n_estimators 300, max_depth 6, learning_rate 0.01, subsample 0.6, colsample_bytree 0.6, scale_pos_weight 10.14 (negatives/positives on train), random_state 42 — from `ml/configs/config.yaml`, tuned in M2 (N3 lever 5, train-only CV) |
@@ -83,7 +83,7 @@ Active-model confusion matrix at 0.1117 (test): **TP 641, FN 616, FP 3,768, TN 8
 1. `train.py` selects the model with the best **ROC-AUC on test** (`evaluation.primary_metric`)
    and saves only that one; XGBoost wins (0.6518 vs 0.6459 RF, 0.6280 LR).
 2. It is the **only one of the three that clears the promotion bar** in `config.yaml`
-   (`roc_auc ≥ 0.65` and `recall ≥ 0.50`). LR and RF are recorded in `model_runs` with
+   (`roc_auc ≥ 0.65` and `recall ≥ 0.50`). LR and RF are recorded in the `model_runs` seed with
    `promoted: false` for comparison but must not serve.
 3. It is also best on PR-AUC, precision, F1 and Brier — it does not win ROC-AUC by trading away
    calibration.
@@ -156,6 +156,11 @@ wide uncertainty. Under-10s (n=29, no readmissions) are too few to evaluate.
   the period, so performance on present-day records is unknown and likely lower.
 - **Random, not temporal, split.** Train and test mix all periods, so the test score is a
   time-averaged estimate. A temporal hold-out would be the stricter test.
+- **Model chosen on the test split.** `train.py` picks the winner by ROC-AUC (`primary_metric`)
+  measured on the **test** split, so the reported test metrics are mildly optimistic: the test
+  set helped choose among 3 models, so it is not fully untouched. The decision threshold itself
+  was tuned on validation. The bias is small (XGBoost beat RF by only 0.006 ROC-AUC), but a future
+  retrain should select the model on validation and touch test once, at the end.
 - **Fixed threshold.** It was tuned at ~9% prevalence and loses recall when prevalence drops
   (latest chunk). It must be re-validated on local data before use.
 - **One encounter per patient** (first only). The model never learned from a patient's later
@@ -188,22 +193,28 @@ dataset  ml/data/raw/diabetic_data.csv
          sha256 d00fe453ec6a4c7ff19df7a727d1ff1fd7d80c4c07979be9b58f4d522cc6af79
    │     (+ ml/configs/config.yaml: split, cleaning, models, thresholds)
    ▼
-code     git commit aac0c2639b2a339d9acae7b8e23fbeade3898a35  (src/models/train.py)
+code     git commit d71f347d6b1b91044a8df67b191def74f96e226a  (src/models/train.py)
    ▼
 artifact ml/artifacts/readmission_model.joblib
          sha256 3b1d27b045bb2b5b6a91449704180e000b57ca9d6767974583a2ca9b60a0aae2
          (trained 2026-09-30 17:03 UTC = file mtime; metrics.json written in the same run)
    ▼
-registry MongoDB healthforecast.model_runs  run_id xgboost-3b1d27b045bb  (is_active: true)
-         evidence copy: ml/artifacts/model_runs_seed.json
+registry ml/artifacts/model_runs_seed.json  run_id xgboost-3b1d27b045bb  (is_active: true)
+         DRY-RUN ONLY - target MongoDB healthforecast.model_runs not seeded yet
 ```
 
 - `run_id` = `<algorithm>-<first 12 hex of artifact sha256>`. The same file always gives the same
   run_id (the seed upserts on it, so it is idempotent), and a retrained model gets a new run_id.
-- `git_commit` is HEAD when the seed ran. `git_dirty: true` in the seed JSON because the M4
-  scripts themselves were not committed yet. The training code (`train.py`, `config.yaml`) was
-  unchanged at that commit, and the seed proves the artifact matches it: retraining-free
-  re-evaluation reproduces `metrics.json` to < 1e-9.
+- **The registry is dry-run only.** `seed_model_runs.py --dry-run` has produced and validated
+  all 3 documents, but the real upsert has not run yet because no reachable MongoDB has been
+  configured (`MONGO_URI` is still a placeholder). Until it runs, `healthforecast.model_runs` is
+  empty and `GET /api/v1/models` has nothing to read. To seed it, run
+  `python -m scripts.seed_model_runs` from `ml/` with a working `MONGO_URI`. The upsert is keyed
+  on `run_id`, so the result is 3 documents with exactly one `is_active: true`.
+- `git_commit` is HEAD when the seed ran. The seed ran on a clean tree (`git_dirty: false` for
+  all 3 runs). The training code (`train.py`, `config.yaml`, data and feature modules) is
+  unchanged since the models were trained, and the seed proves the artifact matches it:
+  retraining-free re-evaluation reproduces `metrics.json` to < 1e-9.
 - The LR and RF artifacts (`ml/artifacts/logistic_regression.joblib`, `random_forest.joblib`) did
   not exist, because `train.py` saves only the winner. The seed retrained them with `train.py`'s own
   functions and identical config/split, and their metrics match `metrics.json` exactly. Like all
@@ -214,6 +225,7 @@ registry MongoDB healthforecast.model_runs  run_id xgboost-3b1d27b045bb  (is_act
 ```bash
 cd ml
 python -m src.models.train                      # only if readmission_model.joblib is missing
-python -m scripts.seed_model_runs --dry-run     # model_runs_seed.json (add no flag to upsert into Mongo)
+python -m scripts.seed_model_runs --dry-run     # model_runs_seed.json only (current state)
+python -m scripts.seed_model_runs               # real upsert into Mongo - not run yet, needs MONGO_URI
 python -m scripts.drift_and_leakage_report      # this card's drift/subgroup numbers
 ```
