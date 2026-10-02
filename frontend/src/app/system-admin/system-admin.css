@@ -1,0 +1,1390 @@
+/* =========================================================
+   SYSTEM ADMIN — COMPLETE CSS
+========================================================= */
+
+
+/* =========================================================
+   MAIN LAYOUT
+========================================================= */
+
+.sysadmin-layout {
+  min-height: 100vh;
+  background: #f5f8fc;
+  color: #173b69;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.sysadmin-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 76px;
+
+  background: #ffffff;
+  border-bottom: 1px solid #dce8f5;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 30px;
+
+  z-index: 1000;
+}
+
+
+/* BRAND */
+
+.sysadmin-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sysadmin-logo {
+  width: 43px;
+  height: 43px;
+
+  border-radius: 12px;
+
+  background: #1268d5;
+  color: #ffffff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sysadmin-brand-text h1 {
+  margin: 0;
+
+  color: #092957;
+
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.sysadmin-brand-text h1 span {
+  color: #1268d5;
+}
+
+.sysadmin-brand-text p {
+  margin: 3px 0 0;
+
+  color: #7890ad;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 1.6px;
+}
+
+
+/* HEADER RIGHT */
+
+.sysadmin-header-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.sysadmin-notification {
+  position: relative;
+
+  border: none;
+  background: transparent;
+
+  color: #466484;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sysadmin-notification-dot {
+  position: absolute;
+
+  top: 0;
+  right: 0;
+
+  width: 7px;
+  height: 7px;
+
+  background: #1268d5;
+
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+}
+
+.sysadmin-header-divider {
+  width: 1px;
+  height: 34px;
+
+  background: #e1eaf4;
+}
+
+
+/* PROFILE */
+
+.sysadmin-profile-wrapper {
+  position: relative;
+}
+
+.sysadmin-profile-button {
+  border: none;
+  background: transparent;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 5px;
+
+  cursor: pointer;
+}
+
+.sysadmin-avatar {
+  width: 39px;
+  height: 39px;
+
+  border-radius: 50%;
+
+  background: #092957;
+  color: #ffffff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.sysadmin-profile-info {
+  text-align: left;
+}
+
+.sysadmin-profile-info strong {
+  display: block;
+
+  color: #173b69;
+
+  font-size: 13px;
+}
+
+.sysadmin-profile-info small {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #7b90aa;
+
+  font-size: 11px;
+}
+
+.sysadmin-profile-arrow {
+  color: #7c91aa;
+
+  transition: transform 0.2s ease;
+}
+
+.sysadmin-profile-arrow.open {
+  transform: rotate(180deg);
+}
+
+
+/* PROFILE DROPDOWN */
+
+.sysadmin-profile-menu {
+  position: absolute;
+
+  top: 52px;
+  right: 0;
+
+  width: 190px;
+
+  background: #ffffff;
+
+  border: 1px solid #dce8f5;
+  border-radius: 12px;
+
+  padding: 7px;
+
+  box-shadow: 0 12px 30px rgba(20, 58, 100, 0.12);
+}
+
+.sysadmin-profile-menu button {
+  width: 100%;
+
+  border: none;
+  background: transparent;
+
+  padding: 10px 11px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  color: #24466e;
+
+  font-size: 13px;
+
+  text-align: left;
+}
+
+.sysadmin-profile-menu button:hover {
+  background: #f1f7ff;
+  color: #1268d5;
+}
+
+.sysadmin-profile-menu .sysadmin-logout {
+  color: #d84b4b;
+}
+
+
+/* =========================================================
+   BODY
+========================================================= */
+
+.sysadmin-body {
+  padding-top: 76px;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sysadmin-sidebar {
+  position: fixed !important;
+
+  top: 76px !important;
+  left: 0 !important;
+  bottom: 0 !important;
+
+  width: 270px !important;
+
+  background: #ffffff !important;
+
+  border-right: 1px solid #dce8f5 !important;
+
+  padding: 32px 20px 24px !important;
+
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+
+  z-index: 900 !important;
+
+  display: block !important;
+
+  margin: 0 !important;
+
+  box-sizing: border-box !important;
+}
+
+
+/* SIDEBAR TITLE */
+
+.sysadmin-sidebar-title {
+  display: block !important;
+
+  width: auto !important;
+
+  margin: 0 0 18px 13px !important;
+
+  padding: 0 !important;
+
+  position: static !important;
+
+  transform: none !important;
+
+  color: #7188a5 !important;
+
+  font-size: 11px !important;
+
+  line-height: 1.2 !important;
+
+  font-weight: 800 !important;
+
+  letter-spacing: 1.6px !important;
+}
+
+
+/* SIDEBAR NAV */
+
+.sysadmin-sidebar > .sysadmin-sidebar-nav {
+  display: flex !important;
+
+  flex-direction: column !important;
+
+  align-items: stretch !important;
+
+  justify-content: flex-start !important;
+
+  width: 100% !important;
+
+  height: auto !important;
+
+  min-height: 0 !important;
+
+  max-height: none !important;
+
+  margin: 0 !important;
+
+  padding: 0 !important;
+
+  gap: 7px !important;
+
+  position: static !important;
+
+  transform: none !important;
+
+  flex: none !important;
+}
+
+
+/* SIDEBAR MENU */
+
+.sysadmin-sidebar
+> .sysadmin-sidebar-nav
+> .sysadmin-menu {
+  display: flex !important;
+
+  align-items: center !important;
+
+  justify-content: flex-start !important;
+
+  flex-direction: row !important;
+
+  width: 100% !important;
+
+  height: 46px !important;
+
+  min-height: 46px !important;
+
+  max-height: 46px !important;
+
+  flex: none !important;
+
+  flex-grow: 0 !important;
+
+  flex-shrink: 0 !important;
+
+  margin: 0 !important;
+
+  padding: 0 17px !important;
+
+  gap: 14px !important;
+
+  position: static !important;
+
+  transform: none !important;
+
+  box-sizing: border-box !important;
+
+  border: none !important;
+
+  border-radius: 11px !important;
+
+  background: transparent;
+
+  color: #173b69;
+
+  text-decoration: none;
+
+  font-size: 14px;
+
+  line-height: 1;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+/* MENU ICON */
+
+.sysadmin-sidebar
+> .sysadmin-sidebar-nav
+> .sysadmin-menu
+svg {
+  width: 21px !important;
+  height: 21px !important;
+
+  min-width: 21px !important;
+
+  flex-shrink: 0 !important;
+
+  margin: 0 !important;
+}
+
+
+/* MENU TEXT */
+
+.sysadmin-sidebar
+> .sysadmin-sidebar-nav
+> .sysadmin-menu
+span {
+  display: block !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  line-height: 1.2 !important;
+}
+
+
+/* MENU HOVER */
+
+.sysadmin-sidebar
+> .sysadmin-sidebar-nav
+> .sysadmin-menu:hover:not(.active) {
+  background: #f1f7ff !important;
+
+  color: #1268d5 !important;
+}
+
+
+/* ACTIVE MENU */
+
+.sysadmin-sidebar
+> .sysadmin-sidebar-nav
+> .sysadmin-menu.active {
+  background: #1268d5 !important;
+
+  color: #ffffff !important;
+
+  font-weight: 700 !important;
+
+  box-shadow:
+    0 5px 12px rgba(18, 104, 213, 0.16) !important;
+}
+
+
+/* ACTIVE ICON */
+
+.sysadmin-sidebar
+> .sysadmin-sidebar-nav
+> .sysadmin-menu.active
+svg {
+  color: #ffffff !important;
+}
+
+
+/* =========================================================
+   SIDEBAR SECURITY
+========================================================= */
+
+.sysadmin-sidebar-bottom {
+  width: 100% !important;
+
+  margin: 28px 0 0 !important;
+
+  padding: 20px 0 0 !important;
+
+  border-top: 1px solid #edf2f8 !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+
+  gap: 11px !important;
+
+  position: static !important;
+
+  transform: none !important;
+
+  box-sizing: border-box !important;
+}
+
+.sysadmin-security-icon {
+  width: 43px !important;
+  height: 43px !important;
+
+  min-width: 43px !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+
+  border-radius: 50% !important;
+
+  background: #e9f8ef !important;
+
+  color: #1a9b58 !important;
+
+  font-weight: 800 !important;
+}
+
+.sysadmin-sidebar-bottom strong {
+  display: block !important;
+
+  margin: 0 !important;
+
+  color: #173b69 !important;
+
+  font-size: 12px !important;
+
+  line-height: 1.2 !important;
+}
+
+.sysadmin-sidebar-bottom p {
+  display: block !important;
+
+  margin: 5px 0 0 !important;
+
+  padding: 0 !important;
+
+  color: #8296ae !important;
+
+  font-size: 10px !important;
+
+  line-height: 1.4 !important;
+}
+
+
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
+.sysadmin-content {
+  margin-left: 270px;
+
+  min-height: calc(100vh - 76px);
+}
+
+
+/* =========================================================
+   DASHBOARD PAGE
+========================================================= */
+
+.sysadmin-page {
+  max-width: 1600px;
+
+  margin: 0 auto;
+
+  padding: 32px 34px 40px;
+}
+
+
+/* =========================================================
+   PAGE TITLE
+========================================================= */
+
+.sysadmin-title {
+  display: flex;
+
+  align-items: flex-end;
+
+  justify-content: space-between;
+
+  gap: 25px;
+
+  margin-bottom: 28px;
+}
+
+.sysadmin-eyebrow {
+  margin: 0 0 6px;
+
+  color: #1268d5;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.5px;
+}
+
+.sysadmin-title h2 {
+  margin: 0;
+
+  color: #092957;
+
+  font-size: 28px;
+
+  font-weight: 800;
+}
+
+.sysadmin-title-description {
+  margin: 7px 0 0;
+
+  color: #748ba5;
+
+  font-size: 13px;
+}
+
+.sysadmin-title-actions {
+  display: flex;
+
+  gap: 10px;
+}
+
+.sysadmin-secondary,
+.sysadmin-primary {
+  height: 42px;
+
+  padding: 0 17px;
+
+  border-radius: 9px;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.sysadmin-secondary {
+  border: 1px solid #d6e3f0;
+
+  background: #ffffff;
+
+  color: #41617f;
+}
+
+.sysadmin-primary {
+  border: none;
+
+  background: #1268d5;
+
+  color: #ffffff;
+
+  box-shadow:
+    0 5px 12px rgba(18, 104, 213, 0.16);
+}
+
+
+/* =========================================================
+   METRICS
+========================================================= */
+
+.sysadmin-metrics {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 17px;
+
+  margin-bottom: 20px;
+}
+
+.sysadmin-metric {
+  background: #ffffff;
+
+  border: 1px solid #e1eaf3;
+
+  border-radius: 13px;
+
+  padding: 19px;
+
+  box-shadow:
+    0 3px 12px rgba(31, 67, 105, 0.04);
+}
+
+.metric-top {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 16px;
+}
+
+.metric-icon {
+  width: 38px;
+  height: 38px;
+
+  border-radius: 10px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 17px;
+}
+
+.metric-icon.green {
+  background: #eaf8f0;
+}
+
+.metric-icon.purple {
+  background: #f0ebff;
+}
+
+.metric-icon.orange {
+  background: #fff2e6;
+}
+
+.metric-icon.blue {
+  background: #eaf3ff;
+}
+
+.metric-change {
+  color: #319267;
+
+  font-size: 10px;
+
+  font-weight: 700;
+}
+
+.sysadmin-metric p {
+  margin: 0 0 5px;
+
+  color: #7890a9;
+
+  font-size: 12px;
+}
+
+.sysadmin-metric strong {
+  display: block;
+
+  color: #092957;
+
+  font-size: 25px;
+
+  line-height: 1.2;
+}
+
+.sysadmin-metric small {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #91a2b5;
+
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   DASHBOARD GRID
+========================================================= */
+
+.sysadmin-grid {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.7fr)
+    minmax(300px, 0.9fr);
+
+  gap: 20px;
+}
+
+.sysadmin-card {
+  background: #ffffff;
+
+  border: 1px solid #e1eaf3;
+
+  border-radius: 13px;
+
+  padding: 20px;
+
+  box-shadow:
+    0 3px 12px rgba(31, 67, 105, 0.04);
+}
+
+.card-header {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: flex-start;
+
+  gap: 15px;
+
+  margin-bottom: 20px;
+}
+
+.card-header h3 {
+  margin: 0;
+
+  color: #173b69;
+
+  font-size: 15px;
+
+  font-weight: 800;
+}
+
+.card-header p {
+  margin: 5px 0 0;
+
+  color: #8295aa;
+
+  font-size: 11px;
+}
+
+.view-button {
+  border: none;
+
+  background: #eef6ff;
+
+  color: #1268d5;
+
+  padding: 8px 11px;
+
+  border-radius: 7px;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   ACTIVITY TABLE
+========================================================= */
+
+.activity-table {
+  width: 100%;
+}
+
+.table-header,
+.activity-row {
+  display: grid;
+
+  grid-template-columns:
+    1.7fr
+    0.9fr
+    0.9fr
+    0.8fr
+    0.8fr;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+.table-header {
+  padding: 0 0 11px;
+
+  border-bottom: 1px solid #edf2f7;
+
+  color: #8b9db1;
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.6px;
+}
+
+.activity-row {
+  padding: 13px 0;
+
+  border-bottom: 1px solid #f0f4f8;
+
+  font-size: 10px;
+
+  color: #506b87;
+}
+
+.activity-user {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  min-width: 0;
+}
+
+.activity-avatar {
+  width: 31px;
+  height: 31px;
+
+  min-width: 31px;
+
+  border-radius: 50%;
+
+  background: #eaf3ff;
+
+  color: #1268d5;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 9px;
+
+  font-weight: 800;
+}
+
+.activity-user strong {
+  display: block;
+
+  color: #24476c;
+
+  font-size: 10px;
+}
+
+.activity-user small,
+.activity-time small {
+  display: block;
+
+  margin-top: 2px;
+
+  color: #91a1b2;
+
+  font-size: 8px;
+}
+
+.activity-time strong {
+  color: #42617e;
+
+  font-size: 9px;
+}
+
+.ip {
+  color: #748ca5;
+
+  font-size: 9px;
+}
+
+.load-more {
+  width: 100%;
+
+  margin-top: 13px;
+
+  border: none;
+
+  background: #f5f9fd;
+
+  color: #1268d5;
+
+  padding: 9px;
+
+  border-radius: 8px;
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   RIGHT COLUMN
+========================================================= */
+
+.right-column {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+
+/* SECURITY */
+
+.security-list {
+  display: flex;
+
+  flex-direction: column;
+}
+
+.security-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 12px 0;
+
+  border-bottom: 1px solid #eef3f7;
+}
+
+.security-row:last-child {
+  border-bottom: none;
+}
+
+.service-icon {
+  width: 31px;
+  height: 31px;
+
+  min-width: 31px;
+
+  border-radius: 8px;
+
+  background: #eef7ff;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 13px;
+}
+
+.service-info {
+  flex: 1;
+}
+
+.service-info strong {
+  display: block;
+
+  color: #315473;
+
+  font-size: 10px;
+}
+
+.service-info p {
+  margin: 3px 0 0;
+
+  color: #94a4b4;
+
+  font-size: 8px;
+}
+
+.healthy {
+  color: #29925f;
+
+  background: #eaf8f0;
+
+  border-radius: 20px;
+
+  padding: 4px 7px;
+
+  font-size: 8px;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   SYSTEM RESOURCES
+========================================================= */
+
+.resource-row {
+  margin-bottom: 17px;
+}
+
+.resource-row:last-child {
+  margin-bottom: 0;
+}
+
+.resource-title {
+  display: flex;
+
+  justify-content: space-between;
+
+  margin-bottom: 7px;
+}
+
+.resource-title strong {
+  color: #41617d;
+
+  font-size: 10px;
+}
+
+.resource-title span {
+  color: #1268d5;
+
+  font-size: 10px;
+
+  font-weight: 700;
+}
+
+.progress-track {
+  height: 7px;
+
+  background: #edf3f8;
+
+  border-radius: 10px;
+
+  overflow: hidden;
+}
+
+.progress-value {
+  height: 100%;
+
+  background: #1268d5;
+
+  border-radius: 10px;
+}
+
+
+/* =========================================================
+   ADMINISTRATION TOOLS
+========================================================= */
+
+.management-section {
+  margin-top: 22px;
+}
+
+.section-heading {
+  margin-bottom: 13px;
+}
+
+.section-heading h3 {
+  margin: 0;
+
+  color: #173b69;
+
+  font-size: 16px;
+}
+
+.section-heading p {
+  margin: 5px 0 0;
+
+  color: #8396aa;
+
+  font-size: 11px;
+}
+
+.management-grid {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 14px;
+}
+
+.management-card {
+  border: 1px solid #e1eaf3;
+
+  background: #ffffff;
+
+  border-radius: 12px;
+
+  padding: 15px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 3px 12px rgba(31, 67, 105, 0.04);
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.management-card:hover {
+  border-color: #bcd7f4;
+
+  transform: translateY(-1px);
+}
+
+.management-icon {
+  width: 35px;
+  height: 35px;
+
+  min-width: 35px;
+
+  border-radius: 9px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 15px;
+}
+
+.management-icon.green {
+  background: #eaf8f0;
+}
+
+.management-icon.purple {
+  background: #f0ebff;
+}
+
+.management-icon.orange {
+  background: #fff2e6;
+}
+
+.management-icon.blue {
+  background: #eaf3ff;
+}
+
+.management-card div:nth-child(2) {
+  flex: 1;
+}
+
+.management-card strong {
+  display: block;
+
+  color: #315473;
+
+  font-size: 10px;
+}
+
+.management-card small {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #92a2b2;
+
+  font-size: 8px;
+
+  line-height: 1.4;
+}
+
+.management-card > span {
+  color: #1268d5;
+
+  font-size: 15px;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.sysadmin-footer {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-top: 28px;
+
+  padding-top: 18px;
+
+  border-top: 1px solid #dfe8f1;
+
+  color: #8b9caf;
+
+  font-size: 9px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1200px) {
+
+  .sysadmin-sidebar {
+    width: 240px !important;
+  }
+
+  .sysadmin-content {
+    margin-left: 240px;
+  }
+
+  .sysadmin-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .management-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
+@media (max-width: 950px) {
+
+  .sysadmin-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sysadmin-title {
+    align-items: flex-start;
+
+    flex-direction: column;
+  }
+}
+
+
+@media (max-width: 700px) {
+
+  .sysadmin-header {
+    padding: 0 16px;
+  }
+
+  .sysadmin-profile-info,
+  .sysadmin-profile-arrow {
+    display: none;
+  }
+
+  .sysadmin-sidebar {
+    position: static !important;
+
+    width: 100% !important;
+
+    height: auto !important;
+
+    border-right: none !important;
+
+    border-bottom: 1px solid #dce8f5 !important;
+  }
+
+  .sysadmin-body {
+    padding-top: 76px;
+  }
+
+  .sysadmin-content {
+    margin-left: 0;
+  }
+
+  .sysadmin-page {
+    padding: 22px 16px 30px;
+  }
+
+  .sysadmin-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .management-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-card {
+    overflow-x: auto;
+  }
+
+  .activity-table {
+    min-width: 650px;
+  }
+
+  .sysadmin-footer {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 7px;
+  }
+}

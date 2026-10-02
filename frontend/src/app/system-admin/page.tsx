@@ -1,6 +1,6 @@
 "use client";
 
-import { HeartPulse } from "lucide-react";
+import { useState } from "react";
 
 const metrics = [
   {
@@ -36,6 +36,7 @@ const metrics = [
     color: "blue",
   },
 ];
+
 
 const activities = [
   {
@@ -90,6 +91,7 @@ const activities = [
   },
 ];
 
+
 const security = [
   {
     icon: "🔒",
@@ -108,6 +110,7 @@ const security = [
   },
 ];
 
+
 const resources = [
   {
     name: "CPU Usage",
@@ -123,231 +126,252 @@ const resources = [
   },
 ];
 
+
 export default function SystemAdminDashboard() {
+
+  const [showAllActivities, setShowAllActivities] =
+    useState(false);
+
+  const displayedActivities = showAllActivities
+    ? activities
+    : activities.slice(0, 4);
+
+
   return (
-    <main className="sysadmin-page">
+    <div className="sysadmin-page">
 
-      {/* HEADER */}
-      <header className="sysadmin-header">
-<div className="sysadmin-brand">
-  <div className="sysadmin-logo">
-    <HeartPulse size={24} strokeWidth={2.5} />
-  </div>
+      {/* TITLE */}
+      <div className="sysadmin-title">
 
-  <div>
-    <h1>
-      HealthForecast <span>AI</span>
-    </h1>
+        <div>
+          <p className="sysadmin-eyebrow">
+            ADMINISTRATION
+          </p>
 
-    <p>HEALTHCARE INTELLIGENCE</p>
-  </div>
-</div>
+          <h2>
+            System Overview
+          </h2>
 
-        <div className="sysadmin-header-right">
+          <p className="sysadmin-title-description">
+            Monitor and manage your healthcare intelligence platform.
+          </p>
+        </div>
 
-          <button className="notification-btn">
-            🔔
-            <span className="notification-dot" />
+
+        <div className="sysadmin-title-actions">
+
+          <button className="sysadmin-secondary">
+            ↻ Refresh
           </button>
 
-          <div className="header-divider" />
-
-          <div className="admin-profile">
-
-            <div className="admin-avatar">
-              SA
-            </div>
-
-            <div>
-              <strong>System Administrator</strong>
-              <small>System Admin</small>
-            </div>
-
-            <span className="profile-arrow">
-              ▾
-            </span>
-
-          </div>
+          <button className="sysadmin-primary">
+            + Add User
+          </button>
 
         </div>
 
-      </header>
+      </div>
 
-      <div className="sysadmin-layout">
 
-        {/* SIDEBAR */}
-        <aside className="sysadmin-sidebar">
+      {/* METRICS */}
+      <div className="sysadmin-metrics">
 
-          <div>
+        {metrics.map((metric) => (
 
-            <p className="sidebar-heading">
-              MAIN MENU
-            </p>
+          <div
+            className="sysadmin-metric"
+            key={metric.title}
+          >
 
-            <nav className="sysadmin-nav">
+            <div className="metric-top">
 
-              <a href="#" className="sysadmin-nav-item active">
-                <span>⌂</span>
-                Dashboard
-              </a>
+              <div
+                className={`metric-icon ${metric.color}`}
+              >
+                {metric.icon}
+              </div>
 
-              <a href="#" className="sysadmin-nav-item">
-                <span>♙</span>
-                Users
-              </a>
+              <span className="metric-change">
+                {metric.change}
+              </span>
 
-              <a href="#" className="sysadmin-nav-item">
-                <span>♢</span>
-                Roles
-              </a>
+            </div>
 
-              <a href="#" className="sysadmin-nav-item">
-                <span>⚿</span>
-                Permissions
-              </a>
 
-              <a href="#" className="sysadmin-nav-item">
-                <span>▤</span>
-                Audit Logs
-              </a>
+            <p>{metric.title}</p>
 
-              <a href="#" className="sysadmin-nav-item">
-                <span>▣</span>
-                Datasets
-              </a>
+            <strong>{metric.value}</strong>
 
-              <a href="#" className="sysadmin-nav-item">
-                <span>✦</span>
-                AI Models
-              </a>
-
-              <a href="#" className="sysadmin-nav-item">
-                <span>⚙</span>
-                System Settings
-              </a>
-
-            </nav>
-
-            <div className="sidebar-divider" />
-
-            <p className="sidebar-heading">
-              SYSTEM
-            </p>
-
-            <nav className="sysadmin-nav">
-
-              <a href="#" className="sysadmin-nav-item">
-                <span>♢</span>
-                Security
-              </a>
-
-              <a href="#" className="sysadmin-nav-item">
-                <span>↗</span>
-                Integrations
-              </a>
-
-              <a href="#" className="sysadmin-nav-item">
-                <span>☁</span>
-                Backup & Restore
-              </a>
-
-              <a href="#" className="sysadmin-nav-item">
-                <span>♧</span>
-                Notifications
-              </a>
-
-            </nav>
+            <small>{metric.subtitle}</small>
 
           </div>
 
-          {/* SECURITY CARD */}
-          <div className="sidebar-security">
+        ))}
 
-            <div className="security-icon">
-              ✓
-            </div>
+      </div>
+
+
+      {/* MAIN GRID */}
+      <div className="sysadmin-grid">
+
+        {/* ACTIVITY */}
+        <div className="sysadmin-card activity-card">
+
+          <div className="card-header">
 
             <div>
-              <strong>System Secure</strong>
+              <h3>
+                Recent System Activity
+              </h3>
 
               <p>
-                All systems are running
-                smoothly
+                Latest actions across the platform
               </p>
             </div>
 
+            <button className="view-button">
+              View All Logs
+            </button>
+
           </div>
 
-        </aside>
 
-        {/* MAIN CONTENT */}
-        <section className="sysadmin-main">
+          <div className="activity-table">
 
-          <div className="sysadmin-content">
+            <div className="table-header">
+              <span>User</span>
+              <span>Action</span>
+              <span>Module</span>
+              <span>Time</span>
+              <span>IP Address</span>
+            </div>
 
-            {/* TITLE */}
-            <div className="sysadmin-title">
 
-              <div>
+            {displayedActivities.map((activity) => (
 
-                <p className="eyebrow">
-                  ADMINISTRATION
-                </p>
+              <div
+                className="activity-row"
+                key={`${activity.user}-${activity.time}`}
+              >
 
-                <h2>
-                  System Overview
-                </h2>
+                <div className="activity-user">
 
-                <p className="title-description">
-                  Monitor and manage your healthcare
-                  intelligence platform.
-                </p>
+                  <div className="activity-avatar">
+                    {activity.initials}
+                  </div>
+
+                  <div>
+                    <strong>
+                      {activity.user}
+                    </strong>
+
+                    <small>
+                      {activity.role}
+                    </small>
+                  </div>
+
+                </div>
+
+
+                <span>
+                  {activity.action}
+                </span>
+
+
+                <span>
+                  {activity.module}
+                </span>
+
+
+                <div className="activity-time">
+
+                  <strong>
+                    {activity.time}
+                  </strong>
+
+                  <small>
+                    {activity.date}
+                  </small>
+
+                </div>
+
+
+                <span className="ip">
+                  {activity.ip}
+                </span>
 
               </div>
 
-              <div className="title-actions">
+            ))}
 
-                <button className="sys-secondary">
-                  ↻ Refresh
-                </button>
+          </div>
 
-                <button className="sys-primary">
-                  + Add User
-                </button>
+
+          <button
+            className="load-more"
+            onClick={() =>
+              setShowAllActivities(!showAllActivities)
+            }
+          >
+            {showAllActivities
+              ? "Show Less"
+              : "Load More"}
+          </button>
+
+        </div>
+
+
+        {/* RIGHT COLUMN */}
+        <div className="right-column">
+
+          {/* SECURITY */}
+          <div className="sysadmin-card">
+
+            <div className="card-header">
+
+              <div>
+
+                <h3>
+                  🛡 Security Status
+                </h3>
+
+                <p>
+                  Platform services health
+                </p>
 
               </div>
 
             </div>
 
-            {/* METRICS */}
-            <div className="sysadmin-metrics">
 
-              {metrics.map((metric) => (
+            <div className="security-list">
+
+              {security.map((item) => (
 
                 <div
-                  className="sysadmin-metric"
-                  key={metric.title}
+                  className="security-row"
+                  key={item.title}
                 >
 
-                  <div className="metric-top">
+                  <div className="service-icon">
+                    {item.icon}
+                  </div>
 
-                    <div
-                      className={`metric-icon ${metric.color}`}
-                    >
-                      {metric.icon}
-                    </div>
+                  <div className="service-info">
 
-                    <span className="metric-change">
-                      {metric.change}
-                    </span>
+                    <strong>
+                      {item.title}
+                    </strong>
+
+                    <p>
+                      {item.description}
+                    </p>
 
                   </div>
 
-                  <p>{metric.title}</p>
-
-                  <strong>{metric.value}</strong>
-
-                  <small>{metric.subtitle}</small>
+                  <span className="healthy">
+                    Healthy
+                  </span>
 
                 </div>
 
@@ -355,316 +379,182 @@ export default function SystemAdminDashboard() {
 
             </div>
 
-            {/* TWO COLUMN */}
-            <div className="sysadmin-grid">
+          </div>
 
-              {/* ACTIVITY */}
-              <div className="sysadmin-card activity-card">
 
-                <div className="card-header">
+          {/* RESOURCES */}
+          <div className="sysadmin-card resources-card">
 
-                  <div>
-                    <h3>
-                      Recent System Activity
-                    </h3>
+            <div className="card-header">
 
-                    <p>
-                      Latest actions across the platform
-                    </p>
-                  </div>
+              <div>
 
-                  <button className="view-button">
-                    View All Logs
-                  </button>
+                <h3>
+                  System Resources
+                </h3>
 
-                </div>
-
-                <div className="activity-table">
-
-                  <div className="table-header">
-                    <span>User</span>
-                    <span>Action</span>
-                    <span>Module</span>
-                    <span>Time</span>
-                    <span>IP Address</span>
-                  </div>
-
-                  {activities.map((activity) => (
-
-                    <div
-                      className="activity-row"
-                      key={`${activity.user}-${activity.time}`}
-                    >
-
-                      <div className="activity-user">
-
-                        <div className="activity-avatar">
-                          {activity.initials}
-                        </div>
-
-                        <div>
-                          <strong>
-                            {activity.user}
-                          </strong>
-
-                          <small>
-                            {activity.role}
-                          </small>
-                        </div>
-
-                      </div>
-
-                      <span>
-                        {activity.action}
-                      </span>
-
-                      <span>
-                        {activity.module}
-                      </span>
-
-                      <div className="activity-time">
-                        <strong>
-                          {activity.time}
-                        </strong>
-
-                        <small>
-                          {activity.date}
-                        </small>
-                      </div>
-
-                      <span className="ip">
-                        {activity.ip}
-                      </span>
-
-                    </div>
-
-                  ))}
-
-                </div>
-
-                <button className="load-more">
-                  Load More
-                </button>
-
-              </div>
-
-              {/* RIGHT COLUMN */}
-              <div className="right-column">
-
-                {/* SECURITY */}
-                <div className="sysadmin-card">
-
-                  <div className="card-header">
-
-                    <div>
-                      <h3>
-                        🛡 Security Status
-                      </h3>
-
-                      <p>
-                        Platform services health
-                      </p>
-                    </div>
-
-                  </div>
-
-                  <div className="security-list">
-
-                    {security.map((item) => (
-
-                      <div
-                        className="security-row"
-                        key={item.title}
-                      >
-
-                        <div className="service-icon">
-                          {item.icon}
-                        </div>
-
-                        <div className="service-info">
-
-                          <strong>
-                            {item.title}
-                          </strong>
-
-                          <p>
-                            {item.description}
-                          </p>
-
-                        </div>
-
-                        <span className="healthy">
-                          Healthy
-                        </span>
-
-                      </div>
-
-                    ))}
-
-                  </div>
-
-                </div>
-
-                {/* RESOURCES */}
-                <div className="sysadmin-card resources-card">
-
-                  <div className="card-header">
-
-                    <div>
-                      <h3>
-                        System Resources
-                      </h3>
-
-                      <p>
-                        Current infrastructure usage
-                      </p>
-                    </div>
-
-                  </div>
-
-                  <div className="resources">
-
-                    {resources.map((resource) => (
-
-                      <div
-                        className="resource-row"
-                        key={resource.name}
-                      >
-
-                        <div className="resource-title">
-
-                          <strong>
-                            {resource.name}
-                          </strong>
-
-                          <span>
-                            {resource.value}%
-                          </span>
-
-                        </div>
-
-                        <div className="progress-track">
-
-                          <div
-                            className="progress-value"
-                            style={{
-                              width: `${resource.value}%`,
-                            }}
-                          />
-
-                        </div>
-
-                      </div>
-
-                    ))}
-
-                  </div>
-
-                </div>
+                <p>
+                  Current infrastructure usage
+                </p>
 
               </div>
 
             </div>
 
-            {/* MANAGEMENT CARDS */}
-            <section className="management-section">
 
-              <div className="section-heading">
-                <h3>Administration Tools</h3>
+            <div className="resources">
 
-                <p>
-                  Manage platform configuration and resources
-                </p>
-              </div>
+              {resources.map((resource) => (
 
-              <div className="management-grid">
+                <div
+                  className="resource-row"
+                  key={resource.name}
+                >
 
-                <button className="management-card">
-                  <div className="management-icon green">
-                    ♙
+                  <div className="resource-title">
+
+                    <strong>
+                      {resource.name}
+                    </strong>
+
+                    <span>
+                      {resource.value}%
+                    </span>
+
                   </div>
 
-                  <div>
-                    <strong>User Management</strong>
-                    <small>
-                      Create and manage platform users
-                    </small>
+
+                  <div className="progress-track">
+
+                    <div
+                      className="progress-value"
+                      style={{
+                        width: `${resource.value}%`,
+                      }}
+                    />
+
                   </div>
 
-                  <span>→</span>
-                </button>
+                </div>
 
-                <button className="management-card">
-                  <div className="management-icon purple">
-                    🛡
-                  </div>
+              ))}
 
-                  <div>
-                    <strong>Roles & Permissions</strong>
-                    <small>
-                      Configure access control
-                    </small>
-                  </div>
-
-                  <span>→</span>
-                </button>
-
-                <button className="management-card">
-                  <div className="management-icon orange">
-                    ▤
-                  </div>
-
-                  <div>
-                    <strong>Audit Logs</strong>
-                    <small>
-                      Review system activities
-                    </small>
-                  </div>
-
-                  <span>→</span>
-                </button>
-
-                <button className="management-card">
-                  <div className="management-icon blue">
-                    ✦
-                  </div>
-
-                  <div>
-                    <strong>AI Model Management</strong>
-                    <small>
-                      Monitor deployed AI models
-                    </small>
-                  </div>
-
-                  <span>→</span>
-                </button>
-
-              </div>
-
-            </section>
-
-            <footer className="sysadmin-footer">
-
-              <span>
-                © 2026 HealthForecast AI
-              </span>
-
-              <span>
-                System Administration Console
-              </span>
-
-              <span>
-                Platform Status: Operational
-              </span>
-
-            </footer>
+            </div>
 
           </div>
 
-        </section>
+        </div>
 
       </div>
 
-    </main>
+
+      {/* MANAGEMENT TOOLS */}
+      <section className="management-section">
+
+        <div className="section-heading">
+
+          <h3>
+            Administration Tools
+          </h3>
+
+          <p>
+            Manage platform configuration and resources
+          </p>
+
+        </div>
+
+
+        <div className="management-grid">
+
+          <button className="management-card">
+            <div className="management-icon green">
+              ♙
+            </div>
+
+            <div>
+              <strong>User Management</strong>
+
+              <small>
+                Create and manage platform users
+              </small>
+            </div>
+
+            <span>→</span>
+          </button>
+
+
+          <button className="management-card">
+            <div className="management-icon purple">
+              🛡
+            </div>
+
+            <div>
+              <strong>Roles & Permissions</strong>
+
+              <small>
+                Configure access control
+              </small>
+            </div>
+
+            <span>→</span>
+          </button>
+
+
+          <button className="management-card">
+            <div className="management-icon orange">
+              ▤
+            </div>
+
+            <div>
+              <strong>Audit Logs</strong>
+
+              <small>
+                Review system activities
+              </small>
+            </div>
+
+            <span>→</span>
+          </button>
+
+
+          <button className="management-card">
+            <div className="management-icon blue">
+              ✦
+            </div>
+
+            <div>
+              <strong>AI Model Management</strong>
+
+              <small>
+                Monitor deployed AI models
+              </small>
+            </div>
+
+            <span>→</span>
+          </button>
+
+        </div>
+
+      </section>
+
+
+      {/* FOOTER */}
+      <footer className="sysadmin-footer">
+
+        <span>
+          © 2026 HealthForecast AI
+        </span>
+
+        <span>
+          System Administration Console
+        </span>
+
+        <span>
+          Platform Status: Operational
+        </span>
+
+      </footer>
+
+    </div>
   );
 }
