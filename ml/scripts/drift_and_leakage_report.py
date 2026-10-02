@@ -549,13 +549,15 @@ def write_report(result: dict[str, Any], figures: dict[str, str]) -> None:
             else "Recall at 0.1117 stays at or above the promotion bar in every chunk."
         ),
         "",
-        "**Limits of this evidence:** there are no real dates in this dataset, so `encounter_id` "
-        "order is only a proxy for time; and every row is from 1999–2008, so none of this says "
-        "how the model would behave on today's patients. Because train/val/test are a random "
-        "split across the whole period, the test score is a time-averaged estimate; a temporal "
-        "hold-out (train on earlier chunks, test on the last) would be the stricter check and is "
-        "recommended before any real deployment. Live drift monitoring needs the "
-        "`prediction_events` collection to be populated in production.",
+        (
+            "**Limits of this evidence:** there are no real dates in this dataset, so `encounter_id` "
+            "order is only a proxy for time; and every row is from 1999–2008, so none of this says "
+            "how the model would behave on today's patients. Because train/val/test are a random "
+            "split across the whole period, the test score is a time-averaged estimate; a temporal "
+            "hold-out (train on earlier chunks, test on the last) would be the stricter check and "
+            "is recommended before any real deployment. Live drift monitoring needs the "
+            "`prediction_events` collection to be populated in production."
+        ),
         "",
         "## 1. Leakage proof",
         "",
@@ -574,9 +576,12 @@ def write_report(result: dict[str, Any], figures: dict[str, str]) -> None:
             ],
         ),
         "",
-        "Why it is zero by construction: `basic_clean` keeps only the first encounter per "
-        "`patient_nbr` (`cleaning.first_encounter_only: true`) before the split, so a row-level "
-        "split is also a patient-level split. The number above is measured, not assumed.",
+        (
+            "Why it is zero by construction: `basic_clean` keeps only the first encounter per "
+            "`patient_nbr` (`cleaning.first_encounter_only: true`) before the split, so a "
+            "row-level split is also a patient-level split. The number above is measured, not "
+            "assumed."
+        ),
         "",
         "### 1.2 No target-derived or post-discharge features",
         "",
@@ -720,8 +725,10 @@ def write_report(result: dict[str, Any], figures: dict[str, str]) -> None:
         "",
         "## 3. Concept drift (performance across chunks)",
         "",
-        "Production model (XGBoost, threshold 0.1117) scored on the **test rows** of each chunk "
-        "only (train/val rows were seen during fitting or calibration).",
+        (
+            "Production model (XGBoost, threshold 0.1117) scored on the **test rows** of each "
+            "chunk only (train/val rows were seen during fitting or calibration)."
+        ),
         "",
         f"![Concept drift]({figures['concept']})",
         "",

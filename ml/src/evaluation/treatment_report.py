@@ -157,10 +157,14 @@ def build_treatment_metrics(
         "cohorts": cohort_analytics(cleaned, config),
         "model_evaluation": evaluation,
         "limitations": [
-            "Associations only. Patients whose medication changed were not "
-            "randomised into that group, so a rate difference is not an effect.",
-            "No HbA1c improvement is measured anywhere. The dataset holds one "
-            "A1Cresult per encounter and no follow-up value.",
+            (
+                "Associations only. Patients whose medication changed were not "
+                "randomised into that group, so a rate difference is not an effect."
+            ),
+            (
+                "No HbA1c improvement is measured anywhere. The dataset holds one "
+                "A1Cresult per encounter and no follow-up value."
+            ),
             "No time trends. The dataset carries no admission dates.",
         ],
     }

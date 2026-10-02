@@ -1,0 +1,12 @@
+# Optional deep-learning dependencies - NOT needed for the ML pipeline.
+#
+# Nothing in ml/ imports TensorFlow today; this is kept only for the
+# Milestone 2 stretch goal. It lives in its own file because
+# tensorflow-cpu==2.18.0 requires numpy<2.1, which conflicts with the
+# numpy==2.2.1 pinned in requirements.txt - having both in one file made
+# `pip install -r ml/requirements.txt` (and CI's pip-audit of it) fail with
+# ResolutionImpossible. Install this in a separate environment, or move
+# numpy below 2.1 there first.
+
+# ---- Deep learning (Milestone 2 stretch goal) ----
+tensorflow-cpu==2.18.0
