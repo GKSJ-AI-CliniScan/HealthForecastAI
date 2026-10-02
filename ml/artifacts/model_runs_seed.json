@@ -1,0 +1,240 @@
+{
+  "collection": "model_runs",
+  "production_artifact": "readmission_model.joblib",
+  "reproduces_metrics_json": true,
+  "reproduction_mismatches": [],
+  "documents": [
+    {
+      "run_id": "logistic_regression-3dfc8d25b129",
+      "model_name": "readmission_logistic_regression",
+      "model_version": "logistic_regression-202610020818",
+      "algorithm": "logistic_regression",
+      "framework": "scikit-learn",
+      "framework_version": "1.6.0",
+      "trained_at": "2026-10-02T08:18:07.931924+00:00",
+      "seeded_at": "2026-10-02T08:29:54.979983+00:00",
+      "git_commit": "aac0c2639b2a339d9acae7b8e23fbeade3898a35",
+      "git_dirty": true,
+      "dataset_hash": "sha256:d00fe453ec6a4c7ff19df7a727d1ff1fd7d80c4c07979be9b58f4d522cc6af79",
+      "dataset": {
+        "name": "diabetes_130_us_hospitals",
+        "path": "ml/data/raw/diabetic_data.csv",
+        "sha256": "d00fe453ec6a4c7ff19df7a727d1ff1fd7d80c4c07979be9b58f4d522cc6af79",
+        "n_raw_rows": 101766,
+        "n_rows_after_cleaning": 69987,
+        "n_train": 48990,
+        "n_val": 6999,
+        "n_test": 13998,
+        "test_prevalence": 0.08979854264894985,
+        "split_strategy": "stratified random split, 70/10/20 train/val/test, random_state=42; one encounter per patient (cleaning.first_encounter_only), so patient-disjoint by construction"
+      },
+      "n_features": 51,
+      "n_model_inputs": 206,
+      "hyperparameters": {
+        "C": 1.0,
+        "class_weight": "balanced",
+        "dual": false,
+        "fit_intercept": true,
+        "intercept_scaling": 1,
+        "max_iter": 1000,
+        "multi_class": "deprecated",
+        "penalty": "l2",
+        "solver": "lbfgs",
+        "tol": 0.0001,
+        "verbose": 0,
+        "warm_start": false
+      },
+      "calibration": "isotonic, fit on the validation split (CalibratedClassifierCV)",
+      "metrics": {
+        "accuracy": 0.6070152878982712,
+        "roc_auc": 0.6280232003659969,
+        "pr_auc": 0.14506528929419368,
+        "recall": 0.573587907716786,
+        "precision": 0.12680267323250088,
+        "f1": 0.20769119976955205,
+        "brier": 0.0799884826482738
+      },
+      "metrics_split": "test",
+      "confusion_matrix": {
+        "true_negative": 7776,
+        "false_positive": 4965,
+        "false_negative": 536,
+        "true_positive": 721
+      },
+      "threshold": 0.09274193548387097,
+      "threshold_selection": {
+        "method": "highest precision with recall >= min_recall (select_decision_threshold)",
+        "split": "validation",
+        "min_recall": 0.5,
+        "validation_precision": 0.12596762843068263,
+        "validation_recall": 0.5691573926868044
+      },
+      "artifact_path": "ml/artifacts/logistic_regression.joblib",
+      "artifact_sha256": "3dfc8d25b12979a701dde69dfd380e7a1689afb02f98a2d383696464131607cb",
+      "retrained_for_seed": false,
+      "promoted": false,
+      "is_active": false,
+      "serving_latency_ms": {
+        "median": 6.147,
+        "p95": 6.572,
+        "n_samples": 200,
+        "method": "in-process predict_proba on one test row, after warm-up"
+      }
+    },
+    {
+      "run_id": "random_forest-d7c3451767db",
+      "model_name": "readmission_random_forest",
+      "model_version": "random_forest-202610020819",
+      "algorithm": "random_forest",
+      "framework": "scikit-learn",
+      "framework_version": "1.6.0",
+      "trained_at": "2026-10-02T08:19:08.137854+00:00",
+      "seeded_at": "2026-10-02T08:29:56.662717+00:00",
+      "git_commit": "aac0c2639b2a339d9acae7b8e23fbeade3898a35",
+      "git_dirty": true,
+      "dataset_hash": "sha256:d00fe453ec6a4c7ff19df7a727d1ff1fd7d80c4c07979be9b58f4d522cc6af79",
+      "dataset": {
+        "name": "diabetes_130_us_hospitals",
+        "path": "ml/data/raw/diabetic_data.csv",
+        "sha256": "d00fe453ec6a4c7ff19df7a727d1ff1fd7d80c4c07979be9b58f4d522cc6af79",
+        "n_raw_rows": 101766,
+        "n_rows_after_cleaning": 69987,
+        "n_train": 48990,
+        "n_val": 6999,
+        "n_test": 13998,
+        "test_prevalence": 0.08979854264894985,
+        "split_strategy": "stratified random split, 70/10/20 train/val/test, random_state=42; one encounter per patient (cleaning.first_encounter_only), so patient-disjoint by construction"
+      },
+      "n_features": 51,
+      "n_model_inputs": 206,
+      "hyperparameters": {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": "balanced",
+        "criterion": "gini",
+        "max_depth": 8,
+        "max_features": 0.5,
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 10,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "n_estimators": 200,
+        "oob_score": false,
+        "random_state": 42,
+        "verbose": 0,
+        "warm_start": false
+      },
+      "calibration": "isotonic, fit on the validation split (CalibratedClassifierCV)",
+      "metrics": {
+        "accuracy": 0.6634519217031004,
+        "roc_auc": 0.6458997965525387,
+        "pr_auc": 0.15813426750654855,
+        "recall": 0.5393794749403341,
+        "precision": 0.14095634095634096,
+        "f1": 0.22350420306576563,
+        "brier": 0.07951677259603127
+      },
+      "metrics_split": "test",
+      "confusion_matrix": {
+        "true_negative": 8609,
+        "false_positive": 4132,
+        "false_negative": 579,
+        "true_positive": 678
+      },
+      "threshold": 0.1,
+      "threshold_selection": {
+        "method": "highest precision with recall >= min_recall (select_decision_threshold)",
+        "split": "validation",
+        "min_recall": 0.5,
+        "validation_precision": 0.13682916837361736,
+        "validation_recall": 0.5310015898251192
+      },
+      "artifact_path": "ml/artifacts/random_forest.joblib",
+      "artifact_sha256": "d7c3451767db77d0dd97a0165bd68e711027f50d846f7547d712c2428a5e826e",
+      "retrained_for_seed": false,
+      "promoted": false,
+      "is_active": false,
+      "serving_latency_ms": {
+        "median": 13.031,
+        "p95": 13.723,
+        "n_samples": 200,
+        "method": "in-process predict_proba on one test row, after warm-up"
+      }
+    },
+    {
+      "run_id": "xgboost-3b1d27b045bb",
+      "model_name": "readmission_xgboost",
+      "model_version": "xgboost-202609301703",
+      "algorithm": "xgboost",
+      "framework": "xgboost",
+      "framework_version": "2.1.4",
+      "trained_at": "2026-09-30T17:03:41.506148+00:00",
+      "seeded_at": "2026-10-02T08:29:59.612125+00:00",
+      "git_commit": "aac0c2639b2a339d9acae7b8e23fbeade3898a35",
+      "git_dirty": true,
+      "dataset_hash": "sha256:d00fe453ec6a4c7ff19df7a727d1ff1fd7d80c4c07979be9b58f4d522cc6af79",
+      "dataset": {
+        "name": "diabetes_130_us_hospitals",
+        "path": "ml/data/raw/diabetic_data.csv",
+        "sha256": "d00fe453ec6a4c7ff19df7a727d1ff1fd7d80c4c07979be9b58f4d522cc6af79",
+        "n_raw_rows": 101766,
+        "n_rows_after_cleaning": 69987,
+        "n_train": 48990,
+        "n_val": 6999,
+        "n_test": 13998,
+        "test_prevalence": 0.08979854264894985,
+        "split_strategy": "stratified random split, 70/10/20 train/val/test, random_state=42; one encounter per patient (cleaning.first_encounter_only), so patient-disjoint by construction"
+      },
+      "n_features": 51,
+      "n_model_inputs": 206,
+      "hyperparameters": {
+        "colsample_bytree": 0.6,
+        "enable_categorical": false,
+        "eval_metric": "logloss",
+        "learning_rate": 0.01,
+        "max_depth": 6,
+        "n_estimators": 300,
+        "objective": "binary:logistic",
+        "random_state": 42,
+        "scale_pos_weight": 10.136621959536258,
+        "subsample": 0.6
+      },
+      "calibration": "isotonic, fit on the validation split (CalibratedClassifierCV)",
+      "metrics": {
+        "accuracy": 0.6868124017716817,
+        "roc_auc": 0.6518298564066656,
+        "pr_auc": 0.16628047418293862,
+        "recall": 0.5099443118536198,
+        "precision": 0.14538444091630756,
+        "f1": 0.22626191316625485,
+        "brier": 0.07912366552967529
+      },
+      "metrics_split": "test",
+      "confusion_matrix": {
+        "true_negative": 8973,
+        "false_positive": 3768,
+        "false_negative": 616,
+        "true_positive": 641
+      },
+      "threshold": 0.1117478534579277,
+      "threshold_selection": {
+        "method": "highest precision with recall >= min_recall (select_decision_threshold)",
+        "split": "validation",
+        "min_recall": 0.5,
+        "validation_precision": 0.14253798033958892,
+        "validation_recall": 0.5071542130365659
+      },
+      "artifact_path": "ml/artifacts/readmission_model.joblib",
+      "artifact_sha256": "3b1d27b045bb2b5b6a91449704180e000b57ca9d6767974583a2ca9b60a0aae2",
+      "retrained_for_seed": false,
+      "promoted": true,
+      "is_active": true,
+      "serving_latency_ms": {
+        "median": 7.36,
+        "p95": 17.473,
+        "n_samples": 200,
+        "method": "in-process predict_proba on one test row, after warm-up"
+      }
+    }
+  ]
+}

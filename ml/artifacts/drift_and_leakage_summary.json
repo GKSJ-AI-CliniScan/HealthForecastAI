@@ -1,0 +1,1187 @@
+{
+  "generated_at": "2026-10-02 08:29 UTC",
+  "git_commit": "aac0c2639b2a339d9acae7b8e23fbeade3898a35",
+  "dataset_sha256": "d00fe453ec6a4c7ff19df7a727d1ff1fd7d80c4c07979be9b58f4d522cc6af79",
+  "production_model": "xgboost",
+  "threshold": 0.1117478534579277,
+  "feature_columns": [
+    "race",
+    "gender",
+    "age",
+    "admission_type_id",
+    "discharge_disposition_id",
+    "admission_source_id",
+    "time_in_hospital",
+    "medical_specialty",
+    "num_lab_procedures",
+    "num_procedures",
+    "num_medications",
+    "number_outpatient",
+    "number_emergency",
+    "number_inpatient",
+    "diag_1",
+    "diag_2",
+    "diag_3",
+    "number_diagnoses",
+    "max_glu_serum",
+    "A1Cresult",
+    "metformin",
+    "repaglinide",
+    "nateglinide",
+    "chlorpropamide",
+    "glimepiride",
+    "acetohexamide",
+    "glipizide",
+    "glyburide",
+    "tolbutamide",
+    "pioglitazone",
+    "rosiglitazone",
+    "acarbose",
+    "miglitol",
+    "troglitazone",
+    "tolazamide",
+    "insulin",
+    "glyburide-metformin",
+    "glipizide-metformin",
+    "glimepiride-pioglitazone",
+    "metformin-rosiglitazone",
+    "metformin-pioglitazone",
+    "change",
+    "diabetesMed",
+    "diag_1_group",
+    "diag_2_group",
+    "diag_3_group",
+    "age_numeric",
+    "age_group",
+    "total_prior_visits",
+    "num_med_changes",
+    "num_meds_prescribed"
+  ],
+  "leakage": {
+    "patient_overlap": {
+      "train_test": 0,
+      "train_val": 0,
+      "val_test": 0,
+      "duplicate_patients_in_dataset": 0
+    },
+    "readmit_named_features": [],
+    "univariate_scan_top": [
+      {
+        "feature": "discharge_disposition_id",
+        "single_feature_auc": 0.5735813203
+      },
+      {
+        "feature": "diag_1",
+        "single_feature_auc": 0.5721443942
+      },
+      {
+        "feature": "diag_3",
+        "single_feature_auc": 0.5590471243
+      },
+      {
+        "feature": "number_inpatient",
+        "single_feature_auc": 0.5520335786
+      },
+      {
+        "feature": "total_prior_visits",
+        "single_feature_auc": 0.5519469747
+      },
+      {
+        "feature": "time_in_hospital",
+        "single_feature_auc": 0.5484212201
+      },
+      {
+        "feature": "number_diagnoses",
+        "single_feature_auc": 0.5481401788
+      },
+      {
+        "feature": "num_lab_procedures",
+        "single_feature_auc": 0.5459861008
+      },
+      {
+        "feature": "diag_2",
+        "single_feature_auc": 0.5455892025
+      },
+      {
+        "feature": "age_numeric",
+        "single_feature_auc": 0.5448183837
+      }
+    ],
+    "univariate_scan_max": 0.5735813203223864,
+    "hospice": {
+      "disposition_ids": [
+        11,
+        13,
+        14,
+        19,
+        20,
+        21
+      ],
+      "raw_rows": 2423,
+      "raw_rows_readmitted_lt30": 43,
+      "rows_after_cleaning": 0
+    },
+    "threshold": {
+      "shipped_threshold": 0.1117478534579277,
+      "rederived_on_validation": 0.1117478534579277,
+      "matches_validation": true,
+      "validation_recall_recomputed": 0.5071542130365659,
+      "validation_precision_recomputed": 0.14253798033958892,
+      "validation_recall_in_metrics_json": 0.5071542130365659,
+      "validation_precision_in_metrics_json": 0.14253798033958892,
+      "test_recall_at_threshold": 0.5099443118536198,
+      "test_precision_at_threshold": 0.14538444091630756,
+      "would_be_if_tuned_on_test": 0.1117478534579277,
+      "test_rule_recall": 0.5099443118536198,
+      "test_rule_precision": 0.14538444091630756,
+      "distinct_calibrated_levels_validation": 26,
+      "min_recall": 0.5
+    }
+  },
+  "drift_train_vs_test": {
+    "max_psi": 0.03578934454232115,
+    "flagged_features": [],
+    "table": [
+      {
+        "feature": "diag_3",
+        "psi": 0.0357893445,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "diag_1",
+        "psi": 0.0310894688,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "diag_2",
+        "psi": 0.0309949451,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "medical_specialty",
+        "psi": 0.0051121427,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "diag_3_group",
+        "psi": 0.0017356683,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "total_prior_visits",
+        "psi": 0.0013850134,
+        "ks_statistic": 0.0021779334,
+        "ks_p_value": 0.9999999994
+      },
+      {
+        "feature": "num_lab_procedures",
+        "psi": 0.0012796497,
+        "ks_statistic": 0.0106961567,
+        "ks_p_value": 0.1643648316
+      },
+      {
+        "feature": "rosiglitazone",
+        "psi": 0.0012088553,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "time_in_hospital",
+        "psi": 0.0011694457,
+        "ks_statistic": 0.0076337386,
+        "ks_p_value": 0.5472338385
+      },
+      {
+        "feature": "diag_1_group",
+        "psi": 0.0007988771,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "number_diagnoses",
+        "psi": 0.0007881921,
+        "ks_statistic": 0.0031565265,
+        "ks_p_value": 0.99990294
+      },
+      {
+        "feature": "discharge_disposition_id",
+        "psi": 0.0007564618,
+        "ks_statistic": 0.0037741548,
+        "ks_p_value": 0.9976303978
+      },
+      {
+        "feature": "num_meds_prescribed",
+        "psi": 0.0006717723,
+        "ks_statistic": 0.0058027273,
+        "ks_p_value": 0.8548137087
+      },
+      {
+        "feature": "pioglitazone",
+        "psi": 0.0006634049,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "num_med_changes",
+        "psi": 0.0006603629,
+        "ks_statistic": 0.0105677331,
+        "ks_p_value": 0.1744306565
+      },
+      {
+        "feature": "insulin",
+        "psi": 0.0005962268,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "age",
+        "psi": 0.0005839595,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "age_numeric",
+        "psi": 0.0005839595,
+        "ks_statistic": 0.0050046079,
+        "ks_p_value": 0.946678118
+      },
+      {
+        "feature": "glyburide",
+        "psi": 0.0005130481,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "number_inpatient",
+        "psi": 0.0005062496,
+        "ks_statistic": 0.0007725887,
+        "ks_p_value": 1.0
+      },
+      {
+        "feature": "admission_type_id",
+        "psi": 0.000403491,
+        "ks_statistic": 0.0046301252,
+        "ks_p_value": 0.9728989682
+      },
+      {
+        "feature": "admission_source_id",
+        "psi": 0.0003950717,
+        "ks_statistic": 0.0025149949,
+        "ks_p_value": 0.9999998053
+      },
+      {
+        "feature": "diag_2_group",
+        "psi": 0.0003927696,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "num_procedures",
+        "psi": 0.0003909291,
+        "ks_statistic": 0.0073056452,
+        "ks_p_value": 0.6038784954
+      },
+      {
+        "feature": "glimepiride",
+        "psi": 0.0003648045,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "number_emergency",
+        "psi": 0.0003625746,
+        "ks_statistic": 0.0018937882,
+        "ks_p_value": 1.0
+      },
+      {
+        "feature": "change",
+        "psi": 0.0003100407,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "num_medications",
+        "psi": 0.0003061616,
+        "ks_statistic": 0.0039823378,
+        "ks_p_value": 0.9949979196
+      },
+      {
+        "feature": "race",
+        "psi": 0.0002460768,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "nateglinide",
+        "psi": 0.0002331735,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "acarbose",
+        "psi": 0.0002031356,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "glipizide",
+        "psi": 0.0001926088,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "max_glu_serum",
+        "psi": 0.0001849904,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "diabetesMed",
+        "psi": 0.0001749227,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "age_group",
+        "psi": 0.0001494371,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "tolbutamide",
+        "psi": 0.0001320039,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "A1Cresult",
+        "psi": 0.0001132366,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "metformin",
+        "psi": 9.58718e-05,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "repaglinide",
+        "psi": 8.58199e-05,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "chlorpropamide",
+        "psi": 8.18409e-05,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "gender",
+        "psi": 7.0301e-05,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "glyburide-metformin",
+        "psi": 5.46768e-05,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "number_outpatient",
+        "psi": 3.85239e-05,
+        "ks_statistic": 0.001400235,
+        "ks_p_value": 1.0
+      },
+      {
+        "feature": "miglitol",
+        "psi": 1.09048e-05,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "tolazamide",
+        "psi": 4.0824e-06,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "glipizide-metformin",
+        "psi": 4.3e-08,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "troglitazone",
+        "psi": 3.8e-09,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "acetohexamide",
+        "psi": 4e-10,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "metformin-pioglitazone",
+        "psi": 4e-10,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "metformin-rosiglitazone",
+        "psi": 4e-10,
+        "ks_statistic": null,
+        "ks_p_value": null
+      },
+      {
+        "feature": "glimepiride-pioglitazone",
+        "psi": 0.0,
+        "ks_statistic": null,
+        "ks_p_value": null
+      }
+    ]
+  },
+  "drift_by_chunk": {
+    "n_chunks": 5,
+    "chunks": [
+      {
+        "chunk": 1,
+        "n_rows": 13998,
+        "encounter_id_min": 12522,
+        "encounter_id_max": 66827406,
+        "readmission_rate": 0.09872838976996713
+      },
+      {
+        "chunk": 2,
+        "n_rows": 13998,
+        "encounter_id_min": 66838224,
+        "encounter_id_max": 116803782,
+        "readmission_rate": 0.09744249178454065
+      },
+      {
+        "chunk": 3,
+        "n_rows": 13997,
+        "encounter_id_min": 116810130,
+        "encounter_id_max": 162217692,
+        "readmission_rate": 0.09966421376009145
+      },
+      {
+        "chunk": 4,
+        "n_rows": 13997,
+        "encounter_id_min": 162221100,
+        "encounter_id_max": 241265268,
+        "readmission_rate": 0.08587554475959135
+      },
+      {
+        "chunk": 5,
+        "n_rows": 13997,
+        "encounter_id_min": 241289898,
+        "encounter_id_max": 443867222,
+        "readmission_rate": 0.06730013574337358
+      }
+    ],
+    "max_psi": 1.4850752819289916,
+    "flagged_features": [
+      "discharge_disposition_id",
+      "medical_specialty",
+      "admission_source_id",
+      "number_diagnoses",
+      "diag_2",
+      "admission_type_id",
+      "diag_3",
+      "diag_1"
+    ],
+    "table": [
+      {
+        "feature": "discharge_disposition_id",
+        "largest_change": "18: 17.0% -> 0.0%",
+        "max_psi_vs_chunk1": 1.4850752819,
+        "worst_chunk": 3,
+        "ks_statistic_last_vs_first": 0.1874432648
+      },
+      {
+        "feature": "medical_specialty",
+        "largest_change": "Missing: 41.5% -> 67.3%",
+        "max_psi_vs_chunk1": 1.0317279634,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "admission_source_id",
+        "largest_change": "6: 0.3% -> 11.2%",
+        "max_psi_vs_chunk1": 0.605279125,
+        "worst_chunk": 2,
+        "ks_statistic_last_vs_first": 0.1374466553
+      },
+      {
+        "feature": "number_diagnoses",
+        "largest_change": "9: 25.9% -> 61.1%",
+        "max_psi_vs_chunk1": 0.5929279141,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": 0.3565234924
+      },
+      {
+        "feature": "diag_2",
+        "largest_change": "250.01: 3.4% -> 0.3%",
+        "max_psi_vs_chunk1": 0.5007026,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "admission_type_id",
+        "largest_change": "1: 45.8% -> 57.6%",
+        "max_psi_vs_chunk1": 0.4653119905,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": 0.1706644974
+      },
+      {
+        "feature": "diag_3",
+        "largest_change": "Missing: 3.3% -> 0.7%",
+        "max_psi_vs_chunk1": 0.3370106793,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "diag_1",
+        "largest_change": "414: 10.7% -> 5.5%",
+        "max_psi_vs_chunk1": 0.2753282744,
+        "worst_chunk": 4,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "max_glu_serum",
+        "largest_change": "None: 90.5% -> 98.8%",
+        "max_psi_vs_chunk1": 0.1805972949,
+        "worst_chunk": 3,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "number_outpatient",
+        "largest_change": "0: 94.5% -> 82.0%",
+        "max_psi_vs_chunk1": 0.165343295,
+        "worst_chunk": 4,
+        "ks_statistic_last_vs_first": 0.1000968223
+      },
+      {
+        "feature": "diag_2_group",
+        "largest_change": "Diabetes: 18.6% -> 10.8%",
+        "max_psi_vs_chunk1": 0.132135868,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "insulin",
+        "largest_change": "No: 55.3% -> 42.2%",
+        "max_psi_vs_chunk1": 0.1230969893,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "num_lab_procedures",
+        "largest_change": "1: 1.1% -> 4.9%",
+        "max_psi_vs_chunk1": 0.1226180532,
+        "worst_chunk": 3,
+        "ks_statistic_last_vs_first": 0.1053833786
+      },
+      {
+        "feature": "total_prior_visits",
+        "largest_change": "0: 82.7% -> 69.4%",
+        "max_psi_vs_chunk1": 0.1036072786,
+        "worst_chunk": 4,
+        "ks_statistic_last_vs_first": 0.1110361728
+      },
+      {
+        "feature": "number_emergency",
+        "largest_change": "0: 96.9% -> 90.4%",
+        "max_psi_vs_chunk1": 0.0806899478,
+        "worst_chunk": 4,
+        "ks_statistic_last_vs_first": 0.0578717228
+      },
+      {
+        "feature": "diag_3_group",
+        "largest_change": "Diabetes: 20.6% -> 15.4%",
+        "max_psi_vs_chunk1": 0.0796321927,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "A1Cresult",
+        "largest_change": "None: 80.8% -> 88.2%",
+        "max_psi_vs_chunk1": 0.0673909809,
+        "worst_chunk": 3,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "race",
+        "largest_change": "AfricanAmerican: 19.7% -> 12.5%",
+        "max_psi_vs_chunk1": 0.066008846,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "change",
+        "largest_change": "Ch: 39.2% -> 51.7%",
+        "max_psi_vs_chunk1": 0.0633595499,
+        "worst_chunk": 4,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "glyburide",
+        "largest_change": "No: 84.2% -> 91.6%",
+        "max_psi_vs_chunk1": 0.0559325885,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "age",
+        "largest_change": "[80-90): 12.7% -> 16.8%",
+        "max_psi_vs_chunk1": 0.055193701,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "age_numeric",
+        "largest_change": "85: 12.7% -> 16.8%",
+        "max_psi_vs_chunk1": 0.055193701,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": 0.0569137328
+      },
+      {
+        "feature": "diag_1_group",
+        "largest_change": "Circulatory: 35.6% -> 27.2%",
+        "max_psi_vs_chunk1": 0.0518245596,
+        "worst_chunk": 4,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "time_in_hospital",
+        "largest_change": "1: 13.2% -> 16.9%",
+        "max_psi_vs_chunk1": 0.0500475754,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": 0.09390972
+      },
+      {
+        "feature": "num_meds_prescribed",
+        "largest_change": "0: 26.4% -> 20.8%",
+        "max_psi_vs_chunk1": 0.0491483835,
+        "worst_chunk": 4,
+        "ks_statistic_last_vs_first": 0.0555314891
+      },
+      {
+        "feature": "num_med_changes",
+        "largest_change": "0: 79.0% -> 69.7%",
+        "max_psi_vs_chunk1": 0.0462514522,
+        "worst_chunk": 4,
+        "ks_statistic_last_vs_first": 0.0828899071
+      },
+      {
+        "feature": "num_medications",
+        "largest_change": "8: 5.3% -> 3.9%",
+        "max_psi_vs_chunk1": 0.0392130847,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": 0.0903453349
+      },
+      {
+        "feature": "pioglitazone",
+        "largest_change": "No: 95.6% -> 91.1%",
+        "max_psi_vs_chunk1": 0.0363038115,
+        "worst_chunk": 4,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "num_procedures",
+        "largest_change": "0: 41.6% -> 44.5%",
+        "max_psi_vs_chunk1": 0.0343141833,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": 0.0292502671
+      },
+      {
+        "feature": "glyburide-metformin",
+        "largest_change": "No: 99.9% -> 98.8%",
+        "max_psi_vs_chunk1": 0.0302684587,
+        "worst_chunk": 4,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "age_group",
+        "largest_change": "60+: 62.2% -> 68.1%",
+        "max_psi_vs_chunk1": 0.02350864,
+        "worst_chunk": 3,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "rosiglitazone",
+        "largest_change": "No: 93.6% -> 96.7%",
+        "max_psi_vs_chunk1": 0.0232550293,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "metformin",
+        "largest_change": "Steady: 16.3% -> 22.0%",
+        "max_psi_vs_chunk1": 0.0210697055,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "glimepiride",
+        "largest_change": "Steady: 3.1% -> 5.7%",
+        "max_psi_vs_chunk1": 0.0174392814,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "diabetesMed",
+        "largest_change": "No: 26.4% -> 20.8%",
+        "max_psi_vs_chunk1": 0.0172265564,
+        "worst_chunk": 4,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "nateglinide",
+        "largest_change": "No: 99.9% -> 99.0%",
+        "max_psi_vs_chunk1": 0.016402965,
+        "worst_chunk": 3,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "number_inpatient",
+        "largest_change": "0: 87.8% -> 90.4%",
+        "max_psi_vs_chunk1": 0.0095132959,
+        "worst_chunk": 4,
+        "ks_statistic_last_vs_first": 0.0177808293
+      },
+      {
+        "feature": "glipizide",
+        "largest_change": "No: 86.6% -> 88.3%",
+        "max_psi_vs_chunk1": 0.0083307035,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "chlorpropamide",
+        "largest_change": "No: 99.7% -> 100.0%",
+        "max_psi_vs_chunk1": 0.0076329881,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "repaglinide",
+        "largest_change": "No: 99.1% -> 98.2%",
+        "max_psi_vs_chunk1": 0.0060548726,
+        "worst_chunk": 3,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "tolazamide",
+        "largest_change": "Steady: 0.1% -> 0.0%",
+        "max_psi_vs_chunk1": 0.0023054694,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "acarbose",
+        "largest_change": "No: 99.6% -> 99.8%",
+        "max_psi_vs_chunk1": 0.0015199538,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "tolbutamide",
+        "largest_change": "No: 99.9% -> 100.0%",
+        "max_psi_vs_chunk1": 0.001208457,
+        "worst_chunk": 4,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "miglitol",
+        "largest_change": "No: 100.0% -> 99.9%",
+        "max_psi_vs_chunk1": 0.0008223269,
+        "worst_chunk": 3,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "gender",
+        "largest_change": "Female: 52.9% -> 54.0%",
+        "max_psi_vs_chunk1": 0.0004864847,
+        "worst_chunk": 2,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "glipizide-metformin",
+        "largest_change": "Steady: 0.0% -> 0.0%",
+        "max_psi_vs_chunk1": 0.0003276142,
+        "worst_chunk": 3,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "troglitazone",
+        "largest_change": "Steady: 0.0% -> 0.0%",
+        "max_psi_vs_chunk1": 8.71873e-05,
+        "worst_chunk": 2,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "metformin-rosiglitazone",
+        "largest_change": "No: 100.0% -> 100.0%",
+        "max_psi_vs_chunk1": 1.53266e-05,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "metformin-pioglitazone",
+        "largest_change": "Steady: 0.0% -> 0.0%",
+        "max_psi_vs_chunk1": 5.1e-09,
+        "worst_chunk": 5,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "acetohexamide",
+        "largest_change": "Steady: 0.0% -> 0.0%",
+        "max_psi_vs_chunk1": 5.1e-09,
+        "worst_chunk": 2,
+        "ks_statistic_last_vs_first": null
+      },
+      {
+        "feature": "glimepiride-pioglitazone",
+        "largest_change": "No: 100.0% -> 100.0%",
+        "max_psi_vs_chunk1": 0.0,
+        "worst_chunk": 2,
+        "ks_statistic_last_vs_first": null
+      }
+    ]
+  },
+  "overall_test": {
+    "roc_auc": 0.6518298564066656,
+    "pr_auc": 0.16628047418293862,
+    "brier": 0.07912366552967529,
+    "precision": 0.14538444091630756,
+    "recall": 0.5099443118536198,
+    "f1": 0.22626191316625485,
+    "accuracy": 0.6868124017716817,
+    "n": 13998,
+    "prevalence": 0.08979854264894985
+  },
+  "concept_drift": [
+    {
+      "roc_auc": 0.656170349891807,
+      "pr_auc": 0.16564640995529506,
+      "brier": 0.08337736711151159,
+      "precision": 0.14846235418875928,
+      "recall": 0.5223880597014925,
+      "f1": 0.23121387283236994,
+      "accuracy": 0.6706756278740714,
+      "n": 2827,
+      "prevalence": 0.0948001414927485,
+      "chunk": 1,
+      "roc_auc_ci95": [
+        0.623795337365097,
+        0.6898243158908133
+      ],
+      "roc_auc_by_model": {
+        "logistic_regression": 0.6203376435524605,
+        "random_forest": 0.6483496935020093,
+        "xgboost": 0.656170349891807
+      }
+    },
+    {
+      "roc_auc": 0.6811305426091419,
+      "pr_auc": 0.19116179955473842,
+      "brier": 0.08314830061553379,
+      "precision": 0.17417061611374407,
+      "recall": 0.5384615384615384,
+      "f1": 0.26320501342882724,
+      "accuracy": 0.710517059444249,
+      "n": 2843,
+      "prevalence": 0.09602532536053465,
+      "chunk": 2,
+      "roc_auc_ci95": [
+        0.6510383123789385,
+        0.7143295608444105
+      ],
+      "roc_auc_by_model": {
+        "logistic_regression": 0.6476140590926583,
+        "random_forest": 0.6800715497213552,
+        "xgboost": 0.6811305426091419
+      }
+    },
+    {
+      "roc_auc": 0.6377136901357972,
+      "pr_auc": 0.18703720102188928,
+      "brier": 0.09293321102083898,
+      "precision": 0.1634199134199134,
+      "recall": 0.5,
+      "f1": 0.2463295269168026,
+      "accuracy": 0.6717584369449379,
+      "n": 2815,
+      "prevalence": 0.10728241563055062,
+      "chunk": 3,
+      "roc_auc_ci95": [
+        0.605142603010584,
+        0.6682077654397056
+      ],
+      "roc_auc_by_model": {
+        "logistic_regression": 0.6087115212813897,
+        "random_forest": 0.6332923104492401,
+        "xgboost": 0.6377136901357972
+      }
+    },
+    {
+      "roc_auc": 0.6416798627606227,
+      "pr_auc": 0.17627156762478474,
+      "brier": 0.07643698791937364,
+      "precision": 0.14065934065934066,
+      "recall": 0.5333333333333333,
+      "f1": 0.22260869565217392,
+      "accuracy": 0.6767895878524945,
+      "n": 2766,
+      "prevalence": 0.08676789587852494,
+      "chunk": 4,
+      "roc_auc_ci95": [
+        0.6019944996667853,
+        0.6805455539974324
+      ],
+      "roc_auc_by_model": {
+        "logistic_regression": 0.6341424188440221,
+        "random_forest": 0.6362537938770124,
+        "xgboost": 0.6416798627606227
+      }
+    },
+    {
+      "roc_auc": 0.6322754868193575,
+      "pr_auc": 0.11091755450164825,
+      "brier": 0.05913466945815057,
+      "precision": 0.09517766497461928,
+      "recall": 0.43103448275862066,
+      "f1": 0.15592515592515593,
+      "accuracy": 0.7044048052420823,
+      "n": 2747,
+      "prevalence": 0.06334182744812522,
+      "chunk": 5,
+      "roc_auc_ci95": [
+        0.5923651857564627,
+        0.6754865660194032
+      ],
+      "roc_auc_by_model": {
+        "logistic_regression": 0.6145784472707293,
+        "random_forest": 0.6206159454279856,
+        "xgboost": 0.6322754868193575
+      }
+    }
+  ],
+  "subgroups": {
+    "age": [
+      {
+        "group": "[0-10)",
+        "n": 29,
+        "prevalence": 0.0,
+        "roc_auc": null,
+        "recall": 0.0,
+        "precision": 0.0,
+        "false_positive_rate": 0.034482758620689655,
+        "flag_rate": 0.034482758620689655,
+        "reliable": false
+      },
+      {
+        "group": "[10-20)",
+        "n": 109,
+        "prevalence": 0.045871559633027525,
+        "roc_auc": 0.7105769230769231,
+        "recall": 0.4,
+        "precision": 0.2,
+        "false_positive_rate": 0.07692307692307693,
+        "flag_rate": 0.09174311926605505,
+        "reliable": true
+      },
+      {
+        "group": "[20-30)",
+        "n": 204,
+        "prevalence": 0.07352941176470588,
+        "roc_auc": 0.7924162257495591,
+        "recall": 0.5333333333333333,
+        "precision": 0.22857142857142856,
+        "false_positive_rate": 0.14285714285714285,
+        "flag_rate": 0.1715686274509804,
+        "reliable": true
+      },
+      {
+        "group": "[30-40)",
+        "n": 535,
+        "prevalence": 0.06542056074766354,
+        "roc_auc": 0.6768285714285713,
+        "recall": 0.2857142857142857,
+        "precision": 0.15873015873015872,
+        "false_positive_rate": 0.106,
+        "flag_rate": 0.11775700934579439,
+        "reliable": true
+      },
+      {
+        "group": "[40-50)",
+        "n": 1352,
+        "prevalence": 0.0695266272189349,
+        "roc_auc": 0.609829009234516,
+        "recall": 0.2978723404255319,
+        "precision": 0.12962962962962962,
+        "false_positive_rate": 0.1494435612082671,
+        "flag_rate": 0.15976331360946747,
+        "reliable": true
+      },
+      {
+        "group": "[50-60)",
+        "n": 2464,
+        "prevalence": 0.07913961038961038,
+        "roc_auc": 0.6664869873772474,
+        "recall": 0.37435897435897436,
+        "precision": 0.1784841075794621,
+        "false_positive_rate": 0.1480828558836492,
+        "flag_rate": 0.16599025974025974,
+        "reliable": true
+      },
+      {
+        "group": "[60-70)",
+        "n": 3126,
+        "prevalence": 0.08765195137555983,
+        "roc_auc": 0.6222333411820108,
+        "recall": 0.4306569343065693,
+        "precision": 0.13736903376018628,
+        "false_positive_rate": 0.2598176718092567,
+        "flag_rate": 0.27479206653870764,
+        "reliable": true
+      },
+      {
+        "group": "[70-80)",
+        "n": 3610,
+        "prevalence": 0.10470914127423822,
+        "roc_auc": 0.6476987728534758,
+        "recall": 0.5978835978835979,
+        "precision": 0.15468856947296372,
+        "false_positive_rate": 0.38211633663366334,
+        "flag_rate": 0.40470914127423824,
+        "reliable": true
+      },
+      {
+        "group": "[80-90)",
+        "n": 2237,
+        "prevalence": 0.10192221725525256,
+        "roc_auc": 0.6369080366421279,
+        "recall": 0.6973684210526315,
+        "precision": 0.13011456628477905,
+        "false_positive_rate": 0.5291189646590343,
+        "flag_rate": 0.5462673223066608,
+        "reliable": true
+      },
+      {
+        "group": "[90-100)",
+        "n": 332,
+        "prevalence": 0.09939759036144578,
+        "roc_auc": 0.6186277490625316,
+        "recall": 0.5151515151515151,
+        "precision": 0.12781954887218044,
+        "false_positive_rate": 0.3879598662207358,
+        "flag_rate": 0.4006024096385542,
+        "reliable": true
+      }
+    ],
+    "gender": [
+      {
+        "group": "Female",
+        "n": 7511,
+        "prevalence": 0.08840367461057116,
+        "roc_auc": 0.6547499696463669,
+        "recall": 0.5376506024096386,
+        "precision": 0.1410509679968392,
+        "false_positive_rate": 0.3175113188257631,
+        "flag_rate": 0.3369724404207163,
+        "reliable": true
+      },
+      {
+        "group": "Male",
+        "n": 6487,
+        "prevalence": 0.09141359642361646,
+        "roc_auc": 0.6484696472990225,
+        "recall": 0.47892074198988194,
+        "precision": 0.15122470713525027,
+        "false_positive_rate": 0.2704445198506956,
+        "flag_rate": 0.28950208108524744,
+        "reliable": true
+      }
+    ],
+    "race": [
+      {
+        "group": "AfricanAmerican",
+        "n": 2505,
+        "prevalence": 0.09221556886227544,
+        "roc_auc": 0.6723644283011038,
+        "recall": 0.47619047619047616,
+        "precision": 0.16541353383458646,
+        "false_positive_rate": 0.24406332453825857,
+        "flag_rate": 0.2654690618762475,
+        "reliable": true
+      },
+      {
+        "group": "Asian",
+        "n": 96,
+        "prevalence": 0.09375,
+        "roc_auc": 0.7535121328224775,
+        "recall": 0.5555555555555556,
+        "precision": 0.2631578947368421,
+        "false_positive_rate": 0.16091954022988506,
+        "flag_rate": 0.19791666666666666,
+        "reliable": true
+      },
+      {
+        "group": "Caucasian",
+        "n": 10520,
+        "prevalence": 0.09068441064638784,
+        "roc_auc": 0.6421032342446235,
+        "recall": 0.5146750524109015,
+        "precision": 0.13996579247434435,
+        "false_positive_rate": 0.31538783190466235,
+        "flag_rate": 0.3334600760456274,
+        "reliable": true
+      },
+      {
+        "group": "Hispanic",
+        "n": 286,
+        "prevalence": 0.1048951048951049,
+        "roc_auc": 0.6899739583333334,
+        "recall": 0.5333333333333333,
+        "precision": 0.2222222222222222,
+        "false_positive_rate": 0.21875,
+        "flag_rate": 0.2517482517482518,
+        "reliable": true
+      },
+      {
+        "group": "Missing",
+        "n": 361,
+        "prevalence": 0.060941828254847646,
+        "roc_auc": 0.6871815500134085,
+        "recall": 0.5454545454545454,
+        "precision": 0.12121212121212122,
+        "false_positive_rate": 0.25663716814159293,
+        "flag_rate": 0.2742382271468144,
+        "reliable": true
+      },
+      {
+        "group": "Other",
+        "n": 230,
+        "prevalence": 0.04782608695652174,
+        "roc_auc": 0.782689912826899,
+        "recall": 0.6363636363636364,
+        "precision": 0.15217391304347827,
+        "false_positive_rate": 0.1780821917808219,
+        "flag_rate": 0.2,
+        "reliable": true
+      }
+    ]
+  }
+}
