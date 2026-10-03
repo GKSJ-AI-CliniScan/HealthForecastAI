@@ -305,8 +305,8 @@ fight each other. When you are ready, run it yourself:
    Turn it on to publish the images to the GitHub Container Registry.
 
 The cloud release step is deliberately a placeholder - implementing it is the
-Milestone 4 task. Follow [`deployment/aws/`](deployment/aws/) or
-[`deployment/azure/`](deployment/azure/), and put your cloud credentials in
+Milestone 4 task. Follow [`deployment/`](deployment/) and
+[`docs/deployment/`](docs/deployment/), and put your cloud credentials in
 repository secrets, never in a file.
 
 ### The repository checks in detail

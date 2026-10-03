@@ -27,7 +27,10 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     """Run startup and shutdown lifecycle hooks."""
     logger.info("Initializing %s in %s mode", settings.APP_NAME, settings.ENVIRONMENT)
     # Ensure database schema is ready
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as exc:
+        logger.warning("Database schema check skipped during startup (use migrations): %s", exc)
     yield
     logger.info("Gracefully shutting down %s", settings.APP_NAME)
 
@@ -50,9 +53,12 @@ register_exception_handlers(app)
 
 # Middlewares
 app.add_middleware(LoggingMiddleware)
+cors_allowed = (
+    ["*"] if (settings.DEBUG and settings.ENVIRONMENT != "production") else settings.cors_origins
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if settings.DEBUG else settings.cors_origins,
+    allow_origins=cors_allowed,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -65,8 +71,8 @@ app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 @app.get("/health", tags=["System"], summary="Liveness Probe")
 @app.get(f"{settings.API_V1_PREFIX}/health", tags=["System"], summary="API v1 Health")
 def health() -> dict[str, str]:
-    """Health check endpoint for Docker and monitoring."""
-    return {"status": "ok", "service": settings.APP_NAME, "environment": settings.ENVIRONMENT}
+    """Health check endpoint for Render, Docker, and uptime monitoring."""
+    return {"status": "healthy", "service": settings.APP_NAME, "environment": settings.ENVIRONMENT}
 
 
 @app.get("/", tags=["System"], summary="Service Banner")

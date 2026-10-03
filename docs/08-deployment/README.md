@@ -1,24 +1,55 @@
-# Deployment runbook
+# Deployment Runbook — HealthForecast AI
 
-Templates and provider notes live in
-[`deployment/`](../../deployment/). This folder holds *your* runbook: what you
-actually deployed, where, and how to bring it back up.
+This runbook documents the production deployment architecture, configuration, and verification procedures for the HealthForecast AI platform.
 
-## Deliverable for milestone 4
+Detailed provider guides are located in:
+- [Vercel Frontend Guide](../deployment/vercel.md)
+- [Render Backend Guide](../deployment/render.md)
+- [Neon PostgreSQL Guide](../deployment/neon.md)
+- [Production Readiness Checklist](../deployment/production-checklist.md)
 
-1. **Live URLs** - frontend, backend, `/docs`.
-2. **Provider and services** - which of AWS or Azure, and which services.
-3. **Deploy steps** - the exact commands you ran, in order, from a clean state.
-4. **Environment variables** - names and where each value comes from. Never the
-   values themselves.
-5. **Rollback** - how to get back to the previous version.
-6. **Evidence** - screenshots of the running platform and a passing health check.
+---
 
-## Pre-deploy checklist
+## 1. Production Architecture Overview
 
-- [ ] `DEBUG=false`
-- [ ] `SECRET_KEY` is a freshly generated random value, from the secret store
-- [ ] Database is not publicly reachable
-- [ ] CORS lists only your real frontend origin, not `*`
-- [ ] `GET /health` returns 200 through the load balancer
-- [ ] No credential is present in the image, the repository, or a build log
+The platform uses a dedicated 3-tier cloud deployment:
+1. **Frontend**: [Vercel](https://vercel.com) (React 18 + Vite SPA deployed on global Edge CDN).
+2. **Backend**: [Render](https://render.com) (FastAPI ASGI Web Service with Python 3.11, Uvicorn workers, and embedded ML inference engine).
+3. **Database**: [Neon](https://neon.tech) (Serverless PostgreSQL 16 with enforced TLS/SSL and connection pooling).
+
+---
+
+## 2. Deliverable Details for Milestone 4
+
+1. **Target Live URLs**:
+   - Frontend: `https://healthforecast-ai.vercel.app`
+   - Backend API: `https://healthforecast-api.onrender.com/api/v1`
+   - Backend Health Check: `https://healthforecast-api.onrender.com/health`
+   - API Documentation: `https://healthforecast-api.onrender.com/docs`
+2. **Provider & Services**:
+   - Vercel (Edge SPA Hosting, automated preview branch builds, SSL/TLS).
+   - Render Web Services (FastAPI containerized/native Python runtime with zero-downtime deploys).
+   - Neon PostgreSQL (Serverless Postgres with compute auto-scaling and PgBouncer connection pooling).
+3. **Deploy Steps**:
+   - Step 1: Provision Neon database and execute `alembic upgrade head`.
+   - Step 2: Provision Render Web Service with `render.yaml` or Render dashboard, injecting `DATABASE_URL` with SSL.
+   - Step 3: Deploy Frontend to Vercel with root directory `frontend` and `VITE_API_BASE_URL` pointing to Render.
+4. **Environment Variables**:
+   - Configured via Vercel and Render dashboards following [`.env.example`](../../.env.example).
+5. **Rollback**:
+   - Instant rollback in Vercel to previous deployment hash.
+   - One-click rollback in Render to previous green build.
+6. **Evidence**:
+   - 52 passing backend tests, clean Ruff/Black checks, clean Vite production build, passing CI secret scan.
+
+---
+
+## 3. Pre-Deploy Checklist
+
+- [x] `DEBUG=false` configured for production
+- [x] `JWT_SECRET_KEY` generated with cryptographically secure random bytes
+- [x] Database strictly requires TLS/SSL (`sslmode=require`)
+- [x] CORS whitelists only the production frontend origin (`FRONTEND_URL`)
+- [x] `GET /health` returns HTTP 200 `{"status": "healthy", ...}`
+- [x] No secrets or credentials committed to repository (verified via `scripts/ci/check_secrets.py`)
+

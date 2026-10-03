@@ -12,7 +12,6 @@ from app.core.dependencies import get_current_active_user, require_roles
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.prediction import (
-    HighRiskPatientListResponse,
     PredictionListResponse,
     PredictionResponse,
     ReadmissionPredictRequest,
@@ -121,28 +120,3 @@ def get_patient_predictions(
 ) -> list[PredictionResponse]:
     service = PredictionService(db)
     return service.get_patient_predictions(patient_id, current_user)
-
-
-@router.get(
-    "/patients/high-risk",
-    response_model=HighRiskPatientListResponse,
-    summary="List High-Risk Inpatients",
-    description=(
-        "Retrieve patients whose latest prediction is HIGH or CRITICAL. "
-        "Doctors receive only assigned patients. Hospital Admins and System Admins receive all."
-    ),
-)
-def list_high_risk_patients(
-    current_user: Annotated[User, Depends(get_current_active_user)],
-    db: Annotated[Session, Depends(get_db)],
-    page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
-    category: str | None = Query(None, description="Optional category filter: HIGH or CRITICAL"),
-) -> HighRiskPatientListResponse:
-    service = PredictionService(db)
-    return service.list_high_risk_patients(
-        current_user=current_user,
-        page=page,
-        page_size=page_size,
-        category=category,
-    )

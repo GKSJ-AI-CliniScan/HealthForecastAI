@@ -1,40 +1,64 @@
-# Deployment
+# Deployment Architecture: HealthForecast AI
 
-Milestone 4 deliverable: the platform runs in Docker locally and on a cloud
-provider.
+HealthForecast AI uses a modern, serverless cloud architecture:
 
-## Local (Docker Compose)
+- **Frontend**: [Vercel](https://vercel.com) (React 18 + TypeScript + Vite SPA)
+- **Backend API & ML Engine**: [Render](https://render.com) (FastAPI + Uvicorn)
+- **Database**: [Neon](https://neon.tech) (Serverless PostgreSQL with SSL)
+
+---
+
+## 1. Production Architecture Overview
+
+```
+                      USER / BROWSER
+                            │
+                            ▼
+                   ┌─────────────────┐
+                   │     VERCEL      │
+                   │  React + TS SPA │
+                   └────────┬────────┘
+                            │
+                            │ HTTPS REST API
+                            ▼
+                   ┌─────────────────┐
+                   │     RENDER      │
+                   │  FastAPI + ML   │
+                   └────────┬────────┘
+                            │
+                            │ SSL Connection
+                            ▼
+                   ┌─────────────────┐
+                   │      NEON       │
+                   │   PostgreSQL    │
+                   └─────────────────┘
+```
+
+---
+
+## 2. Local Containerized Development (Docker Compose)
+
+For local development and testing:
 
 ```bash
-cp .env.example .env       # fill in real values
+cp .env.example .env
 docker compose up --build
 ```
 
-| Service   | URL |
-|-----------|-----|
-| Frontend  | <http://localhost:3000> |
-| Backend   | <http://localhost:8000> |
-| API docs  | <http://localhost:8000/docs> |
-| Postgres  | `localhost:5432` |
-| MongoDB   | `localhost:27017` |
+| Service | Local URL | Description |
+|---|---|---|
+| **Frontend** | `http://localhost:3000` | React web application |
+| **Backend** | `http://localhost:8000` | FastAPI REST services |
+| **Swagger Docs** | `http://localhost:8000/docs` | Interactive OpenAPI documentation |
+| **Health Check** | `http://localhost:8000/health` | Service liveness probe |
+| **PostgreSQL** | `localhost:5432` | Local development database |
 
-Useful commands:
+---
 
-```bash
-docker compose logs -f backend
-docker compose exec backend alembic upgrade head
-docker compose down -v          # -v also drops the database volumes
-```
+## 3. Deployment Guides
 
-## Cloud
-
-`aws/` and `azure/` hold the notes and templates for each target. Pick one -
-you do not need both.
-
-## Rules
-
-- Secrets come from the platform secret store (AWS Secrets Manager, Azure Key
-  Vault), never from a committed file and never from a Docker image layer.
-- `DEBUG=false` and a real `SECRET_KEY` in every deployed environment.
-- Only the reverse proxy is public. Postgres, MongoDB and the app containers
-  stay on the private network.
+Detailed, step-by-step guides are located in `docs/deployment/`:
+* [Vercel Deployment Guide](../docs/deployment/vercel.md)
+* [Render Deployment Guide](../docs/deployment/render.md)
+* [Neon PostgreSQL Guide](../docs/deployment/neon.md)
+* [Production Checklist](../docs/deployment/production-checklist.md)

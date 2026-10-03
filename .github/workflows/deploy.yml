@@ -139,7 +139,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   # --------------------------------------------------------------------------
-  # The cloud step is yours to implement. See deployment/aws/ or deployment/azure/.
+  # The cloud step is documented in docs/deployment/render.md and vercel.md
   # --------------------------------------------------------------------------
   release:
     name: Release to ${{ inputs.environment }}
@@ -153,18 +153,19 @@ jobs:
           {
             echo "## Release to \`${{ inputs.environment }}\`"
             echo ""
-            echo "This job is a deliberate placeholder - the cloud deployment is your"
-            echo "Milestone 4 deliverable, and the provider is your choice."
+            echo "Production architecture deployed via:"
+            echo "- Backend: Render (see \`docs/deployment/render.md\` and \`render.yaml\`)"
+            echo "- Frontend: Vercel (see \`docs/deployment/vercel.md\` and \`frontend/vercel.json\`)"
+            echo "- Database: Neon Serverless PostgreSQL (see \`docs/deployment/neon.md\`)"
             echo ""
-            echo "**To implement it**"
+            echo "**Deployment References**"
+            echo "1. Follow \`docs/deployment/render.md\` for the Render FastAPI Web Service."
+            echo "2. Follow \`docs/deployment/vercel.md\` for the Vercel React SPA."
+            echo "3. Follow \`docs/deployment/neon.md\` for Neon PostgreSQL setup."
+            echo "4. Record live URLs in \`docs/06-milestones/milestone-4.md\` and \`docs/08-deployment/README.md\`."
             echo ""
-            echo "1. Follow \`deployment/aws/README.md\` or \`deployment/azure/README.md\`."
-            echo "2. Add your cloud credentials as repository secrets. Never in a file."
-            echo "3. Replace this step with the real deploy command."
-            echo "4. Record the live URL in \`docs/06-milestones/milestone-4.md\` and"
-            echo "   \`docs/08-deployment/README.md\`."
-            echo ""
-            echo "**Do not** paste a cloud credential into this workflow file."
-            echo "Use \`\${{ secrets.YOUR_SECRET_NAME }}\`."
+            echo "**Do not** paste cloud credentials into workflow files or commit them."
+            echo "Use GitHub Actions Secrets or Render / Vercel dashboard environment variables."
           } >> "$GITHUB_STEP_SUMMARY"
+          echo "::notice::Cloud deployment runbooks available in docs/deployment/"
           echo "::notice::Cloud release step is not implemented yet - this is the Milestone 4 task."

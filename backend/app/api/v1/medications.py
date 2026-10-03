@@ -75,6 +75,7 @@ def update_medication(
 @router.delete(
     "/medications/{medication_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
     summary="Delete Medication Record",
     description="Delete a medication record (SYSTEM_ADMIN or Assigned Doctor).",
     dependencies=[Depends(require_roles("DOCTOR", "SYSTEM_ADMIN"))],

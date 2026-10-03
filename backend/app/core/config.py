@@ -23,15 +23,19 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 10080
 
     # Databases
-    DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@localhost:5432/healthforecast"
+    DATABASE_URL: str = "sqlite:///./healthforecast.db"
     MONGO_URI: str = "mongodb://localhost:27017"
     MONGO_DB: str = "healthforecast"
 
+    # Logging
+    LOG_LEVEL: str = "INFO"
+
     # CORS - comma separated list of allowed origins
-    BACKEND_CORS_ORIGINS: str = "http://localhost:3000"
+    BACKEND_CORS_ORIGINS: str = "http://localhost:3000,http://127.0.0.1:3000"
+    FRONTEND_URL: str | None = None
 
     # ML
-    MODEL_ARTIFACT_DIR: str = "ml/artifacts"
+    MODEL_ARTIFACT_DIR: str = "app/ml/models/saved"
     ACTIVE_RISK_MODEL: str = "readmission_model_v1"
     RISK_THRESHOLD_HIGH: float = 0.70
     RISK_THRESHOLD_MEDIUM: float = 0.40
@@ -40,9 +44,22 @@ class Settings(BaseSettings):
     RISK_HIGH_MAX: int = 75
 
     @property
+    def normalized_database_url(self) -> str:
+        """Ensure connection string uses psycopg3 driver for PostgreSQL / Neon."""
+        url = self.DATABASE_URL.strip()
+        if url.startswith("postgres://"):
+            return "postgresql+psycopg://" + url[len("postgres://") :]
+        if url.startswith("postgresql://") and not url.startswith("postgresql+psycopg://"):
+            return "postgresql+psycopg://" + url[len("postgresql://") :]
+        return url
+
+    @property
     def cors_origins(self) -> list[str]:
         """Return CORS origins as a list."""
-        return [o.strip() for o in self.BACKEND_CORS_ORIGINS.split(",") if o.strip()]
+        origins = [o.strip() for o in self.BACKEND_CORS_ORIGINS.split(",") if o.strip()]
+        if self.FRONTEND_URL and self.FRONTEND_URL.strip() not in origins:
+            origins.append(self.FRONTEND_URL.strip())
+        return origins
 
 
 @lru_cache

@@ -1,13 +1,14 @@
 """Database session factory supporting SQLite for development and PostgreSQL for production."""
 
-import os
 from collections.abc import Generator
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-# Database URL from environment
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./healthforecast.db")
+from app.core.config import settings
+
+# Database URL from environment / settings
+DATABASE_URL = settings.normalized_database_url
 
 # Configure database engine based on dialect
 if DATABASE_URL.startswith("sqlite"):

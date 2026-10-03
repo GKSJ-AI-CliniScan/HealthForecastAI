@@ -7,7 +7,7 @@ def test_health_endpoint_returns_ok(client: TestClient) -> None:
     """The liveness probe must return status ok."""
     response = client.get("/health")
     assert response.status_code == 200
-    assert response.json()["status"] == "ok"
+    assert response.json()["status"] in ("healthy", "ok")
 
 
 def test_root_endpoint_returns_banner(client: TestClient) -> None:
