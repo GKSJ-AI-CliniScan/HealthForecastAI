@@ -5,3 +5,4 @@ export * from './prediction';
 export * from './forecast';
 export * from './analytics';
 export * from './clinicalSupport';
+export * from './model';

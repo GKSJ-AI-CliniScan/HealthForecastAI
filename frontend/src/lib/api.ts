@@ -133,3 +133,30 @@ export const clinicalSupportApi = {
     );
   },
 };
+
+export const modelsApi = {
+  list(token?: string): Promise<Record<string, string>[]> {
+    return apiFetch<Record<string, string>[]>('/models', {}, token);
+  },
+
+  active(token?: string): Promise<{ name: string; artifact_dir: string; status: string }> {
+    return apiFetch<{ name: string; artifact_dir: string; status: string }>('/models/active', {}, token);
+  },
+
+  metrics(token?: string): Promise<{
+    accuracy: number | null;
+    precision: number | null;
+    recall: number | null;
+    f1: number | null;
+    roc_auc: number | null;
+  }> {
+    return apiFetch<{
+      accuracy: number | null;
+      precision: number | null;
+      recall: number | null;
+      f1: number | null;
+      roc_auc: number | null;
+    }>('/models/metrics', {}, token);
+  },
+};
+

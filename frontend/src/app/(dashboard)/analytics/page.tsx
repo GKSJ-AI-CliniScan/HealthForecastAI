@@ -16,6 +16,7 @@ import { ReadmissionChart } from '@/components/charts/ReadmissionChart';
 import { RecoveryTrendChart } from '@/components/charts/RecoveryTrendChart';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
+import { CardSkeleton, ChartSkeleton } from '@/components/ui/Skeleton';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -263,13 +264,23 @@ export default function AnalyticsDashboardPage() {
           </div>
         </Card>
 
-        {/* Loading State */}
+        {/* Loading Skeleton State */}
         {isLoading && !data && (
-          <LoadingState
-            title="Computing Healthcare Analytics..."
-            description="Aggregating clinical encounter metrics, recovery indices, and quality indicators."
-          />
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <CardSkeleton key={i} />
+              ))}
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <ChartSkeleton height={280} />
+              </div>
+              <CardSkeleton />
+            </div>
+          </div>
         )}
+
 
         {/* Error State */}
         {error && (

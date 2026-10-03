@@ -65,6 +65,13 @@ export const ROLE_NAVIGATION: Record<Role, NavItem[]> = {
       icon: ClockIcon,
       isPlaceholder: false,
     },
+    {
+      id: 'doc-models',
+      name: 'AI Model Intelligence',
+      href: '/models',
+      icon: LayersIcon,
+      isPlaceholder: false,
+    },
   ],
   hospital_admin: [
     {
@@ -93,6 +100,13 @@ export const ROLE_NAVIGATION: Record<Role, NavItem[]> = {
       name: 'Department Performance',
       href: '/analytics',
       icon: LayersIcon,
+      isPlaceholder: false,
+    },
+    {
+      id: 'admin-models',
+      name: 'AI Model Benchmarks',
+      href: '/models',
+      icon: ActivityIcon,
       isPlaceholder: false,
     },
     {
@@ -126,6 +140,13 @@ export const ROLE_NAVIGATION: Record<Role, NavItem[]> = {
       isPlaceholder: false,
     },
     {
+      id: 'res-models',
+      name: 'AI Model Registry',
+      href: '/models',
+      icon: ActivityIcon,
+      isPlaceholder: false,
+    },
+    {
       id: 'res-treatment-analysis',
       name: 'Treatment Analysis',
       href: '#treatment-analysis',
@@ -149,6 +170,13 @@ export const ROLE_NAVIGATION: Record<Role, NavItem[]> = {
       isPlaceholder: false,
     },
     {
+      id: 'sys-model-mgmt',
+      name: 'AI Model Management',
+      href: '/models',
+      icon: ActivityIcon,
+      isPlaceholder: false,
+    },
+    {
       id: 'sys-user-mgmt',
       name: 'User Management',
       href: '#user-management',
@@ -167,13 +195,6 @@ export const ROLE_NAVIGATION: Record<Role, NavItem[]> = {
       name: 'Dataset Management',
       href: '#dataset-management',
       icon: LayersIcon,
-      isPlaceholder: true,
-    },
-    {
-      id: 'sys-model-mgmt',
-      name: 'Model Management',
-      href: '#model-management',
-      icon: ActivityIcon,
       isPlaceholder: true,
     },
     {

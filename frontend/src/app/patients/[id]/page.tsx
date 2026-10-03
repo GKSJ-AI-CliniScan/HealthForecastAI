@@ -13,6 +13,7 @@ import { AdmissionHistorySection } from '@/components/patients/AdmissionHistoryS
 import { TreatmentSection } from '@/components/patients/TreatmentSection';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
+import { DetailHeaderSkeleton, CardSkeleton } from '@/components/ui/Skeleton';
 import { ArrowLeftIcon, PrinterIcon } from '@/components/ui/Icons';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -132,13 +133,18 @@ export default function PatientDetailPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Loading State */}
+        {/* Loading Skeleton State */}
         {isLoading && (
-          <LoadingState
-            title="Retrieving patient dossier..."
-            description="Assembling clinical history, encounters, and treatment regimens."
-          />
+          <div className="space-y-6">
+            <DetailHeaderSkeleton />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <CardSkeleton />
+              <CardSkeleton />
+            </div>
+            <CardSkeleton />
+          </div>
         )}
+
 
         {/* Error State */}
         {error && !isLoading && (

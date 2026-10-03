@@ -12,6 +12,7 @@ import { RiskFactorBreakdown } from '@/components/risk/RiskFactorBreakdown';
 import { ClinicalInsightsPanel } from '@/components/risk/ClinicalInsightsPanel';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
+import { CardSkeleton } from '@/components/ui/Skeleton';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import {
@@ -328,13 +329,17 @@ export default function RiskPredictionPage() {
           </Card>
         )}
 
-        {/* Loading State */}
-        {isLoading && (
-          <LoadingState
-            title="Evaluating Patient Biomarkers & Risk Model..."
-            description="Extracting clinical features and scoring readmission probability."
-          />
+        {/* Loading Skeleton State */}
+        {isLoading && !assessment && (
+          <div className="space-y-6">
+            <CardSkeleton className="p-8" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <CardSkeleton />
+              <CardSkeleton />
+            </div>
+          </div>
         )}
+
 
         {/* Error State */}
         {error && !isLoading && (

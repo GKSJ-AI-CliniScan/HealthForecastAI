@@ -15,6 +15,7 @@ import { ReadmissionTrendChart } from '@/components/charts/ReadmissionTrendChart
 import { DepartmentForecastChart } from '@/components/charts/DepartmentForecastChart';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
+import { CardSkeleton, ChartSkeleton } from '@/components/ui/Skeleton';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -229,13 +230,18 @@ export default function ForecastingDashboardPage() {
           </div>
         </div>
 
-        {/* Loading State */}
-        {isLoading && (
-          <LoadingState
-            title="Aggregating Historical Trajectories & Forecasting Readmissions..."
-            description="Executing longitudinal trend regression and confidence bounds modeling."
-          />
+        {/* Loading Skeleton State */}
+        {isLoading && !forecast && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <CardSkeleton key={i} />
+              ))}
+            </div>
+            <ChartSkeleton height={320} />
+          </div>
         )}
+
 
         {/* Error State */}
         {error && !isLoading && (

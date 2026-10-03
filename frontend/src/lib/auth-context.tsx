@@ -36,11 +36,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Restore session from sessionStorage on client mount
+  // Restore session from sessionStorage/localStorage on client mount
   useEffect(() => {
     try {
-      const savedUser = sessionStorage.getItem(STORAGE_KEY_USER);
-      const savedToken = sessionStorage.getItem(STORAGE_KEY_TOKEN);
+      const savedUser = sessionStorage.getItem(STORAGE_KEY_USER) || localStorage.getItem(STORAGE_KEY_USER);
+      const savedToken = sessionStorage.getItem(STORAGE_KEY_TOKEN) || localStorage.getItem(STORAGE_KEY_TOKEN);
       if (savedUser && savedToken) {
         setUser(JSON.parse(savedUser) as SessionUser);
         setToken(savedToken);

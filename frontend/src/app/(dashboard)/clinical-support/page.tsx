@@ -15,6 +15,7 @@ import {
 import { Patient } from '@/types';
 import { LoadingState } from '@/components/ui/LoadingState';
 import { ErrorMessage } from '@/components/ui/ErrorMessage';
+import { CardSkeleton } from '@/components/ui/Skeleton';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -267,13 +268,19 @@ export default function ClinicalDecisionSupportPage() {
           </div>
         </Card>
 
-        {/* Loading State */}
+        {/* Loading Skeleton State */}
         {isLoading && !dossier && (
-          <LoadingState
-            title="Analyzing Patient Clinical Dossier..."
-            description="Evaluating drug interactions, glycemic parameters, and discharge milestones."
-          />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-7 space-y-6">
+              <CardSkeleton className="p-8" />
+              <CardSkeleton />
+            </div>
+            <div className="lg:col-span-5 space-y-6">
+              <CardSkeleton className="p-8" />
+            </div>
+          </div>
         )}
+
 
         {/* Error State */}
         {error && (

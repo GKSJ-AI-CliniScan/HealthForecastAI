@@ -21,8 +21,9 @@ export default function Home() {
           <div className="relative z-10 max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-brand-200 backdrop-blur-sm border border-white/20">
               <PulseIcon className="h-3.5 w-3.5 text-brand-300 animate-pulse" />
-              <span>Milestone 1 Clinical Platform</span>
+              <span>Clinical Intelligence Platform</span>
             </div>
+
 
             <h1 className="mt-4 text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
               HealthForecast <span className="text-brand-300">AI</span>
