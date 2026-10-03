@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -34,8 +35,31 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
 const TOKEN_KEY = 'healthforecast_access_token';
 const USER_KEY = 'healthforecast_current_user';
+
+function clearStoredSession() {
+    window.localStorage.removeItem(TOKEN_KEY);
+    window.localStorage.removeItem(USER_KEY);
+}
+
+function isCurrentUser(value: unknown): value is CurrentUser {
+    if (!value || typeof value !== 'object') {
+        return false;
+    }
+
+    const user = value as Partial<CurrentUser>;
+
+    return (
+        typeof user.subject === 'string' &&
+        typeof user.role === 'string' &&
+        Array.isArray(user.permissions) &&
+        user.permissions.every(
+            (permission) => typeof permission === 'string',
+        )
+    );
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [token, setToken] = useState<string | null>(null);
@@ -44,24 +68,73 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        const storedToken = window.localStorage.getItem(TOKEN_KEY);
-        const storedUser = window.localStorage.getItem(USER_KEY);
+        let active = true;
 
-        if (storedToken && storedUser) {
+        async function restoreSession() {
+            const storedToken = window.localStorage.getItem(TOKEN_KEY);
+            const storedUser = window.localStorage.getItem(USER_KEY);
+
+            if (!storedToken || !storedUser) {
+                clearStoredSession();
+
+                if (active) {
+                    setLoading(false);
+                }
+                return;
+            }
+
             try {
-                const user = JSON.parse(storedUser) as CurrentUser;
+                const parsedUser: unknown = JSON.parse(storedUser);
+
+                if (!isCurrentUser(parsedUser)) {
+                    throw new Error('Stored user data is invalid.');
+                }
+
+                // Verify the session against the backend instead of
+                // trusting cached user information alone.
+                const verifiedUser = await apiFetch<CurrentUser>(
+                    '/auth/me',
+                    {},
+                    storedToken,
+                );
+
+                if (!isCurrentUser(verifiedUser)) {
+                    throw new Error('Invalid user response.');
+                }
+
+                if (!active) {
+                    return;
+                }
+
+                window.localStorage.setItem(
+                    USER_KEY,
+                    JSON.stringify(verifiedUser),
+                );
+
                 setToken(storedToken);
-                setCurrentUser(user);
+                setCurrentUser(verifiedUser);
             } catch {
-                window.localStorage.removeItem(TOKEN_KEY);
-                window.localStorage.removeItem(USER_KEY);
+                clearStoredSession();
+
+                if (active) {
+                    setToken(null);
+                    setCurrentUser(null);
+                }
+            } finally {
+                if (active) {
+                    setLoading(false);
+                }
             }
         }
 
-        setLoading(false);
+        void restoreSession();
+
+        return () => {
+            active = false;
+        };
     }, []);
 
-    async function login(email: string, password: string) {
+    async function login(email: string, password: string): Promise<void> {
         setLoading(true);
         setError('');
 
@@ -71,21 +144,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 body: JSON.stringify({ email, password }),
             });
 
+            if (!result.access_token) {
+                throw new Error('The server did not return an access token.');
+            }
+
             const user = await apiFetch<CurrentUser>(
                 '/auth/me',
                 {},
                 result.access_token,
             );
 
+            if (!isCurrentUser(user)) {
+                throw new Error('The server returned invalid user data.');
+            }
+
             window.localStorage.setItem(TOKEN_KEY, result.access_token);
             window.localStorage.setItem(USER_KEY, JSON.stringify(user));
+
             setToken(result.access_token);
             setCurrentUser(user);
         } catch (err) {
+            clearStoredSession();
+            setToken(null);
+            setCurrentUser(null);
+
             const message =
                 err instanceof ApiError
                     ? err.message
-                    : 'Unable to sign in. Please try again.';
+                    : err instanceof Error
+                        ? err.message
+                        : 'Unable to sign in. Please try again.';
+
             setError(message);
             throw err;
         } finally {
@@ -94,8 +183,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     function logout() {
-        window.localStorage.removeItem(TOKEN_KEY);
-        window.localStorage.removeItem(USER_KEY);
+        clearStoredSession();
         setToken(null);
         setCurrentUser(null);
         setError('');
@@ -103,7 +191,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return (
         <AuthContext.Provider
-            value={{ token, currentUser, loading, error, login, logout }}
+            value={{
+                token,
+                currentUser,
+                loading,
+                error,
+                login,
+                logout,
+            }}
         >
             {children}
         </AuthContext.Provider>
