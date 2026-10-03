@@ -414,57 +414,80 @@
 <!-- Top Row KPI Widgets -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
 <!-- Bed Occupancy -->
+<!-- Total Patients -->
 <div class="clinical-card p-lg clinical-shadow flex flex-col justify-between hover:-translate-y-1 transition-transform duration-300">
-<div class="flex justify-between items-start mb-4">
-<div>
-<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Bed Occupancy Rate</h3>
-<p class="font-body-sm text-body-sm text-outline mt-1">Current total capacity</p>
+    <div class="flex items-start justify-between gap-2">
+  <span class="text-xs font-bold text-slate-500 uppercase tracking-wider leading-4 min-w-0">
+    Total Patients
+  </span>
+
+  <span class="w-8 h-8 shrink-0 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+    <span class="material-symbols-outlined text-[19px] leading-none">
+      groups
+    </span>
+  </span>
 </div>
-<span class="material-symbols-outlined text-outline" data-icon="bed">bed</span>
-</div>
-<div class="flex items-end gap-md">
-<div class="relative w-24 h-24">
-<canvas id="occupancyChart"></canvas>
-<div class="absolute inset-0 flex items-center justify-center">
-<span class="font-headline-md text-headline-md text-on-surface">84%</span>
-</div>
-</div>
-<div class="mb-2">
-<span class="inline-flex items-center px-2 py-1 rounded-full bg-[#E3FCEF] text-[#006644] font-label-md text-label-md gap-1">
-<span class="material-symbols-outlined text-[14px]" data-icon="arrow_downward">arrow_downward</span> 2% vs last wk
-                                </span>
-</div>
-</div>
+    <div>
+        <div id="hospital-total-patients"
+             class="font-display-lg text-display-lg text-primary mb-2">
+            --
+        </div>
+        <p class="font-body-sm text-outline">
+            Live hospital data
+        </p>
+    </div>
 </div>
 <!-- Cost Avoidance -->
+<!-- Total Admissions -->
 <div class="clinical-card p-lg clinical-shadow flex flex-col justify-between hover:-translate-y-1 transition-transform duration-300">
-<div class="flex justify-between items-start mb-4">
-<div>
-<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Total Cost Avoidance</h3>
-<p class="font-body-sm text-body-sm text-outline mt-1">YTD from predictive alerts</p>
-</div>
-<span class="material-symbols-outlined text-outline" data-icon="savings">savings</span>
-</div>
-<div>
-<div class="font-display-lg text-display-lg text-primary mb-2">$1.2M</div>
-<span class="inline-flex items-center px-2 py-1 rounded-full bg-[#E3FCEF] text-[#006644] font-label-md text-label-md gap-1">
-<span class="material-symbols-outlined text-[14px]" data-icon="trending_up">trending_up</span> 15% above target
-                            </span>
-</div>
+    <div class="flex justify-between items-start mb-4">
+        <div>
+            <h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">
+                Total Admissions
+            </h3>
+            <p class="font-body-sm text-body-sm text-outline mt-1">
+                Recorded hospital admissions
+            </p>
+        </div>
+        <span class="material-symbols-outlined text-outline">
+            local_hospital
+        </span>
+    </div>
+
+    <div>
+        <div id="hospital-total-admissions"
+             class="font-display-lg text-display-lg text-primary mb-2">
+            --
+        </div>
+        <p class="font-body-sm text-outline">
+            Live hospital data
+        </p>
+    </div>
 </div>
 <!-- Critical Alerts -->
+<!-- Readmission Rate -->
 <div class="clinical-card p-lg clinical-shadow flex flex-col justify-between border-l-4 border-l-[#FF8B00] hover:-translate-y-1 transition-transform duration-300">
-<div class="flex justify-between items-start mb-4">
-<div>
-<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Active Critical Alerts</h3>
-<p class="font-body-sm text-body-sm text-outline mt-1">Requiring immediate review</p>
+    <div class="flex items-start justify-between gap-2">
+  <span class="text-xs font-bold text-slate-500 uppercase tracking-wider leading-4 min-w-0">
+    Readmission Rate
+  </span>
+
+  <span class="w-8 h-8 shrink-0 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+    <span class="material-symbols-outlined text-[19px] leading-none">
+      replay
+    </span>
+  </span>
 </div>
-<span class="material-symbols-outlined text-[#FF8B00]" data-icon="warning">warning</span>
-</div>
-<div>
-<div class="font-display-lg text-display-lg text-[#FF8B00] mb-2">14</div>
-<div class="font-body-sm text-body-sm text-on-surface-variant">Across 3 departments</div>
-</div>
+
+    <div>
+        <div id="hospital-readmission-rate"
+             class="font-display-lg text-display-lg text-[#FF8B00] mb-2">
+            --
+        </div>
+        <div class="font-body-sm text-body-sm text-on-surface-variant">
+            Based on hospital data
+        </div>
+    </div>
 </div>
 </div>
 <!-- Milestone 2: Readmission Forecast -->
@@ -495,12 +518,706 @@
     <span id="forecast-rate" class="font-bold text-blue-600">--</span>
   </div>
 </div>
+<!-- Hospital Analytics: Admission Risk Distribution -->
+<div class="clinical-card p-lg clinical-shadow mt-lg">
+  <div class="mb-5">
+    <h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary">health_and_safety</span>
+      Admission Risk Distribution
+    </h2>
+    <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+      Distribution of hospital admissions by predicted risk category.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+    <!-- Low Risk -->
+    <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-5">
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-semibold text-emerald-700">Low Risk</span>
+        <span class="material-symbols-outlined text-emerald-600">check_circle</span>
+      </div>
+
+      <div id="hospital-risk-low"
+           class="text-3xl font-bold text-emerald-700 mt-3">
+        --
+      </div>
+
+      <p class="text-xs text-emerald-600 mt-1">
+        Admissions
+      </p>
+    </div>
+    <!-- Medium Risk -->
+    <div class="bg-amber-50 border border-amber-100 rounded-lg p-5">
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-semibold text-amber-700">Medium Risk</span>
+        <span class="material-symbols-outlined text-amber-600">warning</span>
+      </div>
+
+      <div id="hospital-risk-medium"
+           class="text-3xl font-bold text-amber-700 mt-3">
+        --
+      </div>
+
+      <p class="text-xs text-amber-600 mt-1">
+        Admissions
+      </p>
+    </div>
+
+    <!-- High Risk -->
+    <div class="bg-rose-50 border border-rose-100 rounded-lg p-5">
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-semibold text-rose-700">High Risk</span>
+        <span class="material-symbols-outlined text-rose-600">priority_high</span>
+      </div>
+
+      <div id="hospital-risk-high"
+           class="text-3xl font-bold text-rose-700 mt-3">
+        --
+      </div>
+
+      <p class="text-xs text-rose-600 mt-1">
+        Admissions
+      </p>
+    </div>
+
+  </div>
+</div>
+    <!-- Milestone 3: Patient Outcome Analytics -->
+<div class="clinical-card p-lg clinical-shadow mt-lg">
+
+  <div class="mb-5">
+    <h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary">
+        monitoring
+      </span>
+      Patient Outcome Analytics
+    </h2>
+
+    <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+      Live patient outcome metrics from the hospital analytics service.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+
+    <!-- Total Patients -->
+    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+          Total Patients
+        </span>
+
+        <span class="material-symbols-outlined text-blue-600">
+          groups
+        </span>
+      </div>
+
+      <div
+        id="outcome-total-patients"
+        class="text-3xl font-bold text-slate-900 mt-3"
+      >
+        --
+      </div>
+
+      <p class="text-xs text-slate-500 mt-1">
+        Patients in reporting dataset
+      </p>
+    </div>
+
+    <!-- Readmission Rate -->
+    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+          Readmission Rate
+        </span>
+
+        <span class="material-symbols-outlined text-amber-600">
+          replay
+        </span>
+      </div>
+
+      <div
+        id="outcome-readmission-rate"
+        class="text-3xl font-bold text-slate-900 mt-3"
+      >
+        --
+      </div>
+
+      <p class="text-xs text-slate-500 mt-1">
+        Hospital outcome metric
+      </p>
+    </div>
+
+    <!-- Average Recovery -->
+    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+      <div class="flex items-start justify-between gap-2">
+  <span class="text-xs font-bold text-slate-500 uppercase tracking-wider leading-4 min-w-0">
+    Avg Recovery
+  </span>
+
+  <span class="w-8 h-8 shrink-0 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+    <span class="material-symbols-outlined text-[19px] leading-none">
+      healing
+    </span>
+  </span>
+</div>
+
+      <div
+        id="outcome-recovery-days"
+        class="text-3xl font-bold text-slate-900 mt-3"
+      >
+        --
+      </div>
+
+      <p class="text-xs text-slate-500 mt-1">
+        Average recovery duration
+      </p>
+    </div>
+
+    <!-- Complication Rate -->
+    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+      <div class="flex items-start justify-between gap-2">
+  <span class="text-xs font-bold text-slate-500 uppercase tracking-wider leading-4 min-w-0">
+    Complication Rate
+  </span>
+
+  <span class="w-8 h-8 shrink-0 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
+    <span class="material-symbols-outlined text-[19px] leading-none">
+      warning
+    </span>
+  </span>
+</div>
+
+      <div
+        id="outcome-complication-rate"
+        class="text-3xl font-bold text-slate-900 mt-3"
+      >
+        --
+      </div>
+
+      <p class="text-xs text-slate-500 mt-1">
+        Reported complications
+      </p>
+    </div>
+
+    <!-- Mortality Rate -->
+    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+      <div class="flex items-start justify-between gap-2">
+  <span class="text-xs font-bold text-slate-500 uppercase tracking-wider leading-4 min-w-0">
+    Mortality Rate
+  </span>
+
+  <span class="w-8 h-8 shrink-0 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center">
+    <span class="material-symbols-outlined text-[19px] leading-none">
+      emergency
+    </span>
+  </span>
+</div>
+      <div
+        id="outcome-mortality-rate"
+        class="text-3xl font-bold text-slate-900 mt-3"
+      >
+        --
+      </div>
+
+      <p class="text-xs text-slate-500 mt-1">
+        Reported mortality metric
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Data source -->
+  <div class="mt-4 pt-4 border-t border-slate-200">
+    <p class="text-[11px] text-slate-400 font-mono">
+      Source: /api/v1/analytics/outcomes
+    </p>
+  </div>
+
+</div><!-- Milestone 3: Hospital Performance -->
+<div class="clinical-card p-lg clinical-shadow mt-lg">
+
+  <div class="mb-5">
+    <h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary">
+        domain
+      </span>
+      Hospital Performance
+    </h2>
+
+    <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+      Live hospital-level operational performance metrics.
+    </p>
+  </div>
+
+  <!-- Hospital Summary Metrics -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+    <!-- Facility -->
+    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+        Facility
+      </div>
+
+      <div
+        id="hospital-facility-name"
+        class="text-lg font-bold text-slate-900 mt-3"
+      >
+        --
+      </div>
+    </div>
+
+    <!-- Reporting Period -->
+    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+        Reporting Period
+      </div>
+
+      <div
+        id="hospital-reporting-period"
+        class="text-lg font-bold text-slate-900 mt-3"
+      >
+        --
+      </div>
+    </div>
+    
+    <!-- Overall Readmission -->
+    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+        Overall Readmission
+      </div>
+
+      <div
+        id="hospital-overall-readmission"
+        class="text-3xl font-bold text-slate-900 mt-3"
+      >
+        --
+      </div>
+    </div>
+
+    <!-- Average Length of Stay -->
+    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5">
+      <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+        Average Length of Stay
+      </div>
+
+      <div
+        id="hospital-average-los"
+        class="text-3xl font-bold text-slate-900 mt-3"
+      >
+        --
+      </div>
+    </div>
+
+  </div>
+   <!-- Milestone 3: Department Performance -->
+<div class="clinical-card p-lg clinical-shadow mt-lg">
+
+  <div class="mb-5">
+    <h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary">
+        analytics
+      </span>
+      Department Performance
+    </h2>
+
+    <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+      Department-level hospital performance based on live analytics.
+    </p>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+
+      <thead>
+        <tr class="border-b border-slate-200">
+
+          <th class="p-3 text-xs font-bold text-slate-500 uppercase tracking-wider">
+            Department
+          </th>
+
+          <th class="p-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">
+            Admissions
+          </th>
+
+          <th class="p-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">
+            Readmission Rate
+          </th>
+
+          <th class="p-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">
+            Avg Length of Stay
+          </th>
+
+          <th class="p-3 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">
+            Performance Score
+          </th>
+
+        </tr>
+      </thead>
+
+      <tbody
+        id="department-performance-tbody"
+        class="divide-y divide-slate-100"
+      >
+
+        <tr>
+          <td
+            colspan="5"
+            class="p-6 text-center text-sm text-slate-400"
+          >
+            Loading department performance...
+          </td>
+        </tr>
+
+      </tbody>
+
+    </table>
+  </div>
+  <!-- Department Performance Chart -->
+<div class="mt-6 pt-6 border-t border-slate-200">
+
+  <div class="mb-4">
+    <h3 class="text-sm font-semibold text-slate-900">
+      Department Performance Comparison
+    </h3>
+
+    <p class="text-xs text-slate-500 mt-1">
+      Comparison of department performance scores from live hospital analytics.
+    </p>
+  </div>
+
+  <div class="relative h-[300px]">
+    <canvas id="departmentPerformanceChart"></canvas>
+  </div>
+
+</div>
+
+  <div class="mt-4 pt-4 border-t border-slate-200">
+    <p class="text-[11px] text-slate-400 font-mono">
+      Source: /api/v1/analytics/departments
+    </p>
+  </div>
+
+</div>
+
+  <!-- Bed Occupancy -->
+  <div class="mt-5 bg-slate-50 border border-slate-200 rounded-xl p-5">
+
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+        Bed Occupancy Rate
+      </span>
+
+      <span
+        id="hospital-performance-occupancy"
+        class="text-sm font-bold text-blue-600"
+      >
+        --
+      </span>
+    </div>
+
+    <div class="w-full bg-slate-200 rounded-full h-3">
+      <div
+        id="hospital-occupancy-bar"
+        class="bg-blue-600 h-3 rounded-full transition-all duration-500"
+        style="width: 0%"
+      ></div>
+    </div>
+
+  </div>
+
+  <!-- Source -->
+  <div class="mt-4 pt-4 border-t border-slate-200">
+    <p class="text-[11px] text-slate-400 font-mono">
+      Source: /api/v1/analytics/hospital-performance
+    </p>
+  </div>
+
+</div>
+
+<!-- Milestone 3: Treatment Effectiveness Analysis -->
+<div class="clinical-card p-lg clinical-shadow mt-lg">
+
+  <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+
+    <div>
+      <h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">
+          medication
+        </span>
+        Treatment Effectiveness Analysis
+      </h2>
+
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+        Live treatment outcome and medication effectiveness metrics.
+      </p>
+    </div>
+
+    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold uppercase tracking-wider shrink-0">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+      Live Data
+    </span>
+
+  </div>
+
+
+  <div class="overflow-x-auto">
+
+    <table class="w-full">
+
+      <thead>
+        <tr class="border-b border-slate-200">
+
+          <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            Treatment
+          </th>
+
+          <th class="px-4 py-3 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            Condition
+          </th>
+
+          <th class="px-4 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            Patients
+          </th>
+
+          <th class="px-4 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            Success Rate
+          </th>
+
+          <th class="px-4 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            Readmission
+          </th>
+
+          <th class="px-4 py-3 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            Avg Recovery
+          </th>
+
+        </tr>
+      </thead>
+
+      <tbody
+        id="treatment-effectiveness-tbody"
+        class="divide-y divide-slate-100"
+      >
+
+        <tr>
+          <td
+            colspan="6"
+            class="p-8 text-center text-sm text-slate-400"
+          >
+            Loading treatment effectiveness...
+          </td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <div class="mt-5 pt-4 border-t border-slate-200">
+    <p class="text-[11px] text-slate-400 font-mono">
+      Source: /api/v1/analytics/treatments/effectiveness
+    </p>
+  </div>
+
+</div>
+
+<!-- Milestone 3: Healthcare Trend Monitoring -->
+<div class="clinical-card p-lg clinical-shadow mt-lg">
+
+  <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+
+    <div>
+      <h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">
+          show_chart
+        </span>
+        Healthcare Trend Monitoring
+      </h2>
+
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+        Observed trends from live hospital analytics snapshots.
+      </p>
+    </div>
+
+    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold uppercase tracking-wider shrink-0">
+      <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+      Live Monitoring
+    </span>
+
+  </div>
+
+
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-5">
+
+    <!-- Trend Chart -->
+    <div class="lg:col-span-3 rounded-xl border border-slate-200 bg-slate-50/70 p-5">
+
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+
+        <div>
+          <h3
+            id="trend-chart-title"
+            class="text-sm font-bold text-slate-900"
+          >
+            Readmission Rate Trend
+          </h3>
+
+          <p
+            id="trend-subtitle"
+            class="text-xs text-slate-500 mt-1"
+          >
+            Waiting for live snapshots...
+          </p>
+        </div>
+
+        <select
+          id="hospital-trend-metric"
+          onchange="renderHospitalTrendChart()"
+          class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700"
+        >
+          <option value="readmission">
+            Readmission Rate
+          </option>
+
+          <option value="recovery">
+            Average Recovery Days
+          </option>
+
+          <option value="occupancy">
+            Bed Occupancy
+          </option>
+        </select>
+
+      </div>
+
+
+      <div class="relative h-[300px]">
+
+        <canvas id="hospitalTrendChart"></canvas>
+
+        <div
+          id="hospitalTrendEmpty"
+          class="absolute inset-0 flex items-center justify-center text-center px-6 text-sm text-slate-400"
+        >
+          Refresh the Hospital Admin dashboard again after live metrics are loaded to build the observed trend.
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Monitoring Status -->
+    <div class="rounded-xl border border-slate-200 bg-white p-5">
+
+      <h3 class="text-sm font-bold text-slate-900">
+        Monitoring Status
+      </h3>
+
+      <div class="mt-5 space-y-4">
+
+        <!-- API -->
+        <div class="flex items-center justify-between">
+
+          <span class="text-xs text-slate-500">
+            Live API
+          </span>
+
+          <span class="flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            Connected
+          </span>
+
+        </div>
+
+
+        <!-- Snapshots -->
+        <div class="flex items-center justify-between">
+
+          <span class="text-xs text-slate-500">
+            Snapshots
+          </span>
+
+          <strong
+            id="monitor-snapshot-count"
+            class="text-sm text-slate-900"
+          >
+            0
+          </strong>
+
+        </div>
+
+
+        <!-- Departments -->
+        <div class="flex items-center justify-between">
+
+          <span class="text-xs text-slate-500">
+            Departments
+          </span>
+
+          <strong
+            id="monitor-department-count"
+            class="text-sm text-slate-900"
+          >
+            0
+          </strong>
+
+        </div>
+
+
+        <!-- Treatments -->
+        <div class="flex items-center justify-between">
+
+          <span class="text-xs text-slate-500">
+            Treatments
+          </span>
+
+          <strong
+            id="monitor-treatment-count"
+            class="text-sm text-slate-900"
+          >
+            0
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <div class="mt-6 rounded-lg bg-blue-50 border border-blue-100 p-3">
+
+        <p class="text-xs leading-5 text-blue-800">
+          Trend history contains only successful live API snapshots captured by this browser.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="mt-5 pt-4 border-t border-slate-200">
+
+    <p class="text-[11px] text-slate-400 font-mono">
+      Source: live Milestone 3 hospital analytics APIs
+    </p>
+
+  </div>
+
+</div>
+
 <!-- Middle Section: Financial Performance -->
 <div class="clinical-card p-lg clinical-shadow">
 <div class="mb-6 flex justify-between items-end">
 <div>
-<h2 class="font-headline-sm text-headline-sm text-on-surface">Financial Performance</h2>
-<p class="font-body-sm text-body-sm text-on-surface-variant">Projected Readmission Costs vs. Actual Cost Savings (Last 60 Days)</p>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Admission Risk Overview</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Hospital admissions grouped by predicted risk category.</p>
 </div>
 <button onclick="exportHospitalData()" class="px-4 py-2 border border-outline-variant rounded-md text-body-sm font-body-sm text-on-surface hover:bg-surface-container-low transition-colors flex items-center gap-2">Export Data <span class="material-symbols-outlined text-[18px]">download</span></button>
 </div>
@@ -1229,14 +1946,26 @@ async function handleLogin(event) {
       localStorage.setItem('user_role', result.role);
     }
 
-    if (result.permissions) {
+        if (result.permissions) {
       localStorage.setItem(
         'user_permissions',
         JSON.stringify(result.permissions)
       );
     }
 
+    // Convert backend role names to dashboard view names
+    const roleToView = {
+      doctor: 'doctor',
+      hospital_admin: 'hospital',
+      researcher: 'researcher',
+      system_admin: 'system'
+    };
+
+    const userRole = String(result.role || '').toLowerCase();
+    const viewName = roleToView[userRole] || 'doctor';
+
     showDashboard();
+    switchView(viewName);
 
     // Load dashboard data after authentication
     if (typeof loadHighRiskPatients === 'function') {
@@ -1264,17 +1993,805 @@ document.addEventListener('DOMContentLoaded', () => {
   const existingToken = localStorage.getItem('access_token');
 
   if (existingToken) {
-    showDashboard();
-  } else {
-    loginForm.addEventListener('submit', handleLogin);
-  }
-});
+  const savedRole = String(
+    localStorage.getItem('user_role') || ''
+  ).toLowerCase();
+
+  const roleToView = {
+    doctor: 'doctor',
+    hospital_admin: 'hospital',
+    researcher: 'researcher',
+    system_admin: 'system'
+  };
+
+  const viewName = roleToView[savedRole] || 'doctor';
+
+  showDashboard();
+  switchView(viewName);
+} else {
+  loginForm.addEventListener('submit', handleLogin);
+}
+  });
     // ==================== MILESTONE 2 API INTEGRATION ====================
     const API_BASE = 'http://localhost:8000/api/v1';
+    const M3_API_BASE = 'http://localhost:8001/api/v1';
     let doctorApiPatients = [];
     let currentPatientContext = null;
     let forecastLoaded = false;
+    let departmentPerformanceChart = null;
+    let hospitalTrendChart = null;
 
+let hospitalTrendSnapshots = [];
+let trendSnapshotRecordedThisLoad = false;
+
+let latestHospitalPerformanceData = null;
+let latestHospitalOutcomesData = null;
+async function loadHospitalPerformance() {
+  try {
+
+    const response = await fetch(
+      `${M3_API_BASE}/analytics/hospital-performance?facility_id=default`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAccessToken()}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Hospital performance API failed: ${response.status}`
+      );
+    }
+
+    const data = await response.json();
+    latestHospitalPerformanceData = data;
+
+    const setText = (id, value) => {
+      const element = document.getElementById(id);
+
+      if (element) {
+        element.innerText = value;
+      }
+    };
+
+    setText(
+      'hospital-facility-name',
+      data.facility_name ?? '--'
+    );
+
+    setText(
+      'hospital-reporting-period',
+      data.reporting_period ?? '--'
+    );
+
+    setText(
+      'hospital-overall-readmission',
+      data.overall_readmission_rate != null
+        ? `${Number(data.overall_readmission_rate).toFixed(1)}%`
+        : '--'
+    );
+
+    setText(
+      'hospital-average-los',
+      data.average_los_days != null
+        ? `${Number(data.average_los_days).toFixed(1)} days`
+        : '--'
+    );
+
+    const occupancy =
+      Number(data.bed_occupancy_rate_pct);
+
+    setText(
+      'hospital-performance-occupancy',
+      Number.isFinite(occupancy)
+        ? `${occupancy.toFixed(1)}%`
+        : '--'
+    );
+
+    const occupancyBar =
+      document.getElementById('hospital-occupancy-bar');
+
+    if (occupancyBar && Number.isFinite(occupancy)) {
+      occupancyBar.style.width =
+        `${Math.min(Math.max(occupancy, 0), 100)}%`;
+    }
+
+    console.info(
+      'Milestone 3 hospital performance loaded:',
+      data
+    );
+    recordHospitalTrendSnapshot();
+
+  } catch (error) {
+
+    console.error(
+      'Hospital performance unavailable:',
+      error
+    );
+
+    [
+      'hospital-facility-name',
+      'hospital-reporting-period',
+      'hospital-overall-readmission',
+      'hospital-average-los',
+      'hospital-performance-occupancy'
+    ].forEach(id => {
+
+      const element = document.getElementById(id);
+
+      if (element) {
+        element.innerText = 'Unavailable';
+      }
+
+    });
+  }
+}
+function renderDepartmentPerformanceChart(departments) {
+
+  const canvas = document.getElementById(
+    'departmentPerformanceChart'
+  );
+
+  if (!canvas || !Array.isArray(departments)) {
+    return;
+  }
+
+  const labels = departments.map(function(dept) {
+    return dept.department || 'Unknown';
+  });
+
+  const scores = departments.map(function(dept) {
+    return dept.performance_score != null
+      ? Number(dept.performance_score)
+      : 0;
+  });
+
+  if (departmentPerformanceChart) {
+    departmentPerformanceChart.destroy();
+  }
+
+  departmentPerformanceChart = new Chart(canvas, {
+    type: 'bar',
+
+    data: {
+      labels: labels,
+
+      datasets: [
+        {
+          label: 'Performance Score',
+          data: scores,
+          borderWidth: 0,
+          borderRadius: 6,
+          barThickness: 42
+        }
+      ]
+    },
+
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100,
+
+          title: {
+            display: true,
+            text: 'Performance Score'
+          }
+        },
+
+        x: {
+          title: {
+            display: true,
+            text: 'Department'
+          }
+        }
+      },
+
+      plugins: {
+        legend: {
+          display: false
+        },
+
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return 'Performance Score: ' +
+                Number(context.raw).toFixed(1);
+            }
+          }
+        }
+      }
+    }
+});
+  }
+
+function recordHospitalTrendSnapshot() {
+
+  if (
+    !latestHospitalPerformanceData ||
+    !latestHospitalOutcomesData
+  ) {
+    return;
+  }
+
+  const performance = latestHospitalPerformanceData;
+  const outcomes = latestHospitalOutcomesData;
+
+  const snapshot = {
+    timestamp: new Date().toISOString(),
+
+    readmission:
+      performance.overall_readmission_rate != null
+        ? Number(performance.overall_readmission_rate)
+        : outcomes.readmission_rate_pct != null
+          ? Number(outcomes.readmission_rate_pct)
+          : null,
+
+    recovery:
+      outcomes.average_recovery_days != null
+        ? Number(outcomes.average_recovery_days)
+        : null,
+
+    occupancy:
+      performance.bed_occupancy_rate_pct != null
+        ? Number(performance.bed_occupancy_rate_pct)
+        : null
+  };
+
+  if (
+    snapshot.readmission === null &&
+    snapshot.recovery === null &&
+    snapshot.occupancy === null
+  ) {
+    return;
+  }
+
+  if (trendSnapshotRecordedThisLoad) {
+  return;
+}
+
+
+  hospitalTrendSnapshots.push(snapshot);
+  trendSnapshotRecordedThisLoad = true;
+
+  // Keep the latest 20 real observations.
+  hospitalTrendSnapshots =
+    hospitalTrendSnapshots.slice(-20);
+
+  try {
+    localStorage.setItem(
+      'healthforecastai_m3_trend_snapshots',
+      JSON.stringify(hospitalTrendSnapshots)
+    );
+  } catch (error) {
+    console.warn(
+      'Could not save trend history:',
+      error
+    );
+  }
+
+  updateTrendMonitorCounts();
+
+  renderHospitalTrendChart();
+}
+
+
+function renderHospitalTrendChart() {
+
+  const canvas =
+    document.getElementById('hospitalTrendChart');
+
+  const empty =
+    document.getElementById('hospitalTrendEmpty');
+
+  const subtitle =
+    document.getElementById('trend-subtitle');
+
+  const metricSelect =
+    document.getElementById('hospital-trend-metric');
+
+  if (!canvas) {
+    return;
+  }
+
+  const metric =
+    metricSelect?.value || 'readmission';
+
+  const usableSnapshots =
+    hospitalTrendSnapshots.filter(function(snapshot) {
+
+      return snapshot[metric] !== null &&
+             snapshot[metric] !== undefined &&
+             Number.isFinite(Number(snapshot[metric]));
+
+    });
+
+  if (usableSnapshots.length < 2) {
+
+    if (hospitalTrendChart) {
+      hospitalTrendChart.destroy();
+      hospitalTrendChart = null;
+    }
+
+    canvas.classList.add('hidden');
+
+    if (empty) {
+      empty.classList.remove('hidden');
+    }
+
+    if (subtitle) {
+
+      subtitle.innerText =
+        usableSnapshots.length === 1
+          ? '1 live snapshot captured. Refresh again to build the trend.'
+          : 'Waiting for live snapshots...';
+
+    }
+
+    return;
+  }
+
+  canvas.classList.remove('hidden');
+
+  if (empty) {
+    empty.classList.add('hidden');
+  }
+
+  const labels =
+    usableSnapshots.map(function(snapshot) {
+
+      return new Date(
+        snapshot.timestamp
+      ).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+    });
+
+  const values =
+    usableSnapshots.map(function(snapshot) {
+
+      return Number(snapshot[metric]);
+
+    });
+
+  const titleElement =
+  document.getElementById('trend-chart-title');
+
+let chartTitle = 'Readmission Rate (%)';
+let displayTitle = 'Readmission Rate Trend';
+
+if (metric === 'recovery') {
+  chartTitle = 'Average Recovery Days';
+  displayTitle = 'Average Recovery Trend';
+}
+
+if (metric === 'occupancy') {
+  chartTitle = 'Bed Occupancy (%)';
+  displayTitle = 'Bed Occupancy Trend';
+}
+
+if (titleElement) {
+  titleElement.innerText = displayTitle;
+}
+
+  if (subtitle) {
+
+    subtitle.innerText =
+      usableSnapshots.length +
+      ' live snapshots captured in this browser.';
+
+  }
+
+  if (hospitalTrendChart) {
+    hospitalTrendChart.destroy();
+  }
+
+  hospitalTrendChart = new Chart(
+    canvas,
+    {
+      type: 'line',
+
+      data: {
+        labels: labels,
+
+        datasets: [
+          {
+            label: chartTitle,
+            data: values,
+            fill: false,
+            tension: 0.3,
+            borderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          }
+        ]
+      },
+
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        scales: {
+          y: {
+            beginAtZero: false,
+
+            title: {
+              display: true,
+              text: chartTitle
+            }
+          },
+
+          x: {
+            title: {
+              display: true,
+              text: 'Observation Time'
+            }
+          }
+        },
+
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    }
+  );
+}
+
+
+function loadHospitalTrendSnapshots() {
+
+  try {
+
+    const saved =
+      localStorage.getItem(
+        'healthforecastai_m3_trend_snapshots'
+      );
+
+    if (!saved) {
+      hospitalTrendSnapshots = [];
+      return;
+    }
+
+    const parsed = JSON.parse(saved);
+
+    hospitalTrendSnapshots =
+      Array.isArray(parsed)
+        ? parsed.slice(-20)
+        : [];
+
+  } catch (error) {
+
+    console.warn(
+      'Trend history could not be loaded:',
+      error
+    );
+
+    hospitalTrendSnapshots = [];
+  }
+
+  updateTrendMonitorCounts();
+}
+
+
+function updateTrendMonitorCounts() {
+
+  const snapshotCount =
+    document.getElementById(
+      'monitor-snapshot-count'
+    );
+
+  const departmentCount =
+    document.getElementById(
+      'monitor-department-count'
+    );
+
+  const treatmentCount =
+    document.getElementById(
+      'monitor-treatment-count'
+    );
+
+  if (snapshotCount) {
+    snapshotCount.innerText =
+      hospitalTrendSnapshots.length;
+  }
+
+  if (departmentCount) {
+    departmentCount.innerText =
+      Array.isArray(window.m3Departments)
+        ? window.m3Departments.length
+        : 0;
+  }
+
+  if (treatmentCount) {
+    treatmentCount.innerText =
+      Array.isArray(window.m3Treatments)
+        ? window.m3Treatments.length
+        : 0;
+  }
+}
+
+    async function loadDepartmentPerformance() {
+  const tbody = document.getElementById(
+    'department-performance-tbody'
+  );
+
+  if (!tbody) return;
+
+  try {
+
+    const response = await fetch(
+      `${M3_API_BASE}/analytics/departments`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAccessToken()}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Department API failed: ${response.status}`
+      );
+    }
+
+    const departments = await response.json();
+
+    window.m3Departments = departments;
+    updateTrendMonitorCounts();
+
+    renderDepartmentPerformanceChart(departments);
+    if (!Array.isArray(departments) || departments.length === 0) {
+
+      tbody.innerHTML = `
+        <tr>
+          <td
+            colspan="5"
+            class="p-6 text-center text-sm text-slate-400"
+          >
+            No department performance data available.
+          </td>
+        </tr>
+      `;
+
+      return;
+    }
+
+    tbody.innerHTML = departments.map(dept => {
+
+      const performanceScore =
+        dept.performance_score != null
+          ? Number(dept.performance_score)
+          : null;
+
+      return `
+        <tr class="hover:bg-slate-50 transition-colors">
+
+          <td class="p-3 text-sm font-semibold text-slate-800">
+            ${dept.department ?? '--'}
+          </td>
+
+          <td class="p-3 text-sm text-slate-700 text-right font-mono">
+            ${
+              dept.admissions_count != null
+                ? Number(dept.admissions_count).toLocaleString()
+                : '--'
+            }
+          </td>
+
+          <td class="p-3 text-sm text-slate-700 text-right">
+            ${
+              dept.readmission_rate_pct != null
+                ? `${Number(dept.readmission_rate_pct).toFixed(1)}%`
+                : '--'
+            }
+          </td>
+
+          <td class="p-3 text-sm text-slate-700 text-right">
+            ${
+              dept.avg_length_of_stay != null
+                ? `${Number(dept.avg_length_of_stay).toFixed(1)} days`
+                : '--'
+            }
+          </td>
+
+          <td class="p-3 text-sm text-slate-700 text-right font-semibold">
+            ${
+              performanceScore != null
+                ? performanceScore.toFixed(1)
+                : '--'
+            }
+          </td>
+
+        </tr>
+      `;
+
+    }).join('');
+
+    console.info(
+      'Milestone 3 department performance loaded:',
+      departments
+    );
+
+  } catch (error) {
+
+    console.error(
+      'Department performance unavailable:',
+      error
+    );
+
+    tbody.innerHTML = `
+      <tr>
+        <td
+          colspan="5"
+          class="p-6 text-center text-sm text-rose-500"
+        >
+          Department performance is currently unavailable.
+        </td>
+      </tr>
+    `;
+  }
+}
+async function loadTreatmentEffectiveness() {
+
+  const tbody = document.getElementById(
+    'treatment-effectiveness-tbody'
+  );
+
+  if (!tbody) return;
+
+  try {
+
+    const response = await fetch(
+      `${M3_API_BASE}/analytics/treatments/effectiveness`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAccessToken()}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Treatment effectiveness API failed: ${response.status}`
+      );
+    }
+
+    const treatments = await response.json();
+    window.m3Treatments = treatments;
+    updateTrendMonitorCounts();
+
+    if (!Array.isArray(treatments) || treatments.length === 0) {
+
+      tbody.innerHTML = `
+        <tr>
+          <td
+            colspan="6"
+            class="p-8 text-center text-sm text-slate-400"
+          >
+            No treatment effectiveness data available.
+          </td>
+        </tr>
+      `;
+
+      return;
+    }
+
+    tbody.innerHTML = treatments.map(function(treatment) {
+
+      return `
+        <tr class="hover:bg-slate-50 transition-colors">
+
+          <td class="px-4 py-4">
+            <div class="flex items-center gap-3">
+
+              <div class="w-9 h-9 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-blue-600 text-lg">
+                  medical_services
+                </span>
+              </div>
+
+              <div>
+                <div class="text-sm font-semibold text-slate-900">
+                  ${treatment.treatment_name ?? '--'}
+                </div>
+
+                <div class="text-[10px] text-slate-400 mt-0.5">
+                  Treatment protocol
+                </div>
+              </div>
+
+            </div>
+          </td>
+
+          <td class="px-4 py-4">
+            <span class="text-sm text-slate-700">
+              ${treatment.condition ?? '--'}
+            </span>
+          </td>
+
+          <td class="px-4 py-4 text-right">
+            <span class="font-mono text-sm font-semibold text-slate-800">
+              ${
+                treatment.patient_count != null
+                  ? Number(treatment.patient_count).toLocaleString()
+                  : '--'
+              }
+            </span>
+          </td>
+
+          <td class="px-4 py-4 text-right">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-semibold">
+              ${
+                treatment.success_rate_pct != null
+                  ? Number(treatment.success_rate_pct).toFixed(1) + '%'
+                  : '--'
+              }
+            </span>
+          </td>
+
+          <td class="px-4 py-4 text-right">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-amber-50 border border-amber-100 text-amber-700 text-xs font-semibold">
+              ${
+                treatment.readmission_rate_pct != null
+                  ? Number(treatment.readmission_rate_pct).toFixed(1) + '%'
+                  : '--'
+              }
+            </span>
+          </td>
+
+          <td class="px-4 py-4 text-right">
+            <span class="text-sm font-semibold text-slate-700">
+              ${
+                treatment.avg_recovery_days != null
+                  ? Number(treatment.avg_recovery_days).toFixed(1) + ' days'
+                  : '--'
+              }
+            </span>
+          </td>
+
+        </tr>
+      `;
+
+    }).join('');
+
+    console.info(
+      'Milestone 3 treatment effectiveness loaded:',
+      treatments
+    );
+
+  } catch (error) {
+
+    console.error(
+      'Treatment effectiveness unavailable:',
+      error
+    );
+
+    tbody.innerHTML = `
+      <tr>
+        <td
+          colspan="6"
+          class="p-8 text-center text-sm text-rose-500"
+        >
+          Treatment effectiveness data is currently unavailable.
+        </td>
+      </tr>
+    `;
+  }
+}
     function getAccessToken() {
       return (
         localStorage.getItem('access_token') ||
@@ -1454,6 +2971,148 @@ updateDoctorRiskKpis(doctorApiPatients);
     averageRisk: `${(avg * 100).toFixed(1)}%`
   });
 }
+    async function loadHospitalSummary() {
+  try {
+    const data = await apiFetch('/analytics/summary');
+
+    const setText = (id, value) => {
+      const element = document.getElementById(id);
+      if (element) element.innerText = value;
+    };
+
+    setText(
+      'hospital-total-patients',
+      Number(data.total_patients ?? 0).toLocaleString()
+    );
+
+    setText(
+      'hospital-total-admissions',
+      Number(data.total_admissions ?? 0).toLocaleString()
+    );
+
+    setText(
+      'hospital-readmission-rate',
+      `${Number(data.readmission_rate ?? 0).toFixed(2)}%`
+    );
+    const risk = data.risk_distribution || {};
+
+setText(
+  'hospital-risk-low',
+  Number(risk.low ?? 0).toLocaleString()
+);
+
+setText(
+  'hospital-risk-medium',
+  Number(risk.medium ?? 0).toLocaleString()
+);
+
+setText(
+  'hospital-risk-high',
+  Number(risk.high ?? 0).toLocaleString()
+);
+
+    
+    console.info('Hospital analytics summary loaded:', data);
+
+  } catch (error) {
+    console.error('Hospital analytics summary unavailable:', error);
+  }
+}
+    async function loadHospitalOutcomes() {
+  try {
+
+    const response = await fetch(
+      `${M3_API_BASE}/analytics/outcomes`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAccessToken()}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Outcome API failed: ${response.status}`
+      );
+    }
+
+    const data = await response.json();
+    latestHospitalOutcomesData = data;
+    
+
+    const setText = (id, value) => {
+      const element = document.getElementById(id);
+
+      if (element) {
+        element.innerText = value;
+      }
+    };
+
+    setText(
+      'outcome-total-patients',
+      Number(data.total_patients ?? 0).toLocaleString()
+    );
+
+    setText(
+      'outcome-readmission-rate',
+      data.readmission_rate_pct != null
+        ? `${Number(data.readmission_rate_pct).toFixed(1)}%`
+        : '--'
+    );
+
+    setText(
+      'outcome-recovery-days',
+      data.average_recovery_days != null
+        ? `${Number(data.average_recovery_days).toFixed(1)} days`
+        : '--'
+    );
+
+    setText(
+      'outcome-complication-rate',
+      data.complication_rate_pct != null
+        ? `${Number(data.complication_rate_pct).toFixed(1)}%`
+        : '--'
+    );
+
+    setText(
+      'outcome-mortality-rate',
+      data.mortality_rate_pct != null
+        ? `${Number(data.mortality_rate_pct).toFixed(1)}%`
+        : '--'
+    );
+
+    console.info(
+      'Milestone 3 patient outcomes loaded:',
+      data
+    );
+    recordHospitalTrendSnapshot();
+
+  } catch (error) {
+
+    console.error(
+      'Patient outcome analytics unavailable:',
+      error
+    );
+
+    const ids = [
+      'outcome-total-patients',
+      'outcome-readmission-rate',
+      'outcome-recovery-days',
+      'outcome-complication-rate',
+      'outcome-mortality-rate'
+    ];
+
+    ids.forEach(id => {
+      const element = document.getElementById(id);
+
+      if (element) {
+        element.innerText = 'Unavailable';
+      }
+    });
+  }
+}
     async function loadReadmissionForecast() {
       if (forecastLoaded) return;
       forecastLoaded = true;
@@ -1621,43 +3280,122 @@ const result = await response.json();
       }, 3000);
     }
 
-    function switchView(viewName) {
-      const views = ['doctor', 'hospital', 'researcher', 'system'];
-      if (!views.includes(viewName)) viewName = 'doctor';
+function applyRoleBasedAccess() {
 
-      views.forEach(v => {
-        const sec = document.getElementById('view-' + v);
-        const tab = document.getElementById('tab-' + v);
-        const side = document.getElementById('side-' + v);
+  const userRole = String(
+    localStorage.getItem('user_role') || ''
+  ).toLowerCase();
 
-        if (v === viewName) {
-          if (sec) sec.classList.add('active');
-          if (tab) tab.classList.add('active');
-          if (side) side.classList.add('active');
-        } else {
-          if (sec) sec.classList.remove('active');
-          if (tab) tab.classList.remove('active');
-          if (side) side.classList.remove('active');
-        }
-      });
+  const roleToView = {
+    doctor: 'doctor',
+    hospital_admin: 'hospital',
+    researcher: 'researcher',
+    system_admin: 'system'
+  };
 
-      const prof = userProfiles[viewName];
-      if (prof) {
-        document.getElementById('user-name').innerText = prof.name;
-        document.getElementById('user-role-label').innerText = prof.role;
-        document.getElementById('user-avatar').src = prof.avatar;
-      }
+  const allowedView = roleToView[userRole];
 
-      if (viewName === 'hospital') {
-        initHospitalCharts();
-        loadReadmissionForecast();
-      }
-      if (viewName === 'researcher') {
-        renderCohortTable(activeCohortList);
-        initResearcherCharts();
-      }
-      history.replaceState(null, null, '#' + viewName);
+  const views = ['doctor', 'hospital', 'researcher', 'system'];
+
+  views.forEach(view => {
+
+    const tab = document.getElementById('tab-' + view);
+    const side = document.getElementById('side-' + view);
+
+    const allowed = view === allowedView;
+
+    if (tab) {
+      tab.style.display = allowed ? '' : 'none';
     }
+
+    if (side) {
+      side.style.display = allowed ? '' : 'none';
+    }
+  });
+}
+
+    function switchView(viewName) {
+
+  // Get logged-in user's role
+  const userRole = String(
+    localStorage.getItem('user_role') || ''
+  ).toLowerCase();
+
+  // Backend role -> frontend dashboard
+  const roleToView = {
+    doctor: 'doctor',
+    hospital_admin: 'hospital',
+    researcher: 'researcher',
+    system_admin: 'system'
+  };
+
+  // Determine the only dashboard this user is allowed to access
+  const allowedView = roleToView[userRole];
+
+  // If role is unknown, stop access
+  if (!allowedView) {
+    console.warn('Unknown user role:', userRole);
+    return;
+  }
+
+  // BLOCK unauthorized dashboard access
+  if (viewName !== allowedView) {
+    showToast(
+      'Access denied. You are not authorized to access this dashboard.',
+      'error'
+    );
+
+    // Return to authorized dashboard
+    viewName = allowedView;
+  }
+
+  const views = ['doctor', 'hospital', 'researcher', 'system'];
+
+  views.forEach(v => {
+    const sec = document.getElementById('view-' + v);
+    const tab = document.getElementById('tab-' + v);
+    const side = document.getElementById('side-' + v);
+
+    if (v === viewName) {
+      if (sec) sec.classList.add('active');
+      if (tab) tab.classList.add('active');
+      if (side) side.classList.add('active');
+    } else {
+      if (sec) sec.classList.remove('active');
+      if (tab) tab.classList.remove('active');
+      if (side) side.classList.remove('active');
+    }
+  });
+
+  const prof = userProfiles[viewName];
+
+  if (prof) {
+    document.getElementById('user-name').innerText = prof.name;
+    document.getElementById('user-role-label').innerText = prof.role;
+    document.getElementById('user-avatar').src = prof.avatar;
+  }
+
+  if (viewName === 'hospital') {
+
+    trendSnapshotRecordedThisLoad = false;
+
+    loadHospitalTrendSnapshots();
+    initHospitalCharts();
+    loadHospitalSummary();
+    loadReadmissionForecast();
+    loadHospitalOutcomes();
+    loadHospitalPerformance();
+    loadDepartmentPerformance();
+    loadTreatmentEffectiveness();
+  }
+
+  if (viewName === 'researcher') {
+    renderCohortTable(activeCohortList);
+    initResearcherCharts();
+  }
+
+  history.replaceState(null, null, '#' + viewName);
+}
 
     // Modal Handlers
     function openModal(id) {
@@ -2328,44 +4066,44 @@ if (hba1c !== null && hba1c !== undefined && !Number.isNaN(Number(hba1c))) {
       }
 
       // 2. Financial Performance Chart
-      const finCtx = document.getElementById('financialChart');
-      if (finCtx) {
-        new Chart(finCtx, {
-          type: 'line',
-          data: {
-            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8'],
-            datasets: [
-              {
-                label: 'Actual Cost Avoidance ($)',
-                data: [45000, 52000, 48000, 61000, 59000, 68000, 72000, 85000],
-                borderColor: '#0052CC',
-                backgroundColor: 'rgba(0, 82, 204, 0.08)',
-                borderWidth: 2.5,
-                tension: 0.3,
-                fill: true
-              },
-              {
-                label: 'Projected Readmission Cost ($)',
-                data: [60000, 58000, 62000, 55000, 52000, 50000, 48000, 45000],
-                borderColor: '#c3c6d6',
-                borderWidth: 2,
-                borderDash: [5, 5],
-                tension: 0.3,
-                fill: false
-              }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'top', align: 'end' } },
-            scales: {
-              y: { ticks: { callback: function(val) { return '$' + val/1000 + 'k'; } } }
+      // 2. Admission Risk Distribution Chart
+const riskCtx = document.getElementById('financialChart');
+
+if (riskCtx) {
+  (async () => {
+    try {
+      const data = await apiFetch('/analytics/summary');
+      const risk = data.risk_distribution || {};
+
+      new Chart(riskCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+          datasets: [{
+            data: [
+              Number(risk.low ?? 0),
+              Number(risk.medium ?? 0),
+              Number(risk.high ?? 0)
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
             }
           }
-        });
-      }
+        }
+      });
 
+    } catch (error) {
+      console.error('Risk distribution chart unavailable:', error);
+    }
+  })();
+}
       // 3. Patient Discharge Volume by Medical Ward
       const disCtx = document.getElementById('dischargeChart');
       if (disCtx) {
