@@ -1,6 +1,8 @@
 """Database seeding script for demo and review."""
 
+import json
 from datetime import date
+from pathlib import Path
 
 from sqlalchemy.orm import Session
 
@@ -13,7 +15,8 @@ from app.models.treatment import TreatmentOutcome
 from app.models.user import User
 from app.schemas.user import UserCreate
 from app.services.auth_service import create_user
-
+from app.db.base import Base
+from app.db.session import SessionLocal, engine
 
 def seed_database(db: Session) -> None:
     """Populate database with default users, patients, admissions, predictions, and treatments."""
@@ -108,7 +111,9 @@ def seed_database(db: Session) -> None:
             # Add treatment outcome
             treat = TreatmentOutcome(
                 admission_id=adm.id,
-                treatment_name="Insulin Regimen" if mrn == "MRN-1001" else "Metformin Protocol",
+                treatment_name="Insulin Regimen"
+                if mrn == "MRN-1001"
+                else "Metformin Protocol",
                 medication_change=True,
                 recovery_score=85.0 if mrn == "MRN-1001" else 78.5,
                 length_of_stay_days=5,
@@ -117,47 +122,23 @@ def seed_database(db: Session) -> None:
             db.add(treat)
             db.commit()
 
-    # Seed MongoDB Model Registry
+    # Seed MongoDB Model Registry with Kanak's model runs
     try:
         mongo_db = get_mongo_db()
-        if mongo_db.model_runs.count_documents({}) == 0:
-            runs = [
-                {
-                    "model_name": "xgboost",
-                    "version": "1.0.0",
-                    "status": "promoted",
-                    "accuracy": 0.6868,
-                    "precision": 0.1454,
-                    "recall": 0.5099,
-                    "f1": 0.2263,
-                    "roc_auc": 0.6518,
-                    "decision_threshold": 0.1117,
-                },
-                {
-                    "model_name": "random_forest",
-                    "version": "1.0.0",
-                    "status": "archived",
-                    "accuracy": 0.6635,
-                    "precision": 0.1410,
-                    "recall": 0.5394,
-                    "f1": 0.2235,
-                    "roc_auc": 0.6459,
-                    "decision_threshold": 0.1000,
-                },
-                {
-                    "model_name": "logistic_regression",
-                    "version": "1.0.0",
-                    "status": "archived",
-                    "accuracy": 0.6070,
-                    "precision": 0.1268,
-                    "recall": 0.5736,
-                    "f1": 0.2077,
-                    "roc_auc": 0.6280,
-                    "decision_threshold": 0.0927,
-                },
-            ]
-            mongo_db.model_runs.insert_many(runs)
-            print("✅ Seeded MongoDB model_runs registry!")
+        seed_file = Path("ml/artifacts/model_runs_seed.json")
+        if not seed_file.exists():
+            seed_file = Path(__file__).resolve().parents[3] / "ml" / "artifacts" / "model_runs_seed.json"
+
+        if seed_file.exists():
+            seed_payload = json.loads(seed_file.read_text(encoding="utf-8"))
+            docs = seed_payload.get("documents", [])
+            for doc in docs:
+                run_id = doc.get("run_id")
+                if run_id:
+                    mongo_db.model_runs.update_one({"run_id": run_id}, {"$set": doc}, upsert=True)
+            print(f"✅ Upserted {len(docs)} ML model runs into MongoDB!")
+        else:
+            print("Notice: model_runs_seed.json not found, skipping Mongo seed.")
     except Exception as e:
         print(f"MongoDB seed notice: {e}")
 
@@ -165,6 +146,9 @@ def seed_database(db: Session) -> None:
 
 
 def main() -> None:
+    
+    Base.metadata.create_all(bind=engine)
+
     db = SessionLocal()
     try:
         seed_database(db)
