@@ -177,3 +177,56 @@ def require_any_verified_permission(*permissions: Permission) -> Callable[..., V
         return verify_account(caller, db)
 
     return guard
+
+
+def require_verified_permissions(
+    *permissions: Permission,
+) -> Callable[..., VerifiedUser]:
+    """Allow a verified caller holding all of the given permissions."""
+
+    def guard(
+        caller: CurrentUser = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ) -> VerifiedUser:
+        missing = [
+            permission for permission in permissions if not has_permission(caller.role, permission)
+        ]
+
+        if missing:
+            required = ", ".join(str(permission) for permission in permissions)
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Role '{caller.role}' needs all of: {required}",
+            )
+
+        return verify_account(caller, db)
+
+    return guard
+
+
+def require_any_verified_permission_with_required(
+    *any_permissions: Permission,
+    required_permission: Permission,
+) -> Callable[..., VerifiedUser]:
+    """Require one of the given permissions plus an additional permission."""
+
+    def guard(
+        caller: CurrentUser = Depends(get_current_user),
+        db: Session = Depends(get_db),
+    ) -> VerifiedUser:
+        has_any = any(has_permission(caller.role, permission) for permission in any_permissions)
+        has_required = has_permission(caller.role, required_permission)
+
+        if not has_any or not has_required:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=(
+                    f"Role '{caller.role}' needs one of: "
+                    f"{', '.join(str(p) for p in any_permissions)} "
+                    f"and '{required_permission}'"
+                ),
+            )
+
+        return verify_account(caller, db)
+
+    return guard

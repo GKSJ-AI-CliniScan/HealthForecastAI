@@ -11,6 +11,7 @@ from app.api.deps import (
     VerifiedUser,
     get_db,
     require_any_verified_permission,
+    require_any_verified_permission_with_required,
     require_verified_permission,
 )
 from app.core.rbac import Permission
@@ -77,7 +78,12 @@ def list_anonymised(
 def get_patient(
     patient_id: int,
     db: Session = Depends(get_db),
-    caller: VerifiedUser = Depends(require_any_verified_permission(*READ_PATIENTS)),
+    caller: VerifiedUser = Depends(
+        require_any_verified_permission_with_required(
+            *READ_PATIENTS,
+            required_permission=Permission.MEDICAL_HISTORY_READ,
+        )
+    ),
 ) -> PatientDetail:
     """Return a patient and their encounters, subject to the caller's scope."""
     try:

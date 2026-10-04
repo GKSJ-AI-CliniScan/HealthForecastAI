@@ -65,6 +65,7 @@ PERMISSIONS: dict[Role, frozenset[Permission]] = {
     Role.HOSPITAL_ADMIN: frozenset(
         {
             Permission.PATIENT_READ_ALL,
+            Permission.MEDICAL_HISTORY_READ,
             Permission.RISK_REPORT_READ_AGGREGATED,
             Permission.READMISSION_FORECAST_READ,
             Permission.TREATMENT_REPORT_READ,

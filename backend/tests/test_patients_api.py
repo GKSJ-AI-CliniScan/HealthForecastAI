@@ -71,6 +71,30 @@ def test_patient_detail_includes_admissions(
     assert body["admissions"][0]["readmitted_within_30"] is True
 
 
+def test_hospital_admin_can_read_patient_history(
+    client: TestClient, patients: list[Patient], auth_header
+) -> None:
+    """Hospital administrators have view-only access to medical history."""
+    response = client.get(
+        f"/api/v1/patients/{patients[0].id}",
+        headers=auth_header(Role.HOSPITAL_ADMIN),
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body["admissions"]) == 1
+
+
+def test_researcher_cannot_read_identified_patient_history(
+    client: TestClient, patients: list[Patient], auth_header
+) -> None:
+    """Researchers cannot access identified patient history."""
+    response = client.get(
+        f"/api/v1/patients/{patients[0].id}",
+        headers=auth_header(Role.RESEARCHER),
+    )
+    assert response.status_code == 403
+
+
 def test_only_write_permission_can_create_a_patient(client: TestClient, auth_header) -> None:
     """Creation is restricted to roles holding patient:write."""
     payload = {
