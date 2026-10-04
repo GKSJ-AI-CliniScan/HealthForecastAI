@@ -1192,8 +1192,7 @@
       <div class="mt-6 rounded-lg bg-blue-50 border border-blue-100 p-3">
 
         <p class="text-xs leading-5 text-blue-800">
-          Trend history contains only successful live API snapshots captured by this browser.
-        </p>
+          Trend history is loaded from PostgreSQL hospital analytics snapshots.
 
       </div>
 
@@ -1229,7 +1228,9 @@
 <div class="clinical-card p-lg clinical-shadow">
 <div class="mb-6">
 <h2 class="font-headline-sm text-headline-sm text-on-surface">Operational Efficiency</h2>
-<p class="font-body-sm text-body-sm text-on-surface-variant">Patient Discharge Volume by Medical Ward (Last 30 Days)</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+  Patient Volume by Department from Live Hospital Analytics
+</p> 
 </div>
 <div class="w-full h-[300px]">
 <canvas id="dischargeChart"></canvas>
@@ -2103,7 +2104,7 @@ async function loadHospitalPerformance() {
       'Milestone 3 hospital performance loaded:',
       data
     );
-    recordHospitalTrendSnapshot();
+    
 
   } catch (error) {
 
@@ -2385,10 +2386,10 @@ if (titleElement) {
   if (subtitle) {
 
     subtitle.innerText =
-      usableSnapshots.length +
-      ' live snapshots captured in this browser.';
+    usableSnapshots.length +
+    ' historical snapshots from PostgreSQL.';
 
-  }
+}
 
   if (hospitalTrendChart) {
     hospitalTrendChart.destroy();
@@ -2448,38 +2449,70 @@ if (titleElement) {
 }
 
 
-function loadHospitalTrendSnapshots() {
+async function loadHospitalTrendSnapshots() {
 
   try {
 
-    const saved =
-      localStorage.getItem(
-        'healthforecastai_m3_trend_snapshots'
-      );
+    const response = await fetch(
+      `${M3_API_BASE}/analytics/trends?facility_id=default`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAccessToken()}`
+        }
+      }
+    );
 
-    if (!saved) {
-      hospitalTrendSnapshots = [];
-      return;
+    if (!response.ok) {
+      throw new Error(
+        `Trend API failed: ${response.status}`
+      );
     }
 
-    const parsed = JSON.parse(saved);
+    const data = await response.json();
 
     hospitalTrendSnapshots =
-      Array.isArray(parsed)
-        ? parsed.slice(-20)
+      Array.isArray(data)
+        ? data.map(function(snapshot) {
+            return {
+              timestamp: snapshot.snapshot_time,
+              readmission:
+                snapshot.readmission_rate_pct != null
+                  ? Number(snapshot.readmission_rate_pct)
+                  : null,
+              recovery:
+                snapshot.average_recovery_days != null
+                  ? Number(snapshot.average_recovery_days)
+                  : null,
+              occupancy:
+                snapshot.bed_occupancy_rate_pct != null
+                  ? Number(snapshot.bed_occupancy_rate_pct)
+                  : null
+            };
+          })
         : [];
+
+    updateTrendMonitorCounts();
+    renderHospitalTrendChart();
+
+    console.info(
+      'Milestone 3 trend snapshots loaded from PostgreSQL:',
+      hospitalTrendSnapshots
+    );
 
   } catch (error) {
 
-    console.warn(
+    console.error(
       'Trend history could not be loaded:',
       error
     );
 
     hospitalTrendSnapshots = [];
-  }
 
-  updateTrendMonitorCounts();
+    updateTrendMonitorCounts();
+    renderHospitalTrendChart();
+  }
 }
 
 
@@ -3087,7 +3120,7 @@ setText(
       'Milestone 3 patient outcomes loaded:',
       data
     );
-    recordHospitalTrendSnapshot();
+    
 
   } catch (error) {
 
@@ -3708,19 +3741,78 @@ function applyRoleBasedAccess() {
       document.body.removeChild(link);
     }
 
-    function exportHospitalData() {
-      const data = [
-        ['Medical Ward', 'Discharge Volume (Last 30d)', 'Avg Length of Stay (Days)', 'Readmission Rate (%)', 'Bed Occupancy (%)'],
-        ['Cardiology', '120', '5.4', '12.4%', '88%'],
-        ['Oncology', '85', '8.2', '9.1%', '76%'],
-        ['Neurology', '65', '9.0', '11.8%', '82%'],
-        ['General Surgery', '140', '4.1', '6.8%', '91%'],
-        ['Pediatrics', '95', '3.2', '4.2%', '70%'],
-        ['Endocrinology (Diabetic Unit)', '110', '7.1', '18.2%', '94%']
-      ];
-      downloadCSV('hospital_discharge_and_ward_report.csv', data);
-      showToast('Patient discharge volume & ward report exported as CSV!');
+    async function exportHospitalData() {
+  try {
+    let data = latestHospitalPerformanceData;
+
+    // If live hospital data has not been loaded yet, fetch it now.
+    if (!data) {
+      const response = await fetch(
+        `${M3_API_BASE}/analytics/hospital-performance?facility_id=default`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getAccessToken()}`
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Hospital performance API failed: ${response.status}`
+        );
+      }
+
+      data = await response.json();
     }
+
+    const rows = [
+      [
+        'Facility',
+        'Reporting Period',
+        'Department',
+        'Admissions',
+        'Readmission Rate (%)',
+        'Average Length of Stay (Days)',
+        'Performance Score'
+      ]
+    ];
+
+    const departments = data.departments || [];
+
+    departments.forEach(department => {
+      rows.push([
+        data.facility_name || '',
+        data.reporting_period || '',
+        department.department || '',
+        department.admissions_count ?? '',
+        department.readmission_rate_pct ?? '',
+        department.avg_length_of_stay ?? '',
+        department.performance_score ?? ''
+      ]);
+    });
+
+    downloadCSV(
+      'hospital_performance_live_report.csv',
+      rows
+    );
+
+    showToast(
+      `Exported ${departments.length} live hospital department records!`
+    );
+
+  } catch (error) {
+    console.error(
+      'Hospital data export failed:',
+      error
+    );
+
+    showToast(
+      'Unable to export live hospital data.'
+    );
+  }
+}
 
     function exportResearcherReport() {
       const headers = ['Patient_ID', 'Age', 'Gender', 'ICD_Diagnosis', 'Regimen', 'Num_Medications', 'Time_In_Hospital_Days', 'Readmission_Prob', 'Risk_Tier'];
@@ -4104,32 +4196,88 @@ if (riskCtx) {
     }
   })();
 }
-      // 3. Patient Discharge Volume by Medical Ward
+            // 3. Department Patient Volume from live hospital analytics
       const disCtx = document.getElementById('dischargeChart');
+
       if (disCtx) {
-        new Chart(disCtx, {
-          type: 'bar',
-          data: {
-            labels: ['Cardiology', 'Oncology', 'Neurology', 'Gen Surgery', 'Pediatrics', 'Endocrinology'],
-            datasets: [{
-              label: 'Discharged Patients (Last 30 Days)',
-              data: [120, 85, 65, 140, 95, 110],
-              backgroundColor: '#0052CC',
-              borderRadius: 6,
-              barThickness: 36
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-              y: { beginAtZero: true, grid: { color: '#F0F3FF' } },
-              x: { grid: { display: false } }
+        (async () => {
+          try {
+            const response = await fetch(
+              `${M3_API_BASE}/analytics/hospital-performance?facility_id=default`,
+              {
+                method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${getAccessToken()}`
+                }
+              }
+            );
+
+            if (!response.ok) {
+              throw new Error(
+                `Hospital performance API failed: ${response.status}`
+              );
             }
+
+            const data = await response.json();
+            const departments = data.departments || [];
+
+            new Chart(disCtx, {
+              type: 'bar',
+              data: {
+                labels: departments.map(
+                  department => department.department
+                ),
+                datasets: [{
+                  label: 'Patient Volume',
+                  data: departments.map(
+                    department => Number(
+                      department.admissions_count || 0
+                    )
+                  ),
+                  backgroundColor: '#0052CC',
+                  borderRadius: 6,
+                  barThickness: 36
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    display: false
+                  }
+                },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    grid: {
+                      color: '#F0F3FF'
+                    }
+                  },
+                  x: {
+                    grid: {
+                      display: false
+                    }
+                  }
+                }
+              }
+            });
+
+            console.info(
+              'Operational efficiency chart loaded from live hospital analytics:',
+              departments
+            );
+
+          } catch (error) {
+            console.error(
+              'Operational efficiency chart unavailable:',
+              error
+            );
           }
-        });
+        })();
       }
+        
     }
 
     let researcherChartInstance = null;
