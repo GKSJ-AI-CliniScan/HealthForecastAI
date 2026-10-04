@@ -1,36 +1,17 @@
 # syntax=docker/dockerfile:1
 
-# ---------- Stage 1: dependencies ----------
-FROM node:22-alpine AS deps
+FROM node:22-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci
-
-# ---------- Stage 2: build ----------
-FROM node:22-alpine AS builder
-WORKDIR /app
-ENV NEXT_TELEMETRY_DISABLED=1
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+ARG VITE_API_BASE_URL=/api/v1
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN npm run build
 
-# ---------- Stage 3: runtime ----------
-FROM node:22-alpine AS runner
-WORKDIR /app
-
-ENV NODE_ENV=production \
-    NEXT_TELEMETRY_DISABLED=1 \
-    PORT=3000
-
-RUN addgroup -g 1001 -S nodejs \
-    && adduser -S nextjs -u 1001
-
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
-
-EXPOSE 3000
-
-CMD ["node", "server.js"]
+FROM nginx:1.27-alpine AS runtime
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD wget -qO- http://localhost/ || exit 1

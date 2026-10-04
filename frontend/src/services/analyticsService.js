@@ -9,7 +9,24 @@ export const analyticsService = {
     try {
       const res = await apiClient.get('/analytics/hospital-dashboard');
       if (res.data && res.data.success && res.data.data) {
-        return res.data.data;
+        const stats = res.data.data;
+        return {
+          kpis: {
+            ...mockHospitalAnalytics.kpis,
+            totalPatients: stats.total_patients,
+            totalAdmissions: stats.total_admissions,
+            readmissionRate: stats.readmission_rate * 100,
+            avgStayDays: stats.average_length_of_stay,
+            highRiskPatients: stats.risk_distribution?.High || 0
+          },
+          departmentPerformance: mockHospitalAnalytics.departmentPerformance,
+          monthlyTrends: mockHospitalAnalytics.monthlyTrends,
+          riskDistribution: [
+            { name: 'High Risk', count: stats.risk_distribution?.High || 0 },
+            { name: 'Medium Risk', count: stats.risk_distribution?.Medium || 0 },
+            { name: 'Low Risk', count: stats.risk_distribution?.Low || 0 }
+          ]
+        };
       }
     } catch (e) {
       console.warn('[analyticsService] API hospital dashboard failed. Using computed local analytics:', e.message);
@@ -41,7 +58,36 @@ export const analyticsService = {
     try {
       const res = await apiClient.get('/analytics/research');
       if (res.data && res.data.success && res.data.data) {
-        return res.data.data;
+        const stats = res.data.data;
+        const ageDemographics = (stats.by_age_group || []).map(g => ({
+          ageGroup: g.age_group,
+          count: g.admissions
+        }));
+        
+        let anonymizedDataset = [];
+        try {
+          const anonRes = await apiClient.get('/patients/anonymised');
+          const payload = anonRes.data?.data || anonRes.data;
+          if (payload && payload.items) {
+             anonymizedDataset = payload.items.map(p => ({
+               id: p.pseudo_id,
+               age: p.age_group,
+               gender: p.gender,
+               diagnosis: p.primary_diagnosis || 'Unknown',
+               riskLevel: 'N/A',
+               readmissionProbability: 'N/A',
+               treatmentStatus: 'Anonymized'
+             }));
+          }
+        } catch (err) {
+          console.warn('Failed to fetch anonymized dataset', err);
+        }
+
+        return {
+          ageDemographics: ageDemographics.length > 0 ? ageDemographics : mockResearchAnalytics.anonymizedAggregatedData,
+          riskByDiagnosisIndex: mockResearchAnalytics.populationRiskByDiagnosis,
+          anonymizedDataset
+        };
       }
     } catch (e) {
       console.warn('[analyticsService] API research data failed. Using local anonymized cohort generator:', e.message);

@@ -13,11 +13,11 @@ class Settings(BaseSettings):
     # Application
     APP_NAME: str = "HealthForecastAI"
     ENVIRONMENT: str = "development"
-    DEBUG: bool = True
+    DEBUG: bool = False
     API_V1_PREFIX: str = "/api/v1"
 
     # Security
-    SECRET_KEY: str = "change-me-do-not-use-in-production"
+    SECRET_KEY: str = ""
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 10080
@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     MONGO_DB: str = "healthforecast"
 
     # CORS - comma separated list of allowed origins
-    BACKEND_CORS_ORIGINS: str = "http://localhost:3000"
+    BACKEND_CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
 
     # ML
     MODEL_ARTIFACT_DIR: str = "ml/artifacts"

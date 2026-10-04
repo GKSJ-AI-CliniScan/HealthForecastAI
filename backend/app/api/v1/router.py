@@ -4,6 +4,7 @@ from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
     analytics,
+    admin,
     auth,
     clinical_support,
     ml_models,
@@ -25,3 +26,4 @@ api_router.include_router(
 )
 api_router.include_router(analytics.router, prefix="/analytics", tags=["Healthcare Analytics"])
 api_router.include_router(ml_models.router, prefix="/models", tags=["AI Model Management"])
+api_router.include_router(admin.router, prefix="/admin", tags=["Legacy Administration"])

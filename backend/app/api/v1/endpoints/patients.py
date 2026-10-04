@@ -79,6 +79,15 @@ def list_anonymised_patients(
     )
 
 
+@router.get("/doctor/{doctor_name}", response_model=list[PatientRead], include_in_schema=False)
+def list_doctor_patients_compatibility(
+    doctor_name: str, user: CurrentUser, db: DbSession
+) -> list[PatientRead]:
+    """Compatibility route; authorization is always based on the JWT caller."""
+    rows, _ = patient_service.list_patients(db, user, limit=200, offset=0)
+    return [PatientRead.model_validate(row) for row in rows]
+
+
 @router.post(
     "", response_model=PatientRead, status_code=status.HTTP_201_CREATED, summary="Create a patient"
 )
@@ -122,6 +131,54 @@ def update_patient(
     patient = patient_service.update_patient(db, user, patient_id, payload)
     if patient is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+    return PatientRead.model_validate(patient)
+
+
+@router.put("/{patient_id}", response_model=PatientRead, include_in_schema=False)
+def replace_patient_compatibility(
+    patient_id: int, payload: PatientUpdate, user: CanWritePatients, db: DbSession
+) -> PatientRead:
+    """Compatibility alias for the legacy Vite client."""
+    patient = patient_service.update_patient(db, user, patient_id, payload)
+    if patient is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+    return PatientRead.model_validate(patient)
+
+
+@router.post("/{patient_id}/notes", response_model=PatientRead, status_code=status.HTTP_201_CREATED)
+def add_clinical_note(
+    patient_id: int, payload: dict[str, object], user: CanWritePatients, db: DbSession
+) -> PatientRead:
+    """Append a clinical note to the patient's server-side record."""
+    patient = patient_service.get_patient(db, user, patient_id)
+    if patient is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+    notes = list(patient.clinical_notes or [])
+    notes.insert(0, payload)
+    patient.clinical_notes = notes
+    db.commit()
+    db.refresh(patient)
+    return PatientRead.model_validate(patient)
+
+
+@router.post(
+    "/{patient_id}/treatments", response_model=PatientRead, status_code=status.HTTP_201_CREATED
+)
+def add_treatment(
+    patient_id: int, payload: dict[str, str], user: CanWritePatients, db: DbSession
+) -> PatientRead:
+    """Append a treatment or medication protocol to the patient's record."""
+    patient = patient_service.get_patient(db, user, patient_id)
+    if patient is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+    treatment = payload.get("treatment", "").strip()
+    if not treatment:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Treatment is required")
+    history = list(patient.treatment_history or [])
+    history.append(treatment)
+    patient.treatment_history = history
+    db.commit()
+    db.refresh(patient)
     return PatientRead.model_validate(patient)
 
 

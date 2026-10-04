@@ -23,13 +23,34 @@ const savePatientsToStorage = (patients) => {
   localStorage.setItem('hf_patients', JSON.stringify(patients));
 };
 
+const toClientPatient = (patient) => ({
+  ...patient,
+  name: patient.name || patient.medical_record_number || `Patient ${patient.id}`,
+  age: patient.age || patient.age_group,
+  diagnosis: patient.diagnosis || patient.primary_diagnosis,
+  assignedDoctorId: patient.assigned_doctor_id,
+  clinicalNotes: patient.clinical_notes || [],
+  treatmentHistory: patient.treatment_history || [],
+  recoveryProgress: patient.recovery_progress || {},
+  treatmentStatus: patient.treatment_status || 'Stable',
+  riskLevel: patient.risk_level || 'Medium',
+  readmissionProbability: patient.readmission_probability
+    ? Math.round(patient.readmission_probability * 100)
+    : 0,
+  dischargeDate: patient.discharge_date,
+});
+
+const unwrap = (data) => data?.data ?? data;
+
 export const patientService = {
   getAllPatients: async () => {
     try {
       const res = await apiClient.get('/patients');
-      if (res.data && res.data.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
-        savePatientsToStorage(res.data.data);
-        return res.data.data;
+      const payload = unwrap(res.data);
+      if (Array.isArray(payload?.items)) {
+        const patients = payload.items.map(toClientPatient);
+        savePatientsToStorage(patients);
+        return patients;
       }
     } catch (e) {
       console.warn('[patientService] Backend API unreachable. Using persistent local store:', e.message);
@@ -41,8 +62,8 @@ export const patientService = {
   getPatientById: async (id) => {
     try {
       const res = await apiClient.get(`/patients/${id}`);
-      if (res.data && res.data.success && res.data.data) {
-        return res.data.data;
+      if (res.data) {
+        return toClientPatient(unwrap(res.data));
       }
     } catch (e) {
       console.warn(`[patientService] Failed to fetch patient ${id} from API. Falling back to local store:`, e.message);
@@ -55,8 +76,11 @@ export const patientService = {
   getDoctorPatients: async (doctorName) => {
     try {
       const res = await apiClient.get(`/patients/doctor/${encodeURIComponent(doctorName)}`);
-      if (res.data && res.data.success && Array.isArray(res.data.data)) {
-        return res.data.data;
+      if (Array.isArray(res.data)) {
+        return res.data.map(toClientPatient);
+      }
+      if (Array.isArray(res.data?.data)) {
+        return res.data.data.map(toClientPatient);
       }
     } catch (e) {
       // Fallback
@@ -68,15 +92,29 @@ export const patientService = {
 
   updatePatient: async (id, updatedFields) => {
     try {
-      const res = await apiClient.put(`/patients/${id}`, updatedFields);
-      if (res.data && res.data.success && res.data.data) {
+      const payload = {
+        age_group: updatedFields.ageGroup || updatedFields.age_group,
+        gender: updatedFields.gender,
+        primary_diagnosis: updatedFields.diagnosis || updatedFields.primary_diagnosis,
+        recovery_progress: updatedFields.recoveryProgress,
+        treatment_status: updatedFields.treatmentStatus,
+        risk_level: updatedFields.riskLevel,
+        readmission_probability:
+          updatedFields.readmissionProbability == null
+            ? undefined
+            : Number(updatedFields.readmissionProbability) / 100,
+        discharge_date: updatedFields.dischargeDate,
+      };
+      const res = await apiClient.patch(`/patients/${id}`, payload);
+      if (res.data) {
+        const serverPatient = toClientPatient(unwrap(res.data));
         const patients = getPatientsFromStorage();
         const index = patients.findIndex((p) => p.id === id);
         if (index !== -1) {
-          patients[index] = { ...patients[index], ...res.data.data };
+          patients[index] = { ...patients[index], ...serverPatient };
           savePatientsToStorage(patients);
         }
-        return res.data.data;
+        return serverPatient;
       }
     } catch (e) {
       console.warn('[patientService] API update failed. Updating local storage fallback:', e.message);
@@ -126,12 +164,23 @@ export const patientService = {
     };
 
     try {
-      const res = await apiClient.post('/patients', payload);
-      if (res.data && res.data.success && res.data.data) {
+      const res = await apiClient.post('/patients', {
+        medical_record_number: `MRN-${Date.now()}`,
+        age_group: String(payload.age),
+        gender: payload.gender,
+        primary_diagnosis: payload.diagnosis,
+        risk_level: String(payload.riskLevel).toLowerCase(),
+        readmission_probability: Number(payload.readmissionProbability) / 100,
+        treatment_status: payload.treatmentStatus,
+        treatment_history: payload.treatmentHistory,
+        clinical_notes: payload.clinicalNotes,
+      });
+      if (res.data) {
+        const createdPatient = toClientPatient(unwrap(res.data));
         const patients = getPatientsFromStorage();
-        patients.unshift(res.data.data);
+        patients.unshift(createdPatient);
         savePatientsToStorage(patients);
-        return res.data.data;
+        return createdPatient;
       }
     } catch (e) {
       console.warn('[patientService] API add failed. Adding to local storage fallback:', e.message);
@@ -170,8 +219,8 @@ export const patientService = {
 
     try {
       const res = await apiClient.post(`/patients/${patientId}/notes`, newNote);
-      if (res.data && res.data.success && res.data.data) {
-        return res.data.data;
+      if (res.data) {
+        return toClientPatient(unwrap(res.data));
       }
     } catch (e) {
       console.warn('[patientService] API add note failed. Syncing local storage fallback:', e.message);
@@ -192,8 +241,8 @@ export const patientService = {
   addTreatment: async (patientId, treatmentString) => {
     try {
       const res = await apiClient.post(`/patients/${patientId}/treatments`, { treatment: treatmentString });
-      if (res.data && res.data.success && res.data.data) {
-        return res.data.data;
+      if (res.data) {
+        return toClientPatient(unwrap(res.data));
       }
     } catch (e) {
       console.warn('[patientService] API add treatment failed. Syncing local storage fallback:', e.message);

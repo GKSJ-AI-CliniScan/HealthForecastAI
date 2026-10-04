@@ -26,6 +26,21 @@ docker compose exec backend alembic upgrade head
 docker compose down -v          # -v also drops the database volumes
 ```
 
+## Production-shaped stack
+
+The production compose file serves the Vite frontend and FastAPI backend
+behind the Nginx reverse proxy. Set the required values in `.env` first, then
+run:
+
+```bash
+docker compose -f deployment/docker-compose.prod.yml up --build -d
+```
+
+The public application is available at <http://localhost/> and the API health
+check at <http://localhost/health>. In a real deployment, terminate TLS at the
+proxy or an external load balancer and set `BACKEND_CORS_ORIGINS` to the exact
+frontend origin.
+
 ## Cloud
 
 `aws/` and `azure/` hold the notes and templates for each target. Pick one -

@@ -54,8 +54,15 @@ export const adminService = {
     try {
       const res = await apiClient.get('/admin/users');
       if (res.data && res.data.success && Array.isArray(res.data.data)) {
-        saveStoredData('hf_users', res.data.data);
-        return res.data.data;
+        const users = res.data.data.map(u => ({
+          ...u,
+          name: u.full_name || u.name,
+          username: u.username || u.email.split('@')[0],
+          active: u.is_active !== undefined ? u.is_active : (u.active !== false),
+          status: (u.is_active === false || u.active === false) ? 'Suspended' : 'Active'
+        }));
+        saveStoredData('hf_users', users);
+        return users;
       }
     } catch (e) {
       console.warn('[adminService] API getUsers failed. Using local storage:', e.message);
@@ -65,6 +72,8 @@ export const adminService = {
     const data = getStoredData('hf_users', mockUsers);
     return data.map(u => ({
       ...u,
+      name: u.full_name || u.name,
+      username: u.username || (u.email ? u.email.split('@')[0] : ''),
       active: u.active !== false,
       status: u.active === false ? 'Suspended' : 'Active'
     }));
@@ -74,8 +83,15 @@ export const adminService = {
     try {
       const res = await apiClient.put(`/admin/users/${userId}/status`);
       if (res.data && res.data.success && Array.isArray(res.data.data)) {
-        saveStoredData('hf_users', res.data.data);
-        return res.data.data;
+        const users = res.data.data.map(u => ({
+          ...u,
+          name: u.full_name || u.name,
+          username: u.username || u.email.split('@')[0],
+          active: u.is_active !== undefined ? u.is_active : (u.active !== false),
+          status: (u.is_active === false || u.active === false) ? 'Suspended' : 'Active'
+        }));
+        saveStoredData('hf_users', users);
+        return users;
       }
     } catch (e) {
       console.warn('[adminService] API toggleUserStatus failed. Modifying local storage fallback:', e.message);
@@ -98,6 +114,8 @@ export const adminService = {
     }
     return users.map(u => ({
       ...u,
+      name: u.full_name || u.name,
+      username: u.username || (u.email ? u.email.split('@')[0] : ''),
       active: u.active !== false,
       status: u.active === false ? 'Suspended' : 'Active'
     }));
@@ -177,7 +195,12 @@ export const adminService = {
     try {
       const res = await apiClient.get('/admin/audit-logs');
       if (res.data && res.data.success && Array.isArray(res.data.data)) {
-        return res.data.data;
+        return res.data.data.map(log => ({
+          ...log,
+          user: log.user_name || `User ID: ${log.user}`,
+          module: log.resource || log.module,
+          timestamp: log.timestamp ? log.timestamp.replace('T', ' ').substring(0, 19) : ''
+        }));
       }
     } catch (e) {
       console.warn('[adminService] API getAuditLogs failed. Using local storage:', e.message);

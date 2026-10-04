@@ -13,6 +13,13 @@ class PatientBase(BaseModel):
     gender: str | None = None
     race: str | None = None
     primary_diagnosis: str | None = None
+    clinical_notes: list[dict] | None = None
+    treatment_history: list[str] | None = None
+    recovery_progress: dict | None = None
+    treatment_status: str | None = None
+    risk_level: str | None = None
+    readmission_probability: float | None = None
+    discharge_date: str | None = None
 
 
 class PatientCreate(PatientBase):
@@ -29,6 +36,13 @@ class PatientUpdate(BaseModel):
     race: str | None = None
     primary_diagnosis: str | None = None
     assigned_doctor_id: int | None = None
+    clinical_notes: list[dict] | None = None
+    treatment_history: list[str] | None = None
+    recovery_progress: dict | None = None
+    treatment_status: str | None = None
+    risk_level: str | None = None
+    readmission_probability: float | None = None
+    discharge_date: str | None = None
 
 
 class PatientRead(PatientBase):

@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000/api/v1';
+  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1';
 
 export class ApiError extends Error {
   readonly status: number;
@@ -51,7 +51,8 @@ export async function apiFetch<T>(
     return undefined as T;
   }
 
-  return (await response.json()) as T;
+  const body = await response.json();
+  return (body && body.success === true && 'data' in body ? body.data : body) as T;
 }
 
 export function apiPost<T>(path: string, body: unknown, token?: string | null): Promise<T> {
