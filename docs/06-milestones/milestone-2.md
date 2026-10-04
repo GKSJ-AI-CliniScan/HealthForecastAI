@@ -1,16 +1,8 @@
-# Milestone 2 report - Week 3 & 4 - Risk Prediction & Readmission Forecasting
+# Milestone 2 Report – Week 3 & 4 – Risk Prediction & Readmission Forecasting
 
-> **How to use this file**
-> 1. Fill in every section below. Keep all five headings, even if an answer is short.
-> 2. Delete the `_Not started_` line once you begin - that line is what tells CI
->    the report is still a blank template.
-> 3. Commit it on your own branch. Do not open a pull request to `main`.
-
-_Not started_
-
-- **Intern name:**
-- **Branch:** `intern/<your-name>`
-- **Submitted on:**
+- **Intern name:** Liya Babu
+- **Branch:** `intern/22-liya-babu`
+- **Submitted on:** september 15,2026
 
 ---
 
@@ -34,34 +26,122 @@ _Not started_
 
 ## What I built
 
-<!-- What works end to end? Name the files you added or changed and why. -->
+### 1. Risk Prediction
+
+- Implemented database-backed patient risk prediction workflows.
+- Integrated the `risk_predictions` PostgreSQL table with the backend.
+- Added patient readmission probability and risk category information.
+- Supported three risk categories:
+  - High
+  - Medium
+  - Low
+- Implemented latest prediction selection for patient-level risk analysis.
+
+### 2. High-Risk Patient Identification
+
+- Updated the high-risk patient workflow to retrieve the latest risk prediction for each patient from PostgreSQL.
+- Removed the previously hardcoded patient risk response.
+- Added patient-level clinical information to the high-risk response, including admission-related information and medication details.
+- Limited the high-risk response to the top 50 high-risk patients for dashboard display.
+
+### 3. Readmission Forecasting
+
+- Implemented a database-backed readmission forecasting workflow.
+- Used the latest risk prediction for each patient instead of relying on hardcoded forecast values.
+- Calculated:
+  - Total patients
+  - Average current readmission probability
+  - Expected readmissions
+  - High-risk patients
+  - Medium-risk patients
+  - Low-risk patients
+
+### 4. Risk Distribution
+
+The risk prediction data was integrated into the healthcare dashboard to display the distribution of patient risk categories.
+
+The database currently contains:
+
+- **Low risk:** 85,215
+- **Medium risk:** 11,724
+- **High risk:** 2,698
+- **Total predictions:** 99,637
+
+### 5. Clinical Risk Insights
+
+- Integrated risk prediction results into the clinical dashboard.
+- Added high-risk patient information for clinical review.
+- Connected the dashboard to backend APIs and PostgreSQL data.
+- Used patient-level latest predictions for forecasting and risk analysis.
+
+---
 
 ## How to run it
 
-<!-- Exact commands a reviewer can copy and paste from a clean clone. -->
+### Start the Backend
 
 ```bash
-git clone <repo-url>
-git checkout intern/<your-name>
-# ... your steps
-```
+uvicorn app.main:app --app-dir backend --reload --port 8001
 
-## Evidence
+API Documentation
+Open the FastAPI Swagger UI:
+http://localhost:8001/docs
 
-<!--
-Screenshots, API responses or terminal output proving it works.
-Put images in docs/05-wireframes/ or alongside this file and link them.
-Never screenshot real patient data.
--->
+Main Risk Prediction APIs
+/api/v1/risk/high-risk
+/api/v1/risk/forecast
 
-## Metrics
+Evidence
+Risk Prediction Database
+The risk_predictions PostgreSQL table contains:
 
-<!--
-Report all five: accuracy, precision, recall, F1 and ROC-AUC, for every model you
-trained. Say which model won and why. Accuracy alone is not an answer on an
-imbalanced target.
--->
+| Risk Category | Prediction Records |
+|---|---:|
+| Low | 85,215 |
+| Medium | 11,724 |
+| High | 2,698 |
+| **Total** | **99,637** |
 
-## Known gaps
+High-Risk Patient API
+The /risk/high-risk endpoint was tested successfully and returned database-backed high-risk patient records.
+The response includes information such as:
+- Patient ID
+- Readmission probability
+- Risk category
+- Inpatient visits
+- Emergency visits
+- Medication count
+- HbA1c-related information
 
-<!-- What is unfinished, what you would do next, and anything you are stuck on. -->
+Readmission Forecast API
+The /risk/forecast endpoint was updated to use the latest prediction for each patient.
+Verified forecast results:
+
+| Metric | Result |
+|---|---:|
+| Patients | 69,668 |
+| Average current probability | 26.14% |
+| Expected readmissions | 18,213.41 |
+| High risk | 1,003 |
+| Medium risk | 6,451 |
+| Low risk | 62,214 |
+
+The patient-level categories are consistent:
+1,003 + 6,451 + 62,214 = 69,668
+
+Metrics
+The available project evidence supports the following operational risk and forecasting metrics:
+- Total risk prediction records: 99,637
+- Unique patients used for latest-prediction forecasting: 69,668
+- High-risk prediction records: 2,698
+- Medium-risk prediction records: 11,724
+- Low-risk prediction records: 85,215
+- Average current readmission probability: 26.14%
+- Expected readmissions: 18,213.41
+Model Evaluation Metrics
+Accuracy, precision, recall, F1-score, and ROC-AUC values are not included here because the available project evidence does not contain verified model evaluation results for these five metrics.
+
+Known gaps
+- Formal model evaluation metrics such as accuracy, precision, recall, F1-score, and ROC-AUC need to be documented when verified training/evaluation results are available.
+- The current forecasting workflow uses the latest database prediction for each patient to calculate the forecast.
+- Further model validation and performance comparison can be included in a future model evaluation stage.
