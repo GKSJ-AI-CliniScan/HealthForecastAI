@@ -1,4 +1,3 @@
-<<<<<<< ours
 # HealthForecast AI
 
 **Hospital Readmission Prediction & Patient Risk Intelligence System**
@@ -95,7 +94,7 @@ Running each service directly, without Docker, is covered in
 |-----------|-------|-------|------------------|
 | 1 | 1-2 | Project initialization, design process and core setup | **Complete** |
 | 2 | 3-4 | Risk prediction and readmission forecasting | **Complete** |
-| 3 | 5-6 | Treatment effectiveness analysis and healthcare analytics | Not started |
+| 3 | 5-6 | Treatment effectiveness analysis and healthcare analytics | Treatment effectiveness **done** on `intern/13-rambilas-sah` - see [Milestone 3 report](MILESTONE_3_REPORT.md) |
 | 4 | 7-8 | Testing, deployment and documentation | Not started |
 
 Report templates and evaluation criteria: [`docs/06-milestones/`](docs/06-milestones/).
@@ -117,11 +116,21 @@ Report templates and evaluation criteria: [`docs/06-milestones/`](docs/06-milest
   ROC-AUC 0.65; the high band runs **2.86x** the baseline readmission rate, and
   the forecast lands within **1.6%** of the observed count
 
-Treatment effectiveness and clinical decision support endpoints are routed and
-authorised but return placeholder data, tagged `TODO(milestone-3)`.
+Treatment effectiveness analysis is implemented on `intern/13-rambilas-sah`
+(Milestone 3). `GET /api/v1/treatment/summary`, `/medications` and
+`/recovery-trends` aggregate outcomes in SQL over `treatment_outcomes` joined to
+its admission and patient - no reference baselines and no synthesised trend
+series, so an empty table renders an empty state. Each figure is a documented
+proxy: success means no 30-day readmission, a complication means the episode
+ended somewhere other than home, and recovery is a composite index above a
+stated target. Doctors hold `treatment_report:read_limited`, which returns the
+same aggregation narrowed to their own caseload inside the `WHERE` clause.
+Demo seed included; 119 backend tests pass. Analytics dashboards for the
+hospital-admin and researcher screens remain outstanding.
 
 Full write-ups: [milestone-1](docs/06-milestones/milestone-1.md) ·
-[milestone-2](docs/06-milestones/milestone-2.md).
+[milestone-2](docs/06-milestones/milestone-2.md) ·
+[milestone-3](MILESTONE_3_REPORT.md).
 
 ## Continuous integration
 
@@ -160,8 +169,7 @@ Download instructions: [`ml/data/README.md`](ml/data/README.md).
 ## Licence
 
 See [LICENSE](LICENSE).
-||||||| base
-=======
+
 # 🏥 HealthForecast AI — St. Jude Medical Center
 
 > **Enterprise Hospital Readmission Prediction, Patient Risk Stratification & Clinical Intelligence Platform**
@@ -207,6 +215,7 @@ See [LICENSE](LICENSE).
   - 💓 **Update Recovery Vitals**: Track blood pressure readings, recovery progress scores (0–100%), and medication adherence.
   - 🚪 **Status & Discharge Management**: Transition patients between *Stable*, *Improving*, *Critical*, or *Discharged*.
 - **Clinical Decision Support Hub**: Interactive checklist to validate AI-recommended care protocols and discharge criteria.
+- **Treatment Effectiveness & Medication Outcome Analytics** (`/doctor/treatment-effectiveness`): protocol success-versus-complication matrix, Cardiac / Renal / Pulmonary recovery trajectories by day of stay, disease-group filtering and CSV report export — served by `/api/v1/treatment/*` and scoped to the signed-in doctor's own caseload.
 
 ### 🏦 2. Hospital Administrator Workspace (`/hospital-admin/*`)
 - **Executive Dashboard**: Active inpatient count (1,420), bed occupancy management (81.3%), and readmission rate (14.2% vs 12.0% target).
@@ -349,12 +358,19 @@ npm run dev
 
 ## 🔑 Default Test Credentials
 
+The accounts the FastAPI service seeds, from `backend/app/db/init_db.py`:
+
 | Role | Email | Password | Default Landing Page |
 |---|---|---|---|
-| 🩺 **Doctor / Clinician** | `doctor@healthforecast.ai` | `password123` | `/doctor/dashboard` |
-| 🏦 **Hospital Administrator** | `admin@healthforecast.ai` | `password123` | `/hospital-admin/dashboard` |
-| 🧪 **Healthcare Researcher** | `researcher@healthforecast.ai` | `password123` | `/researcher/dashboard` |
-| 💻 **System Administrator** | `sysadmin@healthforecast.ai` | `prasad1234` | `/system-admin/dashboard` |
+| 🩺 **Doctor / Clinician** | `dr.reddy@healthforecast.org` | `password123` | `/doctor/dashboard` |
+| 🩺 **Doctor (2nd)** | `dr.mehta@healthforecast.org` | `password123` | `/doctor/dashboard` |
+| 🏦 **Hospital Administrator** | `admin.ops@healthforecast.org` | `password123` | `/hospital-admin/dashboard` |
+| 🧪 **Healthcare Researcher** | `researcher@healthforecast.org` | `password123` | `/researcher/dashboard` |
+| 💻 **System Administrator** | `admin@healthforecast.org` | `password123` | `/system-admin/dashboard` |
+
+`password123` is whatever you seed with — the login page prefills this value, so
+run `SEED_PASSWORD='password123' python -m app.db.init_db` for the role buttons to
+work click-through. Two doctors exist so caseload scoping is demonstrable.
 
 ---
 
@@ -370,6 +386,10 @@ npm run dev
 | `PUT` | `/api/v1/patients/:id` | Update patient record and vitals | Yes (Doctor, Admin, SysAdmin) |
 | `POST` | `/api/v1/patients/:id/notes` | Add clinical progress note to patient | Yes (Doctor, Admin) |
 | `POST` | `/api/v1/patients/:id/treatments` | Add medication / treatment to patient | Yes (Doctor) |
+| `GET` | `/api/v1/treatment` | Flat per-regimen outcome rollup | Yes |
+| `GET` | `/api/v1/treatment/summary` | Headline success / recovery / complication rates, protocol matrix and recovery trend in one call | Yes (Doctor: own caseload; Admin: hospital-wide) |
+| `GET` | `/api/v1/treatment/medications` | Protocol efficacy vs complication rate | Yes (as above) |
+| `GET` | `/api/v1/treatment/recovery-trends` | Mean recovery index per day of stay, split by specialty cohort | Yes (as above) |
 | `GET` | `/api/v1/analytics/hospital-dashboard` | Aggregate hospital KPIs & departmental metrics | Yes (Hospital Admin) |
 | `GET` | `/api/v1/analytics/research-data` | Retrieve de-identified research cohorts | Yes (Researcher) |
 | `GET` | `/api/v1/admin/dashboard` | Retrieve system telemetry and audit logs | Yes (System Admin) |
@@ -385,5 +405,4 @@ npm run dev
 Developed for **St. Jude Medical Center — HealthForecast AI**.  
 Built with the MERN stack (MongoDB, Express.js, React 19, Node.js) and Tailwind CSS v4.
 
-made for the internship project 
->>>>>>> theirs
+made for the internship project

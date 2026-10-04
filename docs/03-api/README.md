@@ -6,8 +6,9 @@ The live, always-accurate reference is the generated OpenAPI schema:
 - ReDoc: <http://localhost:8000/redoc>
 - Raw schema: <http://localhost:8000/api/v1/openapi.json>
 
-39 operations across 8 routers. 35 are implemented; the 4 marked *(placeholder)*
-are routed and authorised but return empty values until their milestone.
+43 operations across 9 routers, all implemented. Milestone 3 completed the four
+`/treatment` analytics operations and the two `/clinical-support` operations that
+were previously routed as placeholders.
 
 ## Authentication — Module 1
 
@@ -55,6 +56,40 @@ are routed and authorised but return empty values until their milestone.
 was fitted on 50 columns; a request that supplies 8 gets a score built mostly
 from imputed values, and the response says so rather than hiding it.
 
+## Treatment effectiveness — Milestone 3
+
+| Method | Path | Permission | Notes |
+|---|---|---|---|
+| GET | `/treatment` | `treatment_report:read` **or** `:read_limited` | Flat per-regimen list. The original contract, unchanged |
+| GET | `/treatment/summary` | same | The whole dashboard in one call: headline rates, protocol matrix, recovery trend |
+| GET | `/treatment/medications` | same | Protocol efficacy against complication rate |
+| GET | `/treatment/recovery-trends` | same | Mean recovery index per day of stay, split by specialty cohort |
+
+All four accept `?disease_group=DIABETES\|CHF\|COPD\|PNEUMONIA`. A value outside
+that set filters nothing rather than raising — the dropdown and the API must not
+disagree about what "All" means.
+
+Every figure is aggregated in SQL over `treatment_outcomes` joined to its
+admission and patient. There are no reference baselines and no synthesised
+series: with no outcome rows the endpoints return zeroes and an empty list, and
+the dashboard renders its empty state.
+
+The three metrics are proxies, defined in the
+[`treatment_service`](../../backend/app/services/treatment_service.py) docstring
+and worth reading before quoting any number:
+
+- **Success** - the patient was not readmitted within 30 days.
+- **Complication** - the episode ended somewhere other than home.
+- **Recovery** - a composite `recovery_index` of 70 or above, derived from length
+  of stay, diagnosis count, medication count and readmission. An ordering signal
+  traceable to four admission fields, not a measured clinical scale.
+
+Doctor is granted *limited* treatment access, which means the same aggregation
+narrowed to their own caseload. The scoping is a `WHERE` clause
+(`Patient.assigned_doctor_id`), never a post-fetch filter, so another clinician's
+patients are not read out of the database. See
+[`docs/04-rbac`](../04-rbac/README.md).
+
 ## Healthcare analytics — Module 6
 
 | Method | Path | Permission |
@@ -76,14 +111,15 @@ from imputed values, and the response says so rather than hiding it.
 | GET | `/models/drivers` | `model:manage` | Global feature importance |
 | POST | `/models/reload` | `model:manage` | Pick up a retrained artifact without a restart |
 
-## Later milestones
+## Clinical decision support — Milestone 3
 
-| Method | Path | Permission | Milestone |
-|---|---|---|---|
-| GET | `/treatment` *(placeholder)* | `treatment_report:read` | 3 |
-| GET | `/treatment/recovery-trends` *(placeholder)* | `treatment_report:read` | 3 |
-| GET | `/clinical-support/recommendations/{id}` *(placeholder)* | `care_recommendation:generate` | 3 |
-| GET | `/clinical-support/discharge-plan/{id}` *(placeholder)* | `care_recommendation:generate` | 3 |
+| Method | Path | Permission |
+|---|---|---|
+| GET | `/clinical-support/recommendations/{patient_id}` | `care_recommendation:generate` |
+| GET | `/clinical-support/discharge-plan/{patient_id}` | `care_recommendation:generate` |
+
+Both derive from the patient's stored risk prediction and admission history, in
+[`cds_service`](../../backend/app/services/cds_service.py).
 
 ## System
 
@@ -108,6 +144,12 @@ from imputed values, and the response says so rather than hiding it.
   - `503` — a risk endpoint was called with no trained model loaded
 - Error bodies use FastAPI's `{"detail": "..."}` shape. Never leak a stack
   trace, a SQL string or a patient identifier in an error message.
+- Two response shapes are in use. Modules 1-3 return their Pydantic models
+  directly, in `snake_case`. The Milestone 3 analytics endpoints
+  (`/treatment/*`) return the `{success, data}` envelope with `camelCase` keys,
+  because that is the contract the shipped frontend unwraps. The aliases live on
+  the schema (`serialization_alias`), so the service layer stays `snake_case`
+  end to end.
 
 ## Example: log in and read your caseload
 
@@ -130,3 +172,18 @@ curl -s -X POST http://localhost:8000/api/v1/risk/predict \
        "age_group":"70-80","admission_type":"Emergency",
        "discharge_disposition":"Discharged/transferred to SNF"}'
 ```
+
+## Example: read the treatment dashboard payload
+
+```bash
+curl -s "http://localhost:8000/api/v1/treatment/summary?disease_group=CHF" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+Returns `{success: true, data: {...}}` with `successRate`, `recoveryRate`,
+`complicationsRate`, `outcomesRecorded`, `protocolsEvaluated`, `diseaseGroup`,
+`medicationsData[]` and `recoveryProgressTrend[]`.
+
+Called as the seeded doctor it reports only her own caseload; the same request
+with a hospital administrator token reports the whole cohort. That difference is
+the access matrix, not a query parameter, and it cannot be widened by the caller.
