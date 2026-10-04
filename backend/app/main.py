@@ -49,7 +49,7 @@ app.add_middleware(
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Ensure any uncaught server exceptions still include valid CORS response headers."""
-    logger.error("Unhandled server exception on %s: %s", request.url.path, str(exc))
+    logger.exception("Unhandled server exception on %s", request.url.path)
     return JSONResponse(
         status_code=500,
         content={"detail": "An internal server error occurred. Check backend server logs."},

@@ -11,10 +11,10 @@ const DEMO_PASSWORD = 'password123';
 // Mirrors app/db/init_db.py SEED_USERS - seed with SEED_PASSWORD=DEMO_PASSWORD so
 // these accounts exist with the credential the page prefills.
 const DEMO_EMAILS = {
-  doctor: 'dr.reddy@healthforecast.org',
-  'hospital-admin': 'admin.ops@healthforecast.org',
-  researcher: 'researcher@healthforecast.org',
-  'system-admin': 'admin@healthforecast.org',
+  doctor: 'doctor@healthforecast.ai',
+  'hospital-admin': 'hospital@healthforecast.ai',
+  researcher: 'researcher@healthforecast.ai',
+  'system-admin': 'admin@healthforecast.ai',
 };
 
 const LoginPage = () => {
