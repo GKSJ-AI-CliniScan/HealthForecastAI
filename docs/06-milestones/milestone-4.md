@@ -1,136 +1,141 @@
-# Milestone 4 – Model Validation, Testing and Deployment Preparation
+# Milestone 4 report - Week 7 & 8 - Testing, Deployment & Documentation
 
-## 1. Overview
-
-Milestone 4 focuses on validating the AI-based hospital readmission prediction system, testing the complete application workflow, documenting the trained model, and preparing the system for deployment.
-
-The HealthForecast AI system combines:
-
-- Patient management
-- Patient risk prediction
-- Readmission forecasting
-- Treatment effectiveness analysis
-- Clinical decision support
-- Hospital analytics
-- Research-oriented anonymized patient data
-- Role-based access control
-- Machine learning model management
-
-The objective of this milestone is to ensure that the implemented system is technically ready for deployment and demonstration.
+- **Intern name:** Parimala M
+- **Branch:** `intern/24-parimala-m`
+- **Submitted on:** 2026-10-02
 
 ---
 
-# 2. System Components
+## Scope for this milestone
 
-The final system contains the following major components:
+- Validate prediction accuracy and healthcare analytics quality.
+- Optimize healthcare workflows and dashboard responsiveness.
+- Deploy the platform using Docker and a cloud environment.
+- Prepare the final project documentation and presentation.
+- Demonstrate the complete HealthForecast AI platform.
 
-## Frontend
+## Evaluation criteria
 
-Technology:
+- Fully deployed frontend and backend.
+- Model testing and validation completed.
+- Documentation and presentation prepared.
+- Successful end-to-end platform demonstration completed.
 
-- Next.js
+---
+
+## What I built
+
+During Milestone 4, I completed the testing, documentation, containerization, and deployment preparation for the HealthForecast AI platform.
+
+### Testing and validation
+
+The application was tested across the main healthcare workflows, including:
+
+- User authentication and role-based access.
+- Patient registry and patient management.
+- Readmission risk prediction.
+- High-risk patient identification.
+- Readmission forecasting.
+- Treatment effectiveness analysis.
+- Recovery trend analysis.
+- Healthcare analytics and risk distribution.
+- Research cohort functionality.
+- Clinical support and guidance.
+- Reports and exports.
+- Model management and model metrics.
+
+The frontend linting and production build were also validated.
+
+The frontend production build completed successfully with Next.js, including all major dashboard routes.
+
+### Frontend
+
+The frontend was developed using:
+
+- Next.js 15.5.23
 - React
 - TypeScript
 - Tailwind CSS
 - Recharts
 - Lucide React
 
-Frontend responsibilities:
+The frontend includes:
 
-- Authentication
-- Dashboard
+- Dashboard overview
+- Healthcare analytics
 - Patient registry
 - Risk prediction
 - Readmission forecasting
 - Treatment effectiveness
 - Research cohort
-- Clinical support
 - Reports and exports
+- Clinical support
 - Model management
 - User management
 
----
+The interface was designed as a responsive light-themed healthcare dashboard with risk indicators, KPI cards, charts, tables, loading states, error states, and permission-aware navigation.
 
-## Backend
+### Backend
 
-Technology:
+The backend was implemented using:
 
-- Python
 - FastAPI
 - SQLAlchemy
 - PostgreSQL
+- Role-based access control
+- REST APIs
 
-Backend responsibilities:
+Major backend API areas include:
 
 - Authentication
-- Authorization
 - Patient management
 - Risk prediction
-- Forecasting
-- Treatment analysis
-- Hospital analytics
-- Clinical recommendations
+- High-risk patient records
+- Readmission forecasting
+- Treatment analytics
+- Healthcare analytics
+- Reports and exports
 - Model management
-- CSV exports
+
+The backend has been deployed to a cloud environment and its API can be tested through the deployed FastAPI service.
+
+### Machine learning
+
+The readmission prediction system uses an XGBoost-based model.
+
+The final model artifact is:
+
+`readmission_model.joblib`
+
+The model evaluation recorded the following test metrics:
+
+- Accuracy: 0.67688
+- Precision: 0.18588
+- Recall: 0.54353
+- F1 Score: 0.27703
+- ROC-AUC: 0.66916
+
+The selected model is XGBoost with model version:
+
+`2.0.0-simple`
+
+The decision threshold recorded during model evaluation is:
+
+`0.11`
+
+### Docker
+
+Docker configuration was prepared for the frontend and backend so that the application can be built consistently in CI/CD environments.
+
+The frontend Docker build successfully completed the Next.js compilation, linting, type checking, static page generation, and production optimization stages.
 
 ---
 
-## Machine Learning
+## How to run it
 
-The machine-learning component provides hospital readmission risk prediction.
+### Clone the repository
 
-The model workflow includes:
-
-1. Dataset preparation
-2. Feature processing
-3. Model training
-4. Model evaluation
-5. Threshold selection
-6. Model artifact generation
-7. Backend model loading
-8. Risk prediction through API
-
----
-
-# 3. Model Validation
-
-The trained model was evaluated using validation and test data.
-
-The model evaluation includes:
-
-- Accuracy
-- Precision
-- Recall
-- F1-score
-- ROC-AUC
-
-The selected decision threshold is stored with the model evaluation artifacts.
-
-The system also maintains model metadata such as:
-
-- Model name
-- Model version
-- Artifact filename
-- Artifact size
-- Decision threshold
-- Validation metrics
-- Test metrics
-
----
-
-# 4. Model Evaluation Results
-
-The current model evaluation artifact reports the following test metrics.
-
-| Metric | Result |
-|---|---:|
-| Accuracy | 0.6769 |
-| Precision | 0.1859 |
-| Recall | 0.5435 |
-| F1 Score | 0.2770 |
-| ROC-AUC | 0.6692 |
-
-The recorded decision threshold is:
-
-```text
-0.11
+```bash
+git clone https://github.com/GKSJ-AI-CliniScan/HealthForecastAI.git
+cd HealthForecastAI
+git checkout intern/24-parimala-m
