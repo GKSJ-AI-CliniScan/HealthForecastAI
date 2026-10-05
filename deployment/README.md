@@ -12,11 +12,22 @@ docker compose up --build
 
 | Service   | URL |
 |-----------|-----|
+| Streamlit App | <http://localhost:8501> |
 | Frontend  | <http://localhost:3000> |
 | Backend   | <http://localhost:8000> |
 | API docs  | <http://localhost:8000/docs> |
 | Postgres  | `localhost:5432` |
 | MongoDB   | `localhost:27017` |
+
+### Streamlit Direct Launch (without Docker)
+
+```bash
+# Option A: Python convenience runner (auto-launches browser)
+python run_streamlit.py
+
+# Option B: Streamlit CLI
+streamlit run streamlit_app.py --server.port=8501
+```
 
 Useful commands:
 

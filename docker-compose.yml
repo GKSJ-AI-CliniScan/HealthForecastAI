@@ -66,6 +66,20 @@ services:
     depends_on:
       - backend
 
+  streamlit:
+    build:
+      context: .
+      dockerfile: deployment/streamlit/Dockerfile
+    container_name: healthforecast-streamlit
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    environment:
+      - BACKEND_URL=http://backend:8000
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
   mongo_data:
+
