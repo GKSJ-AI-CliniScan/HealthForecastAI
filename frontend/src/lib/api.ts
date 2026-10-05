@@ -1,5 +1,23 @@
+import type {
+  CallerIdentity,
+  DashboardStats,
+  DischargePlanApiResponse,
+  HospitalAnalyticsSummary,
+  LoginResponse,
+  Patient,
+  PatientDetail,
+  ReadmissionTrendPoint,
+  RecommendationsApiResponse,
+  RecoveryTrendPoint,
+  RoleInfo,
+  TreatmentEffectiveness,
+} from '@/types';
+
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000/api/v1';
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  (typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:8000/api/v1`
+    : 'http://localhost:8000/api/v1');
 
 export class ApiError extends Error {
   readonly status: number;
@@ -29,8 +47,119 @@ export async function apiFetch<T>(
   const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
 
   if (!response.ok) {
-    throw new ApiError(response.status, `Request to ${path} failed`);
+    // FastAPI puts the reason in `detail`; fall back to the status text when the
+    // body is not JSON, so the UI never shows "[object Object]".
+    let message = response.statusText || `Request to ${path} failed`;
+    try {
+      const body = (await response.json()) as { detail?: string };
+      if (body?.detail) {
+        message = body.detail;
+      }
+    } catch {
+      // Response had no JSON body; keep the status text.
+    }
+    throw new ApiError(response.status, message);
   }
 
   return (await response.json()) as T;
 }
+
+export const auth = {
+  login(email: string, password: string): Promise<LoginResponse> {
+    return apiFetch<LoginResponse>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+  },
+
+  me(token: string): Promise<CallerIdentity> {
+    return apiFetch<CallerIdentity>('/auth/me', {}, token);
+  },
+
+  roles(): Promise<RoleInfo[]> {
+    return apiFetch<RoleInfo[]>('/auth/roles');
+  },
+};
+
+export const patients = {
+  stats(token: string): Promise<DashboardStats> {
+    return apiFetch<DashboardStats>('/patients/stats', {}, token);
+  },
+
+  list(token: string, limit = 50, offset = 0): Promise<Patient[]> {
+    return apiFetch<Patient[]>(`/patients?limit=${limit}&offset=${offset}`, {}, token);
+  },
+
+  detail(token: string, patientId: number): Promise<PatientDetail> {
+    return apiFetch<PatientDetail>(`/patients/${patientId}`, {}, token);
+  },
+
+  anonymised(token: string, limit = 100): Promise<Patient[]> {
+    return apiFetch<Patient[]>(`/patients/anonymised?limit=${limit}`, {}, token);
+  },
+};
+
+export const analyticsApi = {
+  summary(token?: string): Promise<HospitalAnalyticsSummary> {
+    return apiFetch<HospitalAnalyticsSummary>('/analytics/summary', {}, token);
+  },
+
+  readmissions(token?: string): Promise<ReadmissionTrendPoint[]> {
+    return apiFetch<ReadmissionTrendPoint[]>('/analytics/readmissions', {}, token);
+  },
+};
+
+export const treatmentApi = {
+  list(token?: string): Promise<TreatmentEffectiveness[]> {
+    return apiFetch<TreatmentEffectiveness[]>('/treatment', {}, token);
+  },
+
+  recoveryTrends(token?: string): Promise<RecoveryTrendPoint[]> {
+    return apiFetch<RecoveryTrendPoint[]>('/treatment/recovery-trends', {}, token);
+  },
+};
+
+export const clinicalSupportApi = {
+  recommendations(patientId: number, token?: string): Promise<RecommendationsApiResponse> {
+    return apiFetch<RecommendationsApiResponse>(
+      `/clinical-support/recommendations/${patientId}`,
+      {},
+      token,
+    );
+  },
+
+  dischargePlan(patientId: number, token?: string): Promise<DischargePlanApiResponse> {
+    return apiFetch<DischargePlanApiResponse>(
+      `/clinical-support/discharge-plan/${patientId}`,
+      {},
+      token,
+    );
+  },
+};
+
+export const modelsApi = {
+  list(token?: string): Promise<Record<string, string>[]> {
+    return apiFetch<Record<string, string>[]>('/models', {}, token);
+  },
+
+  active(token?: string): Promise<{ name: string; artifact_dir: string; status: string }> {
+    return apiFetch<{ name: string; artifact_dir: string; status: string }>('/models/active', {}, token);
+  },
+
+  metrics(token?: string): Promise<{
+    accuracy: number | null;
+    precision: number | null;
+    recall: number | null;
+    f1: number | null;
+    roc_auc: number | null;
+  }> {
+    return apiFetch<{
+      accuracy: number | null;
+      precision: number | null;
+      recall: number | null;
+      f1: number | null;
+      roc_auc: number | null;
+    }>('/models/metrics', {}, token);
+  },
+};
+

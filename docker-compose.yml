@@ -43,8 +43,9 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-healthforecast}
-      MONGO_URI: mongodb://mongodb:27017
+      DATABASE_URL: ${DATABASE_URL}
+      MONGO_URI: ${MONGO_URI}
+      MONGO_DB: ${MONGO_DB:-healthforecast}
     ports:
       - "8000:8000"
     depends_on:

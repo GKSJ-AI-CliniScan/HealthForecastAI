@@ -4,11 +4,13 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import CurrentUser, get_current_user
+from app.core.config import settings
 from app.core.rbac import Role, permissions_for
 from app.core.security import create_access_token
 from app.db.session import get_db
+from app.models.user import User
 from app.schemas.token import Token
-from app.schemas.user import UserLogin
+from app.schemas.user import UserLogin, UserRead
 from app.services.auth_service import authenticate_user
 
 router = APIRouter()
@@ -38,20 +40,45 @@ def login(payload: UserLogin, db: Session = Depends(get_db)) -> Token:
     return Token(
         access_token=access_token,
         token_type="bearer",
+        expires_in_minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES,
         role=str(user.role),
         permissions=permissions_for(Role(user.role)),
+        user=UserRead.model_validate(user),
     )
 
 
 @router.get("/me", summary="Return the authenticated caller and their permissions")
-def read_me(user: CurrentUser = Depends(get_current_user)) -> dict[str, object]:
-    """Return the caller's identity, role and effective permission list."""
+def read_me(
+    db: Session = Depends(get_db),
+    user: CurrentUser = Depends(get_current_user),
+) -> dict[str, object]:
+    """Return the caller's identity, role, email and effective permission list."""
+    email = f"{user.subject}@healthforecast.ai" if "@" not in user.subject else user.subject
+    full_name = "Healthcare User"
+    user_id = 1
+
+    try:
+        uid = int(user.subject)
+        db_user = db.query(User).filter(User.id == uid).first()
+        if db_user:
+            user_id = db_user.id
+            email = db_user.email
+            full_name = db_user.full_name
+    except (ValueError, TypeError):
+        db_user = db.query(User).filter(User.email == user.subject).first()
+        if db_user:
+            user_id = db_user.id
+            email = db_user.email
+            full_name = db_user.full_name
+
     return {
+        "id": user_id,
         "subject": user.subject,
+        "email": email,
+        "full_name": full_name,
         "role": str(user.role),
         "permissions": permissions_for(user.role),
     }
-
 
 @router.get("/roles", summary="List the roles supported by the platform")
 def list_roles() -> dict[str, list[str]]:

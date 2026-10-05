@@ -24,11 +24,17 @@ def list_models(
         db = get_mongo_db()
         runs = list(db.model_runs.find({}, {"_id": 0}).sort("trained_at", -1))
         if runs:
+            # Add frontend-compatible aliases
+            for r in runs:
+                r["name"] = r.get("model_name") or r.get("name")
+                r["trained_date"] = r.get("trained_at") or r.get("trained_date")
+                if r.get("status") == "promoted":
+                    r["status"] = "active"
             return runs
     except Exception:
         pass
 
-    # Fallback to local metrics.json if MongoDB is not reachable
+    # Fallback to local evaluation artifact
     metrics_data = model_service.get_metrics_data()
     results = metrics_data.get("results", {})
     best_model = metrics_data.get("best_model", "xgboost")
@@ -37,10 +43,11 @@ def list_models(
     for name, res in results.items():
         fallback_runs.append(
             {
+                "name": name,
                 "model_name": name,
                 "version": "1.0.0",
                 "is_active": name == best_model,
-                "status": "promoted" if name == best_model else "archived",
+                "status": "active" if name == best_model else "archived",
                 "accuracy": res.get("accuracy"),
                 "precision": res.get("precision"),
                 "recall": res.get("recall"),
@@ -61,6 +68,8 @@ def active_model(
         db = get_mongo_db()
         active_doc = db.model_runs.find_one({"is_active": True}, {"_id": 0})
         if active_doc:
+            active_doc["name"] = settings.ACTIVE_RISK_MODEL
+            active_doc["status"] = "ready"
             return active_doc
     except Exception:
         pass
