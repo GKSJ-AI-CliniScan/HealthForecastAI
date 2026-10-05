@@ -47,3 +47,8 @@ class RecoveryTrendPoint(BaseModel):
     month: str
     avg_effectiveness: float | None
     case_count: int
+
+
+class TreatmentMethodCount(BaseModel):
+    treatment_type: str
+    patient_count: int

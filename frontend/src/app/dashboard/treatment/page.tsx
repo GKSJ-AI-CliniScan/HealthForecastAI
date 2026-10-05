@@ -1,68 +1,202 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+} from 'react';
+
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+
+import { Activity } from 'lucide-react';
+
 import { useAuth } from '@/lib/auth-context';
 import { apiFetch, ApiError } from '@/lib/api';
-import type { Patient, TreatmentEffectivenessSummary, RecoveryTrendPoint } from '@/types';
+import { P } from '@/lib/permissions';
 
-const TREATMENT_TYPES = [
-  'insulin_therapy', 'metformin', 'sulfonylurea',
-  'lifestyle_intervention', 'oral_hypoglycemics', 'combination_therapy',
-] as const;
+import type {
+  Patient,
+  RecoveryTrendPoint,
+  TreatmentEffectivenessSummary,
+  TreatmentMethodCount,
+} from '@/types';
 
-const OUTCOME_STATUSES = ['improved', 'unchanged', 'worsened'] as const;
+import {
+  EmptyState,
+  ErrorState,
+  FormField,
+  KpiCard,
+  PageHeader,
+  SectionCard,
+  SubmitButton,
+  SuccessNotice,
+  TableSkeleton,
+} from '@/components/ui';
 
-export default function TreatmentEffectivenessPage() {
+const TYPES = [
+  'insulin_therapy',
+  'metformin',
+  'sulfonylurea',
+  'lifestyle_intervention',
+  'oral_hypoglycemics',
+  'combination_therapy',
+];
+
+const OUTCOMES = [
+  'improved',
+  'unchanged',
+  'worsened',
+];
+
+export default function TreatmentPage() {
   const { token, permissions } = useAuth();
-  const [summary, setSummary] = useState<TreatmentEffectivenessSummary | null>(null);
-  const [trends, setTrends] = useState<RecoveryTrendPoint[]>([]);
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [filterType, setFilterType] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  const canLogTreatment = permissions.includes('treatment_report:read');
+  const full = permissions.includes(P.treatment);
+  const limited = permissions.includes(P.treatmentLimited);
 
-  const [showForm, setShowForm] = useState(false);
+  const [summary, setSummary] =
+    useState<TreatmentEffectivenessSummary | null>(null);
+
+  const [trends, setTrends] =
+    useState<RecoveryTrendPoint[]>([]);
+
+  const [treatmentMethods, setTreatmentMethods] =
+    useState<TreatmentMethodCount[]>([]);
+
+  const [patients, setPatients] =
+    useState<Patient[]>([]);
+
+  const [filter, setFilter] = useState('');
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const [show, setShow] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [success, setSuccess] = useState('');
+
   const [form, setForm] = useState({
     patient_id: '',
-    treatment_type: TREATMENT_TYPES[1] as string,
-    outcome_status: OUTCOME_STATUSES[0] as string,
+    treatment_type: 'metformin',
+    outcome_status: 'improved',
     recovery_days: '10',
     effectiveness_score: '0.6',
   });
-  const [formError, setFormError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function loadData() {
-    if (!token) return;
-    setIsLoading(true);
-    const query = filterType ? `?treatment_type=${filterType}` : '';
-    Promise.all([
-      apiFetch<TreatmentEffectivenessSummary>(`/treatment${query}`, {}, token),
-      apiFetch<RecoveryTrendPoint[]>('/treatment/recovery-trends', {}, token),
-      apiFetch<Patient[]>('/patients', {}, token).catch(() => []),
-    ])
-      .then(([summaryData, trendData, patientData]) => {
-        setSummary(summaryData);
-        setTrends(trendData);
-        setPatients(patientData);
-      })
-      .catch(() => setError('Could not load treatment effectiveness data.'))
-      .finally(() => setIsLoading(false));
-  }
+  /*
+   * Load treatment effectiveness data.
+   *
+   * useCallback keeps the function stable between renders
+   * and allows the effect below to depend safely on it.
+   */
+  const load = useCallback(async () => {
+    if (!token || !full) {
+      setLoading(false);
+      return;
+    }
 
+    setLoading(true);
+    setError('');
+
+    try {
+      const query = filter
+        ? `?treatment_type=${encodeURIComponent(filter)}`
+        : '';
+
+      const [
+        summaryData,
+        trendData,
+        methodData,
+      ] = await Promise.all([
+        apiFetch<TreatmentEffectivenessSummary>(
+          `/treatment${query}`,
+          {},
+          token,
+        ),
+
+        apiFetch<RecoveryTrendPoint[]>(
+          '/treatment/recovery-trends',
+          {},
+          token,
+        ),
+
+        apiFetch<TreatmentMethodCount[]>(
+          '/treatment/method-counts',
+          {},
+          token,
+        ),
+      ]);
+
+      setSummary(summaryData);
+      setTrends(trendData);
+
+      setTreatmentMethods(
+        Array.isArray(methodData)
+          ? methodData
+          : [],
+      );
+    } catch (e) {
+      setError(
+        e instanceof ApiError
+          ? e.message
+          : 'Could not load treatment effectiveness data.',
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [token, full, filter]);
+
+  /*
+   * Reload treatment data when authentication,
+   * permission or treatment filter changes.
+   */
   useEffect(() => {
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, filterType]);
+    void load();
+  }, [load]);
 
-  async function handleLogTreatment(event: FormEvent) {
-    event.preventDefault();
-    if (!token) return;
-    setFormError(null);
-    setIsSubmitting(true);
+  /*
+   * Load patients for the treatment outcome form.
+   */
+  useEffect(() => {
+    if (!token || !full) {
+      return;
+    }
+
+    apiFetch<Patient[]>(
+      '/patients',
+      {},
+      token,
+    )
+      .then(setPatients)
+      .catch(() => setPatients([]));
+  }, [token, full]);
+
+  /*
+   * Submit a new treatment outcome.
+   */
+  async function submit(
+    e: FormEvent<HTMLFormElement>,
+  ) {
+    e.preventDefault();
+
+    if (!token) {
+      return;
+    }
+
+    setBusy(true);
+    setError('');
+    setSuccess('');
+
     try {
       await apiFetch(
         '/treatment',
@@ -72,210 +206,668 @@ export default function TreatmentEffectivenessPage() {
             patient_id: Number(form.patient_id),
             treatment_type: form.treatment_type,
             outcome_status: form.outcome_status,
-            recovery_days: form.recovery_days ? Number(form.recovery_days) : null,
-            effectiveness_score: form.effectiveness_score ? Number(form.effectiveness_score) : null,
+            recovery_days: form.recovery_days
+              ? Number(form.recovery_days)
+              : null,
+            effectiveness_score:
+              form.effectiveness_score
+                ? Number(form.effectiveness_score)
+                : null,
           }),
         },
         token,
       );
-      setShowForm(false);
-      setForm({ ...form, patient_id: '' });
-      loadData(); // refresh summary + trend chart with the new record included
-    } catch (err) {
-      setFormError(
-        err instanceof ApiError ? 'Could not log this outcome. Check the patient and values entered.' : 'Something went wrong.',
+
+      setShow(false);
+
+      setSuccess(
+        'Treatment outcome saved.',
+      );
+
+      setForm({
+        ...form,
+        patient_id: '',
+      });
+
+      await load();
+    } catch (e) {
+      setError(
+        e instanceof ApiError
+          ? e.message
+          : 'Could not save the treatment outcome.',
       );
     } finally {
-      setIsSubmitting(false);
+      setBusy(false);
     }
   }
 
-  const chartData = trends.map((t) => ({
-    month: t.month,
-    effectiveness: t.avg_effectiveness != null ? Math.round(t.avg_effectiveness * 1000) / 10 : null,
-    cases: t.case_count,
-  }));
+  /*
+   * Convert backend effectiveness values
+   * such as 0.60 -> 60%.
+   */
+  const chart = useMemo(
+    () =>
+      trends.map((item) => ({
+        month: item.month,
+        effectiveness:
+          item.avg_effectiveness == null
+            ? null
+            : item.avg_effectiveness * 100,
+        cases: item.case_count,
+      })),
+    [trends],
+  );
+
+  /*
+   * Calculate the observed chart range.
+   *
+   * This prevents a small variation from appearing
+   * completely flat.
+   */
+  const values = chart
+    .map((item) => item.effectiveness)
+    .filter(
+      (value): value is number =>
+        value !== null,
+    );
+
+  const minEffect = values.length
+    ? Math.min(...values)
+    : 0;
+
+  const maxEffect = values.length
+    ? Math.max(...values)
+    : 100;
+
+  const spread = Math.max(
+    5,
+    maxEffect - minEffect,
+  );
+
+  const yMin = Math.max(
+    0,
+    Math.floor(
+      (minEffect - spread * 0.35) * 10,
+    ) / 10,
+  );
+
+  const yMax = Math.min(
+    100,
+    Math.ceil(
+      (maxEffect + spread * 0.35) * 10,
+    ) / 10,
+  );
+
+  /*
+   * Convert:
+   *
+   * insulin_therapy
+   *
+   * into:
+   *
+   * Insulin Therapy
+   */
+  function formatTreatmentName(
+    value: string,
+  ) {
+    return value
+      .replaceAll('_', ' ')
+      .replace(
+        /\b\w/g,
+        (char) => char.toUpperCase(),
+      );
+  }
+
+  /*
+   * Limited treatment access.
+   *
+   * Doctors with treatment_report:read_limited
+   * should not see actions that require the
+   * full treatment_report:read permission.
+   */
+  if (limited && !full) {
+    return (
+      <div>
+        <PageHeader
+          eyebrow="Treatment effectiveness"
+          title="Treatment outcomes"
+          description="Your doctor role has limited treatment-report access. The current backend exposes full treatment endpoints only, so actions that would return 403 are intentionally not rendered."
+        />
+
+        <SectionCard>
+          <EmptyState
+            title="Limited treatment access"
+            message="You can continue using assigned-patient risk, forecast and clinical-support workflows. Aggregated treatment actions require treatment_report:read."
+            icon={
+              <Activity className="h-5 w-5" />
+            }
+          />
+        </SectionCard>
+      </div>
+    );
+  }
 
   return (
-    <div className="mx-auto max-w-6xl px-8 py-10">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Treatment Effectiveness</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">Diabetes treatment outcomes</h1>
-          <p className="mt-2 max-w-xl text-sm text-slate-500">
-            Aggregated recovery and effectiveness data across recorded diabetes treatments.
-          </p>
+    <div>
+      <PageHeader
+        eyebrow="Treatment effectiveness"
+        title="Treatment outcomes"
+        description="Review aggregated treatment effectiveness, recovery trends and recorded outcomes."
+        actions={
+          full ? (
+            <button
+              type="button"
+              onClick={() => setShow(!show)}
+              className="btn-primary"
+            >
+              {show
+                ? 'Close form'
+                : '+ Log outcome'}
+            </button>
+          ) : undefined
+        }
+      />
+
+      {error && (
+        <div className="mb-5">
+          <ErrorState
+            message={error}
+            onRetry={() => void load()}
+          />
         </div>
-        {canLogTreatment && (
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="shrink-0 rounded-md bg-slate-900 px-3.5 py-2 text-sm font-medium text-white hover:bg-slate-800"
-          >
-            {showForm ? 'Cancel' : '+ Log treatment outcome'}
-          </button>
-        )}
-      </div>
-
-      {error && <p className="mt-4 text-sm text-risk-high">{error}</p>}
-
-      {showForm && (
-        <form onSubmit={handleLogTreatment} className="mt-6 grid grid-cols-2 gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6 sm:grid-cols-4">
-          <select
-            required
-            value={form.patient_id}
-            onChange={(e) => setForm({ ...form, patient_id: e.target.value })}
-            className="col-span-2 rounded-md border border-[var(--border)] bg-transparent px-3 py-2 text-sm sm:col-span-1"
-          >
-            <option value="" disabled>Select patient</option>
-            {patients.map((p) => (
-              <option key={p.id} value={p.id}>{p.medical_record_number}</option>
-            ))}
-          </select>
-          <select
-            value={form.treatment_type}
-            onChange={(e) => setForm({ ...form, treatment_type: e.target.value })}
-            className="rounded-md border border-[var(--border)] bg-transparent px-3 py-2 text-sm"
-          >
-            {TREATMENT_TYPES.map((t) => (
-              <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
-            ))}
-          </select>
-          <select
-            value={form.outcome_status}
-            onChange={(e) => setForm({ ...form, outcome_status: e.target.value })}
-            className="rounded-md border border-[var(--border)] bg-transparent px-3 py-2 text-sm"
-          >
-            {OUTCOME_STATUSES.map((s) => (
-              <option key={s} value={s} className="capitalize">{s}</option>
-            ))}
-          </select>
-          <input
-            type="number"
-            placeholder="Recovery days"
-            value={form.recovery_days}
-            onChange={(e) => setForm({ ...form, recovery_days: e.target.value })}
-            className="rounded-md border border-[var(--border)] bg-transparent px-3 py-2 text-sm"
-          />
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            max="1"
-            placeholder="Effectiveness (0-1)"
-            value={form.effectiveness_score}
-            onChange={(e) => setForm({ ...form, effectiveness_score: e.target.value })}
-            className="rounded-md border border-[var(--border)] bg-transparent px-3 py-2 text-sm"
-          />
-          {formError && <p className="col-span-full text-sm text-risk-high">{formError}</p>}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="col-span-full rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50 sm:col-span-1"
-          >
-            {isSubmitting ? 'Saving…' : 'Save outcome'}
-          </button>
-        </form>
       )}
 
-      <div className="mt-6">
-        <label className="text-xs font-medium text-slate-500">Filter by treatment type</label>
-        <select
-          value={filterType}
-          onChange={(e) => setFilterType(e.target.value)}
-          className="mt-1.5 block rounded-md border border-[var(--border)] bg-transparent px-3 py-2 text-sm"
+      {success && (
+        <div className="mb-5">
+          <SuccessNotice
+            message={success}
+          />
+        </div>
+      )}
+
+      {show && (
+        <SectionCard
+          title="Record treatment outcome"
+          description="The backend accepts diabetes treatment outcome records."
+          className="mb-6"
         >
-          <option value="">All treatment types</option>
-          {TREATMENT_TYPES.map((t) => (
-            <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
-          ))}
-        </select>
+          <form
+            onSubmit={submit}
+            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5"
+          >
+            {/* Patient */}
+            <FormField
+              label="Patient"
+              htmlFor="patient"
+            >
+              <select
+                id="patient"
+                required
+                value={form.patient_id}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    patient_id:
+                      e.target.value,
+                  })
+                }
+                className="field mt-1.5"
+              >
+                <option value="">
+                  Select patient
+                </option>
+
+                {patients.map((patient) => (
+                  <option
+                    key={patient.id}
+                    value={patient.id}
+                  >
+                    {patient.medical_record_number}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+
+            {/* Treatment */}
+            <FormField
+              label="Treatment"
+              htmlFor="tt"
+            >
+              <select
+                id="tt"
+                value={form.treatment_type}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    treatment_type:
+                      e.target.value,
+                  })
+                }
+                className="field mt-1.5"
+              >
+                {TYPES.map((type) => (
+                  <option
+                    key={type}
+                    value={type}
+                  >
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+
+            {/* Outcome */}
+            <FormField
+              label="Outcome"
+              htmlFor="outcome"
+            >
+              <select
+                id="outcome"
+                value={form.outcome_status}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    outcome_status:
+                      e.target.value,
+                  })
+                }
+                className="field mt-1.5"
+              >
+                {OUTCOMES.map(
+                  (outcome) => (
+                    <option
+                      key={outcome}
+                      value={outcome}
+                    >
+                      {outcome}
+                    </option>
+                  ),
+                )}
+              </select>
+            </FormField>
+
+            {/* Recovery days */}
+            <FormField
+              label="Recovery days"
+              htmlFor="days"
+            >
+              <input
+                id="days"
+                type="number"
+                min="0"
+                value={form.recovery_days}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    recovery_days:
+                      e.target.value,
+                  })
+                }
+                className="field mt-1.5"
+              />
+            </FormField>
+
+            {/* Effectiveness */}
+            <FormField
+              label="Effectiveness"
+              htmlFor="eff"
+            >
+              <input
+                id="eff"
+                type="number"
+                min="0"
+                max="1"
+                step="0.01"
+                value={
+                  form.effectiveness_score
+                }
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    effectiveness_score:
+                      e.target.value,
+                  })
+                }
+                className="field mt-1.5"
+              />
+
+              <p className="mt-1 text-[11px] text-slate-400">
+                Enter a value between 0 and 1.
+              </p>
+            </FormField>
+
+            <div className="flex justify-end sm:col-span-2 lg:col-span-5">
+              <SubmitButton loading={busy}>
+                Save outcome
+              </SubmitButton>
+            </div>
+          </form>
+        </SectionCard>
+      )}
+
+      {/* KPI CARDS */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <KpiCard
+          label="Total cases"
+          value={
+            loading
+              ? '—'
+              : summary?.total_cases ?? 0
+          }
+          icon={
+            <Activity className="h-5 w-5" />
+          }
+        />
+
+        <KpiCard
+          label="Improved rate"
+          value={
+            loading
+              ? '—'
+              : `${(
+                  (summary?.improved_rate ??
+                    0) * 100
+                ).toFixed(1)}%`
+          }
+          accent="green"
+        />
+
+        <KpiCard
+          label="Average recovery"
+          value={
+            loading
+              ? '—'
+              : summary?.avg_recovery_days ==
+                  null
+                ? '—'
+                : `${summary.avg_recovery_days} days`
+          }
+          accent="teal"
+        />
       </div>
 
-      <section className="mt-6 grid gap-4 sm:grid-cols-3">
-        <StatCard label="Total cases" value={isLoading ? '—' : String(summary?.total_cases ?? 0)} />
-        <StatCard
-          label="Improved rate"
-          value={isLoading ? '—' : `${((summary?.improved_rate ?? 0) * 100).toFixed(1)}%`}
-        />
-        <StatCard
-          label="Avg recovery days"
-          value={isLoading ? '—' : summary?.avg_recovery_days != null ? String(summary.avg_recovery_days) : '—'}
-        />
-      </section>
+      {/* RECOVERY TREND */}
+      <SectionCard
+        title="Recovery trend"
+        description={
+          chart.length > 1
+            ? `Monthly average effectiveness across ${chart.length} recorded points. The chart zooms to the observed range so small changes remain visible.`
+            : 'Monthly average effectiveness score from stored treatment outcomes.'
+        }
+        className="mt-6"
+        actions={
+          <select
+            aria-label="Treatment filter"
+            value={filter}
+            onChange={(e) =>
+              setFilter(e.target.value)
+            }
+            className="field w-auto py-2 text-xs"
+          >
+            <option value="">
+              All treatments
+            </option>
 
-      <section className="mt-10 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6">
-        <h2 className="text-sm font-semibold">Recovery trend by month</h2>
-        <p className="mt-1 text-xs text-slate-500">Average treatment effectiveness score, tracked over time.</p>
-
-        {chartData.length === 0 ? (
-          <div className="mt-6 rounded-lg border border-dashed border-[var(--border)] p-8 text-center">
-            <p className="text-sm text-slate-500">No treatment outcomes recorded yet.</p>
-          </div>
+            {TYPES.map((type) => (
+              <option
+                key={type}
+                value={type}
+              >
+                {type}
+              </option>
+            ))}
+          </select>
+        }
+      >
+        {loading ? (
+          <TableSkeleton
+            columns={3}
+            rows={4}
+          />
+        ) : chart.length === 0 ? (
+          <EmptyState
+            title="No outcomes recorded"
+            message="Treatment trend data will appear after outcome records are stored."
+          />
         ) : (
-          <div className="mt-6 h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#64748b' }} />
-                <YAxis
-                  domain={[0, 100]}
-                  tickFormatter={(v) => `${v}%`}
-                  tick={{ fontSize: 12, fill: '#64748b' }}
-                />
-                <Tooltip
-                  formatter={(value, name) => {
-                    const numeric = typeof value === 'number' ? value : Number(value);
-                    if (Number.isNaN(numeric)) return ['—', String(name)];
-                    return name === 'effectiveness' ? [`${numeric}%`, 'Avg effectiveness'] : [String(numeric), 'Cases'];
+          <>
+            <div className="h-72">
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+              >
+                <LineChart
+                  data={chart}
+                  margin={{
+                    left: 0,
+                    right: 12,
+                    top: 16,
+                    bottom: 0,
                   }}
-                  contentStyle={{ fontSize: 12, borderRadius: 8 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="effectiveness"
-                  stroke="#0f172a"
-                  strokeWidth={2}
-                  dot={{ r: 4, fill: '#0f172a' }}
-                  activeDot={{ r: 6 }}
-                  connectNulls
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        )}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="#e2e8f0"
+                  />
 
-        {chartData.length > 0 && (
-          <div className="mt-4 overflow-hidden rounded-lg border border-[var(--border)]">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-[var(--border)] text-xs uppercase tracking-wide text-slate-400">
-                  <th className="px-4 py-2.5 font-medium">Month</th>
-                  <th className="px-4 py-2.5 font-medium">Avg effectiveness</th>
-                  <th className="px-4 py-2.5 font-medium">Cases</th>
-                </tr>
-              </thead>
-              <tbody>
-                {trends.map((t) => (
-                  <tr key={t.month} className="border-b border-[var(--border)] last:border-0">
-                    <td className="px-4 py-2.5 font-[family-name:var(--font-mono)] text-xs">{t.month}</td>
-                    <td className="px-4 py-2.5">{t.avg_effectiveness != null ? `${(t.avg_effectiveness * 100).toFixed(1)}%` : '—'}</td>
-                    <td className="px-4 py-2.5">{t.case_count}</td>
+                  <XAxis
+                    dataKey="month"
+                    tick={{
+                      fontSize: 11,
+                      fill: '#64748b',
+                    }}
+                  />
+
+                  <YAxis
+                    domain={[
+                      yMin,
+                      yMax,
+                    ]}
+                    tickFormatter={(value) =>
+                      `${value}%`
+                    }
+                    tick={{
+                      fontSize: 11,
+                      fill: '#64748b',
+                    }}
+                  />
+
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: 12,
+                      border:
+                        '1px solid #dce5ee',
+                      fontSize: 12,
+                    }}
+                    formatter={(
+                      value,
+                      name,
+                    ) => {
+                      if (
+                        name ===
+                        'effectiveness'
+                      ) {
+                        return [
+                          value == null
+                            ? '—'
+                            : `${Number(
+                                value,
+                              ).toFixed(
+                                1,
+                              )}%`,
+                          'Avg effectiveness',
+                        ];
+                      }
+
+                      return [
+                        value ?? '—',
+                        'Cases',
+                      ];
+                    }}
+                  />
+
+                  <Line
+                    type="monotone"
+                    dataKey="effectiveness"
+                    stroke="#0e8fa3"
+                    strokeWidth={3}
+                    dot={{
+                      r: 4,
+                      strokeWidth: 2,
+                      fill: '#fff',
+                    }}
+                    activeDot={{
+                      r: 6,
+                    }}
+                    connectNulls
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Chart metadata */}
+            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400">
+              <span>
+                Observed range:{' '}
+                {values.length
+                  ? `${minEffect.toFixed(
+                      1,
+                    )}%–${maxEffect.toFixed(
+                      1,
+                    )}%`
+                  : '—'}
+              </span>
+
+              <span>
+                {chart.length} monthly points
+              </span>
+            </div>
+
+            {/* DATA TABLE */}
+            <div className="mt-5 overflow-x-auto">
+              <table className="w-full min-w-[520px] text-left text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100 text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                    <th className="pb-3">
+                      Month
+                    </th>
+
+                    <th className="pb-3">
+                      Avg effectiveness
+                    </th>
+
+                    <th className="pb-3">
+                      Cases
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+
+                <tbody className="divide-y divide-slate-100">
+                  {trends.map(
+                    (trend) => (
+                      <tr
+                        key={trend.month}
+                      >
+                        <td className="py-3 font-mono text-xs">
+                          {trend.month}
+                        </td>
+
+                        <td className="py-3">
+                          {trend.avg_effectiveness ==
+                          null
+                            ? '—'
+                            : `${(
+                                trend.avg_effectiveness *
+                                100
+                              ).toFixed(
+                                1,
+                              )}%`}
+                        </td>
+
+                        <td className="py-3">
+                          {trend.case_count}
+                        </td>
+                      </tr>
+                    ),
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </SectionCard>
+
+      {/* PATIENTS BY TREATMENT METHOD */}
+      <SectionCard
+        title="Patients by Treatment Method"
+        description="Number of unique patients recorded for each treatment method."
+        className="mt-6"
+      >
+        {loading ? (
+          <TableSkeleton
+            columns={2}
+            rows={5}
+          />
+        ) : treatmentMethods.length === 0 ? (
+          <EmptyState
+            title="No treatment method data"
+            message="Treatment method counts will appear after treatment outcomes are recorded."
+          />
+        ) : (
+          <div className="space-y-5">
+            {treatmentMethods.map(
+              (item) => {
+                const maxCount =
+                  Math.max(
+                    ...treatmentMethods.map(
+                      (method) =>
+                        method.patient_count,
+                    ),
+                    1,
+                  );
+
+                const width =
+                  (item.patient_count /
+                    maxCount) *
+                  100;
+
+                return (
+                  <div
+                    key={
+                      item.treatment_type
+                    }
+                  >
+                    <div className="mb-2 flex items-center justify-between gap-4">
+                      <span className="text-sm font-medium text-slate-700">
+                        {formatTreatmentName(
+                          item.treatment_type,
+                        )}
+                      </span>
+
+                      <span className="shrink-0 text-sm font-semibold text-slate-900">
+                        {item.patient_count}{' '}
+                        patients
+                      </span>
+                    </div>
+
+                    <div className="h-4 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className="h-full rounded-full bg-blue-500 transition-all duration-500"
+                        style={{
+                          width: `${Math.max(
+                            width,
+                            4,
+                          )}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              },
+            )}
           </div>
         )}
-      </section>
-    </div>
-  );
-}
-
-function StatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-2 font-[family-name:var(--font-mono)] text-2xl font-semibold">{value}</p>
+      </SectionCard>
     </div>
   );
 }

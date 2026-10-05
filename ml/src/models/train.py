@@ -151,5 +151,16 @@ joblib.dump(
     {"threshold": best["threshold"], "model_name": best["model"]},
     ARTIFACTS_DIR / "threshold.joblib",
 )
+joblib.dump(
+    {
+        "accuracy": best["accuracy"],
+        "precision": best["precision"],
+        "recall": best["recall"],
+        "f1": best["f1"],
+        "roc_auc": best["roc_auc"],
+    },
+    ARTIFACTS_DIR / "metrics.joblib",
+)
+print(f"Saved: {ARTIFACTS_DIR / 'metrics.joblib'}")
 
 print(f"\nSaved: {ARTIFACTS_DIR / 'readmission_model.joblib'}")

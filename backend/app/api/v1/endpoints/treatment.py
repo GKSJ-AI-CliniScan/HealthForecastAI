@@ -13,6 +13,7 @@ from app.db.session import get_db
 from app.schemas.treatment import (
     RecoveryTrendPoint,
     TreatmentEffectivenessSummary,
+    TreatmentMethodCount,
     TreatmentOutcomeCreate,
     TreatmentOutcomeRead,
 )
@@ -90,3 +91,17 @@ def export_treatment_csv(
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=treatment_effectiveness_report.csv"},
     )
+
+
+@router.get(
+    "/method-counts",
+    response_model=list[TreatmentMethodCount],
+    summary="Patient count by treatment method",
+)
+def treatment_method_counts(
+    db: Session = Depends(get_db),
+    user: CurrentUser = Depends(require_permission(Permission.TREATMENT_REPORT_READ)),
+) -> list[TreatmentMethodCount]:
+    results = treatment_service.get_treatment_method_counts(db)
+
+    return [TreatmentMethodCount(**item) for item in results]

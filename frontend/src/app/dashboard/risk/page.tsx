@@ -1,38 +1,78 @@
 'use client';
 
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
-import { useAuth } from '@/lib/auth-context';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+} from 'react';
+import {
+  AlertTriangle,
+  BrainCircuit,
+  Calculator,
+  Clock3,
+  Users,
+} from 'lucide-react';
+
 import { apiFetch, ApiError } from '@/lib/api';
-import type { Patient, RiskCategory, RiskPrediction } from '@/types';
+import { useAuth } from '@/lib/auth-context';
+import { P } from '@/lib/permissions';
+import type {
+  Patient,
+  ReadmissionForecast,
+  RiskCategory,
+  RiskPrediction,
+} from '@/types';
+import {
+  EmptyState,
+  ErrorState,
+  FormField,
+  KpiCard,
+  PageHeader,
+  RiskLegend,
+  RiskPill,
+  SectionCard,
+  SubmitButton,
+  SuccessNotice,
+  TableSkeleton,
+  formatDate,
+  riskPercent,
+} from '@/components/ui';
 
-interface Forecast {
-  scope: string;
-  horizon_days: number;
-  predicted_readmissions: number;
-  predicted_rate: number;
-}
+const AGE = [
+  '0-10',
+  '10-20',
+  '20-30',
+  '30-40',
+  '40-50',
+  '50-60',
+  '60-70',
+  '70-80',
+  '80-90',
+  '90-100',
+];
 
-const AGE_GROUPS = [
-  '0-10', '10-20', '20-30', '30-40', '40-50',
-  '50-60', '60-70', '70-80', '80-90', '90-100',
-] as const;
+const HORIZONS = [30, 60, 90];
 
-const CATEGORY_STYLES: Record<RiskCategory, string> = {
-  low: 'bg-risk-low/10 text-risk-low',
-  medium: 'bg-risk-medium/15 text-yellow-700',
-  high: 'bg-risk-high/10 text-risk-high',
-};
+export default function RiskPage() {
+  const { token, permissions } = useAuth();
 
-const HORIZON_OPTIONS = [30, 60, 90];
+  const individual = permissions.includes(P.risk);
+  const aggregated = permissions.includes(P.riskAggregated);
+  const canForecast = permissions.includes(P.forecast);
 
-export default function RiskDashboardPage() {
-  const { token } = useAuth();
   const [patients, setPatients] = useState<Patient[]>([]);
-  const [highRisk, setHighRisk] = useState<RiskPrediction[]>([]);
-  const [forecast, setForecast] = useState<Forecast | null>(null);
+  const [scores, setScores] = useState<RiskPrediction[]>([]);
+  const [high, setHigh] = useState<RiskPrediction[]>([]);
+  const [forecast, setForecast] = useState<ReadmissionForecast | null>(null);
   const [horizon, setHorizon] = useState(30);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [assessment, setAssessment] = useState<RiskPrediction | null>(null);
+  const [success, setSuccess] = useState('');
+  const [busy, setBusy] = useState(false);
 
   const [form, setForm] = useState({
     patient_id: '',
@@ -42,300 +82,582 @@ export default function RiskDashboardPage() {
     number_diagnoses: '5',
     number_inpatient: '0',
     number_emergency: '0',
-    age_group: AGE_GROUPS[5] as string,
+    age_group: '50-60',
   });
-  const [assessment, setAssessment] = useState<RiskPrediction | null>(null);
-  const [assessError, setAssessError] = useState<string | null>(null);
-  const [isAssessing, setIsAssessing] = useState(false);
 
-  useEffect(() => {
+  const load = useCallback(async () => {
     if (!token) return;
-    Promise.all([
-      apiFetch<Patient[]>('/patients', {}, token).catch(() => []),
-      apiFetch<RiskPrediction[]>('/risk/high-risk', {}, token),
-    ])
-      .then(([patientData, highRiskData]) => {
-        setPatients(patientData);
-        setHighRisk(highRiskData);
-      })
-      .catch(() => setError('Could not load risk data.'))
-      .finally(() => setIsLoading(false));
-  }, [token]);
 
-  useEffect(() => {
-    if (!token) return;
-    apiFetch<Forecast>(`/risk/forecast?horizon_days=${horizon}`, {}, token)
-      .then(setForecast)
-      .catch(() => setError('Could not load forecast.'));
-  }, [token, horizon]);
+    setLoading(true);
+    setError('');
 
-  async function handleAssess(event: FormEvent) {
-    event.preventDefault();
-    if (!token) return;
-    setAssessError(null);
-    setIsAssessing(true);
     try {
+      if (canForecast) {
+        const forecastData = await apiFetch<ReadmissionForecast>(
+          `/risk/forecast?horizon_days=${horizon}`,
+          {},
+          token,
+        );
+
+        setForecast(forecastData);
+      } else {
+        setForecast(null);
+      }
+
+      if (individual) {
+        const [scoreData, highRiskData] = await Promise.all([
+          apiFetch<RiskPrediction[]>('/risk/scores', {}, token),
+          apiFetch<RiskPrediction[]>('/risk/high-risk', {}, token),
+        ]);
+
+        setScores(scoreData);
+        setHigh(highRiskData);
+      } else if (aggregated) {
+        const distribution = await apiFetch<{
+          current_distribution: {
+            risk_category: string;
+            count: number;
+          }[];
+        }>('/analytics/readmissions', {}, token);
+
+        const pseudoScores = distribution.current_distribution.flatMap(
+          (item) =>
+            Array.from({ length: item.count }, (_, index) => ({
+              patient_id: -index - 1,
+              readmission_probability: 0,
+              risk_category: item.risk_category as RiskCategory,
+              model_name: 'Aggregated',
+              model_version: '',
+              risk_factors: [],
+            })),
+        );
+
+        setScores(pseudoScores);
+        setHigh([]);
+      } else {
+        setScores([]);
+        setHigh([]);
+      }
+    } catch (e) {
+      setError(
+        e instanceof ApiError
+          ? e.message
+          : 'Could not load risk data.',
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [token, horizon, individual, aggregated, canForecast]);
+
+  useEffect(() => {
+    if (token) {
+      void load();
+    }
+  }, [token, load]);
+
+  useEffect(() => {
+    if (!token || !individual) return;
+
+    apiFetch<Patient[]>('/patients', {}, token)
+      .then(setPatients)
+      .catch(() => setPatients([]));
+  }, [token, individual]);
+
+  const distribution = useMemo(
+    () => ({
+      low: scores.filter((item) => item.risk_category === 'low').length,
+      medium: scores.filter((item) => item.risk_category === 'medium').length,
+      high: scores.filter((item) => item.risk_category === 'high').length,
+    }),
+    [scores],
+  );
+
+  async function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (!token) return;
+
+    setBusy(true);
+    setSuccess('');
+    setError('');
+
+    try {
+      const payload = Object.fromEntries(
+        Object.entries(form).map(([key, value]) => [
+          key,
+          key === 'patient_id'
+            ? Number(value)
+            : [
+                  'time_in_hospital',
+                  'num_medications',
+                  'num_lab_procedures',
+                  'number_diagnoses',
+                  'number_inpatient',
+                  'number_emergency',
+                ].includes(key)
+              ? Number(value)
+              : value,
+        ]),
+      );
+
       const result = await apiFetch<RiskPrediction>(
         '/risk/predict',
         {
           method: 'POST',
-          body: JSON.stringify({
-            patient_id: Number(form.patient_id),
-            time_in_hospital: Number(form.time_in_hospital),
-            num_medications: Number(form.num_medications),
-            num_lab_procedures: Number(form.num_lab_procedures),
-            number_diagnoses: Number(form.number_diagnoses),
-            number_inpatient: Number(form.number_inpatient),
-            number_emergency: Number(form.number_emergency),
-            age_group: form.age_group,
-          }),
+          body: JSON.stringify(payload),
         },
         token,
       );
+
       setAssessment(result);
-      apiFetch<RiskPrediction[]>('/risk/high-risk', {}, token).then(setHighRisk).catch(() => {});
-      apiFetch<Forecast>(`/risk/forecast?horizon_days=${horizon}`, {}, token).then(setForecast).catch(() => {});
-    } catch (err) {
-      setAssessError(
-        err instanceof ApiError ? 'Could not score this patient. Check the values entered.' : 'Something went wrong.',
+      setSuccess(
+        `Risk assessment completed for patient #${result.patient_id}.`,
+      );
+
+      await load();
+    } catch (e) {
+      setError(
+        e instanceof ApiError
+          ? e.message
+          : 'Could not score this patient. Check the entered values.',
       );
     } finally {
-      setIsAssessing(false);
+      setBusy(false);
     }
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-8 py-10">
-      <p className="text-xs font-medium uppercase tracking-wide text-slate-400">Risk prediction</p>
-      <h1 className="mt-1 text-2xl font-semibold tracking-tight">Hospital readmission monitoring</h1>
-      <p className="mt-2 max-w-xl text-sm text-slate-500">
-        Review current risk indicators, score an admission, and inspect model-derived factors affecting the prediction.
-      </p>
-
-      {error && <p className="mt-4 text-sm text-risk-high">{error}</p>}
-
-      <section className="mt-8 grid gap-4 sm:grid-cols-4">
-        <StatCard label="Visible patients" value={isLoading ? '—' : String(patients.length)} />
-        <StatCard label="High-risk patients" value={isLoading ? '—' : String(highRisk.length)} />
-        <StatCard label="Expected readmissions" value={forecast ? String(forecast.predicted_readmissions) : '—'} />
-        <StatCard label="Predicted rate" value={forecast ? `${(forecast.predicted_rate * 100).toFixed(1)}%` : '—'} />
-      </section>
-
-      <section className="mt-8 grid gap-4 lg:grid-cols-2">
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-sm font-semibold">Readmission forecast</h2>
-              <p className="mt-1 text-xs text-slate-500">Probability-weighted estimate based on the latest available patient predictions.</p>
-            </div>
-            <select
-              value={horizon}
-              onChange={(e) => setHorizon(Number(e.target.value))}
-              className="rounded-md border border-[var(--border)] bg-transparent px-2 py-1 text-xs"
-            >
-              {HORIZON_OPTIONS.map((h) => (
-                <option key={h} value={h}>{h} days</option>
-              ))}
-            </select>
+    <div>
+      <PageHeader
+        eyebrow="Risk intelligence"
+        title="Risk & readmission forecast"
+        description={
+          individual
+            ? 'Score an admission, monitor latest patient risk, and review the aggregate readmission forecast.'
+            : 'Review hospital-level readmission risk and forecast information available to your role.'
+        }
+        actions={
+          <div className="flex items-center gap-2">
+            <RiskLegend />
           </div>
-          <div className="mt-5 grid grid-cols-3 gap-4 text-sm">
-            <div>
-              <p className="text-slate-500">Forecast horizon</p>
-              <p className="mt-1 font-[family-name:var(--font-mono)] text-lg font-medium">{forecast?.horizon_days ?? '—'} days</p>
-            </div>
-            <div>
-              <p className="text-slate-500">Expected cases</p>
-              <p className="mt-1 font-[family-name:var(--font-mono)] text-lg font-medium">{forecast?.predicted_readmissions ?? '—'}</p>
-            </div>
-            <div>
-              <p className="text-slate-500">Predicted rate</p>
-              <p className="mt-1 font-[family-name:var(--font-mono)] text-lg font-medium">
-                {forecast ? `${(forecast.predicted_rate * 100).toFixed(1)}%` : '—'}
-              </p>
-            </div>
-          </div>
+        }
+      />
+
+      {error && (
+        <div className="mb-5">
+          <ErrorState message={error} onRetry={() => void load()} />
         </div>
+      )}
 
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6">
-          <h2 className="text-sm font-semibold">Model information</h2>
-          <p className="mt-1 text-xs text-slate-500">Model currently used for risk scoring.</p>
-          {assessment ? (
-            <>
-              <dl className="mt-5 grid grid-cols-2 gap-y-3 text-sm">
-                <dt className="text-slate-500">Model</dt>
-                <dd className="text-right font-[family-name:var(--font-mono)] text-xs">{assessment.model_name}</dd>
-                <dt className="text-slate-500">Version</dt>
-                <dd className="text-right font-[family-name:var(--font-mono)] text-xs">{assessment.model_version}</dd>
-                <dt className="text-slate-500">Target</dt>
-                <dd className="text-right">Readmission</dd>
-                <dt className="text-slate-500">Horizon</dt>
-                <dd className="text-right">30 days</dd>
-              </dl>
-              <div className="mt-5 border-t border-[var(--border)] pt-4">
-                <p className="text-xs font-medium text-slate-500">Contributing factors</p>
-                <ul className="mt-2 space-y-1.5 text-sm">
-                  {assessment.risk_factors.map((f, i) => (
-                    <li key={i} className="flex gap-2">
-                      <span className="text-slate-400">•</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </>
-          ) : (
-            <p className="mt-5 text-sm text-slate-400">Run an assessment below to see model details.</p>
-          )}
-        </div>
-      </section>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <KpiCard
+          label={individual ? 'Patients scored' : 'Risk distribution'}
+          value={individual ? (loading ? '—' : scores.length) : 'Aggregated'}
+          icon={<Users className="h-5 w-5" />}
+        />
 
-      <section className="mt-8 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6">
-        <h2 className="text-sm font-semibold">Patient risk assessment</h2>
-        <p className="mt-1 text-xs text-slate-500">Enter the admission characteristics required by the readmission model.</p>
+        <KpiCard
+          label="High-risk patients"
+          value={individual ? (loading ? '—' : high.length) : '—'}
+          detail={
+            individual ? 'Latest scores' : 'Not exposed individually'
+          }
+          icon={<AlertTriangle className="h-5 w-5" />}
+          accent="red"
+        />
 
-        <div className="mt-5 grid gap-8 lg:grid-cols-2">
-          <form onSubmit={handleAssess} className="space-y-4">
-            <Field label="Patient">
+        <KpiCard
+          label="Expected readmissions"
+          value={
+            canForecast
+              ? loading
+                ? '—'
+                : (forecast?.predicted_readmissions ?? 0)
+              : '—'
+          }
+          detail={
+            canForecast && forecast
+              ? `${forecast.horizon_days}-day horizon`
+              : 'Forecast access not granted'
+          }
+          icon={<Calculator className="h-5 w-5" />}
+          accent="teal"
+        />
+
+        <KpiCard
+          label="Predicted rate"
+          value={
+            canForecast
+              ? loading
+                ? '—'
+                : riskPercent(forecast?.predicted_rate ?? 0)
+              : '—'
+          }
+          detail={
+            canForecast
+              ? 'Probability-weighted estimate'
+              : 'Forecast access not granted'
+          }
+          icon={<Clock3 className="h-5 w-5" />}
+          accent="amber"
+        />
+      </div>
+
+      <div className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_.9fr]">
+        <SectionCard
+          title="Readmission forecast"
+          description="The backend forecast scales the latest 30-day risk estimate to the selected horizon."
+          actions={
+            canForecast ? (
               <select
-                required
-                value={form.patient_id}
-                onChange={(e) => setForm({ ...form, patient_id: e.target.value })}
-                className="w-full rounded-md border border-[var(--border)] bg-transparent px-3 py-2 text-sm"
+                aria-label="Forecast horizon"
+                value={horizon}
+                onChange={(e) => setHorizon(Number(e.target.value))}
+                className="field w-auto py-2 text-xs"
               >
-                <option value="" disabled>Select a patient</option>
-                {patients.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.medical_record_number} — {p.primary_diagnosis ?? 'No diagnosis on file'}
+                {HORIZONS.map((value) => (
+                  <option key={value} value={value}>
+                    {value} days
                   </option>
                 ))}
               </select>
-            </Field>
-
-            <div className="grid grid-cols-2 gap-4">
-              <Field label="Length of stay (days)">
-                <NumberInput value={form.time_in_hospital} onChange={(v) => setForm({ ...form, time_in_hospital: v })} min={1} max={14} />
-              </Field>
-              <Field label="Number of medications">
-                <NumberInput value={form.num_medications} onChange={(v) => setForm({ ...form, num_medications: v })} min={0} />
-              </Field>
-              <Field label="Lab procedures">
-                <NumberInput value={form.num_lab_procedures} onChange={(v) => setForm({ ...form, num_lab_procedures: v })} min={0} />
-              </Field>
-              <Field label="Diagnoses recorded">
-                <NumberInput value={form.number_diagnoses} onChange={(v) => setForm({ ...form, number_diagnoses: v })} min={0} />
-              </Field>
-              <Field label="Prior inpatient stays">
-                <NumberInput value={form.number_inpatient} onChange={(v) => setForm({ ...form, number_inpatient: v })} min={0} />
-              </Field>
-              <Field label="Prior ER visits">
-                <NumberInput value={form.number_emergency} onChange={(v) => setForm({ ...form, number_emergency: v })} min={0} />
-              </Field>
-            </div>
-
-            <Field label="Age group">
-              <select
-                value={form.age_group}
-                onChange={(e) => setForm({ ...form, age_group: e.target.value })}
-                className="w-full rounded-md border border-[var(--border)] bg-transparent px-3 py-2 text-sm"
-              >
-                {AGE_GROUPS.map((g) => (
-                  <option key={g} value={g}>{g}</option>
-                ))}
-              </select>
-            </Field>
-
-            {assessError && <p className="text-sm text-risk-high">{assessError}</p>}
-
-            <button
-              type="submit"
-              disabled={isAssessing}
-              className="w-full rounded-md bg-slate-900 px-3 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-50"
-            >
-              {isAssessing ? 'Scoring…' : 'Assess risk'}
-            </button>
-          </form>
-
-          <div className="flex flex-col justify-center rounded-lg border border-dashed border-[var(--border)] p-6">
-            {assessment ? (
-              <>
-                <p className="text-xs text-slate-500">Latest assessment</p>
-                <p className="mt-2 font-[family-name:var(--font-mono)] text-4xl font-semibold">
-                  {(assessment.readmission_probability * 100).toFixed(1)}<span className="text-lg text-slate-400">%</span>
-                </p>
-                <span className={`mt-3 inline-block w-fit rounded-full px-3 py-1 text-xs font-medium capitalize ${CATEGORY_STYLES[assessment.risk_category]}`}>
-                  {assessment.risk_category} risk
-                </span>
-              </>
             ) : (
-              <p className="text-center text-sm text-slate-400">Results will appear here once you assess a patient.</p>
-            )}
-          </div>
-        </div>
-      </section>
+              <span className="text-xs text-slate-400">
+                Not available for this role
+              </span>
+            )
+          }
+        >
+          {canForecast ? (
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-xl bg-slate-50 p-4">
+                <p className="text-xs text-slate-500">Horizon</p>
+                <p className="mt-1 text-xl font-bold">
+                  {forecast?.horizon_days ?? '—'} days
+                </p>
+              </div>
 
-      <section className="mt-10">
-        <h2 className="text-sm font-medium text-slate-500">High-risk patients</h2>
-        {highRisk.length === 0 ? (
-          <div className="mt-3 rounded-xl border border-dashed border-[var(--border)] p-8 text-center">
-            <p className="text-sm text-slate-500">No patients are currently in the high-risk band.</p>
+              <div className="rounded-xl bg-slate-50 p-4">
+                <p className="text-xs text-slate-500">Expected cases</p>
+                <p className="mt-1 text-xl font-bold">
+                  {forecast?.predicted_readmissions ?? '—'}
+                </p>
+              </div>
+
+              <div className="rounded-xl bg-slate-50 p-4">
+                <p className="text-xs text-slate-500">Predicted rate</p>
+                <p className="mt-1 text-xl font-bold">
+                  {forecast
+                    ? riskPercent(forecast.predicted_rate)
+                    : '—'}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <EmptyState
+              title="Forecast access not granted"
+              message="This role can review aggregated risk analytics without the readmission forecast endpoint."
+            />
+          )}
+
+          <div className="mt-5 rounded-xl border border-cyan-100 bg-cyan-50/50 p-4 text-xs leading-5 text-slate-600">
+            This is a model-based estimate, not a time-series clinical
+            forecast. Review the backend methodology and current patient
+            context before acting on it.
           </div>
+        </SectionCard>
+
+        <SectionCard
+          title="Latest risk distribution"
+          description="Latest score per visible patient when individual risk access is available."
+        >
+          {!individual ? (
+            <EmptyState
+              title="Aggregated view"
+              message="Individual patient scores are restricted for this role. Use the hospital analytics view for population-level risk distributions."
+            />
+          ) : loading ? (
+            <TableSkeleton columns={3} rows={3} />
+          ) : (
+            <div className="space-y-4">
+              {(['high', 'medium', 'low'] as RiskCategory[]).map(
+                (category) => {
+                  const count = distribution[category];
+                  const total = scores.length || 1;
+                  const percentage = (count / total) * 100;
+
+                  return (
+                    <div key={category}>
+                      <div className="flex items-center justify-between">
+                        <RiskPill category={category} />
+
+                        <span className="text-xs font-semibold text-slate-600">
+                          {count} · {Math.round(percentage)}%
+                        </span>
+                      </div>
+
+                      <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+                        <div
+                          className={`h-full rounded-full ${
+                            category === 'high'
+                              ? 'bg-risk-high'
+                              : category === 'medium'
+                                ? 'bg-risk-medium'
+                                : 'bg-risk-low'
+                          }`}
+                          style={{
+                            width: `${Math.max(2, percentage)}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                },
+              )}
+            </div>
+          )}
+        </SectionCard>
+      </div>
+
+      {individual && (
+        <div className="mt-6 grid gap-6 xl:grid-cols-[1.2fr_.8fr]">
+          <SectionCard
+            title="Score an admission"
+            description="Enter the feature values required by the current risk model."
+          >
+            {success && (
+              <div className="mb-4">
+                <SuccessNotice message={success} />
+              </div>
+            )}
+
+            <form
+              onSubmit={submit}
+              className="grid gap-4 sm:grid-cols-2"
+            >
+              <FormField
+                label="Patient"
+                htmlFor="patient_id"
+                error={!form.patient_id ? '' : undefined}
+              >
+                <select
+                  id="patient_id"
+                  required
+                  value={form.patient_id}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      patient_id: e.target.value,
+                    })
+                  }
+                  className="field mt-1.5"
+                >
+                  <option value="">Select patient</option>
+
+                  {patients.map((patient) => (
+                    <option key={patient.id} value={patient.id}>
+                      {patient.medical_record_number} ·{' '}
+                      {patient.primary_diagnosis ?? 'No diagnosis'}
+                    </option>
+                  ))}
+                </select>
+              </FormField>
+
+              <FormField label="Age group" htmlFor="age_group">
+                <select
+                  id="age_group"
+                  value={form.age_group}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      age_group: e.target.value,
+                    })
+                  }
+                  className="field mt-1.5"
+                >
+                  {AGE.map((age) => (
+                    <option key={age} value={age}>
+                      {age}
+                    </option>
+                  ))}
+                </select>
+              </FormField>
+
+              {[
+                ['time_in_hospital', 'Length of stay', 1, 14],
+                ['num_medications', 'Medications', 0, 999],
+                ['num_lab_procedures', 'Lab procedures', 0, 999],
+                ['number_diagnoses', 'Diagnoses', 0, 999],
+                ['number_inpatient', 'Prior inpatient visits', 0, 999],
+                ['number_emergency', 'Prior emergency visits', 0, 999],
+              ].map(([fieldId, label, min, max]) => (
+                <FormField
+                  key={String(fieldId)}
+                  label={String(label)}
+                  htmlFor={String(fieldId)}
+                >
+                  <input
+                    id={String(fieldId)}
+                    required
+                    type="number"
+                    min={Number(min)}
+                    max={Number(max)}
+                    value={String(
+                      form[fieldId as keyof typeof form],
+                    )}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        [fieldId]: e.target.value,
+                      })
+                    }
+                    className="field mt-1.5"
+                  />
+                </FormField>
+              ))}
+
+              <div className="flex justify-end sm:col-span-2">
+                <SubmitButton loading={busy}>
+                  Run risk assessment
+                </SubmitButton>
+              </div>
+            </form>
+          </SectionCard>
+
+          <SectionCard
+            title="Latest assessment"
+            description="Model metadata and rule-based explanation from the submitted features."
+          >
+            {!assessment ? (
+              <EmptyState
+                title="No assessment yet"
+                message="Run an assessment to see the probability, category, model version and contributing factors."
+                icon={<BrainCircuit className="h-5 w-5" />}
+              />
+            ) : (
+              <div>
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 p-4">
+                  <div>
+                    <p className="text-xs text-slate-500">
+                      Readmission probability
+                    </p>
+
+                    <p className="mt-1 text-3xl font-bold text-navy-950">
+                      {riskPercent(
+                        assessment.readmission_probability,
+                      )}
+                    </p>
+                  </div>
+
+                  <RiskPill category={assessment.risk_category} />
+                </div>
+
+                <dl className="mt-5 grid grid-cols-2 gap-y-3 text-xs">
+                  <dt className="text-slate-500">Model</dt>
+                  <dd className="text-right font-semibold">
+                    {assessment.model_name}
+                  </dd>
+
+                  <dt className="text-slate-500">Version</dt>
+                  <dd className="text-right font-semibold">
+                    {assessment.model_version}
+                  </dd>
+
+                  <dt className="text-slate-500">Updated</dt>
+                  <dd className="text-right">
+                    {formatDate(assessment.created_at)}
+                  </dd>
+                </dl>
+
+                <div className="mt-5 border-t border-slate-100 pt-4">
+                  <p className="text-xs font-bold text-slate-700">
+                    Contributing factors
+                  </p>
+
+                  <ul className="mt-2 space-y-2 text-xs leading-5 text-slate-600">
+                    {assessment.risk_factors.map((factor, index) => (
+                      <li key={index} className="flex gap-2">
+                        <span className="text-clinical-600">•</span>
+                        {factor}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <p className="mt-4 text-[11px] leading-5 text-slate-400">
+                    These factors are rule-based explanations of
+                    submitted inputs, not model-derived feature
+                    importance.
+                  </p>
+                </div>
+              </div>
+            )}
+          </SectionCard>
+        </div>
+      )}
+
+      <SectionCard
+        title="High-risk monitoring"
+        description="Patients whose latest score is at or above the backend high-risk threshold."
+        className="mt-6"
+      >
+        {!individual ? (
+          <EmptyState
+            title="Individual alerts are restricted"
+            message="Your role has aggregated risk access. No patient identifiers are shown here."
+          />
+        ) : loading ? (
+          <TableSkeleton columns={4} rows={5} />
+        ) : high.length === 0 ? (
+          <EmptyState
+            title="No high-risk patients"
+            message="No visible patient has a latest score in the high-risk band."
+          />
         ) : (
-          <div className="mt-3 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)]">
-            <table className="w-full text-left text-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[700px] text-left text-sm">
               <thead>
-                <tr className="border-b border-[var(--border)] text-xs uppercase tracking-wide text-slate-400">
-                  <th className="px-4 py-3 font-medium">Patient</th>
-                  <th className="px-4 py-3 font-medium">Probability</th>
-                  <th className="px-4 py-3 font-medium">Category</th>
-                  <th className="px-4 py-3 font-medium">Model</th>
+                <tr className="border-b border-slate-100 text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                  <th className="pb-3">Patient</th>
+                  <th className="pb-3">Risk</th>
+                  <th className="pb-3">Model</th>
+                  <th className="pb-3">Updated</th>
                 </tr>
               </thead>
-              <tbody>
-                {highRisk.map((r) => (
-                  <tr key={r.patient_id} className="border-b border-[var(--border)] last:border-0">
-                    <td className="px-4 py-3 font-medium">#{r.patient_id}</td>
-                    <td className="px-4 py-3 font-[family-name:var(--font-mono)]">{(r.readmission_probability * 100).toFixed(1)}%</td>
-                    <td className="px-4 py-3">
-                      <span className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${CATEGORY_STYLES[r.risk_category]}`}>
-                        {r.risk_category}
-                      </span>
+
+              <tbody className="divide-y divide-slate-100">
+                {high.map((item) => (
+                  <tr
+                    key={`${item.patient_id}-${item.created_at}`}
+                  >
+                    <td className="py-3 font-semibold">
+                      Patient #{item.patient_id}
                     </td>
-                    <td className="px-4 py-3 text-slate-500">{r.model_name}</td>
+
+                    <td className="py-3">
+                      <div className="flex items-center gap-2">
+                        <RiskPill category={item.risk_category} />
+                        <span className="font-mono text-xs">
+                          {riskPercent(
+                            item.readmission_probability,
+                          )}
+                        </span>
+                      </div>
+                    </td>
+
+                    <td className="py-3 text-xs text-slate-500">
+                      {item.model_name} · {item.model_version}
+                    </td>
+
+                    <td className="py-3 text-xs text-slate-500">
+                      {formatDate(item.created_at)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         )}
-      </section>
+      </SectionCard>
     </div>
-  );
-}
-
-function StatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-2 font-[family-name:var(--font-mono)] text-2xl font-semibold">{value}</p>
-    </div>
-  );
-}
-
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <label className="block">
-      <span className="text-xs font-medium text-slate-500">{label}</span>
-      <div className="mt-1">{children}</div>
-    </label>
-  );
-}
-
-function NumberInput({ value, onChange, min, max }: { value: string; onChange: (v: string) => void; min?: number; max?: number }) {
-  return (
-    <input
-      type="number" required min={min} max={max}
-      value={value} onChange={(e) => onChange(e.target.value)}
-      className="w-full rounded-md border border-[var(--border)] bg-transparent px-3 py-2 text-sm"
-    />
   );
 }

@@ -1,6 +1,15 @@
-export type Role = 'doctor' | 'hospital_admin' | 'researcher' | 'system_admin';
+export type Role =
+  | "doctor"
+  | "hospital_admin"
+  | "researcher"
+  | "system_admin";
 
-export type RiskCategory = 'low' | 'medium' | 'high';
+export type RiskCategory =
+  | "low"
+  | "medium"
+  | "high";
+
+export type Permission = string;
 
 export interface User {
   id: number;
@@ -9,6 +18,7 @@ export interface User {
   role: Role;
   department: string | null;
   is_active: boolean;
+  created_at?: string | null;
 }
 
 export interface Patient {
@@ -16,6 +26,7 @@ export interface Patient {
   medical_record_number: string;
   age_group: string | null;
   gender: string | null;
+  race?: string | null;
   primary_diagnosis: string | null;
   assigned_doctor_id: number | null;
 }
@@ -26,18 +37,17 @@ export interface RiskPrediction {
   risk_category: RiskCategory;
   model_name: string;
   model_version: string;
-  created_at?: string;
-  risk_factors: string[]
+  created_at?: string | null;
+  risk_factors: string[];
 }
 
-export interface HospitalAnalyticsSummary {
-  total_patients: number;
-  total_admissions: number;
-  readmission_rate: number;
-  average_length_of_stay: number;
-  risk_distribution: Record<RiskCategory, number>;
+export interface ReadmissionForecast {
+  scope: string;
+  horizon_days: number;
+  predicted_readmissions: number;
+  predicted_rate: number;
 }
- 
+
 export interface TreatmentEffectivenessSummary {
   treatment_type: string | null;
   total_cases: number;
@@ -50,6 +60,24 @@ export interface RecoveryTrendPoint {
   avg_effectiveness: number | null;
   case_count: number;
 }
+export interface TreatmentMethodCount {
+  treatment_type: string;
+  patient_count: number;
+}
+
+export interface TreatmentOutcome {
+  id: number;
+  patient_id: number;
+  treatment_type: string;
+  outcome_status:
+    | "improved"
+    | "unchanged"
+    | "worsened"
+    | string;
+  recovery_days: number | null;
+  effectiveness_score: number | null;
+  created_at: string;
+}
 
 export interface HospitalSummary {
   total_patients: number;
@@ -58,13 +86,17 @@ export interface HospitalSummary {
 }
 
 export interface ReadmissionDistribution {
-  current_distribution: { risk_category: string; count: number }[];
+  current_distribution: {
+    risk_category: string;
+    count: number;
+  }[];
   total_predictions_ever_run: number;
 }
 
 export interface PopulationHealth {
   total_patients: number;
   gender_distribution: Record<string, number>;
+  age_distribution: Record<string, number>;
 }
 
 export interface DischargePlan {
@@ -72,6 +104,7 @@ export interface DischargePlan {
   recommendations: string[];
   requires_close_monitoring: boolean;
 }
+
 export interface AnonymisedPatient {
   pseudo_id: string;
   age_group: string | null;
@@ -79,8 +112,30 @@ export interface AnonymisedPatient {
   primary_diagnosis: string | null;
   risk_category: string;
 }
-export interface PopulationHealth {
-  total_patients: number;
-  gender_distribution: Record<string, number>;
-  age_distribution: Record<string, number>;  // NEW
+
+/* =========================================
+   MODEL MANAGEMENT
+   ========================================= */
+
+export interface ActiveModel {
+  model_name: string;
+  model_version: string;
+  artifact_path: string;
+  status: string;
+  filename?: string;
+}
+
+export interface ModelMetrics {
+  accuracy: number | null;
+  precision: number | null;
+  recall: number | null;
+  f1: number | null;
+  roc_auc: number | null;
+  threshold?: number | null;
+}
+
+export interface RegisteredModel {
+  filename: string;
+  size_kb: number;
+  is_active?: boolean;
 }

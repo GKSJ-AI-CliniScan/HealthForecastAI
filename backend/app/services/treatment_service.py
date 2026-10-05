@@ -1,6 +1,6 @@
 """Treatment effectiveness business logic - Module 4."""
 
-from sqlalchemy import func
+from sqlalchemy import Date, cast, func
 from sqlalchemy.orm import Session
 
 from app.models.treatment import TreatmentOutcome
@@ -54,20 +54,20 @@ def get_treatment_effectiveness(db: Session, treatment_type: str | None = None) 
 
 
 def get_recovery_trends(db: Session) -> list[dict]:
-    """Real month-by-month aggregation from stored outcomes."""
+    """Real month-by-day aggregation from stored outcomes - works on SQLite and Postgres."""
     rows = (
         db.query(
-            func.strftime("%Y-%m-%d", TreatmentOutcome.created_at).label("month"),
+            cast(TreatmentOutcome.created_at, Date).label("month"),
             func.avg(TreatmentOutcome.effectiveness_score).label("avg_score"),
             func.count(TreatmentOutcome.id).label("case_count"),
         )
-        .group_by("month")
-        .order_by("month")
+        .group_by(cast(TreatmentOutcome.created_at, Date))
+        .order_by(cast(TreatmentOutcome.created_at, Date))
         .all()
     )
     return [
         {
-            "month": row.month,
+            "month": str(row.month),
             "avg_effectiveness": round(row.avg_score, 3) if row.avg_score is not None else None,
             "case_count": row.case_count,
         }
@@ -83,3 +83,23 @@ def get_patient_treatment_history(db: Session, patient_id: int) -> list[Treatmen
         .order_by(TreatmentOutcome.created_at.desc())
         .all()
     )
+
+
+def get_treatment_method_counts(db: Session) -> list[dict]:
+    rows = (
+        db.query(
+            TreatmentOutcome.treatment_type,
+            func.count(TreatmentOutcome.id).label("patient_count"),
+        )
+        .group_by(TreatmentOutcome.treatment_type)
+        .order_by(func.count(TreatmentOutcome.id).desc())
+        .all()
+    )
+
+    return [
+        {
+            "treatment_type": row.treatment_type,
+            "patient_count": row.patient_count,
+        }
+        for row in rows
+    ]

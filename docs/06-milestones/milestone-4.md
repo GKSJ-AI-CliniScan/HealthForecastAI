@@ -1,65 +1,136 @@
-# Milestone 4 report - Week 7 & 8 - Testing, Deployment & Documentation
+# Milestone 4 – Model Validation, Testing and Deployment Preparation
 
-> **How to use this file**
-> 1. Fill in every section below. Keep all five headings, even if an answer is short.
-> 2. Delete the `_Not started_` line once you begin - that line is what tells CI
->    the report is still a blank template.
-> 3. Commit it on your own branch. Do not open a pull request to `main`.
+## 1. Overview
 
-_Not started_
+Milestone 4 focuses on validating the AI-based hospital readmission prediction system, testing the complete application workflow, documenting the trained model, and preparing the system for deployment.
 
-- **Intern name:**
-- **Branch:** `intern/<your-name>`
-- **Submitted on:**
+The HealthForecast AI system combines:
 
----
+- Patient management
+- Patient risk prediction
+- Readmission forecasting
+- Treatment effectiveness analysis
+- Clinical decision support
+- Hospital analytics
+- Research-oriented anonymized patient data
+- Role-based access control
+- Machine learning model management
 
-## Scope for this milestone
-
-- Validate prediction accuracy and healthcare analytics quality.
-- Optimize healthcare workflows and dashboard responsiveness.
-- Deploy the platform using Docker and a cloud environment.
-- Prepare the final project documentation and presentation.
-- Demonstrate the complete HealthForecast AI platform.
-
-## Evaluation criteria
-
-- Fully deployed frontend and backend.
-- Model testing and validation completed.
-- Documentation and presentation prepared.
-- Successful end-to-end platform demonstration completed.
+The objective of this milestone is to ensure that the implemented system is technically ready for deployment and demonstration.
 
 ---
 
-## What I built
+# 2. System Components
 
-<!-- What works end to end? Name the files you added or changed and why. -->
+The final system contains the following major components:
 
-## How to run it
+## Frontend
 
-<!-- Exact commands a reviewer can copy and paste from a clean clone. -->
+Technology:
 
-```bash
-git clone <repo-url>
-git checkout intern/<your-name>
-# ... your steps
-```
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Recharts
+- Lucide React
 
-## Evidence
+Frontend responsibilities:
 
-<!--
-Screenshots, API responses or terminal output proving it works.
-Put images in docs/05-wireframes/ or alongside this file and link them.
-Never screenshot real patient data.
--->
+- Authentication
+- Dashboard
+- Patient registry
+- Risk prediction
+- Readmission forecasting
+- Treatment effectiveness
+- Research cohort
+- Clinical support
+- Reports and exports
+- Model management
+- User management
 
-## Metrics
+---
 
-<!--
-Record: prediction response time, dashboard loading speed, concurrent request
-handling, final model metrics, test count and coverage, and the live deployment URL.
--->
+## Backend
 
-## Known gaps
+Technology:
 
-<!-- What is unfinished, what you would do next, and anything you are stuck on. -->
+- Python
+- FastAPI
+- SQLAlchemy
+- PostgreSQL
+
+Backend responsibilities:
+
+- Authentication
+- Authorization
+- Patient management
+- Risk prediction
+- Forecasting
+- Treatment analysis
+- Hospital analytics
+- Clinical recommendations
+- Model management
+- CSV exports
+
+---
+
+## Machine Learning
+
+The machine-learning component provides hospital readmission risk prediction.
+
+The model workflow includes:
+
+1. Dataset preparation
+2. Feature processing
+3. Model training
+4. Model evaluation
+5. Threshold selection
+6. Model artifact generation
+7. Backend model loading
+8. Risk prediction through API
+
+---
+
+# 3. Model Validation
+
+The trained model was evaluated using validation and test data.
+
+The model evaluation includes:
+
+- Accuracy
+- Precision
+- Recall
+- F1-score
+- ROC-AUC
+
+The selected decision threshold is stored with the model evaluation artifacts.
+
+The system also maintains model metadata such as:
+
+- Model name
+- Model version
+- Artifact filename
+- Artifact size
+- Decision threshold
+- Validation metrics
+- Test metrics
+
+---
+
+# 4. Model Evaluation Results
+
+The current model evaluation artifact reports the following test metrics.
+
+| Metric | Result |
+|---|---:|
+| Accuracy | 0.6769 |
+| Precision | 0.1859 |
+| Recall | 0.5435 |
+| F1 Score | 0.2770 |
+| ROC-AUC | 0.6692 |
+
+The recorded decision threshold is:
+
+```text
+0.11

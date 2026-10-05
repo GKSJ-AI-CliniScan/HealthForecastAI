@@ -1,31 +1,7 @@
 import type { Metadata } from 'next';
-import { IBM_Plex_Sans, IBM_Plex_Mono } from 'next/font/google';
-import './globals.css';
+import { Inter } from 'next/font/google';
 import { AuthProvider } from '@/lib/auth-context';
-
-const plexSans = IBM_Plex_Sans({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-sans',
-});
-
-const plexMono = IBM_Plex_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-mono',
-});
-
-export const metadata: Metadata = {
-  title: 'HealthForecast AI',
-  description: 'Hospital readmission prediction and patient risk intelligence for clinical teams.',
-};
-
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <html lang="en" className={`${plexSans.variable} ${plexMono.variable}`}>
-      <body>
-        <AuthProvider>{children}</AuthProvider>
-      </body>
-    </html>
-  );
-}
+import './globals.css';
+const inter=Inter({subsets:['latin'],variable:'--font-sans'});
+export const metadata:Metadata={title:'HealthForecast AI Console',description:'Hospital readmission-risk and patient risk-intelligence console'};
+export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en" className={inter.variable}><body><AuthProvider>{children}</AuthProvider></body></html>}
