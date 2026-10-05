@@ -139,3 +139,19 @@ The frontend Docker build successfully completed the Next.js compilation, lintin
 git clone https://github.com/GKSJ-AI-CliniScan/HealthForecastAI.git
 cd HealthForecastAI
 git checkout intern/24-parimala-m
+
+## Evidence
+
+- GitHub Actions frontend build completed successfully after adding the `frontend/public/.gitkeep` file.
+- Backend Docker image build completed successfully in the deployment environment.
+- Backend startup previously failed because the PostgreSQL driver was missing; `psycopg2-binary` has been added to `backend/requirements.txt`.
+- Model artifacts used by the backend are included under `ml/artifacts/`.
+- Final end-to-end deployment evidence will be added after the frontend and backend services are live.
+- No real patient data is included in screenshots or documentation.
+
+## Known gaps
+
+- Final cloud deployment is still in progress.
+- End-to-end validation between the deployed frontend and backend is pending.
+- Final live deployment URLs will be recorded after deployment succeeds.
+- Additional performance measurements such as concurrent request handling can be collected after the live deployment is stable.
