@@ -60,10 +60,7 @@ export const predictionService = {
           ...mockTemplate,
           patientId: response.patient_id,
           readmissionProbability: response.readmission_probability,
-          riskScore: Math.round(response.readmission_probability * 100),
           riskCategory: response.risk_category,
-          predictedReadmissionRate: response.readmission_probability,
-          modelVersion: response.model_version,
           assessedAt: response.created_at ?? new Date().toISOString(),
           dataSource: 'fastapi_ml_backend'
         }
