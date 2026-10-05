@@ -2,7 +2,7 @@
 
 - **Intern name:** Liya Babu
 - **Branch:** `intern/22-liya-babu`
-- **Submitted on:** september 15,2026
+- **Submitted on:** September 15, 2026
 
 ---
 
@@ -91,10 +91,12 @@ Main Risk Prediction APIs
 /api/v1/risk/high-risk
 /api/v1/risk/forecast
 
-Evidence
+---
+
+## Evidence
+
 Risk Prediction Database
 The risk_predictions PostgreSQL table contains:
-
 | Risk Category | Prediction Records |
 |---|---:|
 | Low | 85,215 |
@@ -113,10 +115,6 @@ The response includes information such as:
 - Medication count
 - HbA1c-related information
 
-Readmission Forecast API
-The /risk/forecast endpoint was updated to use the latest prediction for each patient.
-Verified forecast results:
-
 | Metric | Result |
 |---|---:|
 | Patients | 69,668 |
@@ -126,10 +124,11 @@ Verified forecast results:
 | Medium risk | 6,451 |
 | Low risk | 62,214 |
 
-The patient-level categories are consistent:
-1,003 + 6,451 + 62,214 = 69,668
 
-Metrics
+---
+
+## Metrics
+
 The available project evidence supports the following operational risk and forecasting metrics:
 - Total risk prediction records: 99,637
 - Unique patients used for latest-prediction forecasting: 69,668
@@ -139,9 +138,13 @@ The available project evidence supports the following operational risk and forec
 - Average current readmission probability: 26.14%
 - Expected readmissions: 18,213.41
 Model Evaluation Metrics
-Accuracy, precision, recall, F1-score, and ROC-AUC values are not included here because the available project evidence does not contain verified model evaluation results for these five metrics.
+Accuracy, precision, recall, F1-score, and ROC-AUC values are not included here because verified model evaluation results for these five metrics are not available in the current project evidence.
 
-Known gaps
+---
+
+
+## Known gaps
+
 - Formal model evaluation metrics such as accuracy, precision, recall, F1-score, and ROC-AUC need to be documented when verified training/evaluation results are available.
 - The current forecasting workflow uses the latest database prediction for each patient to calculate the forecast.
-- Further model validation and performance comparison can be included in a future model evaluation stage.
+
