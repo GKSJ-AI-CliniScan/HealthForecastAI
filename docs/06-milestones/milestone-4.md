@@ -2,7 +2,7 @@
 
 - **Intern name:** Parimala M
 - **Branch:** `intern/24-parimala-m`
-- **Submitted on:** 2026-10-02
+- **Submitted on:** 2026-10-05
 
 ---
 
@@ -25,111 +25,98 @@
 
 ## What I built
 
-During Milestone 4, I completed the testing, documentation, containerization, and deployment preparation for the HealthForecast AI platform.
+The HealthForecastAI platform was completed as an AI-based hospital readmission prediction and patient risk intelligence system.
 
-### Testing and validation
-
-The application was tested across the main healthcare workflows, including:
-
-- User authentication and role-based access.
-- Patient registry and patient management.
-- Readmission risk prediction.
-- High-risk patient identification.
-- Readmission forecasting.
-- Treatment effectiveness analysis.
-- Recovery trend analysis.
-- Healthcare analytics and risk distribution.
-- Research cohort functionality.
-- Clinical support and guidance.
-- Reports and exports.
-- Model management and model metrics.
-
-The frontend linting and production build were also validated.
-
-The frontend production build completed successfully with Next.js, including the major dashboard routes.
+The following major components were implemented and integrated:
 
 ### Frontend
 
-The frontend was developed using:
+The frontend was developed using Next.js, React, TypeScript, Tailwind CSS, Recharts, and Lucide React.
 
-- Next.js 15.5.23
-- React
-- TypeScript
-- Tailwind CSS
-- Recharts
-- Lucide React
+The completed frontend includes:
 
-The frontend includes:
-
+- Authentication and login
 - Dashboard overview
-- Healthcare analytics
 - Patient registry
-- Risk prediction
-- Readmission forecasting
-- Treatment effectiveness
-- Research cohort
-- Reports and exports
-- Clinical support
-- Model management
-- User management
-
-The interface was designed as a responsive light-themed healthcare dashboard with risk indicators, KPI cards, charts, tables, loading states, error states, and permission-aware navigation.
-
-### Backend
-
-The backend was implemented using:
-
-- FastAPI
-- SQLAlchemy
-- PostgreSQL
-- Role-based access control
-- REST APIs
-
-Major backend API areas include:
-
-- Authentication
-- Patient management
 - Risk prediction
 - High-risk patient records
 - Readmission forecasting
-- Treatment analytics
+- Treatment effectiveness
 - Healthcare analytics
+- Research cohort
+- Clinical support
+- Reports and exports
+- Model management
+- User management
+- Role-based and permission-aware navigation
+
+The dashboard provides KPI cards, risk indicators, charts, tables, loading states, error states, empty states, and responsive layouts.
+
+### Backend
+
+The backend was developed using FastAPI, SQLAlchemy, and PostgreSQL.
+
+The completed API functionality includes:
+
+- Authentication
+- User management
+- Patient management
+- Risk prediction
+- Risk scores
+- High-risk patient retrieval
+- Readmission forecasting
+- Treatment effectiveness
+- Recovery trends
+- Healthcare analytics
+- Readmission analytics
 - Reports and exports
 - Model management
 
-The backend Docker image was successfully built in the cloud deployment environment. Backend deployment is currently being finalized and requires successful application startup and end-to-end verification.
+JWT authentication and permission-based access control are implemented for protected healthcare functionality.
 
-### Machine learning
+### Machine Learning
 
-The readmission prediction system uses an XGBoost-based model.
+The readmission prediction system uses an XGBoost-based machine learning model.
 
-The final model artifact is maintained locally under the project's `ml/artifacts/` directory and is excluded from Git using the repository's `.gitignore` policy.
+The ML workflow includes:
 
-The model evaluation recorded the following test metrics:
+- Patient feature processing
+- Readmission risk prediction
+- Risk categorisation
+- High-risk patient identification
+- Readmission forecasting
 
-- Accuracy: 0.67688
-- Precision: 0.18588
-- Recall: 0.54353
-- F1 Score: 0.27703
-- ROC-AUC: 0.66916
+The model artifacts are maintained under `ml/artifacts/` and are excluded from Git according to the repository artifact policy.
 
-The selected model is XGBoost with model version:
+The final model evaluation metrics are documented in the Metrics section.
 
-`2.0.0-simple`
+### Deployment and CI/CD
 
-The decision threshold recorded during model evaluation is:
+The application was containerized using Docker and prepared for cloud deployment.
 
-`0.11`
+The frontend was successfully built and deployed to a cloud environment.
 
-### Docker
+The backend was containerized and deployed as the FastAPI service.
 
-Docker configuration was prepared for the frontend and backend so that the application can be built consistently in CI/CD environments.
+The repository CI/CD workflow was also used to validate:
 
-The frontend Docker build successfully completed the Next.js compilation, linting, type checking, static page generation, and production optimization stages.
-
-The backend Docker image also successfully completed its image build. Application startup and cloud deployment verification are still in progress.
+- Frontend installation
+- Frontend build
+- Linting
+- Type checking
+- Documentation structure
+- Repository policies
+- Model artifact restrictions
 
 ---
+## Known gaps
+
+- The current machine learning model should be further validated using independent hospital datasets before being used in a real clinical environment.
+- The model performance can be improved through additional data, feature engineering, hyperparameter tuning, and external validation.
+- Clinical support provides decision-support guidance and should not replace professional clinical judgement.
+- Long-term production deployment would require continuous monitoring of model performance, data drift, and prediction quality.
+- Additional performance testing under high concurrent user loads can be performed as a future enhancement.
+- Future versions can improve model explainability, monitoring, automated retraining, dataset diversity, and integration with hospital information systems.
 
 ## How to run it
 
