@@ -46,7 +46,7 @@ The application was tested across the main healthcare workflows, including:
 
 The frontend linting and production build were also validated.
 
-The frontend production build completed successfully with Next.js, including all major dashboard routes.
+The frontend production build completed successfully with Next.js, including the major dashboard routes.
 
 ### Frontend
 
@@ -97,15 +97,13 @@ Major backend API areas include:
 - Reports and exports
 - Model management
 
-The backend has been deployed to a cloud environment and its API can be tested through the deployed FastAPI service.
+The backend Docker image was successfully built in the cloud deployment environment. Backend deployment is currently being finalized and requires successful application startup and end-to-end verification.
 
 ### Machine learning
 
 The readmission prediction system uses an XGBoost-based model.
 
-The final model artifact is:
-
-`readmission_model.joblib`
+The final model artifact is maintained locally under the project's `ml/artifacts/` directory and is excluded from Git using the repository's `.gitignore` policy.
 
 The model evaluation recorded the following test metrics:
 
@@ -129,6 +127,8 @@ Docker configuration was prepared for the frontend and backend so that the appli
 
 The frontend Docker build successfully completed the Next.js compilation, linting, type checking, static page generation, and production optimization stages.
 
+The backend Docker image also successfully completed its image build. Application startup and cloud deployment verification are still in progress.
+
 ---
 
 ## How to run it
@@ -139,19 +139,3 @@ The frontend Docker build successfully completed the Next.js compilation, lintin
 git clone https://github.com/GKSJ-AI-CliniScan/HealthForecastAI.git
 cd HealthForecastAI
 git checkout intern/24-parimala-m
-
-## Evidence
-
-- GitHub Actions frontend build completed successfully after adding the `frontend/public/.gitkeep` file.
-- Backend Docker image build completed successfully in the deployment environment.
-- Backend startup previously failed because the PostgreSQL driver was missing; `psycopg2-binary` has been added to `backend/requirements.txt`.
-- Model artifacts used by the backend are included under `ml/artifacts/`.
-- Final end-to-end deployment evidence will be added after the frontend and backend services are live.
-- No real patient data is included in screenshots or documentation.
-
-## Known gaps
-
-- Final cloud deployment is still in progress.
-- End-to-end validation between the deployed frontend and backend is pending.
-- Final live deployment URLs will be recorded after deployment succeeds.
-- Additional performance measurements such as concurrent request handling can be collected after the live deployment is stable.
