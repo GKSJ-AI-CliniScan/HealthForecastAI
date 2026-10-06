@@ -195,4 +195,5 @@ Formal response-time, concurrent-user, and load-testing benchmarks were not perf
 ```bash
 git clone https://github.com/GKSJ-AI-CliniScan/HealthForecastAI.git
 cd HealthForecastAI
-git checkout intern/24-parimala-m ```
+git checkout intern/24-parimala-m 
+```
