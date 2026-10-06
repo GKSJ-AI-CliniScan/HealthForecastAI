@@ -6,8 +6,9 @@ from pathlib import Path
 
 from sqlalchemy.orm import Session
 
+from app.db.base import Base
 from app.db.mongodb import get_mongo_db
-from app.db.session import SessionLocal
+from app.db.session import SessionLocal, engine
 from app.models.admission import Admission
 from app.models.patient import Patient
 from app.models.prediction import RiskPrediction
@@ -15,8 +16,7 @@ from app.models.treatment import TreatmentOutcome
 from app.models.user import User
 from app.schemas.user import UserCreate
 from app.services.auth_service import create_user
-from app.db.base import Base
-from app.db.session import SessionLocal, engine
+
 
 def seed_database(db: Session) -> None:
     """Populate database with default users, patients, admissions, predictions, and treatments."""
@@ -146,7 +146,7 @@ def seed_database(db: Session) -> None:
 
 
 def main() -> None:
-    
+
     Base.metadata.create_all(bind=engine)
 
     db = SessionLocal()

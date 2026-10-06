@@ -107,6 +107,26 @@ def patient_stats(
         "can_export": True,
     }
 
+@router.get("/anonymised", summary="Anonymised patient cohort for researchers")
+def list_anonymised_patients(
+    limit: int = 100,
+    db: Session = Depends(get_db),
+    user: CurrentUser = Depends(require_permission(Permission.PATIENT_READ_ANONYMIZED)),
+) -> list[dict[str, object]]:
+    """Return a de-identified patient cohort (stripping PII / MRN)."""
+    patients = db.query(Patient).limit(limit).all()
+    return [
+        {
+            "id": p.id,
+            "age_group": p.age_group,
+            "gender": p.gender,
+            "race": p.race,
+            "primary_diagnosis": p.primary_diagnosis,
+        }
+        for p in patients
+    ]
+
+
 @router.get("/{patient_id}", summary="Get detailed patient profile with admissions")
 def get_patient_detail(
     patient_id: int,
@@ -193,25 +213,7 @@ def create_patient(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Database constraint error: {str(exc.orig)}",
-        )
+        ) from exc
     return patient
 
 
-@router.get("/anonymised", summary="Anonymised patient cohort for researchers")
-def list_anonymised_patients(
-    limit: int = 100,
-    db: Session = Depends(get_db),
-    user: CurrentUser = Depends(require_permission(Permission.PATIENT_READ_ANONYMIZED)),
-) -> list[dict[str, object]]:
-    """Return a de-identified patient cohort (stripping PII / MRN)."""
-    patients = db.query(Patient).limit(limit).all()
-    return [
-        {
-            "id": p.id,
-            "age_group": p.age_group,
-            "gender": p.gender,
-            "race": p.race,
-            "primary_diagnosis": p.primary_diagnosis,
-        }
-        for p in patients
-    ]

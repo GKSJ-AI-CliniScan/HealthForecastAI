@@ -18,6 +18,7 @@ from app.main import app
 
 # Isolated in-memory database for unit test suite
 TEST_DATABASE_URL = "sqlite:///:memory:"
+TEST_PASSWORD = "password123"
 
 test_engine = create_engine(
     TEST_DATABASE_URL,
@@ -64,3 +65,59 @@ def auth_header() -> Callable[..., dict[str, str]]:
         return {"Authorization": f"Bearer {token}"}
 
     return _make
+
+
+from datetime import date
+from app.models.user import User
+from app.models.patient import Patient
+from app.models.admission import Admission
+from app.core.security import hash_password
+
+TEST_PASSWORD = "password123"
+
+@pytest.fixture
+def db_session():
+    connection = test_engine.connect()
+    transaction = connection.begin()
+    session = Session(bind=connection)
+    yield session
+    session.close()
+    transaction.rollback()
+    connection.close()
+
+@pytest.fixture
+def users(db_session: Session) -> dict[Role, User]:
+    role_users = {}
+    for role in (Role.DOCTOR, Role.HOSPITAL_ADMIN, Role.RESEARCHER, Role.SYSTEM_ADMIN):
+        user = User(
+            email=f"{role.value}@test.example",
+            hashed_password=hash_password(TEST_PASSWORD),
+            full_name=f"Test {role.value.title()}",
+            role=role,
+            is_active=True,
+        )
+        db_session.add(user)
+        role_users[role] = user
+    db_session.flush()
+    return role_users
+
+@pytest.fixture
+def patients(db_session: Session, users: dict[Role, User]) -> list[Patient]:
+    doctor = users[Role.DOCTOR]
+    p1 = Patient(
+        medical_record_number="MRN-1",
+        age_group="[50-60)",
+        gender="Male",
+        primary_diagnosis="428",
+        assigned_doctor_id=doctor.id,
+    )
+    p2 = Patient(
+        medical_record_number="MRN-2",
+        age_group="[60-70)",
+        gender="Female",
+        primary_diagnosis="250",
+        assigned_doctor_id=None,
+    )
+    db_session.add_all([p1, p2])
+    db_session.flush()
+    return [p1, p2]
