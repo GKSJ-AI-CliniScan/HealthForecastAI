@@ -107,8 +107,78 @@ The repository CI/CD workflow was also used to validate:
 - Documentation structure
 - Repository policies
 - Model artifact restrictions
+## Evidence
 
+The following evidence was used to validate the completed project.
+
+ Application functionality
+
+The following healthcare workflows were tested:
+
+- User authentication
+- Role-based access
+- Patient registry
+- Patient management
+- Readmission risk prediction
+- High-risk patient identification
+- Readmission forecasting
+- Treatment effectiveness analysis
+- Recovery trend analysis
+- Healthcare analytics
+- Research cohort
+- Clinical support
+- Reports and exports
+- Model management
 ---
+
+## Metrics
+
+### Machine learning model
+
+The final XGBoost model was evaluated using the project validation and test workflow.
+
+- Model: XGBoost
+- Decision threshold: 0.11
+- Test accuracy: 0.6769
+- Test precision: 0.1859
+- Test recall: 0.5435
+- Test F1-score: 0.2770
+- Test ROC-AUC: 0.6692
+
+These metrics are evaluation results for the project model and should not be interpreted as clinical performance for real-world hospital deployment.
+
+### Code quality and CI validation
+
+The repository CI workflow was used to validate the project.
+
+- Frontend build: Passed
+- Frontend linting: Passed
+- Frontend type checking: Passed
+- Backend linting: Passed
+- Backend formatting check: Passed
+- ML linting: Passed
+- ML formatting check: Passed
+- Milestone report structure: Passed
+
+### Deployment
+
+| Component | Status |
+|---|---|
+| Frontend | Deployed |
+| Backend | Deployed |
+| Database | Configured for deployment |
+| ML model | Integrated |
+| Frontend-backend integration | Pending final end-to-end verification |
+| End-to-end application | Pending final verification |
+
+### Live deployment
+
+- Frontend: `https://healthforecastai-1.onrender.com`
+- Backend: `https://healthforecastai-sarj.onrender.com`
+- Backend API base: `https://healthforecastai-sarj.onrender.com/api/v1`
+
+Formal response-time, concurrent-user, and load-testing benchmarks were not performed during this milestone.
+
 ## Known gaps
 
 - The current machine learning model should be further validated using independent hospital datasets before being used in a real clinical environment.
@@ -125,4 +195,4 @@ The repository CI/CD workflow was also used to validate:
 ```bash
 git clone https://github.com/GKSJ-AI-CliniScan/HealthForecastAI.git
 cd HealthForecastAI
-git checkout intern/24-parimala-m
+git checkout intern/24-parimala-m ```
