@@ -59,13 +59,15 @@ def list_patients(
                 "race": p.race,
                 "primary_diagnosis": p.primary_diagnosis,
                 "assigned_doctor_id": p.assigned_doctor_id,
-                "admission_status": "admitted"
-                if (latest_adm and latest_adm.discharge_date is None)
-                else "discharged",
+                "admission_status": (
+                    "admitted"
+                    if (latest_adm and latest_adm.discharge_date is None)
+                    else "discharged"
+                ),
                 "risk_category": latest_pred.risk_category if latest_pred else "low",
-                "readmission_risk_score": latest_pred.readmission_probability
-                if latest_pred
-                else 0.089,
+                "readmission_risk_score": (
+                    latest_pred.readmission_probability if latest_pred else 0.089
+                ),
                 "last_admission_date": str(latest_adm.admission_date) if latest_adm else None,
                 "time_in_hospital": latest_adm.time_in_hospital if latest_adm else 4,
             }
@@ -81,12 +83,10 @@ def patient_stats(
     """Return high-level patient metrics for the UI dashboard."""
     total_patients = db.query(Patient).count()
     total_admissions = db.query(Admission).count()
-    readmissions_30 = (
-        db.query(Admission)
-        .filter(Admission.readmitted == "<30")
-        .count()
+    readmissions_30 = db.query(Admission).filter(Admission.readmitted == "<30").count()
+    readmission_rate = (
+        round((readmissions_30 / total_admissions) * 100, 1) if total_admissions > 0 else 11.2
     )
-    readmission_rate = round((readmissions_30 / total_admissions) * 100, 1) if total_admissions > 0 else 11.2
 
     scope_map = {
         Role.DOCTOR: "assigned",
@@ -102,10 +102,13 @@ def patient_stats(
         "readmitted_within_30_days": readmissions_30,
         "readmission_rate_percent": readmission_rate,
         "average_length_of_stay_days": 4.5,
-        "high_risk_patients_count": db.query(RiskPrediction).filter(RiskPrediction.risk_category == "high").count(),
+        "high_risk_patients_count": db.query(RiskPrediction)
+        .filter(RiskPrediction.risk_category == "high")
+        .count(),
         "bed_occupancy_percent": 78.4,
         "can_export": True,
     }
+
 
 @router.get("/anonymised", summary="Anonymised patient cohort for researchers")
 def list_anonymised_patients(
@@ -156,9 +159,9 @@ def get_patient_detail(
         "primary_diagnosis": patient.primary_diagnosis,
         "assigned_doctor_id": patient.assigned_doctor_id,
         "risk_category": latest_prediction.risk_category if latest_prediction else "low",
-        "readmission_risk_score": latest_prediction.readmission_probability
-        if latest_prediction
-        else 0.089,
+        "readmission_risk_score": (
+            latest_prediction.readmission_probability if latest_prediction else 0.089
+        ),
         "admissions": [
             {
                 "id": a.id,
@@ -215,5 +218,3 @@ def create_patient(
             detail=f"Database constraint error: {str(exc.orig)}",
         ) from exc
     return patient
-
-

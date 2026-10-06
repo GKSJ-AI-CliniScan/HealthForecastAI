@@ -10,11 +10,13 @@ from sqlalchemy.pool import StaticPool
 
 import app.models  # noqa: F401 - registers all ORM models with Base.metadata
 from app.core.rbac import Role
-from app.core.security import create_access_token
+from app.core.security import create_access_token, hash_password
 from app.db.base import Base
 from app.db.mongodb import close_mongo_connection
 from app.db.session import get_db
 from app.main import app
+from app.models.patient import Patient
+from app.models.user import User
 
 # Isolated in-memory database for unit test suite
 TEST_DATABASE_URL = "sqlite:///:memory:"
@@ -46,7 +48,6 @@ def override_get_db() -> Generator[Session, None, None]:
         db.close()
 
 
-# Override real PostgreSQL get_db dependency in FastAPI app for tests
 app.dependency_overrides[get_db] = override_get_db
 
 
@@ -67,16 +68,9 @@ def auth_header() -> Callable[..., dict[str, str]]:
     return _make
 
 
-from datetime import date
-from app.models.user import User
-from app.models.patient import Patient
-from app.models.admission import Admission
-from app.core.security import hash_password
-
-TEST_PASSWORD = "password123"
-
 @pytest.fixture
-def db_session():
+def db_session() -> Generator[Session, None, None]:
+    """Function-scoped DB session that rolls back after each test."""
     connection = test_engine.connect()
     transaction = connection.begin()
     session = Session(bind=connection)
@@ -85,8 +79,10 @@ def db_session():
     transaction.rollback()
     connection.close()
 
+
 @pytest.fixture
 def users(db_session: Session) -> dict[Role, User]:
+    """Seed one user per role into the test database."""
     role_users = {}
     for role in (Role.DOCTOR, Role.HOSPITAL_ADMIN, Role.RESEARCHER, Role.SYSTEM_ADMIN):
         user = User(
@@ -101,8 +97,10 @@ def users(db_session: Session) -> dict[Role, User]:
     db_session.flush()
     return role_users
 
+
 @pytest.fixture
 def patients(db_session: Session, users: dict[Role, User]) -> list[Patient]:
+    """Seed test patients."""
     doctor = users[Role.DOCTOR]
     p1 = Patient(
         medical_record_number="MRN-1",

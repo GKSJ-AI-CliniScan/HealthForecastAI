@@ -111,9 +111,7 @@ def seed_database(db: Session) -> None:
             # Add treatment outcome
             treat = TreatmentOutcome(
                 admission_id=adm.id,
-                treatment_name="Insulin Regimen"
-                if mrn == "MRN-1001"
-                else "Metformin Protocol",
+                treatment_name="Insulin Regimen" if mrn == "MRN-1001" else "Metformin Protocol",
                 medication_change=True,
                 recovery_score=85.0 if mrn == "MRN-1001" else 78.5,
                 length_of_stay_days=5,
@@ -127,7 +125,9 @@ def seed_database(db: Session) -> None:
         mongo_db = get_mongo_db()
         seed_file = Path("ml/artifacts/model_runs_seed.json")
         if not seed_file.exists():
-            seed_file = Path(__file__).resolve().parents[3] / "ml" / "artifacts" / "model_runs_seed.json"
+            seed_file = (
+                Path(__file__).resolve().parents[3] / "ml" / "artifacts" / "model_runs_seed.json"
+            )
 
         if seed_file.exists():
             seed_payload = json.loads(seed_file.read_text(encoding="utf-8"))

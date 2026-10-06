@@ -80,6 +80,7 @@ def read_me(
         "permissions": permissions_for(user.role),
     }
 
+
 @router.get("/roles", summary="List the roles supported by the platform")
 def list_roles() -> dict[str, list[str]]:
     """Expose the role catalogue and the permissions attached to each role."""
