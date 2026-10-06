@@ -26,22 +26,22 @@ export function FormField({
         <div className="flex items-center justify-between">
           <label
             htmlFor={htmlFor}
-            className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300"
+            className="block text-xs font-semibold uppercase tracking-wider text-warm-text dark:text-warm-text"
           >
             {label}
-            {required && <span className="ml-1 text-red-500">*</span>}
+            {required && <span className="ml-1 text-coral-500">*</span>}
           </label>
         </div>
       )}
       {children}
       {hint && !error && (
-        <p className="text-xs text-slate-500 dark:text-slate-400" id={htmlFor ? `${htmlFor}-hint` : undefined}>
+        <p className="text-xs text-warm-text-muted dark:text-warm-text-muted" id={htmlFor ? `${htmlFor}-hint` : undefined}>
           {hint}
         </p>
       )}
       {error && (
         <p
-          className="text-xs font-medium text-red-600 dark:text-red-400 flex items-center gap-1 animate-fadeIn"
+          className="text-xs font-medium text-coral-600 dark:text-coral-400 flex items-center gap-1 animate-fadeIn"
           id={htmlFor ? `${htmlFor}-error` : undefined}
           role="alert"
         >

@@ -124,20 +124,20 @@ export function RegisterForm() {
   return (
     <div className="w-full space-y-5">
       {registerSuccess ? (
-        <div className="rounded-xl border border-emerald-200 bg-emerald-50/90 p-6 text-center dark:border-emerald-800 dark:bg-emerald-950/50">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-300 mb-3">
+        <div className="rounded-xl border border-sage-200 bg-sage-50/90 p-6 text-center dark:border-sage-800 dark:bg-sage-950/50">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-sage-100 dark:bg-sage-900 text-sage-600 dark:text-sage-300 mb-3">
             <CheckCircleIcon className="h-6 w-6" />
           </div>
-          <h3 className="text-base font-bold text-emerald-900 dark:text-emerald-200">
+          <h3 className="text-base font-bold text-sage-900 dark:text-sage-200">
             Account Registration Submitted
           </h3>
-          <p className="mt-1.5 text-xs text-emerald-800 dark:text-emerald-300/90 max-w-md mx-auto">
+          <p className="mt-1.5 text-xs text-sage-800 dark:text-sage-300/90 max-w-md mx-auto">
             {registerSuccess}
           </p>
           <div className="mt-5">
             <Link
               href="/login"
-              className="inline-flex items-center justify-center rounded-lg bg-emerald-700 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-800 shadow-sm"
+              className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2 text-xs font-semibold text-white hover:bg-brand-600 shadow-sm"
             >
               Go to Sign In &rarr;
             </Link>
@@ -225,7 +225,7 @@ export function RegisterForm() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus-visible:outline-none"
+                  className="text-warm-text-muted hover:text-warm-text focus-visible:outline-none"
                 >
                   {showPassword ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
                 </button>
@@ -248,7 +248,7 @@ export function RegisterForm() {
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
-                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus-visible:outline-none"
+                  className="text-warm-text-muted hover:text-warm-text focus-visible:outline-none"
                 >
                   {showConfirmPassword ? (
                     <EyeOffIcon className="h-4 w-4" />
@@ -285,7 +285,7 @@ export function RegisterForm() {
             fullWidth
             isLoading={isLoading}
             rightIcon={<ArrowRightIcon className="h-4 w-4" />}
-            className="mt-4"
+            className="mt-4 font-semibold"
           >
             Create Healthcare Account
           </Button>
@@ -293,11 +293,11 @@ export function RegisterForm() {
       )}
 
       {/* Switch to Login */}
-      <div className="text-center text-xs text-slate-600 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
+      <div className="text-center text-xs text-warm-text-muted dark:text-warm-text-muted pt-2 border-t border-warm-border/60 dark:border-warm-border/60">
         Already have an authorized healthcare account?{' '}
         <Link
           href="/login"
-          className="font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 focus-visible:outline-none focus-visible:underline"
+          className="font-semibold text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300 focus-visible:outline-none focus-visible:underline"
         >
           Sign In
         </Link>

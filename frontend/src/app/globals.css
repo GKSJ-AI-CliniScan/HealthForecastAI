@@ -1,25 +1,125 @@
+/*
+ * globals.css — colour tokens, text sizes and accessibility modes.
+ *
+ * PALETTE (chosen for this brief: a calm hospital tool used by everyone):
+ *   paper  #F6F7F4  soft neutral background (less glare than pure white)
+ *   ink    #17212B  text — 15.8:1 contrast on paper
+ *   teal   #0B5D6B  primary actions — 7.4:1 on white (passes WCAG AAA for large text)
+ *   marigold #E3A21A focus ring / highlights — visible on light AND dark
+ *   risk colours are dark-on-light pairs, all ≥ 4.5:1, and never used alone
+ * Every colour is a CSS variable so the high-contrast mode can swap them in one place.
+ * FLOWS NEXT: tailwind.config.ts maps class names (bg-paper, text-ink…) to these vars.
+ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #f7f9fc;
-  --foreground: #0f1c2e;
-  --surface: #ffffff;
-  --border: #dde3ec;
+  --paper: #f6f7f4;
+  --paper-raised: #ffffff;
+  --paper-sunk: #eceee8;
+  --ink: #17212b;
+  --ink-soft: #4a5560;
+  --line: #c9cfc6;
+  --teal: #0b5d6b;
+  --teal-dark: #08434d;
+  --marigold: #e3a21a;
+  --marigold-bg: #fdf3d8;
+  --risk-high: #a3221a;
+  --risk-high-bg: #fdecea;
+  --risk-mid: #7a4f00;
+  --risk-mid-bg: #fff4dc;
+  --risk-low: #1d6337;
+  --risk-low-bg: #e7f5ec;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0b1220;
-    --foreground: #e6ecf5;
-    --surface: #131c2b;
-    --border: #23304a;
-  }
+/* High contrast: pure black/white/yellow — for low vision. Toggled by A11yProvider (html.hc). */
+html.hc {
+  --paper: #000;
+  --paper-raised: #000;
+  --paper-sunk: #111;
+  --ink: #fff;
+  --ink-soft: #fff;
+  --line: #fff;
+  --teal: #ffeb3b;
+  --teal-dark: #ffeb3b;
+  --marigold: #00e5ff;
+  --marigold-bg: #000;
+  --risk-high: #ff8a80;
+  --risk-high-bg: #000;
+  --risk-mid: #ffd54f;
+  --risk-mid-bg: #000;
+  --risk-low: #69f0ae;
+  --risk-low-bg: #000;
 }
+/* In high contrast, "white text on teal" buttons would become white on yellow — fix to black. */
+html.hc .bg-teal { color: #000 !important; }
+
+/* Text size: everything uses rem, so changing the root size scales the whole UI. */
+html { font-size: 106.25%; }                       /* 17 px base: easier to read than 16 */
+html[data-text-size='large'] { font-size: 125%; }  /* 20 px */
+html[data-text-size='xlarge'] { font-size: 150%; } /* 24 px */
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  /* System fonts first: they already cover Devanagari, Bengali, Tamil, Telugu,
+     Kannada, Malayalam, Gujarati, Gurmukhi, Odia, Arabic script on Android/Windows/macOS.
+     Noto Sans Ol Chiki is loaded on demand for Santali (I18nProvider). */
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Nirmala UI', 'Noto Nastaliq Urdu',
+    'Noto Sans Ol Chiki', sans-serif;
+  line-height: 1.6; /* Indic scripts have tall vowel signs — give them room */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* One clearly visible focus ring for keyboard users, everywhere. */
+:focus-visible {
+  outline: 4px solid var(--marigold);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Underlined links are recognisable without colour. */
+main a:not([class*='rounded']) { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Skip link: hidden until focused with Tab, then a big obvious button. */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -10rem;
+  z-index: 50;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.75rem 1.25rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  border-radius: 0.75rem;
+}
+.skip-link:focus { top: 1rem; }
+
+/* Loading spinner (stops spinning in reduce-motion; the text says "Loading…" anyway). */
+.spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 4px solid var(--line);
+  border-top-color: var(--teal);
+  border-radius: 9999px;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Reduce movement: user setting OR the operating-system preference. */
+html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* Printing a page (e.g. care advice for a patient's family): only the content. */
+@media print {
+  header, nav, footer, .skip-link, button { display: none !important; }
+  main { padding: 0 !important; }
 }
