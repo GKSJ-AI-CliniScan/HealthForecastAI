@@ -1,0 +1,155 @@
+HealthForecast AI
+Finds patients who may return to hospital soon, so they get care in time.
+Loading…
+Something went wrong.
+Try again
+Nothing to show yet.
+Go back
+All
+Open
+Show as table
+Show as chart
+Showing sample data. The server is not connected.
+Showing live data from the server.
+Download (CSV file)
+{n} days
+Your role cannot open this page.
+This page does not exist.
+{name}: from {first} to {last}.
+High risk
+Medium risk
+Low risk
+Chance of returning to hospital within {days} days
+Doctor
+Hospital administrator
+Researcher
+System administrator
+Main menu
+Home
+Patients
+Risk check
+Forecast
+Treatment results
+Care advice
+Hospital report
+Research data
+AI model
+Users
+Help and accessibility
+Choose what you want to do.
+Search patients by name, record number or illness.
+Everything about one patient.
+How likely a patient is to return to hospital, and why.
+How many patients may return to hospital soon.
+Which treatments helped patients recover best.
+Next steps for a patient, and whether they can go home.
+How the whole hospital is doing.
+Patient data with names hidden, for research.
+The AI model that makes predictions, and how good it is.
+People who can sign in.
+Change language, text size, colours and voice.
+Sign in
+Email
+Password
+Sign in
+Signing in…
+Could not sign in. Check your email and password.
+Or sign in with a demo account:
+Sign out
+The system administrator creates new accounts.
+Hello, {name}
+What would you like to do?
+Patients who need attention now
+No high-risk patients right now.
+Patients
+Hospital visits
+Returned within 30 days
+Average days in hospital
+High-risk patients
+Type a name, record number or illness
+{n} patients found
+Show risk level
+Record number
+Age
+Gender
+Main illness
+Patient not found.
+Hospital visits
+Stayed {n} days
+Returned within 30 days
+Did not return within 30 days
+Nothing recorded.
+Choose a patient
+What to do
+Check risk
+Time period
+Patients expected to return
+Rate now
+Expected rate
+Treatment
+Patients treated
+Recovery score (out of 100)
+Returned (%)
+Best recovery
+Recommended actions
+Ready to go home?
+Ready to go home
+Not ready yet
+Readiness: {p}
+Instructions after going home
+Follow-up visit within {n} days
+Patients by risk level
+Anonymous patient group
+Names and contact details are hidden for privacy.
+Anonymous ID
+AI model in use
+How often the AI is right
+How many at-risk patients it finds
+When it says high risk, how often it is right
+Overall quality score
+All saved models
+Version
+Trained on
+Technical name: {name}
+People who can sign in
+Add a person
+Full name
+Role
+{name} was added.
+Could not add this person.
+Please fill this in.
+Please enter a valid email.
+Skip to main content
+Language
+Read aloud
+Stop reading
+Speak a command
+Listening… say a page name.
+Heard: {text}
+Sorry, I did not understand. Try “{example}”.
+Voice commands need Google Chrome or Microsoft Edge.
+No {lang} voice on this device. Add one in speech settings.
+Text size
+Normal
+Large
+Extra large
+High contrast colours
+Reduce movement
+Speak buttons and links when I reach them
+Read the page title when a page opens
+Reading speed
+Slow
+Normal
+Fast
+Keyboard shortcuts
+Read this page
+Stop reading
+Speak a command
+Go to Home
+Open menu item 1 to 9
+{page} page opened.
+Say a menu name, or “read aloud”, “stop reading”, “go back” or “sign out”.
+The server has no data for this yet.
+Cannot reach the server. Please try again later.
+Return rate by how patients left hospital
+Patients by age group

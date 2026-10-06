@@ -32,15 +32,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       primary:
-        'bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 focus-visible:ring-brand-500 shadow-sm border border-transparent',
+        'bg-brand-500 text-white hover:bg-brand-600 active:bg-brand-700 focus-visible:ring-brand-400 shadow-sm border border-transparent',
       secondary:
-        'bg-slate-100 text-slate-900 hover:bg-slate-200 active:bg-slate-300 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700 focus-visible:ring-slate-400 border border-transparent',
+        'bg-warm-neutral text-warm-text hover:bg-warm-neutral-hover active:bg-warm-border border border-transparent dark:bg-warm-neutral/20 dark:text-warm-text dark:hover:bg-warm-neutral/30 focus-visible:ring-warm-border',
       outline:
-        'border border-slate-300 dark:border-slate-700 bg-transparent text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/60 focus-visible:ring-brand-500 shadow-sm',
+        'border border-warm-border bg-white text-warm-text hover:bg-warm-bg dark:border-warm-border dark:bg-warm-card dark:text-warm-text dark:hover:bg-warm-neutral/20 focus-visible:ring-brand-500 shadow-sm',
       ghost:
-        'bg-transparent text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 active:bg-slate-200 dark:active:bg-slate-700 focus-visible:ring-brand-500',
+        'bg-transparent text-warm-text hover:bg-warm-neutral/60 active:bg-warm-neutral dark:text-warm-text dark:hover:bg-warm-neutral/20 focus-visible:ring-brand-500',
       danger:
-        'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus-visible:ring-red-500 shadow-sm border border-transparent',
+        'bg-coral-500 text-white hover:bg-coral-600 active:bg-coral-700 focus-visible:ring-coral-400 shadow-sm border border-transparent',
     };
 
     const sizeStyles = {

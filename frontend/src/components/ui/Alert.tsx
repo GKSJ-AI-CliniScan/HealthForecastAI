@@ -15,20 +15,20 @@ export function Alert({
   ...props
 }: AlertProps) {
   const variantStyles = {
-    info: 'bg-blue-50/80 border-blue-200 text-blue-900 dark:bg-blue-950/40 dark:border-blue-900 dark:text-blue-200',
+    info: 'bg-brand-50/90 border-brand-200 text-brand-900 dark:bg-brand-950/40 dark:border-brand-900 dark:text-brand-200',
     success:
-      'bg-emerald-50/80 border-emerald-200 text-emerald-900 dark:bg-emerald-950/40 dark:border-emerald-900 dark:text-emerald-200',
+      'bg-sage-50/90 border-sage-200 text-sage-900 dark:bg-sage-900/40 dark:border-sage-800 dark:text-sage-200',
     warning:
-      'bg-amber-50/80 border-amber-200 text-amber-900 dark:bg-amber-950/40 dark:border-amber-900 dark:text-amber-200',
+      'bg-amber-50/90 border-amber-200 text-amber-900 dark:bg-amber-900/40 dark:border-amber-800 dark:text-amber-200',
     danger:
-      'bg-red-50/80 border-red-200 text-red-900 dark:bg-red-950/40 dark:border-red-900 dark:text-red-200',
+      'bg-coral-50/90 border-coral-200 text-coral-900 dark:bg-coral-900/40 dark:border-coral-800 dark:text-coral-200',
   };
 
   const iconStyles = {
-    info: 'text-blue-600 dark:text-blue-400',
-    success: 'text-emerald-600 dark:text-emerald-400',
+    info: 'text-brand-600 dark:text-brand-400',
+    success: 'text-sage-600 dark:text-sage-400',
     warning: 'text-amber-600 dark:text-amber-400',
-    danger: 'text-red-600 dark:text-red-400',
+    danger: 'text-coral-600 dark:text-coral-400',
   };
 
   return (

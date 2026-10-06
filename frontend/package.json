@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.6.0"
   },
   "scripts": {
     "dev": "next dev",
@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
-    "test": "echo \"No frontend tests yet - add them under src/**/__tests__\" && exit 0"
+    "test": "node --experimental-strip-types --test tests/*.test.mjs",
+    "i18n:build": "node scripts/i18n-build.mjs"
   },
   "dependencies": {
     "next": "15.5.23",
