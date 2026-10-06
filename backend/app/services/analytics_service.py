@@ -24,11 +24,7 @@ def get_hospital_summary(db: Session) -> HospitalAnalyticsSummary:
 
     # Calculate overall readmission rate
     if total_admissions > 0:
-        readmitted_count = (
-            db.query(Admission)
-            .filter(Admission.readmitted.isnot(None), Admission.readmitted != "NO")
-            .count()
-        )
+        readmitted_count = db.query(Admission).filter(Admission.readmitted == "<30").count()
         readmission_rate = round(readmitted_count / total_admissions, 4)
     else:
         readmission_rate = 0.0
@@ -68,8 +64,7 @@ def get_readmission_trends(db: Session) -> list[dict[str, Any]]:
             db.query(Admission)
             .filter(
                 Admission.discharge_disposition == disp,
-                Admission.readmitted.isnot(None),
-                Admission.readmitted != "NO",
+                Admission.readmitted == "<30",
             )
             .count()
         )

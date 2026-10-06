@@ -3,6 +3,7 @@
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -64,12 +65,12 @@ def list_patients(
                     if (latest_adm and latest_adm.discharge_date is None)
                     else "discharged"
                 ),
-                "risk_category": latest_pred.risk_category if latest_pred else "low",
+                "risk_category": latest_pred.risk_category if latest_pred else None,
                 "readmission_risk_score": (
-                    latest_pred.readmission_probability if latest_pred else 0.089
+                    latest_pred.readmission_probability if latest_pred else None
                 ),
                 "last_admission_date": str(latest_adm.admission_date) if latest_adm else None,
-                "time_in_hospital": latest_adm.time_in_hospital if latest_adm else 4,
+                "time_in_hospital": latest_adm.time_in_hospital if latest_adm else None,
             }
         )
     return result
@@ -81,11 +82,43 @@ def patient_stats(
     user: CurrentUser = Depends(get_current_user),
 ) -> dict[str, Any]:
     """Return high-level patient metrics for the UI dashboard."""
-    total_patients = db.query(Patient).count()
-    total_admissions = db.query(Admission).count()
-    readmissions_30 = db.query(Admission).filter(Admission.readmitted == "<30").count()
+    visible_patients = get_patients_for_user(db, user)
+    patient_ids = [p.id for p in visible_patients]
+    total_patients = len(patient_ids)
+
+    if total_patients > 0:
+        total_admissions = db.query(Admission).filter(Admission.patient_id.in_(patient_ids)).count()
+        # Consistent standard: 30-day readmission (<30)
+        readmissions_30 = (
+            db.query(Admission)
+            .filter(
+                Admission.patient_id.in_(patient_ids),
+                Admission.readmitted == "<30",
+            )
+            .count()
+        )
+        high_risk_count = (
+            db.query(RiskPrediction)
+            .filter(
+                RiskPrediction.patient_id.in_(patient_ids),
+                RiskPrediction.risk_category == "high",
+            )
+            .count()
+        )
+        avg_stay_result = (
+            db.query(func.avg(Admission.time_in_hospital))
+            .filter(Admission.patient_id.in_(patient_ids))
+            .scalar()
+        )
+        avg_stay = round(float(avg_stay_result), 1) if avg_stay_result else 0.0
+    else:
+        total_admissions = 0
+        readmissions_30 = 0
+        high_risk_count = 0
+        avg_stay = 0.0
+
     readmission_rate = (
-        round((readmissions_30 / total_admissions) * 100, 1) if total_admissions > 0 else 11.2
+        round((readmissions_30 / total_admissions) * 100, 1) if total_admissions > 0 else 0.0
     )
 
     scope_map = {
@@ -101,15 +134,14 @@ def patient_stats(
         "total_admissions": total_admissions,
         "readmitted_within_30_days": readmissions_30,
         "readmission_rate_percent": readmission_rate,
-        "average_length_of_stay_days": 4.5,
-        "high_risk_patients_count": db.query(RiskPrediction)
-        .filter(RiskPrediction.risk_category == "high")
-        .count(),
+        "average_length_of_stay_days": avg_stay,
+        "high_risk_patients_count": high_risk_count,
         "bed_occupancy_percent": 78.4,
         "can_export": True,
     }
 
 
+# Route /anonymised MUST precede /{patient_id}
 @router.get("/anonymised", summary="Anonymised patient cohort for researchers")
 def list_anonymised_patients(
     limit: int = 100,
@@ -121,6 +153,7 @@ def list_anonymised_patients(
     return [
         {
             "id": p.id,
+            "cohort_id": f"P{p.id:06d}",
             "age_group": p.age_group,
             "gender": p.gender,
             "race": p.race,
@@ -141,6 +174,9 @@ def get_patient_detail(
     if not patient:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
 
+    if user.role is Role.DOCTOR and patient.assigned_doctor_id != user.id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+
     admissions = db.query(Admission).filter(Admission.patient_id == patient_id).all()
     latest_prediction = (
         db.query(RiskPrediction)
@@ -158,9 +194,9 @@ def get_patient_detail(
         "race": patient.race,
         "primary_diagnosis": patient.primary_diagnosis,
         "assigned_doctor_id": patient.assigned_doctor_id,
-        "risk_category": latest_prediction.risk_category if latest_prediction else "low",
+        "risk_category": latest_prediction.risk_category if latest_prediction else None,
         "readmission_risk_score": (
-            latest_prediction.readmission_probability if latest_prediction else 0.089
+            latest_prediction.readmission_probability if latest_prediction else None
         ),
         "admissions": [
             {
@@ -174,6 +210,7 @@ def get_patient_detail(
                 "num_lab_procedures": a.num_lab_procedures,
                 "number_diagnoses": a.number_diagnoses,
                 "readmitted": a.readmitted,
+                "readmitted_within_30": a.readmitted == "<30",
             }
             for a in admissions
         ],
@@ -187,7 +224,6 @@ def create_patient(
     user: CurrentUser = Depends(require_permission(Permission.PATIENT_WRITE)),
 ) -> PatientRead:
     """Create a new patient record in PostgreSQL."""
-    # Check for duplicate MRN
     existing = (
         db.query(Patient)
         .filter(Patient.medical_record_number == payload.medical_record_number)
