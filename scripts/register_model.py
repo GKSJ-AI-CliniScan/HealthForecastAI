@@ -23,11 +23,6 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT / "backend"))
 
-from app.db.session import SessionLocal  # noqa: E402
-from app.repositories.model_metadata_repository import (
-    ModelMetadataRepository,
-)  # noqa: E402
-
 _TARGETS = ("risk", "readmission")
 
 
@@ -45,6 +40,13 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> int:
+    # Backend package only importable after REPO_ROOT/backend is on sys.path
+    # (set at module load above), so these stay function-local rather than
+    # top-of-file - that's the real fix for the E402 ruff was flagging, not
+    # a noqa.
+    from app.db.session import SessionLocal
+    from app.repositories.model_metadata_repository import ModelMetadataRepository
+
     args = build_parser().parse_args()
     artifacts_dir = Path(args.artifacts_dir)
     metrics_path = artifacts_dir / f"{args.target}_metrics.json"
