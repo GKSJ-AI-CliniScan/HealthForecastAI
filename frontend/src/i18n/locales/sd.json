@@ -153,5 +153,7 @@
   "common.serverEmpty": "سرور ۾ اڃا هن جو ڊيٽا ناهي.",
   "common.offline": "سرور تائين پهچي نه سگهياسين. پوءِ ٻيهر ڪوشش ڪريو.",
   "analytics.byDischarge": "مريض اسپتال مان ڪيئن ويا، ان مطابق واپسي جي شرح",
-  "research.byAge": "عمر مطابق مريض"
+  "research.byAge": "عمر مطابق مريض",
+  "a11y.dark": "ڊارڪ موڊ",
+  "common.close": "بند ڪريو"
 }

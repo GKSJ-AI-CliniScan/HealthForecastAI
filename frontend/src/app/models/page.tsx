@@ -14,8 +14,9 @@ import { data } from '@/data';
 import { useI18n } from '@/i18n/I18nProvider';
 import { AppShell } from '@/saral/AppShell';
 import { orDash } from '@/saral/format';
-import { LoadState, PageHeader, Section, SimpleTable } from '@/saral/ui';
+import { CARD, IconChip, LoadState, PageHeader, Section, SimpleTable } from '@/saral/ui';
 import { useData } from '@/saral/useData';
+import { Bot } from 'lucide-react';
 
 export default function ModelsPage() {
   return (
@@ -35,21 +36,24 @@ function Models() {
       <LoadState q={q}>
         {(m) => (
           <>
-            <div className="mb-8 rounded-2xl border-2 border-line bg-paper-raised p-6">
-              <p className="text-lg text-ink-soft">{t('models.inUse')}</p>
-              <p className="text-3xl font-bold">🤖 {m.activeName}</p>
-              <p className="text-lg">{m.status}</p>
+            <div className={`${CARD} mb-6 flex items-center gap-4 p-6`}>
+              <IconChip icon={<Bot size={26} />} size="lg" />
+              <div>
+                <p className="text-sm text-ink-soft">{t('models.inUse')}</p>
+                <p className="text-2xl font-bold">{m.activeName}</p>
+                <p className="text-sm text-ink-soft">{m.status}</p>
+              </div>
             </div>
-            <dl className="mb-8 grid gap-4 sm:grid-cols-2">
+            <dl className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {[
                 [t('models.accuracy'), m.accuracyPct, 'accuracy'],
                 [t('models.recall'), m.recallPct, 'recall'],
                 [t('models.precision'), m.precisionPct, 'precision'],
                 [t('models.overall'), m.qualityPct, 'ROC-AUC'],
               ].map(([label, v, tech]) => (
-                <div key={String(tech)} className="rounded-2xl border-2 border-line bg-paper-raised p-5">
-                  <dt className="text-lg">{label}</dt>
-                  <dd className="text-4xl font-bold tabular-nums">{pct(v as number | null)}</dd>
+                <div key={String(tech)} className={`${CARD} p-5`}>
+                  <dt className="text-sm font-medium text-ink-soft">{label}</dt>
+                  <dd className="mt-1 text-3xl font-bold tabular-nums">{pct(v as number | null)}</dd>
                   <dd className="text-sm text-ink-soft">{t('models.technical', { name: String(tech) })}</dd>
                 </div>
               ))}

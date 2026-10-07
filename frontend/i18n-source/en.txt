@@ -153,3 +153,5 @@ The server has no data for this yet.
 Cannot reach the server. Please try again later.
 Return rate by how patients left hospital
 Patients by age group
+Dark mode
+Close

@@ -153,5 +153,7 @@
   "common.serverEmpty": "सर्वर च हजें इसदा डेटा नेईं।",
   "common.offline": "सर्वर तगर नेईं पुज्जी सके। बाद च फ्ही कोशश करो।",
   "analytics.byDischarge": "मरीज हस्पताल थमां कियां गे, उस मताबक वापसी दी दर",
-  "research.byAge": "उमरै मताबक मरीज"
+  "research.byAge": "उमरै मताबक मरीज",
+  "a11y.dark": "न्हेरा मोड",
+  "common.close": "बंद करो"
 }

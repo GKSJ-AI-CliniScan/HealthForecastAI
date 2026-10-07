@@ -19,6 +19,7 @@ import { AppShell } from '@/saral/AppShell';
 import { PatientPicker, patientFromUrl } from '@/saral/PatientPicker';
 import { Empty, LoadState, PageHeader, Section } from '@/saral/ui';
 import { useData } from '@/saral/useData';
+import { CalendarClock } from 'lucide-react';
 
 export default function CarePage() {
   return (
@@ -50,7 +51,7 @@ function AdviceFor({ id }: { id: number }) {
         <>
           {a.readyToGoHome !== null && (
             <div
-              className={`mb-8 rounded-2xl border-2 p-6 ${a.readyToGoHome ? 'border-rlow bg-rlow-bg text-rlow' : 'border-rhigh bg-rhigh-bg text-rhigh'}`}
+              className={`mb-6 rounded-2xl border p-6 ${a.readyToGoHome ? 'border-rlow bg-rlow-bg text-rlow' : 'border-rhigh bg-rhigh-bg text-rhigh'}`}
             >
               <p className="text-lg">{t('care.goHome')}</p>
               <p className="mt-1 text-3xl font-bold">
@@ -58,7 +59,11 @@ function AdviceFor({ id }: { id: number }) {
                 {a.readyToGoHome ? t('care.ready') : t('care.notReady')}
               </p>
               {a.readinessPct !== null && (
-                <p className="mt-2 text-xl">{t('care.readiness', { p: `${formatNumber(a.readinessPct, 0)}%` })}</p>
+                <p className="mt-2 text-base">
+                  {t('care.readiness', {
+                    p: `${formatNumber(a.readinessPct, 0)}%`,
+                  })}
+                </p>
               )}
             </div>
           )}
@@ -67,14 +72,17 @@ function AdviceFor({ id }: { id: number }) {
             {a.actions.length === 0 ? (
               <Empty />
             ) : (
-              <ol className="list-decimal space-y-2 pl-6 text-xl">
+              <ol className="list-decimal space-y-2 pl-6 text-base marker:font-semibold marker:text-teal">
                 {a.actions.map((x) => (
                   <li key={x}>{x}</li>
                 ))}
               </ol>
             )}
             {a.followUpDays !== null && (
-              <p className="mt-4 text-xl font-semibold">📅 {t('care.followUp', { n: a.followUpDays })}</p>
+              <p className="mt-4 flex items-center gap-2 rounded-xl bg-teal-bg p-3 font-semibold text-teal-dark">
+                <CalendarClock aria-hidden="true" size={20} />
+                {t('care.followUp', { n: a.followUpDays })}
+              </p>
             )}
           </Section>
 
@@ -82,7 +90,7 @@ function AdviceFor({ id }: { id: number }) {
             {a.afterHomeSteps.length === 0 ? (
               <Empty />
             ) : (
-              <ul className="list-disc space-y-2 pl-6 text-xl">
+              <ul className="list-disc space-y-2 pl-6 text-base">
                 {a.afterHomeSteps.map((x) => (
                   <li key={x}>{x}</li>
                 ))}

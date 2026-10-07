@@ -9,15 +9,22 @@
  * says who built it — screen readers would otherwise read it twice.
  * FLOWS NEXT: rendered by AppShell and the sign-in page.
  */
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export function Watermark() {
   const [logoOk, setLogoOk] = useState(true);
+  const img = useRef<HTMLImageElement>(null);
+  // If the image already failed BEFORE React attached onError (fast 404 during hydration),
+  // onError never fires — so also check once after mount (bug seen in the browser test).
+  useEffect(() => {
+    const el = img.current;
+    if (el && el.complete && el.naturalWidth === 0) setLogoOk(false);
+  }, []);
   return (
-    <footer className="mx-auto flex max-w-6xl items-center justify-center gap-2 px-4 py-6 text-base text-ink-soft">
+    <footer className="flex items-center justify-center gap-2 px-4 py-6 text-sm text-ink-soft">
       {logoOk && (
         // eslint-disable-next-line @next/next/no-img-element -- tiny local SVG, no optimisation needed
-        <img src="/logo-mark.svg" alt="" width={24} height={24} onError={() => setLogoOk(false)} />
+        <img ref={img} src="/logo-mark.svg" alt="" width={24} height={24} onError={() => setLogoOk(false)} />
       )}
       {!logoOk && (
         <span aria-hidden="true" className="grid h-6 w-6 place-items-center rounded-full border-2 border-current text-xs font-bold">
