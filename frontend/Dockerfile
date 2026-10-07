@@ -20,8 +20,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
-    PORT=0.0.0.0
-
+    HOSTNAME=0.0.0.0 \
+    PORT=10000
 RUN addgroup -g 1001 -S nodejs \
     && adduser -S nextjs -u 1001
 
