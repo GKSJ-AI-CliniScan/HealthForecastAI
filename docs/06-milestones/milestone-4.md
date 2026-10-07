@@ -115,20 +115,21 @@ The following evidence was used to validate the completed project.
 
 The following healthcare workflows were tested:
 
-- User authentication
-- Role-based access
-- Patient registry
-- Patient management
+- User authentication  ![Login Page](evidence/login.png)
+- Role-based access ![Login Page](evidence/login.png)
+- Patient registry  ![Patient Registry Page](evidence/patient.png)
+- Patient management ![Patient Registry Page](evidence/patient.png)
 - Readmission risk prediction
 - High-risk patient identification
 - Readmission forecasting
-- Treatment effectiveness analysis
+- Treatment effectiveness analysis ![Treament Page](evidence/treatment.png)
 - Recovery trend analysis
 - Healthcare analytics
-- Research cohort
+- Research cohort 
 - Clinical support
-- Reports and exports
+- Reports and exports ![Report Page](evidence/report.png)
 - Model management
+- User Management ![user ManagementPage](evidence/user.png)
 ---
 
 ## Metrics

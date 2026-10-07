@@ -37,7 +37,5 @@ def main():
 
     finally:
         db.close()
-
-
 if __name__ == "__main__":
     main()
