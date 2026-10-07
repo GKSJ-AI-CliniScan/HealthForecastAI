@@ -56,6 +56,7 @@
   "auth.busy": "Signing in…",
   "auth.failed": "Could not sign in. Check your email and password.",
   "auth.demo": "Or sign in with a demo account:",
+  "auth.roleLabel": "Your role",
   "auth.logout": "Sign out",
   "auth.noAccount": "The system administrator creates new accounts.",
   "home.hello": "Hello, {name}",
