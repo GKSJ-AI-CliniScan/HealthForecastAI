@@ -29,7 +29,7 @@ const OutcomeAnalyticsPage = () => {
         const res = await treatmentService.getTreatmentSummary();
         setData(res);
 
-        const hfcAnalytics = await analyticsService.getDashboardAnalytics();
+        const hfcAnalytics = await analyticsService.getHospitalDashboardData();
         setAnalytics(hfcAnalytics);
       } catch (err) {
         setError(err);

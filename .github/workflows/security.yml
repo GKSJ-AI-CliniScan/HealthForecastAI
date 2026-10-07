@@ -1,0 +1,113 @@
+name: Security
+
+# Dependency and code scanning. Reports rather than blocks, so a newly disclosed
+# CVE in a transitive dependency does not stop an intern mid-milestone - but the
+# findings are always visible in the job summary.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  schedule:
+    # Every Monday at 06:00 UTC.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  python-dependencies:
+    name: Python dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install pip-audit
+        run: pip install pip-audit==2.7.3
+
+      - name: Audit backend
+        continue-on-error: true
+        run: |
+          echo "## Backend dependency audit" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f backend/requirements.txt ]; then
+            pip-audit -r backend/requirements.txt --progress-spinner off \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No backend/requirements.txt on this branch." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Audit ML
+        continue-on-error: true
+        run: |
+          echo "## ML dependency audit" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f ml/requirements.txt ]; then
+            pip-audit -r ml/requirements.txt --progress-spinner off \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No ml/requirements.txt on this branch." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  node-dependencies:
+    name: Node dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Audit frontend
+        continue-on-error: true
+        working-directory: frontend
+        run: |
+          echo "## Frontend dependency audit" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f package.json ]; then
+            npm audit --audit-level=high || true
+            npm audit --audit-level=high --json > audit.json || true
+            high=$(node -e "const a=require('./audit.json');const m=a.metadata?.vulnerabilities||{};console.log((m.high||0)+(m.critical||0))")
+            echo "High or critical advisories: $high" >> "$GITHUB_STEP_SUMMARY"
+            rm -f audit.json
+          else
+            echo "No frontend/package.json on this branch." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  codeql:
+    name: CodeQL
+    # CodeQL takes several minutes per language. Running it on all 26 branches on
+    # every push would swallow the Actions budget, so it runs weekly, on demand,
+    # and on main. Run it manually against your branch before a milestone.
+    if: >-
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, javascript-typescript]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialise CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          language: ${{ matrix.language }}
+          queries: security-and-quality
+
+      - name: Analyse
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: /language:${{ matrix.language }}

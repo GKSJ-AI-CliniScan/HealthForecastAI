@@ -28,7 +28,7 @@ const TreatmentEffectivenessPage = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const res = await treatmentService.getTreatmentSummary();
+      const res = await treatmentService.getTreatmentSummary(selectedDisease);
       setData(res);
     } catch (err) {
       setError(err);
@@ -39,7 +39,8 @@ const TreatmentEffectivenessPage = () => {
 
   useEffect(() => {
     loadData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDisease]);
 
   const handleExportTreatmentReport = () => {
     setExportingReport(true);
@@ -50,13 +51,17 @@ const TreatmentEffectivenessPage = () => {
         ["Disease Filter", selectedDisease],
         ["Overall Success Rate", `${data.successRate}%`],
         ["Patient Recovery Rate", `${data.recoveryRate}%`],
+        ["Complication Rate", `${data.complicationsRate ?? 0}%`],
+        ["Episodes Evaluated", data.outcomesRecorded ?? 0],
         [],
         ["Treatment Protocol", "Clinical Efficacy Rate (%)", "Complication Rate (%)", "Observed Patients Count", "Evaluation Rating"],
-        ["Insulin Glargine (Diabetes)", "85%", "4%", "350", "High Efficacy"],
-        ["Furosemide IV (Heart Failure)", "82%", "8%", "420", "Moderate Efficacy"],
-        ["Nebulizer Steroids (COPD)", "88%", "5%", "280", "High Efficacy"],
-        ["Ceftriaxone IV (Pneumonia)", "94%", "2%", "328", "Excellent Efficacy"],
-        ["Laparoscopic Excision (Appendicitis)", "97%", "1%", "140", "Excellent Efficacy"]
+        ...(data.medicationsData || []).map((m) => [
+          m.treatment,
+          `${m.successRate}%`,
+          `${m.sideEffectsRate}%`,
+          m.patientsTreated ?? '',
+          m.successRate >= 90 ? 'Optimal Outcome' : 'Good Response',
+        ])
       ];
 
       const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");

@@ -6,13 +6,24 @@ import {
   Lock, ArrowRight, ShieldCheck, Stethoscope, Building2, Microscope, Sparkles
 } from 'lucide-react';
 
+const DEMO_PASSWORD = 'password123';
+
+// Mirrors app/db/init_db.py SEED_USERS - seed with SEED_PASSWORD=DEMO_PASSWORD so
+// these accounts exist with the credential the page prefills.
+const DEMO_EMAILS = {
+  doctor: 'doctor@healthforecast.ai',
+  'hospital-admin': 'hospital@healthforecast.ai',
+  researcher: 'researcher@healthforecast.ai',
+  'system-admin': 'admin@healthforecast.ai',
+};
+
 const LoginPage = () => {
   const { login, isAuthenticated, role } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedRole, setSelectedRole] = useState('doctor');
-  const [email, setEmail] = useState('doctor@healthforecast.ai');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState(DEMO_EMAILS.doctor);
+  const [password, setPassword] = useState(DEMO_PASSWORD);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -20,22 +31,22 @@ const LoginPage = () => {
     doctor: {
       name: "Doctor & Clinician Portal",
       description: "Patient risk stratification, acute vitals, and decision support worksheets.",
-      icon: Stethoscope, label: "Doctor", email: "doctor@healthforecast.ai"
+      icon: Stethoscope, label: "Doctor", email: DEMO_EMAILS.doctor
     },
     'hospital-admin': {
       name: "Hospital Administration Node",
       description: "Outcome performance statistics, department metrics, bed occupancy, and reports.",
-      icon: Building2, label: "Hospital Admin", email: "admin@healthforecast.ai"
+      icon: Building2, label: "Hospital Admin", email: DEMO_EMAILS['hospital-admin']
     },
     researcher: {
       name: "Healthcare Researcher Lab",
       description: "Anonymized cohort ages, stay duration metrics, and dataset exports.",
-      icon: Microscope, label: "Researcher", email: "researcher@healthforecast.ai"
+      icon: Microscope, label: "Researcher", email: DEMO_EMAILS.researcher
     },
     'system-admin': {
       name: "System Administration Console",
       description: "Staff RBAC permissions, audit trail stream, and system configurations.",
-      icon: ShieldCheck, label: "System Admin", email: "sysadmin@healthforecast.ai"
+      icon: ShieldCheck, label: "System Admin", email: DEMO_EMAILS['system-admin']
     }
   };
 
@@ -49,7 +60,7 @@ const LoginPage = () => {
   }, []);
 
   const getRoleUser = (roleName) => {
-    const emailMap = { doctor: 'doctor@healthforecast.ai', 'hospital-admin': 'admin@healthforecast.ai', researcher: 'researcher@healthforecast.ai', 'system-admin': 'sysadmin@healthforecast.ai' };
+    const emailMap = DEMO_EMAILS;
     return usersList.find(u => u.email.toLowerCase() === emailMap[roleName].toLowerCase());
   };
 
@@ -76,7 +87,7 @@ const LoginPage = () => {
   const handleRoleSelect = (roleName) => {
     setSelectedRole(roleName);
     setEmail(roleConfigs[roleName].email);
-    setPassword(roleName === 'system-admin' ? '' : 'password123');
+    setPassword(DEMO_PASSWORD);
     setError('');
   };
 
@@ -212,7 +223,8 @@ const LoginPage = () => {
           {/* Helper */}
           <div className="text-center pt-3 border-t border-zinc-100">
             <p className="text-[10px] text-zinc-400 font-medium">
-              Demo passwords auto-populate for rapid evaluation (SysAdmin password: <span className="font-bold text-red-600">prasad1234</span>).
+              Role buttons prefill the seeded demo account and password. Backend logins use
+              <span className="font-semibold text-zinc-500"> {DEMO_PASSWORD}</span> (see backend/README.md).
             </p>
           </div>
         </div>

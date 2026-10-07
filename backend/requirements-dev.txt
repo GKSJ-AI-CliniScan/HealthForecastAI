@@ -1,0 +1,9 @@
+-r requirements.txt
+
+pytest==8.3.4
+pytest-cov==6.0.0
+pytest-asyncio==0.25.2
+ruff==0.8.6
+black==24.10.0
+mypy==1.14.1
+types-python-jose==3.3.4.20240106

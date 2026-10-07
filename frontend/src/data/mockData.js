@@ -3,7 +3,7 @@
 export const mockUsers = [
   {
     id: "U-101",
-    email: "doctor@healthforecast.ai",
+    email: "dr.reddy@healthforecast.org",
     password: "password123",
     name: "S.Saumya",
     role: "doctor",
@@ -13,7 +13,7 @@ export const mockUsers = [
   },
   {
     id: "U-102",
-    email: "admin@healthforecast.ai",
+    email: "admin.ops@healthforecast.org",
     password: "password123",
     name: "Rambilas Sah",
     role: "hospital-admin",
@@ -23,7 +23,7 @@ export const mockUsers = [
   },
   {
     id: "U-103",
-    email: "researcher@healthforecast.ai",
+    email: "researcher@healthforecast.org",
     password: "password123",
     name: "K.Deepak Raja",
     role: "researcher",
@@ -32,8 +32,8 @@ export const mockUsers = [
   },
   {
     id: "U-104",
-    email: "sysadmin@healthforecast.ai",
-    password: "prasad1234",
+    email: "admin@healthforecast.org",
+    password: "password123",
     name: "Penchala Prasad",
     role: "system-admin",
     avatar: "https://images.unsplash.com/photo-1628157582853-a796fa650a6a?auto=format&fit=crop&q=80&w=150",

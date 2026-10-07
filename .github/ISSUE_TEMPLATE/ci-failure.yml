@@ -1,0 +1,60 @@
+name: CI check I do not understand
+description: A CI job is failing and the message does not tell you enough.
+title: "[ci] "
+labels: ["ci"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        First open the failing job and read the summary at the top of the run -
+        most checks explain exactly what to fix. If it still does not make sense,
+        that is a problem with the check, and this issue helps us fix it.
+
+  - type: input
+    id: branch
+    attributes:
+      label: Your branch
+      placeholder: intern/firstname-lastname
+    validations:
+      required: true
+
+  - type: input
+    id: run_url
+    attributes:
+      label: Link to the failing workflow run
+      placeholder: https://github.com/.../actions/runs/...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: job
+    attributes:
+      label: Which job failed?
+      options:
+        - Repository checks
+        - Backend (FastAPI)
+        - Frontend (Next.js)
+        - ML pipeline
+        - Docker build
+        - Branch guard
+        - Security
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: The error, copied from the log
+      render: shell
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: local
+    attributes:
+      label: Did you run the same command locally?
+      options:
+        - label: Yes, and it fails locally too
+        - label: Yes, and it passes locally but fails in CI
+        - label: No, I do not know which command to run

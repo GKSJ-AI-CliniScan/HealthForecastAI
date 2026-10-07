@@ -1,0 +1,170 @@
+name: Deploy
+
+# The CD half of the pipeline, for Milestone 4.
+#
+# Manual only. Nothing deploys on a push, because 26 branches pushing to one
+# environment would fight each other. You run this yourself, against your own
+# branch, when you are ready to demonstrate.
+#
+# By default it only *builds* the images and proves your branch is deployable.
+# Set "push_images" to true to publish them to the GitHub Container Registry
+# under your branch name.
+on:
+  workflow_dispatch:
+    inputs:
+      push_images:
+        description: 'Publish images to GHCR (otherwise build only)'
+        type: boolean
+        default: false
+      environment:
+        description: 'Target environment name, for your own records'
+        type: choice
+        options: [development, staging, production]
+        default: development
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  # --------------------------------------------------------------------------
+  # Never deploy a branch that is not passing its own tests.
+  # --------------------------------------------------------------------------
+  verify:
+    name: Pre-deploy verification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Repository checks
+        run: |
+          python scripts/ci/check_structure.py
+          python scripts/ci/check_files.py
+          python scripts/ci/check_secrets.py
+
+      - name: Backend tests
+        working-directory: backend
+        env:
+          SECRET_KEY: ci-only-secret-not-used-anywhere-else
+          ENVIRONMENT: test
+        run: |
+          pip install -r requirements-dev.txt
+          pytest
+
+      - name: Deployment readiness checklist
+        run: |
+          {
+            echo "## Pre-deploy checklist"
+            echo ""
+            echo "Confirm each of these in your target environment before you demo:"
+            echo ""
+            echo "- [ ] \`DEBUG=false\`"
+            echo "- [ ] \`SECRET_KEY\` is a fresh random value from the secret store"
+            echo "- [ ] The database is not publicly reachable"
+            echo "- [ ] CORS lists your real frontend origin, not \`*\`"
+            echo "- [ ] \`GET /health\` returns 200 through the load balancer"
+            echo "- [ ] No credential is in the image, the repository or a build log"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # --------------------------------------------------------------------------
+  # Build, and optionally publish, the container images.
+  # --------------------------------------------------------------------------
+  images:
+    name: Build images
+    needs: verify
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: backend
+            context: ./backend
+          - service: frontend
+            context: ./frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Derive an image tag from the branch
+        id: tag
+        run: |
+          slug=$(printf '%s' "${{ github.ref_name }}" | tr '[:upper:]/' '[:lower:]-' \
+                 | sed 's/[^a-z0-9._-]/-/g' | cut -c1-100)
+          echo "slug=$slug" >> "$GITHUB_OUTPUT"
+          echo "Image tag: $slug"
+
+      - name: Log in to GHCR
+        if: inputs.push_images
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build${{ inputs.push_images && ' and push' || '' }} ${{ matrix.service }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          push: ${{ inputs.push_images }}
+          tags: |
+            ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ steps.tag.outputs.slug }}
+            ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Record the result
+        run: |
+          {
+            echo "### ${{ matrix.service }}"
+            if [ "${{ inputs.push_images }}" = "true" ]; then
+              echo ""
+              echo "Published:"
+              echo ""
+              echo "\`\`\`"
+              echo "ghcr.io/${{ github.repository }}/${{ matrix.service }}:${{ steps.tag.outputs.slug }}"
+              echo "\`\`\`"
+            else
+              echo ""
+              echo "Built successfully. Re-run with **push_images** enabled to publish it."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # --------------------------------------------------------------------------
+  # The cloud step is yours to implement. See deployment/aws/ or deployment/azure/.
+  # --------------------------------------------------------------------------
+  release:
+    name: Release to ${{ inputs.environment }}
+    needs: images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy
+        run: |
+          {
+            echo "## Release to \`${{ inputs.environment }}\`"
+            echo ""
+            echo "This job is a deliberate placeholder - the cloud deployment is your"
+            echo "Milestone 4 deliverable, and the provider is your choice."
+            echo ""
+            echo "**To implement it**"
+            echo ""
+            echo "1. Follow \`deployment/aws/README.md\` or \`deployment/azure/README.md\`."
+            echo "2. Add your cloud credentials as repository secrets. Never in a file."
+            echo "3. Replace this step with the real deploy command."
+            echo "4. Record the live URL in \`docs/06-milestones/milestone-4.md\` and"
+            echo "   \`docs/08-deployment/README.md\`."
+            echo ""
+            echo "**Do not** paste a cloud credential into this workflow file."
+            echo "Use \`\${{ secrets.YOUR_SECRET_NAME }}\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "::notice::Cloud release step is not implemented yet - this is the Milestone 4 task."
