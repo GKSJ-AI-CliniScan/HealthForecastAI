@@ -3,7 +3,7 @@
  * A11yProvider.tsx — all features for blind and low-vision users live here.
  *
  * WHAT IT GIVES THE APP:
- *   settings    text size, high contrast, reduce movement, talking buttons,
+ *   settings    text size, high contrast, dark mode, reduce movement, talking buttons,
  *               auto-read page title, reading speed — saved in localStorage and
  *               applied as classes on <html> (globals.css does the styling)
  *   announce()  writes into an aria-live region → screen readers (TalkBack,
@@ -35,6 +35,8 @@ export type Speed = 'slow' | 'normal' | 'fast';
 export interface A11ySettings {
   textSize: TextSize;
   contrast: boolean;
+  /** Dark colours (less glare at night). High contrast wins if both are on. */
+  dark: boolean;
   reduceMotion: boolean;
   talking: boolean;
   autoRead: boolean;
@@ -44,6 +46,7 @@ export interface A11ySettings {
 const DEFAULTS: A11ySettings = {
   textSize: 'normal',
   contrast: false,
+  dark: false,
   reduceMotion: false,
   talking: false,
   autoRead: false,
@@ -91,6 +94,7 @@ export function A11yProvider({ children }: { children: ReactNode }) {
     const html = document.documentElement;
     html.dataset.textSize = settings.textSize; // globals.css: html[data-text-size="large"] { font-size: … }
     html.classList.toggle('hc', settings.contrast);
+    html.classList.toggle('dark', settings.dark && !settings.contrast);
     html.classList.toggle('reduce-motion', settings.reduceMotion);
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));

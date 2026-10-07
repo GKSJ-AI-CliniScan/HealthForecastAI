@@ -153,3 +153,5 @@ common.serverEmpty
 common.offline
 analytics.byDischarge
 research.byAge
+a11y.dark
+common.close

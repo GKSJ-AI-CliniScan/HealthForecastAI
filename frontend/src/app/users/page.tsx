@@ -15,6 +15,7 @@ import { useI18n } from '@/i18n/I18nProvider';
 import { AppShell } from '@/saral/AppShell';
 import { Button, Field, INPUT, LoadState, PageHeader, Section, SimpleTable } from '@/saral/ui';
 import { useData } from '@/saral/useData';
+import { UserPlus } from 'lucide-react';
 
 export default function UsersPage() {
   return (
@@ -30,11 +31,20 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 function Users() {
   const { t } = useI18n();
   const q = useData(() => data.users(), []);
-  const [form, setForm] = useState({ name: '', email: '', role: 'doctor' as Role, password: '' });
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    role: 'doctor' as Role,
+    password: '',
+  });
   const [errors, setErrors] = useState<Partial<Record<'name' | 'email' | 'password', string>>>({});
   const [result, setResult] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
-  const refs = { name: useRef<HTMLInputElement>(null), email: useRef<HTMLInputElement>(null), password: useRef<HTMLInputElement>(null) };
+  const refs = {
+    name: useRef<HTMLInputElement>(null),
+    email: useRef<HTMLInputElement>(null),
+    password: useRef<HTMLInputElement>(null),
+  };
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -49,7 +59,11 @@ function Users() {
     setBusy(true);
     setResult(null);
     try {
-      const u = await data.addUser({ ...form, name: form.name.trim(), email: form.email.trim() });
+      const u = await data.addUser({
+        ...form,
+        name: form.name.trim(),
+        email: form.email.trim(),
+      });
       setResult({ ok: true, text: t('users.added', { name: u.name }) });
       setForm({ name: '', email: '', role: 'doctor', password: '' });
       q.reload();
@@ -90,7 +104,7 @@ function Users() {
       </Section>
 
       <Section title={t('users.add')} id="add">
-        <form onSubmit={onSubmit} noValidate className="max-w-xl rounded-2xl border-2 border-line bg-paper-raised p-5">
+        <form onSubmit={onSubmit} noValidate className="max-w-xl">
           <Field id="u-name" label={t('users.name')} error={errors.name}>
             {input('name', 'text', 'name')}
           </Field>
@@ -98,7 +112,12 @@ function Users() {
             {input('email', 'email', 'email')}
           </Field>
           <Field id="u-role" label={t('users.role')}>
-            <select id="u-role" value={form.role} onChange={(e) => setForm((f) => ({ ...f, role: e.target.value as Role }))} className={INPUT}>
+            <select
+              id="u-role"
+              value={form.role}
+              onChange={(e) => setForm((f) => ({ ...f, role: e.target.value as Role }))}
+              className={INPUT}
+            >
               {ROLES.map((r) => (
                 <option key={r} value={r}>
                   {t(`role.${r}`)}
@@ -109,7 +128,7 @@ function Users() {
           <Field id="u-password" label={t('auth.password')} error={errors.password} hint="8+">
             {input('password', 'password', 'new-password')}
           </Field>
-          <Button type="submit" disabled={busy} icon="+">
+          <Button type="submit" disabled={busy} icon={<UserPlus size={18} />}>
             {busy ? t('common.loading') : t('users.add')}
           </Button>
           {result && (

@@ -15,6 +15,8 @@ import { BarChartA11y } from '@/saral/BarChartA11y';
 import { downloadCsv, toCsv } from '@/saral/csv';
 import { Button, LoadState, PageHeader, Section, Stat, StatGrid } from '@/saral/ui';
 import { useData } from '@/saral/useData';
+import { BedDouble, CalendarCheck, Download, RotateCcw, Users } from 'lucide-react';
+import { DonutChartA11y } from '@/saral/DonutChartA11y';
 
 export default function AnalyticsPage() {
   return (
@@ -34,7 +36,7 @@ function Report() {
           <PageHeader title={t('nav.analytics')} help={t('help.analytics')}>
             <Button
               variant="quiet"
-              icon="⬇"
+              icon={<Download size={18} />}
               onClick={() =>
                 downloadCsv(
                   'hospital-report.csv',
@@ -49,18 +51,19 @@ function Report() {
             </Button>
           </PageHeader>
           <StatGrid>
-            <Stat label={t('stat.patients')} value={formatNumber(r.patients, 0)} />
-            <Stat label={t('stat.visits')} value={formatNumber(r.visits, 0)} />
+            <Stat icon={<Users size={22} />} accent="teal" label={t('stat.patients')} value={formatNumber(r.patients, 0)} />
+            <Stat icon={<CalendarCheck size={22} />} accent="blue" label={t('stat.visits')} value={formatNumber(r.visits, 0)} />
             {/* summary counts ANY return (readmitted != 'NO'), not only <30 days → "Returned (%)" */}
-            <Stat label={t('treatment.cameBack')} value={`${formatNumber(r.returnRatePct)}%`} />
-            <Stat label={t('stat.avgStay')} value={formatNumber(r.avgStayDays)} />
+            <Stat
+              icon={<RotateCcw size={22} />}
+              accent="violet"
+              label={t('treatment.cameBack')}
+              value={`${formatNumber(r.returnRatePct)}%`}
+            />
+            <Stat icon={<BedDouble size={22} />} accent="teal" label={t('stat.avgStay')} value={formatNumber(r.avgStayDays)} />
           </StatGrid>
           <Section title={t('analytics.riskMix')} id="mix">
-            <BarChartA11y
-              title={t('analytics.riskMix')}
-              valueName={t('stat.patients')}
-              data={(['high', 'medium', 'low'] as const).map((k) => ({ label: t(`risk.${k}`), value: r.riskMix[k] }))}
-            />
+            <DonutChartA11y wide title={t('analytics.riskMix')} counts={r.riskMix} centerLabel={t('stat.patients')} />
           </Section>
           <Section title={t('analytics.byDischarge')} id="discharge">
             {r.byDischarge.length > 0 && (
@@ -68,7 +71,10 @@ function Report() {
                 title={t('analytics.byDischarge')}
                 valueName={t('treatment.cameBack')}
                 unit="%"
-                data={r.byDischarge.map((d) => ({ label: d.label, value: d.ratePct }))}
+                data={r.byDischarge.map((d) => ({
+                  label: d.label,
+                  value: d.ratePct,
+                }))}
               />
             )}
           </Section>

@@ -14,6 +14,7 @@ import { BarChartA11y } from '@/saral/BarChartA11y';
 import { orDash } from '@/saral/format';
 import { LoadState, PageHeader, Section, SimpleTable } from '@/saral/ui';
 import { useData } from '@/saral/useData';
+import { Trophy } from 'lucide-react';
 
 export default function TreatmentPage() {
   return (
@@ -34,24 +35,36 @@ function Treatments() {
           const best = [...rows].sort((a, b) => b.recoveryScore - a.recoveryScore)[0];
           return (
             <>
-              <div className="mb-8 rounded-2xl border-2 border-rlow bg-rlow-bg p-6 text-rlow">
-                <p className="text-lg">🏆 {t('treatment.best')}</p>
-                <p className="mt-1 text-2xl font-bold">{best.name}</p>
-                <p className="text-xl">
-                  {t('treatment.recovery')}: {formatNumber(best.recoveryScore)}
-                </p>
+              <div className="mb-6 flex items-center gap-4 rounded-2xl border border-rlow bg-rlow-bg p-6 text-rlow">
+                <Trophy aria-hidden="true" size={36} className="shrink-0" />
+                <div>
+                  <p className="text-lg">{t('treatment.best')}</p>
+                  <p className="mt-1 text-2xl font-bold">{best.name}</p>
+                  <p className="text-base">
+                    {t('treatment.recovery')}: {formatNumber(best.recoveryScore)}
+                  </p>
+                </div>
               </div>
               <Section title={t('treatment.recovery')} id="chart">
                 <BarChartA11y
                   title={t('treatment.recovery')}
                   valueName={t('treatment.recovery')}
-                  data={rows.map((r) => ({ label: r.name, value: r.recoveryScore }))}
+                  data={rows.map((r) => ({
+                    label: r.name,
+                    value: r.recoveryScore,
+                  }))}
                 />
               </Section>
               <Section title={t('nav.treatment')} id="table">
                 <SimpleTable
                   caption={t('nav.treatment')}
-                  headers={[t('treatment.name'), t('treatment.patients'), t('treatment.recovery'), t('treatment.cameBack'), t('stat.avgStay')]}
+                  headers={[
+                    t('treatment.name'),
+                    t('treatment.patients'),
+                    t('treatment.recovery'),
+                    t('treatment.cameBack'),
+                    t('stat.avgStay'),
+                  ]}
                   rows={rows.map((r) => [
                     r.name,
                     formatNumber(r.patients, 0),

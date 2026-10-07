@@ -52,7 +52,10 @@ function ForecastView() {
             <Empty />
           ) : (
             <StatGrid>
-              <Stat label={`${t('forecast.expected')} (${t('common.days', { n: f.horizonDays })})`} value={formatNumber(f.expectedReturns, 0)} />
+              <Stat
+                label={`${t('forecast.expected')} (${t('common.days', { n: f.horizonDays })})`}
+                value={formatNumber(f.expectedReturns, 0)}
+              />
               <Stat label={t('forecast.rateNext')} value={`${formatNumber(f.expectedRatePct)}%`} />
               {now.status === 'ok' && <Stat label={t('forecast.rateNow')} value={`${formatNumber(now.data.returnRatePct)}%`} />}
             </StatGrid>

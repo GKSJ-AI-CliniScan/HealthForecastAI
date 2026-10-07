@@ -15,7 +15,9 @@ import { ApiError, data, type RiskResult } from '@/data';
 import { useI18n } from '@/i18n/I18nProvider';
 import { AppShell } from '@/saral/AppShell';
 import { PatientPicker, patientFromUrl } from '@/saral/PatientPicker';
-import { Button, LoadState, PageHeader, RiskBadge, Section } from '@/saral/ui';
+import { RiskGauge } from '@/saral/RiskGauge';
+import { Button, CARD, LoadState, PageHeader, Section } from '@/saral/ui';
+import { RotateCw } from 'lucide-react';
 import { useData } from '@/saral/useData';
 
 export default function RiskPage() {
@@ -55,18 +57,19 @@ function RiskFor({ id }: { id: number }) {
         const level = fresh?.risk ?? p.risk;
         return (
           <>
-            <div aria-live="polite" className="mb-8 rounded-2xl border-2 border-line bg-paper-raised p-6">
-              <p className="text-xl font-semibold">{p.name}</p>
-              <p className="mt-2 text-lg text-ink-soft">{t('risk.chance', { days: 30 })}</p>
-              <p className="my-2 text-7xl font-bold tabular-nums">{formatNumber(pct, 0)}%</p>
-              <RiskBadge level={level} />
-              {fresh && (
-                <p className="mt-3 text-base text-ink-soft">{t('models.technical', { name: fresh.modelName })}</p>
-              )}
+            <div aria-live="polite" className={`${CARD} mb-6 p-6 text-center`}>
+              <p className="text-lg font-semibold">{p.name}</p>
+              <p className="mt-1 text-sm text-ink-soft">{t('risk.chance', { days: 30 })}</p>
+              {/* sr-only sentence: the gauge is a picture, this is what screen readers hear */}
+              <p className="sr-only">{`${formatNumber(pct, 0)}%`}</p>
+              <div className="my-4">
+                <RiskGauge pct={pct} level={level} />
+              </div>
+              {fresh && <p className="mb-3 text-sm text-ink-soft">{t('models.technical', { name: fresh.modelName })}</p>}
               <div className="mt-5">
                 <Button
                   disabled={busy}
-                  icon="↻"
+                  icon={<RotateCw size={18} />}
                   onClick={async () => {
                     setBusy(true);
                     setErr(null);
@@ -82,7 +85,7 @@ function RiskFor({ id }: { id: number }) {
                   {busy ? t('common.loading') : t('risk.calculate')}
                 </Button>
                 {err && (
-                  <p role="alert" className="mt-3 text-lg font-semibold text-rhigh">
+                  <p role="alert" className="mt-3 text-base font-semibold text-rhigh">
                     {err}
                   </p>
                 )}
@@ -92,7 +95,7 @@ function RiskFor({ id }: { id: number }) {
             <Section title={t('risk.todo')} id="todo">
               <LoadState q={advice} isEmpty={(a) => a.actions.length === 0}>
                 {(a) => (
-                  <ol className="list-decimal space-y-2 pl-6 text-xl">
+                  <ol className="list-decimal space-y-2 pl-6 text-base marker:font-semibold marker:text-teal">
                     {a.actions.map((x) => (
                       <li key={x}>{x}</li>
                     ))}

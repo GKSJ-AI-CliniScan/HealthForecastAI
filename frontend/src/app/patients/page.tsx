@@ -17,7 +17,8 @@ import { data, type PatientRow, type RiskLevel } from '@/data';
 import { useI18n } from '@/i18n/I18nProvider';
 import { AppShell } from '@/saral/AppShell';
 import { orDash } from '@/saral/format';
-import { Button, INPUT, LoadState, PageHeader, RiskBadge } from '@/saral/ui';
+import { Avatar, Button, CARD, INPUT, LoadState, PageHeader, RiskBadge, RiskBar } from '@/saral/ui';
+import { ChevronRight, Search } from 'lucide-react';
 import { useData } from '@/saral/useData';
 import { filterPatients } from '@/saral/filterPatients';
 
@@ -40,21 +41,28 @@ function Patients() {
   return (
     <>
       <PageHeader title={t('nav.patients')} help={t('help.patients')} />
-      <label htmlFor="search" className="mb-2 block text-lg font-semibold">
-        {t('patients.hint')}
-      </label>
-      <input id="search" type="search" value={query} onChange={(e) => setQuery(e.target.value)} className={`${INPUT} mb-4 max-w-xl`} />
-
-      <fieldset className="mb-6">
-        <legend className="mb-2 text-lg font-semibold">{t('patients.riskFilter')}</legend>
-        <div className="flex flex-wrap gap-2">
-          {FILTERS.map((f) => (
-            <Button key={f} variant="quiet" pressed={risk === f} onClick={() => setRisk(f)}>
-              {f === 'all' ? t('common.all') : t(`risk.${f}`)}
-            </Button>
-          ))}
+      {/* Toolbar card: search + risk filter, one row on desktop. */}
+      <div className={`${CARD} mb-5 flex flex-wrap items-end gap-4 p-4`}>
+        <div className="min-w-[16rem] flex-1">
+          <label htmlFor="search" className="mb-1.5 block text-sm font-semibold text-ink">
+            {t('patients.hint')}
+          </label>
+          <div className="relative">
+            <Search aria-hidden="true" size={18} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-soft" />
+            <input id="search" type="search" value={query} onChange={(e) => setQuery(e.target.value)} className={`${INPUT} pl-10`} />
+          </div>
         </div>
-      </fieldset>
+        <fieldset>
+          <legend className="mb-1.5 text-sm font-semibold text-ink">{t('patients.riskFilter')}</legend>
+          <div className="flex flex-wrap gap-2">
+            {FILTERS.map((f) => (
+              <Button key={f} variant="quiet" pressed={risk === f} onClick={() => setRisk(f)}>
+                {f === 'all' ? t('common.all') : t(`risk.${f}`)}
+              </Button>
+            ))}
+          </div>
+        </fieldset>
+      </div>
 
       <LoadState q={q} isEmpty={(rows) => rows.length === 0}>
         {(rows) => <PatientCards rows={filterPatients(rows, query, risk)} />}
@@ -68,20 +76,81 @@ function PatientCards({ rows }: { rows: PatientRow[] }) {
   return (
     <>
       {/* role=status: screen readers hear "12 patients found" after each keystroke settles */}
-      <p role="status" className="mb-4 text-xl font-semibold">
+      <p role="status" className="mb-3 text-sm font-semibold text-ink-soft">
         {t('patients.found', { n: rows.length })}
       </p>
-      <ul className="grid gap-3">
+      {/* Desktop: a real table (scan many patients quickly). Phones: one card per patient. */}
+      <div className="hidden overflow-hidden rounded-2xl border border-line bg-paper-raised shadow-card md:block">
+        <table className="w-full border-collapse text-left">
+          <caption className="sr-only">{t('nav.patients')}</caption>
+          <thead>
+            <tr className="bg-paper-sunk text-xs font-semibold uppercase tracking-wide text-ink-soft">
+              <th scope="col" className="px-5 py-3">
+                {t('users.name')}
+              </th>
+              <th scope="col" className="px-5 py-3">
+                {t('patient.age')}
+              </th>
+              <th scope="col" className="px-5 py-3">
+                {t('patient.illness')}
+              </th>
+              <th scope="col" className="px-5 py-3">
+                {t('risk.chance', { days: 30 })}
+              </th>
+              <th scope="col" className="px-5 py-3">
+                <span className="sr-only">{t('common.open')}</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((p) => (
+              <tr key={p.id} className="border-t border-line hover:bg-paper">
+                <th scope="row" className="px-5 py-3 font-normal">
+                  <Link href={`/patients/${p.id}`} className="flex items-center gap-3 rounded-lg hover:text-teal">
+                    <Avatar name={p.name} tone={p.risk} />
+                    <span>
+                      <span className="block font-semibold text-ink">{p.name}</span>
+                      <span className="block text-sm text-ink-soft">{p.mrn}</span>
+                    </span>
+                  </Link>
+                </th>
+                <td className="px-5 py-3 text-ink">{orDash(p.ageGroup)}</td>
+                <td className="px-5 py-3 text-ink">{orDash(p.illness)}</td>
+                <td className="px-5 py-3">
+                  <span className="flex flex-wrap items-center gap-3">
+                    <RiskBar level={p.risk} pct={p.riskPct} />
+                    <RiskBadge level={p.risk} />
+                  </span>
+                </td>
+                <td className="px-5 py-3 text-right">
+                  <Link
+                    href={`/patients/${p.id}`}
+                    aria-label={`${t('common.open')}: ${p.name}`}
+                    className="inline-grid h-10 w-10 place-items-center rounded-xl text-ink-soft hover:bg-teal-bg hover:text-teal"
+                  >
+                    <ChevronRight aria-hidden="true" size={20} />
+                  </Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <ul className="grid gap-3 md:hidden">
         {rows.map((p) => (
           <li key={p.id}>
-            <Link href={`/patients/${p.id}`} className="block rounded-2xl border-2 border-line bg-paper-raised p-4 hover:border-teal">
-              <span className="flex flex-wrap items-center justify-between gap-3">
-                <span className="text-xl font-bold">{p.name}</span>
-                <RiskBadge level={p.risk} pct={p.riskPct} />
+            <Link href={`/patients/${p.id}`} className={`${CARD} flex items-center gap-3 p-4`}>
+              <Avatar name={p.name} tone={p.risk} />
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold text-ink">{p.name}</span>
+                <span className="block text-sm text-ink-soft">
+                  {p.mrn} · {orDash(p.ageGroup)} · {orDash(p.illness)}
+                </span>
+                <span className="mt-2 block">
+                  <RiskBadge level={p.risk} pct={p.riskPct} />
+                </span>
               </span>
-              <span className="mt-1 block text-lg text-ink-soft">
-                {t('patient.record')}: {p.mrn} · {t('patient.age')}: {orDash(p.ageGroup)} · {t('patient.illness')}: {orDash(p.illness)}
-              </span>
+              <ChevronRight aria-hidden="true" size={20} className="text-ink-soft" />
             </Link>
           </li>
         ))}

@@ -153,5 +153,7 @@
   "common.serverEmpty": "The server has no data for this yet.",
   "common.offline": "Cannot reach the server. Please try again later.",
   "analytics.byDischarge": "Return rate by how patients left hospital",
-  "research.byAge": "Patients by age group"
+  "research.byAge": "Patients by age group",
+  "a11y.dark": "Dark mode",
+  "common.close": "Close"
 }

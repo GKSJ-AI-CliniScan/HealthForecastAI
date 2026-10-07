@@ -8,22 +8,25 @@
  * still finds it; `lang` on each option makes screen readers pronounce it right.
  * FLOWS NEXT: setLang() in I18nProvider → whole app re-renders in that language.
  */
+import { Languages } from 'lucide-react';
+
 import { useI18n } from '@/i18n/I18nProvider';
 import { LANGUAGES, isLangCode } from '@/i18n/languages';
 
-export function LanguagePicker({ id = 'lang-picker' }: { id?: string }) {
+export function LanguagePicker({ id = 'lang-picker', compact = false }: { id?: string; compact?: boolean }) {
   const { lang, setLang, t } = useI18n();
   return (
     <div className="flex items-center gap-2">
-      <label htmlFor={id} className="text-lg font-semibold">
-        <span aria-hidden="true">🌐 </span>
-        <span className="sr-only sm:not-sr-only">{t('a11y.language')}</span>
+      <label htmlFor={id} className="flex items-center gap-1.5 text-sm font-semibold text-ink-soft">
+        <Languages aria-hidden="true" size={18} />
+        {/* compact = label visible to screen readers only (top bar); full = visible label (Help page) */}
+        <span className={compact ? 'sr-only' : ''}>{t('a11y.language')}</span>
       </label>
       <select
         id={id}
         value={lang}
         onChange={(e) => isLangCode(e.target.value) && setLang(e.target.value)}
-        className="min-h-[48px] rounded-xl border-2 border-line bg-paper-raised px-3 text-lg"
+        className={`min-h-[44px] rounded-xl border border-line bg-paper-raised px-3 text-base text-ink ${compact ? 'max-w-[6.5rem] sm:max-w-none' : ''}`}
       >
         {LANGUAGES.map((l) => (
           <option key={l.code} value={l.code} lang={l.code}>

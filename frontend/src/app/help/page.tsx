@@ -12,6 +12,7 @@ import { useI18n, type TKey } from '@/i18n/I18nProvider';
 import { AppShell } from '@/saral/AppShell';
 import { LanguagePicker } from '@/saral/LanguagePicker';
 import { Button, PageHeader, Section } from '@/saral/ui';
+import { Mic, Volume2 } from 'lucide-react';
 
 export default function HelpPage() {
   return (
@@ -21,7 +22,13 @@ export default function HelpPage() {
   );
 }
 
-function Radios<T extends string>({ name, legend, options, value, onChange }: {
+function Radios<T extends string>({
+  name,
+  legend,
+  options,
+  value,
+  onChange,
+}: {
   name: string;
   legend: string;
   options: { value: T; label: string }[];
@@ -33,8 +40,18 @@ function Radios<T extends string>({ name, legend, options, value, onChange }: {
       <legend className="mb-2 text-lg font-semibold">{legend}</legend>
       <div className="flex flex-wrap gap-2">
         {options.map((o) => (
-          <label key={o.value} className={`flex min-h-[48px] cursor-pointer items-center gap-2 rounded-xl border-2 px-4 text-lg ${value === o.value ? 'border-teal bg-paper-raised font-semibold' : 'border-line'}`}>
-            <input type="radio" name={name} value={o.value} checked={value === o.value} onChange={() => onChange(o.value)} className="h-5 w-5" />
+          <label
+            key={o.value}
+            className={`flex min-h-[48px] cursor-pointer items-center gap-2 rounded-xl border px-4 text-base ${value === o.value ? 'border-teal bg-paper-raised font-semibold' : 'border-line'}`}
+          >
+            <input
+              type="radio"
+              name={name}
+              value={o.value}
+              checked={value === o.value}
+              onChange={() => onChange(o.value)}
+              className="h-5 w-5"
+            />
             {o.label}
           </label>
         ))}
@@ -47,7 +64,7 @@ function Toggle({ id, label, checked, onChange }: { id: string; label: string; c
   return (
     <div className="mb-3 flex min-h-[48px] items-center gap-3">
       <input id={id} type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="h-6 w-6" />
-      <label htmlFor={id} className="text-lg">
+      <label htmlFor={id} className="text-base">
         {label}
       </label>
     </div>
@@ -86,6 +103,7 @@ function Help() {
           ]}
         />
         <Toggle id="hc" label={t('a11y.contrast')} checked={settings.contrast} onChange={(v) => update({ contrast: v })} />
+        <Toggle id="dark" label={t('a11y.dark')} checked={settings.dark} onChange={(v) => update({ dark: v })} />
         <Toggle id="rm" label={t('a11y.motion')} checked={settings.reduceMotion} onChange={(v) => update({ reduceMotion: v })} />
       </Section>
 
@@ -104,22 +122,22 @@ function Help() {
           ]}
         />
         <div className="flex flex-wrap gap-2">
-          <Button variant="quiet" icon="🔊" onClick={() => say(t('app.tagline'))}>
+          <Button variant="quiet" icon={<Volume2 size={18} />} onClick={() => say(t('app.tagline'))}>
             {t('a11y.read')}
           </Button>
-          <Button variant="quiet" icon="🎤" onClick={listen}>
+          <Button variant="quiet" icon={<Mic size={18} />} onClick={listen}>
             {t('a11y.listen')}
           </Button>
         </div>
-        <p className="mt-3 text-lg">{t('a11y.voiceHelp')}</p>
+        <p className="mt-3 text-base text-ink-soft">{t('a11y.voiceHelp')}</p>
       </Section>
 
       <Section title={t('a11y.shortcuts')} id="keys">
         <dl className="grid gap-2">
           {SHORTCUTS.map(([keys, k]) => (
-            <div key={keys} className="flex flex-wrap gap-3 text-lg">
+            <div key={keys} className="flex flex-wrap items-center gap-3 text-base">
               <dt>
-                <kbd className="rounded-lg border-2 border-line bg-paper-raised px-2 py-1 font-semibold">{keys}</kbd>
+                <kbd className="rounded-lg border border-line bg-paper-raised px-2 py-1 font-semibold">{keys}</kbd>
               </dt>
               <dd>{t(k)}</dd>
             </div>

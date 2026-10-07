@@ -16,6 +16,7 @@ import { downloadCsv, toCsv } from '@/saral/csv';
 import { orDash } from '@/saral/format';
 import { Button, LoadState, PageHeader, Section, SimpleTable } from '@/saral/ui';
 import { useData } from '@/saral/useData';
+import { Download, ShieldCheck } from 'lucide-react';
 
 export default function ResearchPage() {
   return (
@@ -32,7 +33,10 @@ function Research() {
   return (
     <>
       <PageHeader title={t('nav.research')} help={t('help.research')} />
-      <p className="mb-8 rounded-2xl border-2 border-teal bg-paper-raised p-4 text-lg">🔒 {t('research.privacy')}</p>
+      <p className="mb-6 flex items-center gap-3 rounded-2xl border border-teal bg-teal-bg p-4 text-base text-teal-dark">
+        <ShieldCheck aria-hidden="true" size={22} />
+        {t('research.privacy')}
+      </p>
 
       <Section title={t('research.byAge')} id="ages">
         <LoadState q={ages} isEmpty={(a) => a.length === 0}>
@@ -53,11 +57,14 @@ function Research() {
               <div className="mb-3">
                 <Button
                   variant="quiet"
-                  icon="⬇"
+                  icon={<Download size={18} />}
                   onClick={() =>
                     downloadCsv(
                       'anonymous-cohort.csv',
-                      toCsv(['anon_id', 'age_group', 'gender', 'primary_diagnosis'], c.map((r) => [r.anonId, r.ageGroup, r.gender, r.illness])),
+                      toCsv(
+                        ['anon_id', 'age_group', 'gender', 'primary_diagnosis'],
+                        c.map((r) => [r.anonId, r.ageGroup, r.gender, r.illness]),
+                      ),
                     )
                   }
                 >

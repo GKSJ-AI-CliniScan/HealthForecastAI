@@ -9,8 +9,6 @@ import type { PatientRow, RiskLevel } from '../data/types';
 export function filterPatients(rows: PatientRow[], query: string, risk: RiskLevel | 'all'): PatientRow[] {
   const q = query.trim().toLocaleLowerCase();
   return rows.filter(
-    (p) =>
-      (risk === 'all' || p.risk === risk) &&
-      (!q || [p.name, p.mrn, p.illness ?? ''].some((f) => f.toLocaleLowerCase().includes(q))),
+    (p) => (risk === 'all' || p.risk === risk) && (!q || [p.name, p.mrn, p.illness ?? ''].some((f) => f.toLocaleLowerCase().includes(q))),
   );
 }

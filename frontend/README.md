@@ -1,7 +1,7 @@
 # HealthForecast AI — Frontend ("Saral" UI)
 
 Simple, multilingual, accessible frontend for Milestones 1–4.
-Next.js 15 · React 19 · TypeScript · Tailwind · Recharts. No new runtime dependencies.
+Next.js 15 · React 19 · TypeScript · Tailwind · Recharts · lucide-react (icons, added in v2).
 
 ## 1. Run it
 
@@ -54,6 +54,30 @@ against a running backend). The backend is the real guard.
 returns zeros (forecast) shows "The server has no data for this yet". Errors are
 plain language by type: cannot reach server / no permission / not found / retry.
 
+## 2b. Look and feel — v2 "Saral Pro" (UI/UX brief, short)
+
+**Why v2.** Samarth reviewed v1 and found it too plain. Before redesigning, every team
+branch with a frontend was run and screenshotted (Srija #01, Saumya #10, Nishakar #23,
+Niyati #19, Parimala #24). The strongest (Srija's) has a sidebar, line icons, KPI cards,
+a donut chart and a split sign-in — but runs on mock data. v2 takes those visual patterns
+and keeps v1's rules (live data, 23 languages, blind-user features, one idea per block).
+
+| Area | v2 decision | Why |
+|---|---|---|
+| Layout | Left sidebar (icons + labels, "you are here" bar), drawer on phones | Familiar app pattern; menu always visible on desktop |
+| Top bar | Language · Stop reading · Speak a command · Dark mode | Accessibility tools one tap away on every page |
+| Home | Welcome banner, KPI cards with icon chips, attention list with risk bars, risk donut, quick actions | One glance answers "how are we doing, who needs me, what next" |
+| Patients | Toolbar card (search + filter); table on desktop, cards on phones | Scan many patients on desktop, read easily on phones |
+| Risk | Half-circle gauge + icon/word badge | Instantly readable; colour is never the only cue |
+| Icons | lucide-react line icons instead of emoji | Same look on every device; decorative only (aria-hidden) |
+| Themes | Light (default), Dark, High contrast — CSS variables only | One place to change colours; charts read matching values from `chartTheme.ts` |
+| Density | 16 px base text (19/22 px options), 44–48 px touch targets | Professional density without losing WCAG target size |
+
+Verified in headless Chrome against the real backend: axe-core WCAG 2.1 A/AA = 0 violations on
+login, home (doctor, admin, dark, phone), patients (also high contrast), patient, risk check,
+care advice, help, hospital report and the phone drawer; no horizontal scrolling at 360 px and
+390 px; Escape closes the drawer; the skip link is still the first Tab stop.
+
 ## 3. How it is built (TRD, short)
 
 ```
@@ -104,7 +128,7 @@ Numbers use 0–9 in every language.
 - **Speak a command** (🎤): say a menu name in your language or English, or "read aloud",
   "stop reading", "go back", "sign out". Chrome/Edge only.
 - Talking buttons, read page title on open, reading speed, text size (3 levels),
-  high contrast, reduce movement — in **Help and accessibility**, remembered per device.
+  high contrast, dark mode, reduce movement — in **Help and accessibility**, remembered per device.
 - Risk is always colour + icon + words. Every chart has a spoken summary and a
   "Show as table" button. Skip link, 48 px targets, visible focus ring, pinch-zoom allowed.
 - Shortcuts: `Alt+Shift+R` read · `S` stop · `V` voice · `H` home · `1–9` menu items.

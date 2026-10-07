@@ -13,8 +13,8 @@ export default function RegisterPage() {
   return (
     <main id="main" className="mx-auto max-w-md px-4 py-16">
       <h1 className="mb-4 text-3xl font-bold">{t('auth.title')}</h1>
-      <p className="mb-6 text-xl">{t('auth.noAccount')}</p>
-      <Link href="/login" className="text-xl font-semibold text-teal-dark underline">
+      <p className="mb-6 text-lg">{t('auth.noAccount')}</p>
+      <Link href="/login" className="text-lg font-semibold text-teal-dark underline">
         {t('auth.submit')}
       </Link>
     </main>

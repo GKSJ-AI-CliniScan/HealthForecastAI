@@ -1,28 +1,35 @@
 /*
  * globals.css — colour tokens, text sizes and accessibility modes.
  *
- * PALETTE (chosen for this brief: a calm hospital tool used by everyone):
- *   paper  #F6F7F4  soft neutral background (less glare than pure white)
- *   ink    #17212B  text — 15.8:1 contrast on paper
- *   teal   #0B5D6B  primary actions — 7.4:1 on white (passes WCAG AAA for large text)
- *   marigold #E3A21A focus ring / highlights — visible on light AND dark
- *   risk colours are dark-on-light pairs, all ≥ 4.5:1, and never used alone
- * Every colour is a CSS variable so the high-contrast mode can swap them in one place.
- * FLOWS NEXT: tailwind.config.ts maps class names (bg-paper, text-ink…) to these vars.
+ * PALETTE v2 ("Saral Pro" — calm hospital look, benchmarked against the team's best UIs):
+ *   paper   #F3F6F9  cool light background; cards are white with a soft shadow
+ *   ink     #0F1B2A  text — 16.9:1 on white
+ *   teal    #0B6E79  brand + primary buttons — 5.9:1 on white (AA for all text)
+ *   blue / violet     extra accents only for icon chips on number cards
+ *   marigold #E3A21A focus ring — visible on light, dark AND high contrast
+ *   risk colours are dark-on-light pairs (≥ 4.5:1) and are never used alone (always icon + word)
+ * Three themes swap ONLY these variables: light (default), html.dark, html.hc (high contrast).
+ * FLOWS NEXT: tailwind.config.ts maps class names (bg-paper, text-ink, shadow-card…) to these vars.
  */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --paper: #f6f7f4;
+  --paper: #f3f6f9;
   --paper-raised: #ffffff;
-  --paper-sunk: #eceee8;
-  --ink: #17212b;
-  --ink-soft: #4a5560;
-  --line: #c9cfc6;
-  --teal: #0b5d6b;
-  --teal-dark: #08434d;
+  --paper-sunk: #eef2f6;
+  --ink: #0f1b2a;
+  --ink-soft: #4b5b6e;
+  --line: #dce3ea;
+  --teal: #0b6e79;
+  --teal-dark: #075560;
+  --teal-bg: #e3f3f4;
+  --on-teal: #ffffff;
+  --blue: #1d4ed8;
+  --blue-bg: #e7eefd;
+  --violet: #6d28d9;
+  --violet-bg: #f1eafd;
   --marigold: #e3a21a;
   --marigold-bg: #fdf3d8;
   --risk-high: #a3221a;
@@ -31,6 +38,37 @@
   --risk-mid-bg: #fff4dc;
   --risk-low: #1d6337;
   --risk-low-bg: #e7f5ec;
+  --shadow: 0 1px 2px rgba(15, 27, 42, 0.05), 0 6px 20px rgba(15, 27, 42, 0.06);
+  --hero: linear-gradient(135deg, #075560 0%, #0b6e79 45%, #138a8f 100%);
+  color-scheme: light;
+}
+
+/* Dark mode: less glare at night. Toggled by A11yProvider (html.dark). */
+html.dark {
+  --paper: #0b1220;
+  --paper-raised: #121b2c;
+  --paper-sunk: #18233a;
+  --ink: #e8eef6;
+  --ink-soft: #a9b6c6;
+  --line: #2a3850;
+  --teal: #2cc5b6;
+  --teal-dark: #5eead4;
+  --teal-bg: #0f2f33;
+  --on-teal: #04201d;
+  --blue: #93b4fb;
+  --blue-bg: #17264a;
+  --violet: #c4a8fb;
+  --violet-bg: #2a1d4a;
+  --marigold-bg: #33270a;
+  --risk-high: #fca5a5;
+  --risk-high-bg: #3a1517;
+  --risk-mid: #fcd34d;
+  --risk-mid-bg: #382a0b;
+  --risk-low: #86efac;
+  --risk-low-bg: #0f2e1c;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --hero: linear-gradient(135deg, #0f2f33 0%, #123b42 100%);
+  color-scheme: dark;
 }
 
 /* High contrast: pure black/white/yellow — for low vision. Toggled by A11yProvider (html.hc). */
@@ -43,6 +81,12 @@ html.hc {
   --line: #fff;
   --teal: #ffeb3b;
   --teal-dark: #ffeb3b;
+  --teal-bg: #000;
+  --on-teal: #000;
+  --blue: #fff;
+  --blue-bg: #000;
+  --violet: #fff;
+  --violet-bg: #000;
   --marigold: #00e5ff;
   --marigold-bg: #000;
   --risk-high: #ff8a80;
@@ -51,14 +95,17 @@ html.hc {
   --risk-mid-bg: #000;
   --risk-low: #69f0ae;
   --risk-low-bg: #000;
+  --shadow: none;
+  --hero: #000;
+  color-scheme: dark;
 }
-/* In high contrast, "white text on teal" buttons would become white on yellow — fix to black. */
-html.hc .bg-teal { color: #000 !important; }
+/* In high contrast every card gets a solid white border instead of a shadow. */
+html.hc .shadow-card { border-color: #fff !important; }
 
 /* Text size: everything uses rem, so changing the root size scales the whole UI. */
-html { font-size: 106.25%; }                       /* 17 px base: easier to read than 16 */
-html[data-text-size='large'] { font-size: 125%; }  /* 20 px */
-html[data-text-size='xlarge'] { font-size: 150%; } /* 24 px */
+html { font-size: 100%; }                          /* 16 px base — professional density; users can enlarge */
+html[data-text-size='large'] { font-size: 118.75%; }  /* 19 px */
+html[data-text-size='xlarge'] { font-size: 137.5%; } /* 22 px */
 
 body {
   background: var(--paper);
@@ -120,6 +167,9 @@ html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after 
 
 /* Printing a page (e.g. care advice for a patient's family): only the content. */
 @media print {
-  header, nav, footer, .skip-link, button { display: none !important; }
+  header, nav, aside, footer, .skip-link, button { display: none !important; }
   main { padding: 0 !important; }
 }
+
+/* Hero band (welcome banner, sign-in panel). */
+.bg-hero { background: var(--hero); }
