@@ -127,7 +127,7 @@ The following healthcare workflows were tested:
 - Healthcare analytics
 - Research cohort 
 - Clinical support
-- Reports and exports ![Report Page](evidence/report.png)
+- Reports and exports ![Report Page](evidence/reports.png)
 - Model management
 - User Management ![user ManagementPage](evidence/user.png)
 ---
