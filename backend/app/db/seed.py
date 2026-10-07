@@ -120,7 +120,6 @@ def seed_database(db: Session) -> None:
             db.add(treat)
             db.commit()
 
-    # Seed MongoDB Model Registry with Kanak's model runs
     try:
         mongo_db = get_mongo_db()
         seed_file = Path("ml/artifacts/model_runs_seed.json")

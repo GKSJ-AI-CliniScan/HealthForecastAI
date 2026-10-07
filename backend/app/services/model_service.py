@@ -1,7 +1,7 @@
 """model service - business logic layer.
 
 Loads the trained readmission model and scores admissions through it,
-via Kanak's build_serving_features(), so predictions never silently skip
+via build_serving_features(), so predictions never silently skip
 the 8 derived columns her a16_serving_fidelity.json shows are worth an
 ~41-point recall gap.
 """

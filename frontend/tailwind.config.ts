@@ -4,7 +4,20 @@ const config: Config = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
     extend: {
+      boxShadow: { card: 'var(--shadow)' },
       colors: {
+        // New simple-UI tokens (values live in globals.css so high-contrast mode can swap them).
+        paper: { DEFAULT: 'var(--paper)', raised: 'var(--paper-raised)', sunk: 'var(--paper-sunk)' },
+        ink: { DEFAULT: 'var(--ink)', soft: 'var(--ink-soft)' },
+        line: 'var(--line)',
+        teal: { DEFAULT: 'var(--teal)', dark: 'var(--teal-dark)', bg: 'var(--teal-bg)' },
+        'on-teal': 'var(--on-teal)',
+        accent: { blue: 'var(--blue)', 'blue-bg': 'var(--blue-bg)', violet: 'var(--violet)', 'violet-bg': 'var(--violet-bg)' },
+        marigold: { DEFAULT: 'var(--marigold)', bg: 'var(--marigold-bg)' },
+        rhigh: { DEFAULT: 'var(--risk-high)', bg: 'var(--risk-high-bg)' },
+        rmid: { DEFAULT: 'var(--risk-mid)', bg: 'var(--risk-mid-bg)' },
+        rlow: { DEFAULT: 'var(--risk-low)', bg: 'var(--risk-low-bg)' },
+        // ---- older tokens below are kept for the previous components ----
         warm: {
           bg: '#FFF9F5',
           card: '#FFFFFF',

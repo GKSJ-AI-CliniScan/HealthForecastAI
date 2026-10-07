@@ -1,65 +1,175 @@
+/*
+ * globals.css — colour tokens, text sizes and accessibility modes.
+ *
+ * PALETTE v2 ("Saral Pro" — calm hospital look, benchmarked against the team's best UIs):
+ *   paper   #F3F6F9  cool light background; cards are white with a soft shadow
+ *   ink     #0F1B2A  text — 16.9:1 on white
+ *   teal    #0B6E79  brand + primary buttons — 5.9:1 on white (AA for all text)
+ *   blue / violet     extra accents only for icon chips on number cards
+ *   marigold #E3A21A focus ring — visible on light, dark AND high contrast
+ *   risk colours are dark-on-light pairs (≥ 4.5:1) and are never used alone (always icon + word)
+ * Three themes swap ONLY these variables: light (default), html.dark, html.hc (high contrast).
+ * FLOWS NEXT: tailwind.config.ts maps class names (bg-paper, text-ink, shadow-card…) to these vars.
+ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #FFF9F5;
-  --foreground: #2F2926;
-  --surface: #FFFFFF;
-  --surface-subtle: #F3E8E1;
-  --border: #EADDD5;
-  --border-subtle: #F2E8E2;
-  --primary: #C96B4B;
-  --primary-hover: #B85A3C;
-  --accent: #E8A87C;
-  --text-muted: #6B625E;
+  --paper: #f3f6f9;
+  --paper-raised: #ffffff;
+  --paper-sunk: #eef2f6;
+  --ink: #0f1b2a;
+  --ink-soft: #4b5b6e;
+  --line: #dce3ea;
+  --teal: #0b6e79;
+  --teal-dark: #075560;
+  --teal-bg: #e3f3f4;
+  --on-teal: #ffffff;
+  --blue: #1d4ed8;
+  --blue-bg: #e7eefd;
+  --violet: #6d28d9;
+  --violet-bg: #f1eafd;
+  --marigold: #e3a21a;
+  --marigold-bg: #fdf3d8;
+  --risk-high: #a3221a;
+  --risk-high-bg: #fdecea;
+  --risk-mid: #7a4f00;
+  --risk-mid-bg: #fff4dc;
+  --risk-low: #1d6337;
+  --risk-low-bg: #e7f5ec;
+  --shadow: 0 1px 2px rgba(15, 27, 42, 0.05), 0 6px 20px rgba(15, 27, 42, 0.06);
+  --hero: linear-gradient(135deg, #075560 0%, #0b6e79 45%, #138a8f 100%);
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1C1816;
-    --foreground: #F5EBE6;
-    --surface: #26201D;
-    --surface-subtle: #332B27;
-    --border: #3E3530;
-    --border-subtle: #4D423C;
-    --primary: #C96B4B;
-    --primary-hover: #DA8560;
-    --accent: #E8A87C;
-    --text-muted: #B3A8A2;
-  }
+/* Dark mode: less glare at night. Toggled by A11yProvider (html.dark). */
+html.dark {
+  --paper: #0b1220;
+  --paper-raised: #121b2c;
+  --paper-sunk: #18233a;
+  --ink: #e8eef6;
+  --ink-soft: #a9b6c6;
+  --line: #2a3850;
+  --teal: #2cc5b6;
+  --teal-dark: #5eead4;
+  --teal-bg: #0f2f33;
+  --on-teal: #04201d;
+  --blue: #93b4fb;
+  --blue-bg: #17264a;
+  --violet: #c4a8fb;
+  --violet-bg: #2a1d4a;
+  --marigold-bg: #33270a;
+  --risk-high: #fca5a5;
+  --risk-high-bg: #3a1517;
+  --risk-mid: #fcd34d;
+  --risk-mid-bg: #382a0b;
+  --risk-low: #86efac;
+  --risk-low-bg: #0f2e1c;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --hero: linear-gradient(135deg, #0f2f33 0%, #123b42 100%);
+  color-scheme: dark;
 }
+
+/* High contrast: pure black/white/yellow — for low vision. Toggled by A11yProvider (html.hc). */
+html.hc {
+  --paper: #000;
+  --paper-raised: #000;
+  --paper-sunk: #111;
+  --ink: #fff;
+  --ink-soft: #fff;
+  --line: #fff;
+  --teal: #ffeb3b;
+  --teal-dark: #ffeb3b;
+  --teal-bg: #000;
+  --on-teal: #000;
+  --blue: #fff;
+  --blue-bg: #000;
+  --violet: #fff;
+  --violet-bg: #000;
+  --marigold: #00e5ff;
+  --marigold-bg: #000;
+  --risk-high: #ff8a80;
+  --risk-high-bg: #000;
+  --risk-mid: #ffd54f;
+  --risk-mid-bg: #000;
+  --risk-low: #69f0ae;
+  --risk-low-bg: #000;
+  --shadow: none;
+  --hero: #000;
+  color-scheme: dark;
+}
+/* In high contrast every card gets a solid white border instead of a shadow. */
+html.hc .shadow-card { border-color: #fff !important; }
+
+/* Text size: everything uses rem, so changing the root size scales the whole UI. */
+html { font-size: 100%; }                          /* 16 px base — professional density; users can enlarge */
+html[data-text-size='large'] { font-size: 118.75%; }  /* 19 px */
+html[data-text-size='xlarge'] { font-size: 137.5%; } /* 22 px */
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  /* System fonts first: they already cover Devanagari, Bengali, Tamil, Telugu,
+     Kannada, Malayalam, Gujarati, Gurmukhi, Odia, Arabic script on Android/Windows/macOS.
+     Noto Sans Ol Chiki is loaded on demand for Santali (I18nProvider). */
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Nirmala UI', 'Noto Nastaliq Urdu',
+    'Noto Sans Ol Chiki', sans-serif;
+  line-height: 1.6; /* Indic scripts have tall vowel signs — give them room */
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Smooth transitions for interactive elements */
-a, button {
-  transition: all 0.15s ease-in-out;
+/* One clearly visible focus ring for keyboard users, everywhere. */
+:focus-visible {
+  outline: 4px solid var(--marigold);
+  outline-offset: 3px;
+  border-radius: 6px;
 }
 
-/* Print styles for clinical charts */
+/* Underlined links are recognisable without colour. */
+main a:not([class*='rounded']) { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Skip link: hidden until focused with Tab, then a big obvious button. */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -10rem;
+  z-index: 50;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.75rem 1.25rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  border-radius: 0.75rem;
+}
+.skip-link:focus { top: 1rem; }
+
+/* Loading spinner (stops spinning in reduce-motion; the text says "Loading…" anyway). */
+.spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 4px solid var(--line);
+  border-top-color: var(--teal);
+  border-radius: 9999px;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Reduce movement: user setting OR the operating-system preference. */
+html.reduce-motion *, html.reduce-motion *::before, html.reduce-motion *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* Printing a page (e.g. care advice for a patient's family): only the content. */
 @media print {
-  aside, header, nav, button, a[href="/patients"], .role-switcher {
-    display: none !important;
-  }
-  
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
-  }
-  
-  .lg\:pl-64 {
-    padding-left: 0 !important;
-  }
-  
-  main {
-    max-width: 100% !important;
-    padding: 0 !important;
-  }
+  header, nav, aside, footer, .skip-link, button { display: none !important; }
+  main { padding: 0 !important; }
 }
+
+/* Hero band (welcome banner, sign-in panel). */
+.bg-hero { background: var(--hero); }

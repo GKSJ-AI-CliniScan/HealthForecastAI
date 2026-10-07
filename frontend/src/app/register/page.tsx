@@ -1,23 +1,22 @@
-import React from 'react';
-import type { Metadata } from 'next';
-import { RegisterForm } from '@/components/auth/RegisterForm';
-import { AuthLayout } from '@/components/auth/AuthLayout';
+'use client';
+/**
+ * /register — self sign-up does not exist on purpose: in the backend only the
+ * System Administrator (user:manage) can create accounts (POST /users).
+ * This page just explains that and links back to sign-in.
+ */
+import Link from 'next/link';
 
-export const metadata: Metadata = {
-  title: 'Register Practitioner Account | HealthForecast AI',
-  description: 'Create an authorized practitioner or administrator account on HealthForecast AI.',
-};
+import { useI18n } from '@/i18n/I18nProvider';
 
 export default function RegisterPage() {
+  const { t } = useI18n();
   return (
-    <AuthLayout
-      title="Create Practitioner Account"
-      subtitle="Provide your professional credentials to establish role-based access."
-      badgeText="Role Onboarding"
-      heroHeadline="Join the Clinical Intelligence Platform"
-      heroDescription="Accounts are provisioned based on hospital credentials, department assignment, and role-based access governance."
-    >
-      <RegisterForm />
-    </AuthLayout>
+    <main id="main" className="mx-auto max-w-md px-4 py-16">
+      <h1 className="mb-4 text-3xl font-bold">{t('auth.title')}</h1>
+      <p className="mb-6 text-lg">{t('auth.noAccount')}</p>
+      <Link href="/login" className="text-lg font-semibold text-teal-dark underline">
+        {t('auth.submit')}
+      </Link>
+    </main>
   );
 }

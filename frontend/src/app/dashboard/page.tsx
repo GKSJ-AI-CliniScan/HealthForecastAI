@@ -1,168 +1,200 @@
 'use client';
-
-import React, { useCallback, useEffect, useState } from 'react';
+/**
+ * Home (/dashboard) — Milestone 1 "healthcare dashboard, role-based".
+ *
+ * v2 layout (still one glance, now looks like a real product):
+ *   1. welcome banner: "Hello, <name>", role, today's date, Read aloud
+ *   2. KPI cards with icons        GET /patients/stats (+ avg stay if role may see analytics)
+ *   3. left:  patients who need attention now (doctor/admin/sysadmin)  GET /patients
+ *      right: patients by risk level (donut)
+ *             roles that see patients → counted from the same patient list (numbers agree)
+ *             researcher → /analytics/summary risk distribution (he may not list patients)
+ *   4. quick actions: one tile per page this role may open
+ * FLOWS NEXT: tiles link to each page; patient rows link to /patients/{id}.
+ */
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { AppShell } from '@/components/layout/AppShell';
-import { RoleSwitcher } from '@/components/dashboard/RoleSwitcher';
-import { StatsOverview } from '@/components/dashboard/StatsOverview';
-import { PatientListTable } from '@/components/patients/PatientListTable';
-import { patientService } from '@/services/patientService';
-import { useAuth } from '@/lib/auth-context';
-import { DashboardStats, Patient, ROLE_LABELS, ROLE_DESCRIPTIONS } from '@/types';
-import { ErrorMessage } from '@/components/ui/ErrorMessage';
-import { LoadingState } from '@/components/ui/LoadingState';
-import {
-  PulseIcon,
-  ArrowRightIcon,
-  RefreshCwIcon,
-} from '@/components/ui/Icons';
-import { Button } from '@/components/ui/Button';
+import { AlertTriangle, CalendarCheck, ChevronRight, RotateCcw, Users, Volume2 } from 'lucide-react';
 
-export default function DashboardPage() {
-  const router = useRouter();
-  const { user, isInitialized } = useAuth();
-  const currentRole = user?.role ?? 'doctor';
+import { useA11y } from '@/a11y/A11yProvider';
+import { data, type PatientRow, type RiskLevel } from '@/data';
+import { useI18n } from '@/i18n/I18nProvider';
+import { canOpen, pagesFor } from '@/lib/nav';
+import { useSession } from '@/lib/session';
+import { AppShell } from '@/saral/AppShell';
+import { DonutChartA11y } from '@/saral/DonutChartA11y';
+import { orDash } from '@/saral/format';
+import { PAGE_ICON } from '@/saral/icons';
+import { Avatar, IconChip, LoadState, RiskBadge, RiskBar, Section, Stat, StatGrid } from '@/saral/ui';
+import { useData } from '@/saral/useData';
 
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [patients, setPatients] = useState<Patient[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export default function HomePage() {
+  return (
+    <AppShell page="home">
+      <Home />
+    </AppShell>
+  );
+}
 
-  // Protected route guard: Redirect to /login if unauthenticated
-  useEffect(() => {
-    if (isInitialized && !user) {
-      router.replace('/login');
-    }
-  }, [isInitialized, user, router]);
+function countRisk(rows: PatientRow[]): Record<RiskLevel, number> {
+  const c = { high: 0, medium: 0, low: 0 };
+  rows.forEach((r) => c[r.risk]++);
+  return c;
+}
 
-  const loadDashboardData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const [statsResult, patientsResult] = await Promise.all([
-        patientService.getDashboardStats(currentRole),
-        patientService.getPatients({}, currentRole, 5),
-      ]);
-      setStats(statsResult);
-      setPatients(patientsResult.patients);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to load dashboard intelligence.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentRole]);
-
-  useEffect(() => {
-    void loadDashboardData();
-  }, [loadDashboardData]);
-
-  const roleTitle = ROLE_LABELS[currentRole];
-  const roleDescription = ROLE_DESCRIPTIONS[currentRole];
-
-  if (!isInitialized || !user) {
-    return (
-      <AppShell>
-        <div className="flex min-h-[50vh] items-center justify-center">
-          <LoadingState
-            title="Authenticating Session..."
-            description="Verifying practitioner credentials for protected dashboard access."
-          />
-        </div>
-      </AppShell>
-    );
-  }
+function Home() {
+  const { t, formatNumber, lang } = useI18n();
+  const { readPage } = useA11y();
+  const { user } = useSession();
+  const role = user!.role; // AppShell guarantees a user here
+  const stats = useData(() => data.homeStats(), []);
+  const seesPatients = canOpen(role, 'patients');
+  const seesReport = canOpen(role, 'analytics');
+  const patients = useData(() => (seesPatients ? data.patients() : Promise.resolve([])), [seesPatients]);
+  const report = useData(() => (seesReport ? data.hospitalReport() : Promise.reject(new Error('n/a'))), [seesReport]);
+  const today = new Date().toLocaleDateString(`${lang}-IN`, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    numberingSystem: 'latn',
+  });
 
   return (
-    <AppShell>
-      <div className="space-y-6">
-        {/* Role Switcher Toolbar for Reviewers / Milestone 1 Testing */}
-        <RoleSwitcher />
-
-        {/* Dashboard Welcome Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl bg-gradient-to-r from-brand-900 via-brand-800 to-warm-text p-6 text-white shadow-md">
-          <div className="space-y-1 max-w-2xl">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-md bg-white/15 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-brand-200">
-                <PulseIcon className="h-3.5 w-3.5 animate-pulse text-brand-300" />
-                {roleTitle} Workspace
-              </span>
-            </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
-              Welcome back, {user?.full_name || 'Healthcare Practitioner'}
-            </h1>
-            <p className="text-xs text-brand-100/90 leading-relaxed">
-              {roleDescription}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2.5 shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => void loadDashboardData()}
-              isLoading={isLoading}
-              leftIcon={<RefreshCwIcon className="h-3.5 w-3.5" />}
-              className="border-white/25 bg-white/15 text-white hover:bg-white/20 dark:border-white/25 dark:text-white"
-            >
-              Refresh
-            </Button>
-            <Link href="/patients">
-              <Button
-                variant="primary"
-                size="sm"
-                rightIcon={<ArrowRightIcon className="h-3.5 w-3.5" />}
-                className="bg-brand-500 hover:bg-brand-600 text-white shadow"
-              >
-                {currentRole === 'researcher' ? 'Explore Cohorts' : 'Patient Roster'}
-              </Button>
-            </Link>
-          </div>
+    <>
+      {/* 1. Welcome banner — holds the page's only <h1>. */}
+      <header className="bg-hero mb-6 flex flex-wrap items-center justify-between gap-4 rounded-3xl p-6 text-white shadow-card sm:p-8">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-white/80">{today}</p>
+          <h1 tabIndex={-1} className="mt-1 text-2xl font-bold tracking-tight outline-none sm:text-3xl">
+            {t('home.hello', { name: user!.name })}
+          </h1>
+          <p data-page-help className="mt-1.5 max-w-prose text-base text-white/90">
+            {t(`role.${role}`)} — {t('help.home')}
+          </p>
         </div>
+        <button
+          type="button"
+          onClick={readPage}
+          className="inline-flex min-h-[44px] items-center gap-2 rounded-xl border border-white/40 bg-white/10 px-4 font-semibold text-white hover:bg-white/20"
+        >
+          <Volume2 aria-hidden="true" size={18} />
+          {t('a11y.read')}
+        </button>
+      </header>
 
-        {/* Error State */}
-        {error && (
-          <ErrorMessage
-            title="Failed to Load Dashboard Data"
-            message={error}
-            onRetry={loadDashboardData}
-          />
+      {/* 2. Key numbers */}
+      <LoadState q={stats}>
+        {(s) => (
+          <StatGrid>
+            <Stat icon={<Users size={22} />} accent="teal" label={t('stat.patients')} value={formatNumber(s.patients, 0)} />
+            <Stat
+              icon={<CalendarCheck size={22} />}
+              accent="blue"
+              label={t('stat.visits')}
+              value={formatNumber(s.visits, 0)}
+              note={s.avgStayDays === null ? undefined : `${t('stat.avgStay')}: ${formatNumber(s.avgStayDays)}`}
+            />
+            <Stat icon={<RotateCcw size={22} />} accent="violet" label={t('stat.cameBack')} value={`${formatNumber(s.returnRatePct)}%`} />
+            <Stat
+              icon={<AlertTriangle size={22} />}
+              label={t('stat.highRisk')}
+              value={formatNumber(s.highRisk, 0)}
+              tone={s.highRisk > 0 ? 'high' : undefined}
+              accent="low"
+            />
+          </StatGrid>
+        )}
+      </LoadState>
+
+      {/* 3. Attention list + risk donut */}
+      <div className="grid gap-6 lg:grid-cols-5">
+        {seesPatients && (
+          <div className="lg:col-span-3">
+            <Section title={t('home.attention')} id="attention">
+              <LoadState q={patients}>
+                {(rows) => {
+                  const high = rows
+                    .filter((r) => r.risk === 'high')
+                    .sort((a, b) => b.riskPct - a.riskPct)
+                    .slice(0, 6);
+                  if (high.length === 0) return <p className="text-base text-ink-soft">{t('home.noAttention')}</p>;
+                  return (
+                    <ul className="divide-y divide-line">
+                      {high.map((p) => (
+                        <li key={p.id}>
+                          <Link href={`/patients/${p.id}`} className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-3 hover:bg-paper">
+                            <Avatar name={p.name} tone="high" />
+                            <span className="min-w-0 flex-1">
+                              <span className="block truncate font-semibold text-ink">{p.name}</span>
+                              <span className="block truncate text-sm text-ink-soft">
+                                {p.mrn} · {orDash(p.illness)}
+                              </span>
+                              {/* phones: badge under the name (no room beside it) */}
+                              <span className="mt-1 block sm:hidden">
+                                <RiskBadge level={p.risk} pct={p.riskPct} />
+                              </span>
+                            </span>
+                            <span className="hidden sm:block">
+                              <RiskBar level={p.risk} pct={p.riskPct} />
+                            </span>
+                            <ChevronRight aria-hidden="true" size={18} className="text-ink-soft" />
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  );
+                }}
+              </LoadState>
+            </Section>
+          </div>
         )}
 
-        {/* KPI Metrics Overview */}
-        <StatsOverview stats={stats} isLoading={isLoading} />
-
-        {/* High Priority Patient Activity / Cohorts */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-bold text-warm-text dark:text-warm-text">
-                {currentRole === 'researcher'
-                  ? 'Recent De-Identified Cohort Samples'
-                  : 'High Priority Patient Monitoring'}
-              </h3>
-              <p className="text-[11px] text-warm-text-muted dark:text-warm-text-muted">
-                {currentRole === 'researcher'
-                  ? 'Sample entries from the Diabetes 130-US Hospitals dataset.'
-                  : 'Patients requiring close readmission risk observation.'}
-              </p>
-            </div>
-            <Link
-              href="/patients"
-              className="text-xs font-semibold text-brand-500 hover:text-brand-600 dark:text-brand-400 flex items-center gap-1"
-            >
-              <span>View All Patients</span>
-              <ArrowRightIcon className="h-3 w-3" />
-            </Link>
+        {(seesReport || seesPatients) && (
+          <div className={seesPatients ? 'lg:col-span-2' : 'lg:col-span-3'}>
+            <Section title={t('analytics.riskMix')} id="mix">
+              {/* Same source as the attention list when the role sees patients, so the numbers agree.
+                  (/analytics/summary counts only patients that already have a saved prediction.) */}
+              {seesPatients ? (
+                <LoadState q={patients}>
+                  {(rows) => <DonutChartA11y title={t('analytics.riskMix')} counts={countRisk(rows)} centerLabel={t('stat.patients')} />}
+                </LoadState>
+              ) : (
+                <LoadState q={report}>
+                  {(r) => <DonutChartA11y title={t('analytics.riskMix')} counts={r.riskMix} centerLabel={t('stat.patients')} />}
+                </LoadState>
+              )}
+            </Section>
           </div>
+        )}
 
-          <PatientListTable
-            patients={patients}
-            role={currentRole}
-            isLoading={isLoading}
-          />
+        {/* 4. Quick actions */}
+        <div className={seesPatients ? 'lg:col-span-5' : 'lg:col-span-2'}>
+          <Section title={t('home.question')} id="tasks">
+            <ul className={`grid gap-3 ${seesPatients ? 'sm:grid-cols-2 xl:grid-cols-3' : ''}`}>
+              {pagesFor(role)
+                .filter((p) => p.id !== 'home')
+                .map((p) => {
+                  const Icon = PAGE_ICON[p.id];
+                  return (
+                    <li key={p.id}>
+                      <Link
+                        href={p.href}
+                        className="group flex h-full items-center gap-4 rounded-2xl border border-line p-4 transition-colors hover:border-teal hover:bg-teal-bg"
+                      >
+                        <IconChip icon={<Icon size={22} />} accent="teal" />
+                        <span className="min-w-0 flex-1">
+                          <span className="block font-semibold text-ink">{t(p.labelKey)}</span>
+                          <span className="block text-sm text-ink-soft">{t(p.helpKey)}</span>
+                        </span>
+                        <ChevronRight aria-hidden="true" size={18} className="text-ink-soft group-hover:text-teal" />
+                      </Link>
+                    </li>
+                  );
+                })}
+            </ul>
+          </Section>
         </div>
       </div>
-    </AppShell>
+    </>
   );
 }

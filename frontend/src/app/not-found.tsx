@@ -1,27 +1,20 @@
+'use client';
+/** Custom 404 — plain words + one way back. */
 import Link from 'next/link';
 
+import { useI18n } from '@/i18n/I18nProvider';
+
 export default function NotFound() {
+  const { t } = useI18n();
   return (
-    <div className="min-h-screen flex items-center justify-center bg-warm-bg px-4">
-      <div className="max-w-md w-full text-center space-y-6 bg-white p-8 rounded-2xl border border-warm-border shadow-sm">
-        <div className="w-16 h-16 mx-auto bg-brand-50 rounded-2xl flex items-center justify-center text-brand-600 font-bold text-2xl">
-          404
-        </div>
-        <div className="space-y-2">
-          <h1 className="text-xl font-bold text-warm-text">Page Not Found</h1>
-          <p className="text-sm text-warm-text-muted">
-            The requested clinical record or application page could not be located.
-          </p>
-        </div>
-        <div className="pt-2">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center justify-center px-4 py-2.5 rounded-xl bg-brand-600 text-white text-sm font-medium hover:bg-brand-700 transition-colors shadow-sm"
-          >
-            Return to Dashboard
-          </Link>
-        </div>
-      </div>
-    </div>
+    <main id="main" className="mx-auto max-w-md px-4 py-16 text-center">
+      <p aria-hidden="true" className="mb-4 text-6xl font-bold text-teal">
+        404
+      </p>
+      <h1 className="mb-6 text-3xl font-bold">{t('common.notFound')}</h1>
+      <Link href="/dashboard" className="text-lg font-semibold text-teal-dark underline">
+        {t('a11y.sc.home')}
+      </Link>
+    </main>
   );
 }
