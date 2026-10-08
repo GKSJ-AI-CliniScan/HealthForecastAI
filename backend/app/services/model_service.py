@@ -1,5 +1,7 @@
 """Machine-learning model loading and inference service."""
 
+import json
+from contextlib import suppress
 from functools import lru_cache
 from hashlib import sha256
 from pathlib import Path
@@ -21,11 +23,12 @@ MODEL_DOWNLOAD_URL = (
 )
 
 MODEL_ZIP_SHA256 = "584cc7afd66117b82c1c64f9a244070fb76520de799ea594264aa9b3c162612e"
+PRODUCTION_MODEL_DIR = Path("/tmp/healthforecastai-model")
 
 
 def _download_model() -> Path:
     """Download and extract the production model artifact."""
-    artifacts_dir = Path("/tmp/healthforecastai-model")
+    artifacts_dir = PRODUCTION_MODEL_DIR
     artifacts_dir.mkdir(parents=True, exist_ok=True)
 
     model_path = artifacts_dir / MODEL_FILENAME
@@ -61,7 +64,7 @@ def _download_model() -> Path:
 @lru_cache(maxsize=1)
 def load_risk_model() -> Any:
     """Load the production risk prediction model."""
-    model_path = Path(settings.MODEL_ARTIFACT_DIR) / MODEL_FILENAME
+    model_path = PRODUCTION_MODEL_DIR / MODEL_FILENAME
 
     if not model_path.exists():
         model_path = _download_model()
@@ -104,29 +107,35 @@ def predict_readmission(
 
 
 def list_registered_models() -> list[dict]:
-    """List locally available model artifacts."""
-    artifacts_dir = Path(settings.MODEL_ARTIFACT_DIR)
+    """List the production model artifact."""
+    model_path = PRODUCTION_MODEL_DIR / MODEL_FILENAME
 
-    if not artifacts_dir.exists():
+    if not model_path.exists():
+        try:
+            model_path = _download_model()
+        except Exception:
+            return []
+
+    if not model_path.exists():
         return []
 
-    models: list[dict] = []
-
-    for file in sorted(artifacts_dir.glob("*.joblib")):
-        models.append(
-            {
-                "filename": file.name,
-                "size_kb": round(file.stat().st_size / 1024, 1),
-                "is_active": file.name == MODEL_FILENAME,
-            }
-        )
-
-    return models
+    return [
+        {
+            "filename": model_path.name,
+            "size_kb": round(model_path.stat().st_size / 1024, 1),
+            "is_active": True,
+        }
+    ]
 
 
 def get_active_model_info() -> dict:
-    """Return information about the active model."""
-    model_path = Path(settings.MODEL_ARTIFACT_DIR) / MODEL_FILENAME
+    """Return information about the active production model."""
+    model_path = PRODUCTION_MODEL_DIR / MODEL_FILENAME
+
+    if not model_path.exists():
+        with suppress(Exception):
+            model_path = _download_model()
+
     exists = model_path.exists()
 
     return {
@@ -139,10 +148,8 @@ def get_active_model_info() -> dict:
 
 
 def get_active_model_metrics() -> dict:
-    """Return stored model evaluation metrics when available."""
-    artifacts_dir = Path(settings.MODEL_ARTIFACT_DIR)
-    metrics_path = artifacts_dir / "metrics.joblib"
-    threshold_path = artifacts_dir / "threshold.joblib"
+    """Return evaluation metrics for the active model."""
+    metrics_path = Path(__file__).with_name("model_metrics.json")
 
     metrics = {
         "accuracy": None,
@@ -153,37 +160,20 @@ def get_active_model_metrics() -> dict:
         "threshold": None,
     }
 
-    if metrics_path.exists():
-        try:
-            saved_metrics = joblib.load(metrics_path)
+    if not metrics_path.exists():
+        return metrics
 
-            if isinstance(saved_metrics, dict):
-                for key in (
-                    "accuracy",
-                    "precision",
-                    "recall",
-                    "f1",
-                    "roc_auc",
-                ):
-                    value = saved_metrics.get(key)
+    try:
+        with metrics_path.open("r", encoding="utf-8") as file:
+            saved_metrics = json.load(file)
 
-                    if value is not None:
-                        metrics[key] = float(value)
-        except Exception:
-            pass
+        for key in metrics:
+            value = saved_metrics.get(key)
 
-    if threshold_path.exists():
-        try:
-            threshold = joblib.load(threshold_path)
+            if value is not None:
+                metrics[key] = float(value)
 
-            if isinstance(threshold, int | float):
-                metrics["threshold"] = float(threshold)
-            elif isinstance(threshold, dict):
-                threshold_value = threshold.get("threshold")
-
-                if threshold_value is not None:
-                    metrics["threshold"] = float(threshold_value)
-        except Exception:
-            pass
+    except (OSError, ValueError, TypeError):
+        pass
 
     return metrics
