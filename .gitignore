@@ -75,6 +75,12 @@ ml/artifacts/*
 *.pth
 *.onnx
 *.pb
+
+# Deployment copy of required ML artifacts
+!backend/ml/
+!backend/ml/artifacts/
+!backend/ml/artifacts/*.joblib
+
 mlruns/
 wandb/
 
