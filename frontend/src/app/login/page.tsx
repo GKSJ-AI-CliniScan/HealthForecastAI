@@ -3,13 +3,22 @@
  * Sign-in page (Milestone 1 — authentication).
  *
  * SIMPLE ON PURPOSE: language picker FIRST (so a non-English user can read the
- * rest), then just email + password + one big button. In demo mode, one-tap
+ * rest), then email + password + role + one big button. In demo mode, one-tap
  * buttons for the 4 roles.
  * v2 look: split screen — left a brand panel that says in 4 lines what the app does
  * (reuses the translated page-help sentences, so it is in every language), right the form card.
  * On phones the brand panel shrinks to a header above the form. Errors are spoken by screen readers (role="alert")
  * and focus jumps to the first wrong field.
- * FLOWS NEXT: session.login() → data.login() → POST /auth/login → /dashboard.
+ *
+ * v3 (RBAC on screen): the user also picks their role ("Your role").
+ * WHY: the team wants role-based access to be visible at sign-in.
+ * SECURITY: the picked role is only a CHECK, never the source of truth. The real
+ * role always comes from the backend (POST /auth/login → user.role). If the two
+ * differ we sign the user straight out and show the normal "sign-in failed"
+ * message — we do NOT say which role the account really has, so nobody can use
+ * this screen to guess roles.
+ * FLOWS NEXT: session.login() → data.login() → POST /auth/login → role check → /dashboard
+ *             (RequireRole then guards every page by user.role).
  */
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -18,6 +27,7 @@ import type { FormEvent } from 'react';
 import { DATA_MODE } from '@/config';
 import { ApiError } from '@/data';
 import { DEMO_ACCOUNTS } from '@/data/demo';
+import type { Role } from '@/data/types';
 import { useI18n } from '@/i18n/I18nProvider';
 import { useSession } from '@/lib/session';
 import { LanguagePicker } from '@/saral/LanguagePicker';
@@ -37,30 +47,60 @@ const FEATURES: { icon: keyof typeof PAGE_ICON; key: TKey }[] = [
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/**
+ * The 4 roles, taken from the demo accounts list.
+ * WHY from DEMO_ACCOUNTS (not a new hard-coded list): that list already has one
+ * account per role with the exact role values the app uses, and the role names
+ * are already translated as `role.<value>` — so no second list can go out of sync.
+ * Set → removes duplicates if a role ever gets two demo accounts.
+ */
+const ROLE_OPTIONS: Role[] = Array.from(new Set(DEMO_ACCOUNTS.map((a) => a.role as Role)));
+
 export default function LoginPage() {
   const { t } = useI18n();
-  const { login, user, ready } = useSession();
+  // logout is needed now: a role mismatch must undo the session login() just created.
+  const { login, logout, user, ready } = useSession();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  // null = nothing picked yet → the form asks for it (no silent default role).
+  const [role, setRole] = useState<Role | null>(null);
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
+    role?: string;
     form?: string;
   }>({});
   const [busy, setBusy] = useState(false);
   const emailRef = useRef<HTMLInputElement>(null);
   const passRef = useRef<HTMLInputElement>(null);
+  // First radio button — focus goes here when no role was picked.
+  const roleRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (ready && user) router.replace('/dashboard'); // already signed in
   }, [ready, user, router]);
 
-  async function signIn(e?: string, p?: string) {
+  /**
+   * @param expected the role the person says they are. Demo buttons pass their own
+   *                 role; the form passes the picked radio button.
+   */
+  async function signIn(e?: string, p?: string, expected?: Role) {
     setBusy(true);
     setErrors({});
     try {
-      await login(e ?? email, p ?? password);
+      const u = await login(e ?? email, p ?? password);
+      const want = expected ?? role;
+      // ROLE CHECK — backend role (u.role) must equal the picked role.
+      if (want && u.role !== want) {
+        // Undo the session right away. login() and logout() run in the same tick,
+        // so React batches them and the "already signed in → /dashboard" effect
+        // above never sees this user.
+        logout();
+        setPassword(''); // make them type it again — no silent retry with another role
+        setErrors({ form: t('auth.failed') }); // same message as a wrong password, on purpose
+        return;
+      }
       router.push('/dashboard');
     } catch (err) {
       // offline gets its own message, so people don't retype a correct password forever
@@ -74,13 +114,15 @@ export default function LoginPage() {
 
   function onSubmit(ev: FormEvent) {
     ev.preventDefault();
-    // Validate before calling the server; move focus to the first problem.
+    // Validate before calling the server; move focus to the first problem (top to bottom).
     const next: typeof errors = {};
     if (!EMAIL_RE.test(email.trim())) next.email = email ? t('form.badEmail') : t('form.required');
     if (!password) next.password = t('form.required');
+    if (!role) next.role = t('form.required');
     setErrors(next);
     if (next.email) return emailRef.current?.focus();
     if (next.password) return passRef.current?.focus();
+    if (next.role) return roleRef.current?.focus();
     void signIn();
   }
 
@@ -160,6 +202,48 @@ export default function LoginPage() {
                   className={INPUT}
                 />
               </Field>
+
+              {/* Role picker — real radio buttons inside a fieldset, so screen readers
+                  announce "Your role, group, Doctor, radio button, 1 of 4" and arrow keys work. */}
+              <fieldset
+                className="mb-5"
+                aria-invalid={!!errors.role}
+                aria-describedby={errors.role ? 'role-err' : undefined}
+              >
+                {/* <legend className="mb-2 text-base font-semibold">{t('auth.roleLabel')}</legend> */}
+                <div className="grid grid-cols-2 gap-2">
+                  {ROLE_OPTIONS.map((r, i) => {
+                    const picked = role === r;
+                    return (
+                      <label
+                        key={r}
+                        // Big tap targets (min 48px) and a clear ring on the picked one —
+                        // not colour alone, so it also works for colour-blind users.
+                        className={`flex min-h-12 cursor-pointer items-center gap-2 rounded-xl border p-3 text-sm ${
+                          picked ? 'border-current font-semibold ring-2 ring-current' : 'border-line'
+                        }`}
+                      >
+                        <input
+                          ref={i === 0 ? roleRef : undefined}
+                          type="radio"
+                          name="role"
+                          value={r}
+                          checked={picked}
+                          onChange={() => setRole(r)}
+                          className="h-4 w-4 shrink-0"
+                        />
+                        {t(`role.${r}` as TKey)}
+                      </label>
+                    );
+                  })}
+                </div>
+                {errors.role && (
+                  <p id="role-err" role="alert" className="mt-2 text-sm font-semibold text-rhigh">
+                    {errors.role}
+                  </p>
+                )}
+              </fieldset>
+
               <div className="[&>button]:w-full">
                 <Button type="submit" disabled={busy}>
                   {busy ? t('auth.busy') : t('auth.submit')}
@@ -175,8 +259,18 @@ export default function LoginPage() {
                 </h2>
                 <div className="grid grid-cols-2 gap-2">
                   {DEMO_ACCOUNTS.map((a) => (
-                    <Button key={a.role} variant="quiet" disabled={busy} onClick={() => void signIn(a.email, 'demo')}>
-                      {t(`role.${a.role}`)}
+                    <Button
+                      key={a.role}
+                      variant="quiet"
+                      disabled={busy}
+                      onClick={() => {
+                        // Demo button = that account AND that role, so the role check passes
+                        // and the picker shows which role was used.
+                        setRole(a.role as Role);
+                        void signIn(a.email, 'demo', a.role as Role);
+                      }}
+                    >
+                      {t(`role.${a.role}` as TKey)}
                     </Button>
                   ))}
                 </div>
