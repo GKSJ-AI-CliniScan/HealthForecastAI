@@ -25,7 +25,7 @@ MODEL_ZIP_SHA256 = "584cc7afd66117b82c1c64f9a244070fb76520de799ea594264aa9b3c162
 
 def _download_model() -> Path:
     """Download and extract the production model artifact."""
-    artifacts_dir = Path(settings.MODEL_ARTIFACT_DIR)
+    artifacts_dir = Path("/tmp/healthforecastai-model")
     artifacts_dir.mkdir(parents=True, exist_ok=True)
 
     model_path = artifacts_dir / MODEL_FILENAME
