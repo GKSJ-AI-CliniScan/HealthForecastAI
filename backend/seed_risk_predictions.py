@@ -1,11 +1,10 @@
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.db.session import SessionLocal
 from app.models.admission import Admission
 from app.models.prediction import RiskPrediction
 from app.services.risk_service import evaluate_patient_risk
-from app.core.config import settings
-
 
 BATCH_SIZE = 1000
 
@@ -29,11 +28,7 @@ def seed_risk_predictions():
 
         while offset < total:
             admissions = (
-                db.query(Admission)
-                .order_by(Admission.id)
-                .offset(offset)
-                .limit(BATCH_SIZE)
-                .all()
+                db.query(Admission).order_by(Admission.id).offset(offset).limit(BATCH_SIZE).all()
             )
 
             if not admissions:
