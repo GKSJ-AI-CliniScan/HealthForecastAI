@@ -9,12 +9,13 @@ from app.db.session import get_db
 from app.schemas.patient import (
     PatientAssignment,
     PatientCreate,
-    PatientRead,)
+    PatientRead,
+)
 from app.services.patient_service import (
     assign_patient_to_doctor,
     create_patient_record,
-    get_scoped_patients,
     get_dashboard_patients,
+    get_scoped_patients,
 )
 
 router = APIRouter()
@@ -26,7 +27,10 @@ def list_patients(
     user: CurrentUser = Depends(get_current_user),
 ) -> list[PatientRead]:
     """Return the patients the caller is allowed to see based on their role."""
-    return get_scoped_patients(db=db, user=user)
+    patients = get_scoped_patients(db=db, user=user)
+    return [PatientRead.model_validate(patient) for patient in patients]
+
+
 @router.get("/dashboard", summary="List patients with latest admission risk")
 def dashboard_patients(
     db: Session = Depends(get_db),
@@ -42,7 +46,10 @@ def create_patient(
     user: CurrentUser = Depends(require_permission(Permission.PATIENT_WRITE)),
 ) -> PatientRead:
     """Create a new patient record."""
-    return create_patient_record(db=db, payload=payload)
+    patient = create_patient_record(db=db, payload=payload)
+    return PatientRead.model_validate(patient)
+
+
 @router.patch(
     "/{patient_id}/assign",
     summary="Assign a patient to a doctor",
@@ -51,9 +58,7 @@ def assign_patient(
     patient_id: int,
     payload: PatientAssignment,
     db: Session = Depends(get_db),
-    user: CurrentUser = Depends(
-        require_permission(Permission.PATIENT_WRITE)
-    ),
+    user: CurrentUser = Depends(require_permission(Permission.PATIENT_WRITE)),
 ) -> dict:
     """Assign an existing patient to a doctor."""
 

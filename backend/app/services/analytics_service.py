@@ -6,7 +6,6 @@ from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
 from app.models.admission import Admission
-from app.models.patient import Patient
 from app.models.treatment import TreatmentOutcome
 from app.schemas.analytics import (
     DepartmentPerformance,
@@ -49,29 +48,13 @@ class AnalyticsService:
 
         patient_ids = {a.patient_id for a in admissions}
 
-        readmitted_count = sum(
-            1
-            for a in admissions
-            if a.readmitted in {"<30", "<30 days"}
-        )
+        readmitted_count = sum(1 for a in admissions if a.readmitted in {"<30", "<30 days"})
 
-        readmission_rate = (
-            readmitted_count / len(admissions) * 100
-            if admissions
-            else 0.0
-        )
+        readmission_rate = readmitted_count / len(admissions) * 100 if admissions else 0.0
 
-        recovery_values = [
-            a.time_in_hospital
-            for a in admissions
-            if a.time_in_hospital is not None
-        ]
+        recovery_values = [a.time_in_hospital for a in admissions if a.time_in_hospital is not None]
 
-        average_recovery = (
-            sum(recovery_values) / len(recovery_values)
-            if recovery_values
-            else 0.0
-        )
+        average_recovery = sum(recovery_values) / len(recovery_values) if recovery_values else 0.0
 
         admission_ids = [a.id for a in admissions]
 
@@ -122,9 +105,10 @@ class AnalyticsService:
     ) -> HospitalPerformanceResponse:
         """Return hospital and department performance from PostgreSQL."""
 
-        rows = db.execute(
-            text(
-                """
+        rows = (
+            db.execute(
+                text(
+                    """
                 SELECT
                     facility_name,
                     reporting_period,
@@ -139,9 +123,12 @@ class AnalyticsService:
                 WHERE facility_id = :facility_id
                 ORDER BY department
                 """
-            ),
-            {"facility_id": facility_id},
-        ).mappings().all()
+                ),
+                {"facility_id": facility_id},
+            )
+            .mappings()
+            .all()
+        )
 
         if not rows:
             return HospitalPerformanceResponse(
@@ -153,58 +140,34 @@ class AnalyticsService:
                 departments=[],
             )
 
-        total_admissions = sum(
-            int(row["admissions_count"]) for row in rows
-        )
+        total_admissions = sum(int(row["admissions_count"]) for row in rows)
 
         weighted_readmission = (
-            sum(
-                float(row["readmission_rate_pct"])
-                * int(row["admissions_count"])
-                for row in rows
-            )
+            sum(float(row["readmission_rate_pct"]) * int(row["admissions_count"]) for row in rows)
             / total_admissions
             if total_admissions
             else 0.0
         )
 
         weighted_los = (
-            sum(
-                float(row["average_los_days"])
-                * int(row["admissions_count"])
-                for row in rows
-            )
+            sum(float(row["average_los_days"]) * int(row["admissions_count"]) for row in rows)
             / total_admissions
             if total_admissions
             else 0.0
         )
 
-        total_beds = sum(
-            int(row["bed_capacity"]) for row in rows
-        )
-        occupied_beds = sum(
-            int(row["occupied_beds"]) for row in rows
-        )
+        total_beds = sum(int(row["bed_capacity"]) for row in rows)
+        occupied_beds = sum(int(row["occupied_beds"]) for row in rows)
 
-        occupancy_rate = (
-            occupied_beds / total_beds * 100
-            if total_beds
-            else 0.0
-        )
+        occupancy_rate = occupied_beds / total_beds * 100 if total_beds else 0.0
 
         departments = [
             DepartmentPerformance(
                 department=row["department"],
                 admissions_count=int(row["admissions_count"]),
-                readmission_rate_pct=float(
-                    row["readmission_rate_pct"]
-                ),
-                avg_length_of_stay=float(
-                    row["average_los_days"]
-                ),
-                performance_score=float(
-                    row["performance_score"]
-                ),
+                readmission_rate_pct=float(row["readmission_rate_pct"]),
+                avg_length_of_stay=float(row["average_los_days"]),
+                performance_score=float(row["performance_score"]),
             )
             for row in rows
         ]
@@ -234,9 +197,10 @@ class AnalyticsService:
     ) -> list[dict]:
         """Return historical hospital trend snapshots."""
 
-        rows = db.execute(
-            text(
-                """
+        rows = (
+            db.execute(
+                text(
+                    """
                 SELECT
                     snapshot_time,
                     readmission_rate_pct,
@@ -246,22 +210,19 @@ class AnalyticsService:
                 WHERE facility_id = :facility_id
                 ORDER BY snapshot_time ASC
                 """
-            ),
-            {"facility_id": facility_id},
-        ).mappings().all()
+                ),
+                {"facility_id": facility_id},
+            )
+            .mappings()
+            .all()
+        )
 
         return [
             {
                 "snapshot_time": row["snapshot_time"].isoformat(),
-                "readmission_rate_pct": float(
-                    row["readmission_rate_pct"]
-                ),
-                "average_recovery_days": float(
-                    row["average_recovery_days"]
-                ),
-                "bed_occupancy_rate_pct": float(
-                    row["bed_occupancy_rate_pct"]
-                ),
+                "readmission_rate_pct": float(row["readmission_rate_pct"]),
+                "average_recovery_days": float(row["average_recovery_days"]),
+                "bed_occupancy_rate_pct": float(row["bed_occupancy_rate_pct"]),
             }
             for row in rows
         ]
@@ -277,12 +238,8 @@ class AnalyticsService:
             select(
                 TreatmentOutcome.treatment_name,
                 func.count(TreatmentOutcome.id).label("patient_count"),
-                func.avg(
-                    TreatmentOutcome.recovery_score
-                ).label("avg_recovery_score"),
-                func.avg(
-                    TreatmentOutcome.length_of_stay_days
-                ).label("avg_recovery_days"),
+                func.avg(TreatmentOutcome.recovery_score).label("avg_recovery_score"),
+                func.avg(TreatmentOutcome.length_of_stay_days).label("avg_recovery_days"),
             )
             .group_by(TreatmentOutcome.treatment_name)
             .order_by(TreatmentOutcome.treatment_name)
@@ -295,17 +252,18 @@ class AnalyticsService:
         for row in rows:
             treatment_name = row.treatment_name
 
-            treatment_admissions = db.execute(
-                select(Admission)
-                .join(
-                    TreatmentOutcome,
-                    TreatmentOutcome.admission_id == Admission.id,
+            treatment_admissions = (
+                db.execute(
+                    select(Admission)
+                    .join(
+                        TreatmentOutcome,
+                        TreatmentOutcome.admission_id == Admission.id,
+                    )
+                    .where(TreatmentOutcome.treatment_name == treatment_name)
                 )
-                .where(
-                    TreatmentOutcome.treatment_name
-                    == treatment_name
-                )
-            ).scalars().all()
+                .scalars()
+                .all()
+            )
 
             total = len(treatment_admissions)
 
@@ -313,9 +271,7 @@ class AnalyticsService:
                 continue
 
             successful = sum(
-                1
-                for admission in treatment_admissions
-                if admission.readmitted == "NO"
+                1 for admission in treatment_admissions if admission.readmitted == "NO"
             )
 
             readmitted = sum(

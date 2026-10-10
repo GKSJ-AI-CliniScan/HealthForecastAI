@@ -1,17 +1,15 @@
 """Risk prediction and readmission forecasting endpoints - Module 3."""
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import func,select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
-
-
-from app.db.session import get_db
-from app.models.admission import Admission
-from app.models.prediction import RiskPrediction
 
 from app.api.deps import CurrentUser, require_permission
 from app.core.config import settings
 from app.core.rbac import Permission
+from app.db.session import get_db
+from app.models.admission import Admission
+from app.models.prediction import RiskPrediction
 from app.schemas.prediction import (
     ReadmissionForecast,
     RiskPredictionRead,
@@ -89,9 +87,7 @@ def list_high_risk_patients(
             Admission.id == latest_prediction.c.admission_id,
             isouter=True,
         )
-        .order_by(
-            latest_prediction.c.readmission_probability.desc()
-        )
+        .order_by(latest_prediction.c.readmission_probability.desc())
         .limit(50)
     )
 
@@ -110,26 +106,19 @@ def list_high_risk_patients(
 
         if row.number_emergency:
             factors.append(
-                f"Frequent emergency department encounters "
-                f"({row.number_emergency} visits)"
+                f"Frequent emergency department encounters " f"({row.number_emergency} visits)"
             )
 
         if row.time_in_hospital and row.time_in_hospital >= 7:
-            factors.append(
-                f"Extended hospital length of stay "
-                f"({row.time_in_hospital} days)"
-            )
+            factors.append(f"Extended hospital length of stay " f"({row.time_in_hospital} days)")
 
         if row.num_medications and row.num_medications >= 15:
             factors.append(
-                f"Polypharmacy detected "
-                f"({row.num_medications} active prescribed medications)"
+                f"Polypharmacy detected " f"({row.num_medications} active prescribed medications)"
             )
 
         if row.A1Cresult == ">8":
-            factors.append(
-                "Poor glycemic management (HbA1c level exceeds 8%)"
-            )
+            factors.append("Poor glycemic management (HbA1c level exceeds 8%)")
 
         actions: list[str] = [
             "Schedule post-discharge primary care follow-up within 48 to 72 hours",
@@ -137,19 +126,13 @@ def list_high_risk_patients(
         ]
 
         if row.num_medications and row.num_medications >= 15:
-            actions.append(
-                "Conduct clinical pharmacist medication reconciliation before discharge"
-            )
+            actions.append("Conduct clinical pharmacist medication reconciliation before discharge")
 
         if row.time_in_hospital and row.time_in_hospital >= 7:
-            actions.append(
-                "Arrange dedicated care coordination and discharge nurse review"
-            )
+            actions.append("Arrange dedicated care coordination and discharge nurse review")
 
         if row.A1Cresult == ">8":
-            actions.append(
-                "Order outpatient endocrine or certified diabetes educator consultation"
-            )
+            actions.append("Order outpatient endocrine or certified diabetes educator consultation")
 
         results.append(
             RiskPredictionRead(
@@ -166,6 +149,7 @@ def list_high_risk_patients(
 
     return results
 
+
 @router.get(
     "/forecast",
     response_model=ReadmissionForecast,
@@ -174,9 +158,7 @@ def list_high_risk_patients(
 def readmission_forecast(
     horizon_days: int = 30,
     db: Session = Depends(get_db),
-    user: CurrentUser = Depends(
-        require_permission(Permission.READMISSION_FORECAST_READ)
-    ),
+    user: CurrentUser = Depends(require_permission(Permission.READMISSION_FORECAST_READ)),
 ) -> ReadmissionForecast:
     """Return a database-backed readmission forecast."""
 
@@ -196,20 +178,14 @@ def readmission_forecast(
     summary = db.execute(
         select(
             func.count().label("patient_count"),
-            func.avg(
-                latest_predictions.c.readmission_probability
-            ).label("average_probability"),
-            func.sum(
-                latest_predictions.c.readmission_probability
-            ).label("expected_readmissions"),
+            func.avg(latest_predictions.c.readmission_probability).label("average_probability"),
+            func.sum(latest_predictions.c.readmission_probability).label("expected_readmissions"),
         )
     ).one()
 
     patient_count = int(summary.patient_count or 0)
     average_probability = float(summary.average_probability or 0.0)
-    expected_readmissions_30d = float(
-        summary.expected_readmissions or 0.0
-    )
+    expected_readmissions_30d = float(summary.expected_readmissions or 0.0)
 
     if patient_count == 0:
         return ReadmissionForecast(
@@ -222,9 +198,7 @@ def readmission_forecast(
     # Scale the 30-day expectation according to the requested horizon.
     horizon_factor = max(horizon_days, 1) / 30.0
 
-    predicted_readmissions = int(
-        round(expected_readmissions_30d * horizon_factor)
-    )
+    predicted_readmissions = int(round(expected_readmissions_30d * horizon_factor))
 
     predicted_rate = min(
         average_probability * horizon_factor,

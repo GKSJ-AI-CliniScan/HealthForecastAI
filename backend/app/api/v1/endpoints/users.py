@@ -26,7 +26,7 @@ def list_users(
     """Return platform users with pagination."""
     try:
         users = db.query(User).offset(skip).limit(limit).all()
-        return list(users)
+        return [UserRead.model_validate(item) for item in users]
     except (OperationalError, DBAPIError):
         return []
 
@@ -57,7 +57,7 @@ def create_user(
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-        return db_user
+        return UserRead.model_validate(db_user)
     except (OperationalError, DBAPIError):
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,

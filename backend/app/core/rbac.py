@@ -53,16 +53,16 @@ class Permission(StrEnum):
 
 PERMISSIONS: dict[Role, frozenset[Permission]] = {
     Role.DOCTOR: frozenset(
-    {
-        Permission.PATIENT_READ_ASSIGNED,
-        Permission.PATIENT_WRITE,
-        Permission.MEDICAL_HISTORY_READ,
-        Permission.RISK_REPORT_READ,
-        Permission.READMISSION_FORECAST_READ,
-        Permission.TREATMENT_REPORT_READ_LIMITED,
-        Permission.CARE_RECOMMENDATION_GENERATE,
-    }
-),
+        {
+            Permission.PATIENT_READ_ASSIGNED,
+            Permission.PATIENT_WRITE,
+            Permission.MEDICAL_HISTORY_READ,
+            Permission.RISK_REPORT_READ,
+            Permission.READMISSION_FORECAST_READ,
+            Permission.TREATMENT_REPORT_READ_LIMITED,
+            Permission.CARE_RECOMMENDATION_GENERATE,
+        }
+    ),
     Role.HOSPITAL_ADMIN: frozenset(
         {
             Permission.PATIENT_READ_ALL,

@@ -29,16 +29,7 @@ class PatientRead(PatientBase):
 
 
 class PatientAnonymised(BaseModel):
-    """Researcher facing view - no identifiers, no MRN."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    pseudo_id: str
-    age_group: str | None = None
-    gender: str | None = None
-    primary_diagnosis: str | None = None
-class PatientAnonymised(BaseModel):
-    """Researcher facing view - no identifiers, no MRN."""
+    """Researcher-facing view - no identifiers, no MRN."""
 
     model_config = ConfigDict(from_attributes=True)
 
