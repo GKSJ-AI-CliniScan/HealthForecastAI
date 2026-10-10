@@ -1,70 +1,23 @@
-"""Patient business logic."""
+"""Patient service - business logic layer for patient records and scoping."""
 
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.api.deps import CurrentUser
 from app.core.rbac import Role
-from app.models.audit_log import AuditLog
-from app.models.patient import Patient
+from app.models import Patient, User
 
 
-def list_patients_for_user(
-    db: Session,
-    user_id: int,
-    role: Role,
-) -> list[Patient]:
-    """Return patients visible to the current caller."""
+def get_patients_for_user(db: Session, current_user: CurrentUser) -> list[Patient]:
+    """Return patients filtered according to caller's role privileges."""
+    if current_user.role == Role.DOCTOR:
+        if current_user.subject.isdigit():
+            user_id = int(current_user.subject)
+        else:
+            user = db.query(User).filter(User.email == current_user.subject).first()
+            user_id = user.id if user else None
 
-    stmt = select(Patient)
+        # Doctors see only assigned patients
+        return db.query(Patient).filter(Patient.assigned_doctor_id == user_id).all()
 
-    if role is Role.DOCTOR:
-        stmt = stmt.where(Patient.assigned_doctor_id == user_id)
-
-    elif role is Role.HOSPITAL_ADMIN or role is Role.SYSTEM_ADMIN:
-        pass
-
-    else:
-        return []
-
-    return list(db.scalars(stmt.order_by(Patient.id)).all())
-
-
-def create_patient(
-    db: Session,
-    *,
-    medical_record_number: str,
-    age_group: str | None,
-    gender: str | None,
-    race: str | None,
-    primary_diagnosis: str | None,
-    assigned_doctor_id: int | None,
-    actor_id: int,
-    actor_role: Role,
-) -> Patient:
-    """Create a patient and record an audit event."""
-
-    patient = Patient(
-        medical_record_number=medical_record_number,
-        age_group=age_group,
-        gender=gender,
-        race=race,
-        primary_diagnosis=primary_diagnosis,
-        assigned_doctor_id=assigned_doctor_id,
-    )
-
-    db.add(patient)
-    db.flush()
-
-    audit = AuditLog(
-        actor_id=actor_id,
-        actor_role=str(actor_role),
-        action="patient.create",
-        resource=f"patient:{patient.id}",
-        outcome="success",
-    )
-
-    db.add(audit)
-    db.commit()
-    db.refresh(patient)
-
-    return patient
+    # Hospital Admin and System Admin see all patient records
+    return db.query(Patient).all()

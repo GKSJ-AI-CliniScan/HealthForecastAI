@@ -1,0 +1,66 @@
+/* login.module.css — sirf login page ka style (CSS Module = dusre pages pe leak nahi).
+   WHY plain CSS: Tailwind ho ya na ho, ye har Next.js project mein chalega.
+   Colors HealthForecast ke blue theme se; contrast WCAG AA ke upar. */
+
+.page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: #f2f7fd;
+}
+.card {
+  width: 100%;
+  max-width: 400px; /* mobile pe full width, desktop pe readable */
+  background: #ffffff;
+  border: 1px solid #d6e4f5;
+  border-radius: 16px;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.title { margin: 0; font-size: 1.75rem; color: #0b2a4a; }
+.sub { margin: 0 0 16px; color: #4a6380; font-size: 0.95rem; }
+.label { font-weight: 600; font-size: 0.9rem; color: #0b2a4a; margin-top: 8px; }
+.input {
+  width: 100%;
+  font-size: 1rem; /* 16px+: iPhone pe zoom nahi hota */
+  padding: 12px 14px;
+  border: 1px solid #b9cde6;
+  border-radius: 10px;
+  background: #fbfdff;
+  color: #0b2a4a;
+}
+.input:focus-visible, .primary:focus-visible, .ghost:focus-visible {
+  outline: 3px solid #1a73e8; /* keyboard users ko saaf dikhe kahan focus hai */
+  outline-offset: 2px;
+}
+.pwRow { display: flex; gap: 8px; }
+.ghost {
+  padding: 0 14px;
+  border: 1px solid #b9cde6;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #0b4fa3;
+  font-weight: 600;
+  cursor: pointer;
+}
+.roles { border: 0; padding: 0; margin: 0; display: grid; gap: 6px; }
+.roleOpt {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border: 1px solid #d6e4f5; border-radius: 10px; cursor: pointer;
+}
+.error { min-height: 1.4em; margin: 8px 0 0; color: #b3261e; font-size: 0.9rem; }
+.primary {
+  margin-top: 8px;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  border: 0;
+  border-radius: 10px;
+  background: #0b5ed7;
+  color: #ffffff;
+  cursor: pointer;
+}
+.primary:disabled { opacity: 0.6; cursor: progress; }

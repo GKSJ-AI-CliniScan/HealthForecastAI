@@ -3,29 +3,27 @@ name: healthforecast-ai
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: healthforecast-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-healthforecast}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/postgres/schema:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-healthforecast}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   mongodb:
     image: mongo:7
-    container_name: healthforecast-mongodb
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "27018:27017"
     volumes:
       - mongo_data:/data/db
     healthcheck:
@@ -38,13 +36,13 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: healthforecast-backend
     restart: unless-stopped
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-healthforecast}
+      DATABASE_URL: postgresql+psycopg://postgres:ahmed123@host.docker.internal:5432/healthforecast
       MONGO_URI: mongodb://mongodb:27017
+      MONGO_DB: ${MONGO_DB:-healthforecast}
     ports:
       - "8000:8000"
     depends_on:
@@ -57,10 +55,9 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: healthforecast-frontend
+      args:
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api/v1
     restart: unless-stopped
-    environment:
-      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api/v1
     ports:
       - "3000:3000"
     depends_on:

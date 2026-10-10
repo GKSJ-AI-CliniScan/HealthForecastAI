@@ -1,22 +1,25 @@
 """Risk prediction and readmission forecasting endpoints - Module 3."""
 
+from datetime import UTC, datetime, timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.api.deps import CurrentUser, require_permission
+from app.api.deps import CurrentUser, get_current_user, require_permission
 from app.core.config import settings
 from app.core.rbac import Permission, Role
 from app.db.session import get_db
+from app.models.admission import Admission
+from app.models.patient import Patient
 from app.models.prediction import RiskPrediction
 from app.schemas.prediction import (
     ReadmissionForecast,
     RiskPredictionRead,
     RiskPredictionRequest,
 )
-from app.services import risk_service
-from app.services.model_service import ModelNotAvailableError
-from app.services.patient_service import list_patients_for_user
+from app.services import model_service
+from app.services.patient_service import get_patients_for_user
+from app.services.risk_service import save_prediction
 
 router = APIRouter()
 
@@ -24,98 +27,106 @@ router = APIRouter()
 @router.post("/predict", response_model=RiskPredictionRead, summary="Score one admission")
 def predict_risk(
     payload: RiskPredictionRequest,
-    user: CurrentUser = Depends(require_permission(Permission.RISK_REPORT_READ)),
     db: Session = Depends(get_db),
+    user: CurrentUser = Depends(require_permission(Permission.RISK_REPORT_READ)),
 ) -> RiskPredictionRead:
-    """Score one admission, persist the result, and return it."""
-    try:
-        probability = risk_service.score_admission(db, payload)
-    except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
-    except ModelNotAvailableError as exc:
+    """Return the readmission probability and risk band for one admission."""
+    patient = db.get(Patient, payload.patient_id)
+    admission = (
+        db.query(Admission)
+        .filter(Admission.patient_id == payload.patient_id)
+        .order_by(Admission.id.desc())
+        .first()
+    )
+    if patient is None or admission is None:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient or admission not found"
+        )
+
+    try:
+        probability = model_service.predict_probability(patient, admission)
+    except (FileNotFoundError, RuntimeError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Risk prediction model unavailable: {str(exc)}",
         ) from exc
 
-    record = RiskPrediction(
-        patient_id=payload.patient_id,
-        readmission_probability=probability,
-        risk_category=risk_service.categorise_risk(probability),
-        model_name=settings.ACTIVE_RISK_MODEL,
-        # TODO(milestone-4): pull the real trained version from the MongoDB
-        # model_runs registry once it exists, instead of this placeholder.
-        model_version="unversioned",
+    prediction = save_prediction(
+        db, payload.patient_id, probability, settings.ACTIVE_RISK_MODEL, "1.0.0"
     )
-    db.add(record)
-    db.commit()
-    db.refresh(record)
-
-    return RiskPredictionRead.model_validate(record)
+    return RiskPredictionRead.model_validate(prediction)
 
 
-@router.get("/high-risk", summary="List patients currently in the high risk band")
+@router.get(
+    "/high-risk", response_model=list[RiskPredictionRead], summary="List high risk patients"
+)
 def list_high_risk_patients(
-    user: CurrentUser = Depends(require_permission(Permission.RISK_REPORT_READ)),
     db: Session = Depends(get_db),
+    user: CurrentUser = Depends(get_current_user),
 ) -> list[RiskPredictionRead]:
-    """Return the current high risk cohort, scoped to what the caller may see.
+    """Return all high risk predictions scoped to the user's patient visibility."""
+    visible_patients = get_patients_for_user(db, user)
+    patient_ids = [p.id for p in visible_patients]
 
-    "Current" means each patient's most recent prediction - an older
-    prediction that happened to be high risk doesn't count if a newer one
-    dropped them out of the band.
-    """
-    visible_patients = list_patients_for_user(db=db, user_id=int(user.subject), role=user.role)
-    if user.role not in (Role.DOCTOR, Role.HOSPITAL_ADMIN, Role.SYSTEM_ADMIN):
-        return []
-    visible_ids = {patient.id for patient in visible_patients}
-    if not visible_ids:
+    if not patient_ids:
         return []
 
-    latest_id_per_patient = (
-        select(
-            RiskPrediction.patient_id,
-            func.max(RiskPrediction.id).label("latest_id"),
+    predictions = (
+        db.query(RiskPrediction)
+        .filter(
+            RiskPrediction.patient_id.in_(patient_ids),
+            RiskPrediction.risk_category == "high",
         )
-        .where(RiskPrediction.patient_id.in_(visible_ids))
-        .group_by(RiskPrediction.patient_id)
-        .subquery()
+        .order_by(RiskPrediction.created_at.desc())
+        .all()
     )
-
-    rows = db.scalars(
-        select(RiskPrediction)
-        .join(latest_id_per_patient, RiskPrediction.id == latest_id_per_patient.c.latest_id)
-        .where(RiskPrediction.risk_category == risk_service.RISK_HIGH)
-    ).all()
-
-    return [RiskPredictionRead.model_validate(row) for row in rows]
+    return [RiskPredictionRead.model_validate(p) for p in predictions]
 
 
 @router.get("/forecast", response_model=ReadmissionForecast, summary="Readmission forecast")
 def readmission_forecast(
     horizon_days: int = 30,
-    user: CurrentUser = Depends(require_permission(Permission.READMISSION_FORECAST_READ)),
     db: Session = Depends(get_db),
+    user: CurrentUser = Depends(require_permission(Permission.READMISSION_FORECAST_READ)),
 ) -> ReadmissionForecast:
-    """Return a hospital-wide readmission forecast from current predictions.
+    """Return an aggregated readmission forecast over the requested horizon."""
+    visible_patients = get_patients_for_user(db, user)
+    patient_ids = [p.id for p in visible_patients]
+    scope = "assigned" if user.role is Role.DOCTOR else "hospital"
 
-    NOTE: the brief's "per department" breakdown isn't possible yet - the
-    Admission model has no department column. This aggregates hospital-wide
-    only; flag with your mentor whether department needs adding upstream.
-    """
-    total = db.scalar(select(func.count()).select_from(RiskPrediction)) or 0
-    high_risk = (
-        db.scalar(
-            select(func.count())
-            .select_from(RiskPrediction)
-            .where(RiskPrediction.risk_category == risk_service.RISK_HIGH)
+    if not patient_ids:
+        return ReadmissionForecast(
+            scope=scope,
+            horizon_days=horizon_days,
+            predicted_readmissions=0,
+            predicted_rate=0.0,
         )
-        or 0
+
+    cutoff = datetime.now(UTC) - timedelta(days=horizon_days)
+    recent_predictions = (
+        db.query(RiskPrediction)
+        .filter(
+            RiskPrediction.patient_id.in_(patient_ids),
+            RiskPrediction.created_at >= cutoff,
+        )
+        .all()
     )
-    predicted_rate = (high_risk / total) if total else 0.0
+
+    total = len(recent_predictions)
+    if total == 0:
+        return ReadmissionForecast(
+            scope=scope,
+            horizon_days=horizon_days,
+            predicted_readmissions=0,
+            predicted_rate=0.0,
+        )
+
+    high_risk = sum(1 for p in recent_predictions if p.risk_category == "high")
+    rate = round(high_risk / total, 4)
 
     return ReadmissionForecast(
-        scope="hospital",
+        scope=scope,
         horizon_days=horizon_days,
         predicted_readmissions=high_risk,
-        predicted_rate=predicted_rate,
+        predicted_rate=rate,
     )

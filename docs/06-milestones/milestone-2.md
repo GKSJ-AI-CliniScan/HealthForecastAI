@@ -1,116 +1,129 @@
-# Milestone 2 report - Week 3 & 4 - Risk Prediction & Readmission Forecasting
+# Milestone 2 Report - Week 3 & 4 - Risk Prediction & Readmission Forecasting
 
-> **How to use this file**
-> 1. Fill in every section below. Keep all five headings, even if an answer is short.
-> 2. Delete the `_Not started_` line once you begin - that line is what tells CI
->    the report is still a blank template.
-> 3. Commit it on your own branch. Do not open a pull request to `main`.
-
-_Not started_
-
-- **Intern name:** Mujahad Ahmed
-- **Branch:** `intern/07-mujahad-ahmed`
-- **Submitted on:** 16sept2026
+-   **Intern name:** Samarth A C
+-   **Branch:** `intern/14-samarth-a-c`
+-   **Submitted on:** 2026-09-15
 
 ---
 
 ## Scope for this milestone
 
-- Train patient risk prediction models.
-- Generate patient risk scores.
-- Build risk prediction dashboards.
-- Develop readmission forecasting workflows.
-- Generate forecasting reports.
-- Build clinical insights modules.
+-   Train patient risk prediction models.
+-   Generate patient risk scores.
+-   Build risk prediction dashboards.
+-   Develop readmission forecasting workflows.
+-   Generate forecasting reports.
+-   Build clinical insights modules.
 
 ## Evaluation criteria
 
-- Patient risk prediction and readmission forecasting workflows implemented.
-- Risk scoring and forecasting models functional.
-- Clinical insights generated successfully.
-- AI prediction models integrated.
+-   Patient risk prediction and readmission forecasting workflows implemented.
+-   Risk scoring and forecasting models functional.
+-   Clinical insights generated successfully.
+-   AI prediction models integrated.
 
 ---
 
 ## What I built
 
-Wired `/predict`, `/high-risk`, and `/forecast` to a real trained model instead of
-placeholders (`risk_service.py`, `model_service.py`, `risk.py`). `model_service.py`
-loads and caches the trained pipeline and its metrics from `MODEL_ARTIFACT_DIR`.
-`risk_service.score_admission()` looks up the patient's demographics by
-`patient_id` and combines them with the admission's clinical fields to build the
-feature row the model expects.
+As Backend Engineer for Milestone 2:
 
-I also found and fixed a real design gap: the ML config (`config.yaml`) was set up
-to train on ~45 raw dataset columns, but `RiskPredictionRequest` only carries the
-~9 fields the API/DB can actually supply. A `ColumnTransformer` fit on the full
-column set throws `KeyError` on any real request. I narrowed `config.yaml`'s
-`drop_columns` so training matches what's actually available at inference time.
+1. **Rebuilt Milestone 1 Backend Foundation:** Rebuilt and refactored the Milestone 1 backend integration from scratch to resolve critical database connectivity, schema inconsistencies, RBAC token validation, and Docker container networking issues.
+2. **Model Serving & Pipeline Integration (`backend/app/services/model_service.py`):**
+    - Implemented artifact loading with memory caching for `readmission_model.joblib` and `feature_contract.json`.
+    - Wired in the ML feature pipeline (`build_serving_features`) to construct derived signals (e.g. prior visits, medication changes, ICD-9 diagnosis groupings) without training-serving skew.
+    - Built a robust execution engine bypassing scikit-learn 1.6 `FrozenEstimator` MRO tag bugs to produce calibrated readmission probabilities.
+3. **Risk Scoring & Persistence (`backend/app/api/v1/endpoints/risk.py`, `backend/app/services/risk_service.py`):**
+    - Replaced hardcoded dummy probabilities in `POST /api/v1/risk/predict` with real model inference.
+    - Implemented risk categorization (`low`, `medium`, `high`) based on calibrated decision thresholds.
+    - Persisted prediction outputs into PostgreSQL table `risk_predictions`.
+4. **Dynamic AI Model Metrics Endpoint (`backend/app/api/v1/endpoints/ml_models.py`):**
+    - Connected `GET /api/v1/models/metrics` to dynamically load and serve evaluation metrics from `metrics.json`.
+5. **Lead Integration Duties:**
+    - Standardized the API contract between backend schemas (`RiskPredictionRead`, `ReadmissionForecast`) and frontend TypeScript interfaces (`frontend/src/types/index.ts`).
+    - Coordinated feature contracts and artifact schemas with the AI/ML pipeline.
 
-Generated my own Alembic migration (`alembic revision --autogenerate`) since none
-existed on this branch — `patients`, `admissions`, `users`, `risk_predictions`, etc.
-now exist as real tables.
+---
 
 ## How to run it
 
-```bash
-git clone <repo-url>
-git checkout intern/07-mujahad-ahmed
+### 1. Prerequisites
 
-# Database
-cd backend
-cp .env.example .env   # set SECRET_KEY and MODEL_ARTIFACT_DIR=../ml/artifacts
-alembic upgrade head
-uvicorn app.main:app --reload
+-   Docker & Docker Compose
+-   Python 3.11+
 
-# Model (separate terminal)
-cd ml
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements-dev.txt
-# download dataset - see data/README.md (note: the URL in that file has a typo,
-# missing two hyphens - see "Known gaps" below)
-python -m src.models.train --config configs/config.yaml
-```
+### 2. Start Docker Containers
 
-## Evidence
+-   docker compose up -d --build
 
-Training output (see Metrics below). Example request:
+### 3. Run Backend Unit Tests
 
-`POST /api/v1/risk/predict` with a valid `patient_id` and admission fields
-returns a `RiskPredictionRead` with `readmission_probability`, `risk_category`,
-and persists the result to `risk_predictions`.
+-   docker compose exec backend pytest tests/
+
+### 4. Interactive API Documentation
+
+-   Open your browser and navigate to: http://localhost:8000/docs
+
+### Evidence
+
+1. Model Evaluation Metrics Endpoint (GET /api/v1/models/metrics)
+
+    Status: 200 OK
+
+-   {
+    "accuracy": 0.6868124017716817,
+    "precision": 0.14538444091630756,
+    "recall": 0.5099443118536198,
+    "f1": 0.22626191316625485,
+    "roc_auc": 0.6518298564066656
+    }
+
+2. Live Patient Risk Scoring (POST /api/v1/risk/predict)
+
+-   {
+    "patient_id": 1,
+    "time_in_hospital": 5,
+    "num_medications": 14,
+    "num_lab_procedures": 45,
+    "number_diagnoses": 8,
+    "number_inpatient": 0,
+    "number_emergency": 0,
+    "age_group": "[60-70)"
+    }
+
+        Response: 200 OK
+
+-   {
+    "patient_id": 1,
+    "readmission_probability": 0.08948,
+    "risk_category": "low",
+    "model_name": "readmission_xgboost_v1",
+    "model_version": "1.0.0",
+    "created_at": "2026-09-15T00:21:00Z"
+    }
+
+3. Backend Test Suite Execution
+
+-   35 passed in 1.45s
 
 ## Metrics
 
-Trained on Diabetes 130-US Hospitals, three models per `config.yaml`:
+Due to class imbalance (~9% readmission prevalence), decision thresholds were tuned off the validation set precision-recall curve.
 
-| Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
-|---|---|---|---|---|---|
-| Logistic Regression | 0.679 | 0.174 | 0.494 | 0.258 | 0.639 |
-| Random Forest | 0.689 | 0.176 | 0.477 | 0.258 | 0.638 |
-| XGBoost | 0.887 | 0.528 | 0.012 | 0.024 | 0.633 |
+| Model                  |   Accuracy |  Precision |     Recall |   F1 Score |    ROC-AUC | Decision Threshold |
+| :--------------------- | ---------: | ---------: | ---------: | ---------: | ---------: | -----------------: |
+| Logistic Regression    |     60.70% |     12.68% |     57.36% |     0.2077 |     0.6280 |             0.0927 |
+| Random Forest          |     66.35% |     14.10% |     53.94% |     0.2235 |     0.6459 |             0.1000 |
+| **XGBoost (Promoted)** | **68.68%** | **14.54%** | **50.99%** | **0.2263** | **0.6518** |         **0.1117** |
 
-Best model: **logistic regression** (highest ROC-AUC). **Not promoted** — misses
-the 0.65 ROC-AUC threshold (0.639) and 0.50 recall threshold (0.494), close but
-under. XGBoost's headline accuracy (0.887) is the misleading-accuracy trap the
-guide warns about — its recall (0.012) means it almost never catches a true
-readmission.
+Winner Selection Rationale:
+**XGBoost** won and was promoted to serving (readmission_xgboost_v1) because:
+
+-   It achieved the top ROC-AUC (0.6518) and F1 score (0.2263) across evaluation splits.
+-   Isotonic calibration successfully aligned output probabilities with the real ~9% prevalence while maintaining ranking discrimination on complex non-linear feature interactions.
 
 ## Known gaps
 
-- Model does not clear the promotion threshold (ROC-AUC 0.639 vs 0.65 required).
-  Likely cause: I had to drop ~30 raw feature columns (diagnoses codes,
-  admission_type_id, discharge_disposition_id, all medication columns) from
-  training to match what the API/DB schema can supply at inference time — several
-  of those are known strong readmission predictors. Next step: reintroduce
-  `admission_type`/`discharge_disposition` using `IDS_mapping.csv`, since both
-  already exist as string fields on the `Admission` model.
-- `ml/data/README.md`'s download URL has a typo (missing hyphens in
-  `130-us`/`1999-2008`) that causes a silent 9-byte failed download — flagging
-  for the mentor to fix upstream.
-- No frontend UI built yet for any milestone.
-- `/forecast`'s "per department" requirement from the brief isn't implementable —
-  `Admission` has no department column.
-- `model_version` on saved predictions is hardcoded to `"unversioned"` — real
-  versioning is Milestone 4's model registry.
+1. Department-Level Aggregation (GET /risk/forecast): Aggregates hospital-wide baseline forecast; department breakdown queries will be completed in Milestone
+2. MongoDB Model Registry: Persisting experiment runs into the model_runs collection is slated for Milestone 4.
+3. Background Batch Inference: Batch inference queue for newly admitted patients overnight will be added via background workers.

@@ -39,6 +39,8 @@ class Settings(BaseSettings):
     @property
     def cors_origins(self) -> list[str]:
         """Return CORS origins as a list."""
+        if self.BACKEND_CORS_ORIGINS.strip() == "*":
+            return ["*"]
         return [o.strip() for o in self.BACKEND_CORS_ORIGINS.split(",") if o.strip()]
 
 

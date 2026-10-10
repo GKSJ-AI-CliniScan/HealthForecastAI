@@ -1,0 +1,157 @@
+|HealthForecast AI|
+jahan rugi coṭ arhõ haspatal heć lagaṛ hoyog dareaga onkoe cinhaoa, jemon okte re iläj ńamoge.
+loḍ huyug kana…
+cet hõ bhul hoyena.
+arhõ kurumuṭuy me
+nit udug lagid cet hõ banuga.
+ruaṛ calag me
+sanam
+jhij me
+ṭebul leka udug me
+caṛṭ leka udug me
+namuna ḍeṭa udug kana. sarbhar sãote joṛao banuga.
+sarbhar reag lāib ḍeṭa udug kana.
+ḍaunloḍ me (|CSV| phail)
+{n} maha
+amag kami te noa sakam jhij ban daṛeaga.
+noa sakam banuga.
+{name}: {first} khon {last} habić.
+usul bipod
+tala bipod
+huḍiń bipod
+{days} maha bhitri re arhõ haspatal heć reag sambhaona
+ḍakṭar
+haspatal sasonic
+puṭhạu kamic
+sisṭem sasonic
+mul menu
+mul sakam
+rugi ko
+bipod ńeloḱ
+lahaṭ lekha
+iläj reag phol
+dekhrekh reag salah
+haspatal riporṭ
+puṭhạu ḍeṭa
+|AI| maḍel
+beohạr ko
+goṛo ar sohoj beohạr
+am cet em kami sanaea bachao me.
+ńutum, rekorḍ nombor se rog te rugi sendra me.
+mit́ rugi reag sanam katha.
+rugi arhõ haspatal heć reag tinạk sambhaona, ar cedag.
+coṭ tinạk rugi arhõ heć dareaga.
+oka iläj te rugi ko bhage ńir bogeyena.
+rugi lagid tayom reag kami, ar uni oṛag calag dareaga se ban.
+gota haspatal cele leka kami kana.
+ńutum ukuena rugi ḍeṭa, puṭhạu lagid.
+lahaṭ lekha |AI| maḍel, ar noa tinạk bhage.
+sain in daṛeag hoṛ ko.
+paṛsi, ạkhor reag maraṅ, rõ ar aṛaṅ bodol me.
+sain in
+imel
+pasoarḍ
+sain in me
+sain in huyug kana…
+sain in ban hoyena. imel ar pasoarḍ ńel me.
+se ḍemo khata te sain in me:
+sain auṭ
+nəwa khata sisṭem sasonic benaoa.
+johar, {name}
+am cet em kami sanaea?
+nitoḱ ge ńel lagaṛ rugi ko
+nit usul bipod rugi banuga.
+rugi ko
+haspatal re bhorti
+30 maha bhitri ruaṛ heć
+haspatal re ạbrej maha
+usul bipod rugi ko
+ńutum, rekorḍ nombor se rog ol me
+{n} rugi ńam ena
+bipod reag thak udug me
+rekorḍ nombor
+umer
+jati
+mul rog
+rugi ban ńam ena.
+haspatal re bhorti
+{n} maha tahẽ ena
+30 maha bhitri ruaṛ heć ena
+30 maha bhitri ban ruaṛ heć ena
+cet hõ ban olakana.
+mit́ rugi bachao me
+cet kami hoyoga
+bipod ńel me
+okte reag sima
+ruaṛ heć sambhaona rugi ko
+nit reag reṭ
+lahaṭ reṭ
+iläj
+iläj ńam rugi ko
+bogeyog reag nombor (100 khon)
+ruaṛ heć (%)
+bhage bogeyog
+salah kami ko
+oṛag calag lagid tayar?
+oṛag calag lagid tayar
+nit hõ ban tayar
+tayari: {p}
+oṛag calag tayom reag hukum ko
+{n} maha bhitri arhõ udug heć me
+bipod thak leka rugi ko
+ńutum banuga rugi dal
+gupot lagid ńutum ar joṛao katha ko ukuena.
+ńutum banuga |ID|
+beohạr reag |AI| maḍel
+|AI| tinạk dhao sạri hoyoga
+bipod re menag tinạk rugi noa sendra ńama
+usul bipod men kateć tinạk dhao sạri
+sanam bhage reag nombor
+sanam doho akan maḍel ko
+bhorson
+cet re sikhạu akana
+ṭeknikal ńutum: {name}
+sain in daṛeag hoṛ ko
+mit́ hoṛ joṛao me
+purạ ńutum
+kami
+{name} joṛao ena.
+noa hoṛ ban joṛao daṛeyena.
+doya kate noa perec me.
+doya kate sạri imel ol me.
+mul katha te calag me
+paṛsi
+paṛhao kate anjom ocoy me
+paṛhao bonḍ me
+aṛaṅ te hukum em me
+anjom kana… mit́ sakam reag ńutum men me.
+anjom ena: {text}
+khema me, ban bujhạu ena. “{example}” men kate ńel me.
+aṛaṅ hukum ko |Google Chrome| se |Microsoft Edge| re kami kana.
+noa ḍibhais re {lang} aṛaṅ banuga. spic seṭiṅ re joṛao me.
+ạkhor reag maraṅ
+sadharon
+maraṅ
+ạḍi maraṅ
+usul konṭrasṭ rõ ko
+alom aḍi ńir-dạṛ
+baṭon ar liṅk re seṭer kateć onko men me
+sakam jhij kateć onag ńutum paṛhao me
+paṛhao reag tejo
+lạhạ lạhạ
+sadharon
+ńir
+kibrḍ saṭkaṭ
+noa sakam paṛhao me
+paṛhao bonḍ me
+aṛaṅ te hukum em me
+mul sakam te calag me
+menu reag 1 khon 9 habić jinis jhij me
+{page} sakam jhij ena.
+menu reag jahan ńutum men me, se “paṛhao kate anjom ocoy me”, “paṛhao bonḍ me”, “ruaṛ calag me” se “sain auṭ”.
+sarbhar re nit hõ noa reag ḍeṭa banuga.
+sarbhar habić ban seṭer daṛeyena. tayom te arhõ kurumuṭuy me.
+rugi ko cele leka haspatal khon odog ena, onka leka ruaṛ heć reṭ
+umer leka rugi ko
+ńinda rõ ko
+bonḍ me

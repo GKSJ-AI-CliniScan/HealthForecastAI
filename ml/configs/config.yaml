@@ -4,8 +4,8 @@
 dataset:
   name: diabetes_130_us_hospitals
   source_url: https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008
-  raw_path: data/raw/diabetic_data.csv
-  processed_path: data/processed/admissions_features.parquet
+  raw_path: ml/data/raw/diabetic_data.csv
+  processed_path: ml/data/processed/admissions_features.parquet
   target_column: readmitted
   # The brief targets 30-day readmission: map "<30" -> 1, {">30", "NO"} -> 0
   positive_label: "<30"
@@ -23,51 +23,21 @@ preprocessing:
     - weight
     - payer_code
     - medical_specialty
-    # Milestone 2: the API's RiskPredictionRequest only carries the fields
-    # below, so the trained pipeline must be fit on the same reduced set or
-    # ColumnTransformer.transform() raises a KeyError at inference time.
-    # Kept: race, gender, age, time_in_hospital, num_lab_procedures,
-    # num_medications, number_diagnoses, number_inpatient, number_emergency.
-    - admission_type_id
-    - discharge_disposition_id
-    - admission_source_id
-    - num_procedures
-    - number_outpatient
-    - diag_1
-    - diag_2
-    - diag_3
-    - max_glu_serum
-    - A1Cresult
-    - metformin
-    - repaglinide
-    - nateglinide
-    - chlorpropamide
-    - glimepiride
-    - acetohexamide
-    - glipizide
-    - glyburide
-    - tolbutamide
-    - pioglitazone
-    - rosiglitazone
-    - acarbose
-    - miglitol
-    - troglitazone
-    - tolazamide
-    - examide
-    - citoglipton
-    - insulin
-    - glyburide-metformin
-    - glipizide-metformin
-    - glimepiride-pioglitazone
-    - metformin-rosiglitazone
-    - metformin-pioglitazone
-    - change
-    - diabetesMed
   missing_value_token: "?"
   numeric_imputation: median
   categorical_imputation: most_frequent
   scale_numeric: true
   one_hot_encode: true
+
+cleaning:
+  # Applied by src/data/preprocess.basic_clean
+  drop_columns:
+    - encounter_id
+    - weight
+    - payer_code
+  remove_death_and_hospice: true
+  first_encounter_only: true
+  apply_legacy_drop: false
 
 imbalance:
   strategy: class_weight   # one of: none | class_weight | smote
@@ -76,18 +46,24 @@ models:
   logistic_regression:
     enabled: true
     max_iter: 1000
+  # N3 lever 5 (RandomizedSearchCV, train-only CV, see
+  # ml/artifacts/n3_ledger.json): these five values replace the M1
+  # defaults with what the search found. Not the protected
+  # evaluation.thresholds bar (C1) - these are ordinary hyperparameters,
+  # which this file exists to hold.
   random_forest:
     enabled: true
-    n_estimators: 300
-    max_depth: 12
-    min_samples_leaf: 5
+    n_estimators: 200
+    max_depth: 8
+    min_samples_leaf: 10
+    max_features: 0.5
   xgboost:
     enabled: true
-    n_estimators: 400
+    n_estimators: 300
     max_depth: 6
-    learning_rate: 0.05
-    subsample: 0.8
-    colsample_bytree: 0.8
+    learning_rate: 0.01
+    subsample: 0.6
+    colsample_bytree: 0.6
 
 evaluation:
   primary_metric: roc_auc
@@ -101,6 +77,70 @@ risk_bands:
   medium: 0.40
 
 artifacts:
-  output_dir: artifacts
+  output_dir: ml/artifacts
   model_filename: readmission_model.joblib
   metrics_filename: metrics.json
+
+# Milestone 3 - treatment modelling and analytics. Every weight, mapping and
+# cutoff below is read by src/evaluation/treatment.py and src/evaluation/cohorts.py;
+# none of them is repeated in Python.
+recovery_score:
+  # Frozen as v1 on 2026-09-19 - see docs/06-milestones/milestone-3.md.
+  # The weights only sum to 1.0 when all three components are present. When one
+  # is missing the remaining weights are re-normalised, so the score keeps
+  # meaning the same thing on a row with no A1C result.
+  weights:
+    readmitted: 0.50
+    time_in_hospital: 0.25
+    a1c_result: 0.25
+  # "NO" and "Norm" are quoted because unquoted NO parses as a boolean in YAML.
+  readmitted_values:
+    "NO": 1.0
+    ">30": 0.5
+    "<30": 0.0
+  a1c_values:
+    "Norm": 1.0
+    ">7": 0.5
+    ">8": 0.0
+  # Fixed bounds, not the min/max of whatever rows are being scored. A range
+  # taken from the current batch would score the same patient differently
+  # depending on who else was in the batch.
+  time_in_hospital_range:
+    min: 1
+    max: 14
+
+treatment_analysis:
+  confidence_level: 0.95
+  # Groups smaller than this are reported with reliable=false rather than
+  # dropped, so a small group is never mistaken for a group with no events.
+  min_group_size: 30
+  # Non-medication treatment factors. Medication columns are read from
+  # artifacts/feature_contract.json instead, so the two stay in step.
+  factors:
+    - change
+    - diabetesMed
+  # Any other A1Cresult value (the dataset uses the literal string "None")
+  # counts as not tested.
+  a1c_tested_values:
+    - ">7"
+    - ">8"
+    - "Norm"
+
+cohorts:
+  min_size: 30
+  # Cohort type -> the column it groups by, after basic_clean has run.
+  columns:
+    age: age
+    gender: gender
+    race: race
+    diagnosis: diag_1_group
+
+explainability:
+  # Rows drawn from the test split for the SHAP background and global ranking.
+  sample_size: 2000
+  # Patients written into feature_importance.json's patient_drivers. Kept small
+  # on purpose: full per-patient drivers belong on demand, not in a checked-in file.
+  patient_sample_size: 200
+  top_global_drivers: 20
+  top_patient_drivers: 5
+  random_state: 42

@@ -19,3 +19,11 @@ def get_mongo_client() -> MongoClient:
 def get_mongo_db() -> Database:
     """Return the application MongoDB database handle."""
     return get_mongo_client()[settings.MONGO_DB]
+
+
+def close_mongo_connection() -> None:
+    """Close the active MongoDB client connection."""
+    global _client
+    if _client is not None:
+        _client.close()
+        _client = None
