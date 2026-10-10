@@ -1,14 +1,14 @@
-import pandas as pd
 import joblib
+import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 
 # 1. Load data
 df = pd.read_csv("diabetic_data_features.csv")
-X = df.drop(columns=['risk_label'])
-y = df['risk_label']
+X = df.drop(columns=["risk_label"])
+y = df["risk_label"]
 
 # 2. Train final model on full data (this is the model we'll actually save/use)
-model = RandomForestClassifier(n_estimators=100, random_state=42, class_weight='balanced')
+model = RandomForestClassifier(n_estimators=100, random_state=42, class_weight="balanced")
 model.fit(X, y)
 
 # 3. Save the trained model to a file

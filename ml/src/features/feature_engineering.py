@@ -4,52 +4,63 @@ import pandas as pd
 df = pd.read_csv("diabetic_data_cleaned.csv")
 
 # 2. Drop columns not useful for prediction
-df = df.drop(columns=['encounter_id', 'patient_nbr', 'readmitted'])
+df = df.drop(columns=["encounter_id", "patient_nbr", "readmitted"])
 
 # 3. Check data types and unique value counts (for our reference)
 print("Checking unique values in key columns:")
-for col in ['race', 'gender', 'age', 'diag_1', 'diag_2', 'diag_3',
-            'admission_type_id', 'discharge_disposition_id', 'admission_source_id']:
+for col in [
+    "race",
+    "gender",
+    "age",
+    "diag_1",
+    "diag_2",
+    "diag_3",
+    "admission_type_id",
+    "discharge_disposition_id",
+    "admission_source_id",
+]:
     print(f"{col}: {df[col].nunique()} unique values")
+
 
 # 4. Simplify diag_1, diag_2, diag_3
 # These are ICD-9 codes with 700+ possible values - too many to one-hot encode directly.
 # We group them into broader categories based on the first character/number of the code.
 def simplify_diagnosis(code):
     code = str(code)
-    if code.startswith('V') or code.startswith('E'):
-        return 'Other'
+    if code.startswith("V") or code.startswith("E"):
+        return "Other"
     try:
         code_num = float(code)
         if 390 <= code_num <= 459 or code_num == 785:
-            return 'Circulatory'
+            return "Circulatory"
         elif 460 <= code_num <= 519 or code_num == 786:
-            return 'Respiratory'
+            return "Respiratory"
         elif 520 <= code_num <= 579 or code_num == 787:
-            return 'Digestive'
+            return "Digestive"
         elif code_num == 250:
-            return 'Diabetes'
+            return "Diabetes"
         elif 800 <= code_num <= 999:
-            return 'Injury'
+            return "Injury"
         elif 710 <= code_num <= 739:
-            return 'Musculoskeletal'
+            return "Musculoskeletal"
         elif 580 <= code_num <= 629 or code_num == 788:
-            return 'Genitourinary'
+            return "Genitourinary"
         elif 140 <= code_num <= 239:
-            return 'Neoplasms'
+            return "Neoplasms"
         else:
-            return 'Other'
-    except:
-        return 'Other'
+            return "Other"
+    except (ValueError, TypeError):
+        return "Other"
 
-df['diag_1'] = df['diag_1'].apply(simplify_diagnosis)
-df['diag_2'] = df['diag_2'].apply(simplify_diagnosis)
-df['diag_3'] = df['diag_3'].apply(simplify_diagnosis)
 
-print("\nSimplified diag_1 categories:\n", df['diag_1'].value_counts())
+df["diag_1"] = df["diag_1"].apply(simplify_diagnosis)
+df["diag_2"] = df["diag_2"].apply(simplify_diagnosis)
+df["diag_3"] = df["diag_3"].apply(simplify_diagnosis)
+
+print("\nSimplified diag_1 categories:\n", df["diag_1"].value_counts())
 
 # 5. Identify all categorical (text) columns for one-hot encoding
-categorical_cols = df.select_dtypes(include='object').columns.tolist()
+categorical_cols = df.select_dtypes(include="object").columns.tolist()
 print("\nCategorical columns to encode:", categorical_cols)
 
 # 6. One-hot encode all categorical columns

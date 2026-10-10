@@ -1,14 +1,21 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, classification_report
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+)
+from sklearn.model_selection import train_test_split
 
 # 1. Load the feature-engineered data
 df = pd.read_csv("diabetic_data_features.csv")
 
 # 2. Separate features (X) and target (y)
-X = df.drop(columns=['risk_label'])
-y = df['risk_label']
+X = df.drop(columns=["risk_label"])
+y = df["risk_label"]
 
 # 3. Split into train and test sets (80% train, 20% test)
 X_train, X_test, y_train, y_test = train_test_split(
@@ -19,7 +26,7 @@ print("Training set size:", X_train.shape)
 print("Test set size:", X_test.shape)
 
 # 4. Train a Random Forest model
-model = RandomForestClassifier(n_estimators=100, random_state=42, class_weight='balanced')
+model = RandomForestClassifier(n_estimators=100, random_state=42, class_weight="balanced")
 model.fit(X_train, y_train)
 
 # 5. Make predictions on the test set

@@ -47,7 +47,11 @@ def prepare_milestone1_data(
         "num_lab_procedures",
         "num_procedures",
         "num_medications",
+        "number_outpatient",
+        "number_emergency",
+        "number_inpatient",
         "number_diagnoses",
+        "A1Cresult",
         "readmitted",
     ]
 
