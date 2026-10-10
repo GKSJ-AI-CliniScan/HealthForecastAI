@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     MONGO_DB: str = "healthforecast"
 
     # CORS - comma separated list of allowed origins
-    BACKEND_CORS_ORIGINS: str = "http://localhost:3000"
+    BACKEND_CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5500"
 
     # ML
     MODEL_ARTIFACT_DIR: str = "ml/artifacts"

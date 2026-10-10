@@ -23,4 +23,13 @@ class Admission(Base):
     num_medications: Mapped[int | None] = mapped_column(Integer, nullable=True)
     num_lab_procedures: Mapped[int | None] = mapped_column(Integer, nullable=True)
     number_diagnoses: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    number_inpatient: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    number_emergency: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    A1Cresult: Mapped[str | None] = mapped_column(
+    "a1cresult",
+    String(16),
+    nullable=True,
+)
+
     readmitted: Mapped[str | None] = mapped_column(String(8), nullable=True)
