@@ -97,7 +97,7 @@ Running each service directly, without Docker, is covered in
 | 3 | 5-6 | Treatment effectiveness analysis and healthcare analytics |
 | 4 | 7-8 | Testing, deployment and documentation |
 
-Report templates and evaluation criteria: [`docs/06-milestones/`](docs/06-milestones/).
+Report templates and evaluation criteria: [Milestone documentation](docs/06-milestones/README.md).
 
 ## Continuous integration
 

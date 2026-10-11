@@ -48,8 +48,8 @@ Live reference (always accurate):
 
 Generated files, produced by `python scripts/export_api_docs.py` from `backend/`:
 
-- [`openapi.json`](openapi.json): the exported schema
-- [`endpoints.md`](endpoints.md): table of every method and path
+- **OpenAPI schema:** Available at `/api/v1/openapi.json` when the FastAPI server is running.
+- **Endpoint reference:** See the API endpoint descriptions in this document and the running API documentation at `/docs`.
 
 ### Route map
 

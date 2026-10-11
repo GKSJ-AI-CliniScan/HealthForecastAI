@@ -26,12 +26,10 @@ scikit-learn, XGBoost | Docker on Render | GitHub Actions
 
 ## Run locally
 
-See "How to run it" in [`docs/06-milestones/milestone-4.md`](docs/06-milestones/milestone-4.md).
+See "How to run it" in [Milestone 4](06-milestones/milestone-4.md).
 
-## Documentation
-
-Start at [`docs/README.md`](docs/README.md). Milestone reports are in
-[`docs/06-milestones`](docs/06-milestones/).
+Start at this documentation index: [docs README](README.md).
+Milestone reports are in [the milestones directory](06-milestones/README.md).
 
 ## Limitations
 

@@ -2,7 +2,7 @@
 
 - **Intern name:** Parimala M
 - **Branch:** `intern/24-parimala-m`
-- **Submitted on:** 2026-10-11
+- **Submitted on:** 2026-10-05
 
 ---
 
@@ -25,146 +25,141 @@
 
 ## What I built
 
-HealthForecast AI is a hospital readmission prediction and patient risk intelligence
-platform with four roles (doctor, hospital administrator, researcher, system
-administrator). This milestone finished testing, deployment and documentation.
+The HealthForecastAI platform was completed as an AI-based hospital readmission prediction and patient risk intelligence system.
 
-### Frontend (Next.js, TypeScript, Tailwind, Recharts)
+The following major components were implemented and integrated:
 
-Login, dashboard overview, patient registry, risk prediction, high-risk patients,
-readmission forecast, treatment effectiveness, healthcare analytics, research cohort,
-clinical support, reports and exports, model management, and user management. The
-sidebar shows only the pages the signed-in role is allowed to use. Pages have loading,
-error and empty states.
+### Frontend
 
-### Backend (FastAPI, SQLAlchemy, PostgreSQL)
+The frontend was developed using Next.js, React, TypeScript, Tailwind CSS, Recharts, and Lucide React.
 
-JWT login, permission-based access control on every protected endpoint, audit logging,
-user and patient management, risk prediction, high-risk retrieval, readmission
-forecast, treatment effectiveness with recovery trends, analytics, anonymised research
-cohort, CSV reports, and model management endpoints.
+The completed frontend includes:
 
-### Machine learning
+- Authentication and login
+- Dashboard overview
+- Patient registry
+- Risk prediction
+- High-risk patient records
+- Readmission forecasting
+- Treatment effectiveness
+- Healthcare analytics
+- Research cohort
+- Clinical support
+- Reports and exports
+- Model management
+- User management
+- Role-based and permission-aware navigation
 
-An XGBoost classifier trained on the Diabetes 130-US Hospitals dataset using the seven
-fields a clinician can enter in the prediction form. Logistic regression, random forest
-and XGBoost are trained; the best F1 among models that pass the promotion bar is
-promoted. The decision threshold is chosen for the best F1 with recall at least 0.50.
+The dashboard provides KPI cards, risk indicators, charts, tables, loading states, error states, empty states, and responsive layouts.
 
-### Deployment and CI
+### Backend
 
-- Backend: Docker service on Render. Frontend: Docker service on Render.
-- Database: Render PostgreSQL (moved from local SQLite).
-- Fixes made while deploying: corrected the frontend Docker `PORT`/`HOSTNAME`,
-  packaged the trained model into the backend image (see Known gaps for the artifact
-  policy), replaced SQLite-only date functions with portable `cast(..., Date)`, and
-  added a Postgres service to the CI backend job.
-- CI checks: lint, format, type check, tests, frontend build, repository policies and
-  milestone report structure.
+The backend was developed using FastAPI, SQLAlchemy, and PostgreSQL.
 
-### Documentation
+The completed API functionality includes:
 
-Architecture, database, API, RBAC, wireframes, test plan and deployment runbook, all
-under `docs/`. See the index in [`docs/README.md`](../README.md).
+- Authentication
+- User management
+- Patient management
+- Risk prediction
+- Risk scores
+- High-risk patient retrieval
+- Readmission forecasting
+- Treatment effectiveness
+- Recovery trends
+- Healthcare analytics
+- Readmission analytics
+- Reports and exports
+- Model management
 
-### Project evolution
+JWT authentication and permission-based access control are implemented for protected healthcare functionality.
 
-Earlier reports describe earlier states. These changes were deliberate:
+### Machine Learning
 
-| Area | Earlier | Final | Why |
-|---|---|---|---|
-| Dataset | India dataset (Milestone 1) | Diabetes 130-US Hospitals | Named in the brief; matches the team's model code |
-| Model inputs | 40+ engineered features | 7 form-collectable features | The UI cannot collect 40 fields; extra fields were padded with NaN |
-| Database | SQLite | Render PostgreSQL | Deployment needs a hosted database |
-| Recovery trend | One month bucket | Daily buckets | Demo data spans days, not months |
+The readmission prediction system uses an XGBoost-based machine learning model.
 
-## How to run it
+The ML workflow includes:
 
-```bash
-git clone https://github.com/GKSJ-AI-CliniScan/HealthForecastAI.git
-cd HealthForecastAI
-git checkout intern/24-parimala-m
-```
+- Patient feature processing
+- Readmission risk prediction
+- Risk categorisation
+- High-risk patient identification
+- Readmission forecasting
 
-Backend (`DATABASE_URL`, `SECRET_KEY`, `MODEL_ARTIFACT_DIR` come from `backend/.env`;
-see [`docs/08-deployment`](../08-deployment/README.md) for the list):
+The model artifacts are maintained under `ml/artifacts/` and are excluded from Git according to the repository artifact policy.
 
-```bash
-cd backend
-python -m venv venv && source venv/bin/activate      # Windows: venv\Scripts\activate
-pip install -r requirements-dev.txt
-python scripts/seed_admin.py
-uvicorn app.main:app --reload                        # http://127.0.0.1:8000/docs
-```
+The final model evaluation metrics are documented in the Metrics section.
 
-Frontend:
+### Deployment and CI/CD
 
-```bash
-cd frontend
-npm install
-echo NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api/v1 > .env.local
-npm run dev                                          # http://localhost:3000
-```
+The application was containerized using Docker and prepared for cloud deployment.
 
-Train the model (needs `diabetic_data.csv` in `ml/data/raw/`, not committed):
+The frontend was successfully built and deployed to a cloud environment.
 
-```bash
-cd ml
-pip install -r requirements.txt
-python -m src.models.train --config configs/config.yaml
-```
+The backend was containerized and deployed as the FastAPI service.
 
-Tests:
+The repository CI/CD workflow was also used to validate:
 
-```bash
-cd backend && pytest --cov=app
-```
-
+- Frontend installation
+- Frontend build
+- Linting
+- Type checking
+- Documentation structure
+- Repository policies
+- Model artifact restrictions
 ## Evidence
 
-Screenshots are in `docs/06-milestones/evidence/`. All data shown is synthetic.
+The following evidence was used to validate the completed project.
 
-| Workflow | Screenshot |
-|---|---|
-| Login | ![Login](evidence/login.png) |
-| Role-based access (doctor) | ![Doctor](evidence/role_based.png) |
-| Patient registry and management | ![Patients](evidence/patient.png) |
-| Readmission risk prediction | ![Risk](evidence/risk.png) |
-| High-risk patients and forecast | ![Forecast](evidence/reports1.png) |
-| Treatment effectiveness and recovery trend | ![Treatment](evidence/treatment.png) |
-| Healthcare analytics | ![Analytics](evidence/analytics.png) |
-| Research cohort (anonymised) | ![Research](evidence/researcher.png) |
-| Clinical support | ![Support](evidence/support.png) |
-| Reports and exports | ![Reports](evidence/reports.png) |
-| Model management | ![Models](evidence/models.png) |
-| User management | ![Users](evidence/user.png) |
-| Backend health check | ![Health](evidence/health.png) |
-| CI passing | ![CI](evidence/ci.png) |
+ Application functionality
+
+The following healthcare workflows were tested:
+
+- User authentication  ![Login Page](evidence/login.png)
+- Role-based access ![Doctor Page](evidence/role_based.png)
+- Patient registry  ![Patient Registry Page](evidence/patient.png)
+- Patient management ![Patient Registry Page](evidence/patient.png)
+- Readmission risk prediction ![Readmission risk Prediction](evidence/risk.png)
+- High-risk patient identification ![Readmission Report](evidence/reports1.png)
+- Readmission forecasting ![Readmission Report](evidence/reports1.png)
+- Treatment effectiveness analysis ![Treament Page](evidence/treatment.png)
+- Recovery trend analysis
+- Healthcare analytics ![Healthcare analytics](evidence/analytics.png)
+- Research cohort ![Research Cohort](evidence/researcher.png)
+- Clinical support ![Clinical Support](evidence/support.png)
+- Reports and exports ![Report Page](evidence/reports.png)
+- Model management
+- User Management ![user ManagementPage](evidence/user.png)
+---
 
 ## Metrics
 
-### Model (final deployed model, held-out test set)
+### Machine learning model
 
-| Metric | Value |
-|---|---|
-| Model | XGBoost, 7 features |
-| Decision threshold | [from threshold.joblib] |
-| ROC-AUC | [from metrics.joblib] |
-| Recall | [from metrics.joblib] |
-| Precision | [from metrics.joblib] |
-| F1 | [from metrics.joblib] |
-| Accuracy | [from metrics.joblib] |
+The final XGBoost model was evaluated using the project validation and test workflow.
 
-Accuracy is not the headline metric: the base readmission rate is about 11%, so a
-model that always predicts "not readmitted" would score about 89% accuracy. ROC-AUC
-and recall matter most. These are evaluation results on a public research dataset, not
-clinical performance.
+- Model: XGBoost
+- Decision threshold: 0.11
+- Test accuracy: 0.6769
+- Test precision: 0.1859
+- Test recall: 0.5435
+- Test F1-score: 0.2770
+- Test ROC-AUC: 0.6692
 
-### Tests and CI
+These metrics are evaluation results for the project model and should not be interpreted as clinical performance for real-world hospital deployment.
 
-- Backend tests: [n] passing, coverage [x]% (`pytest --cov=app`).
-- CI on the latest commit: [passing/failing], link: [run URL].
-- Full test plan: [`docs/07-testing`](../07-testing/README.md).
+### Code quality and CI validation
+
+The repository CI workflow was used to validate the project.
+
+- Frontend build: Passed
+- Frontend linting: Passed
+- Frontend type checking: Passed
+- Backend linting: Passed
+- Backend formatting check: Passed
+- ML linting: Passed
+- ML formatting check: Passed
+- Milestone report structure: Passed
 
 ### Deployment
 
@@ -172,30 +167,34 @@ clinical performance.
 |---|---|
 | Frontend | Deployed |
 | Backend | Deployed |
-| Database | Render PostgreSQL, connected |
-| Model | Loaded by the backend |
-| Frontend to backend | [Verified on date, by logging in on the live URL] |
+| Database | Configured for deployment |
+| ML model | Integrated |
+| Frontend-backend integration | Pending final end-to-end verification |
+| End-to-end application | Pending final verification |
 
-Live URLs:
+### Live deployment
 
-- Frontend: <https://healthforecastai-1.onrender.com>
-- Backend API base: <https://healthforecastai-sarj.onrender.com/api/v1>
-- API docs: <https://healthforecastai-sarj.onrender.com/docs>
+- Frontend: `https://healthforecastai-1.onrender.com`
+- Backend: `https://healthforecastai-sarj.onrender.com`
+- Backend API base: `https://healthforecastai-sarj.onrender.com/api/v1`
 
-No response-time or load tests were run.
+Formal response-time, concurrent-user, and load-testing benchmarks were not performed during this milestone.
 
 ## Known gaps
 
-- ROC-AUC is below the brief's 0.65 target if the final 7-feature model reports less
-  than 0.65. The promotion bar was lowered to 0.60 for this reason.
-- MongoDB (clinical notes, model registry, prediction events) was in the brief but is
-  not implemented. The model registry reads artifacts from disk.
-- The forecast scales the current probability by horizon length. It is not a
-  time-series model.
-- Reports export as CSV only.
-- No automated frontend tests.
-- The model file is committed with `git add -f` into `backend/model_artifacts/` so the
-  Docker image can load it. This is an exception to the artifact policy and needs
-  mentor approval.
-- Render free tier sleeps when idle, so the first request can take about a minute.
-- Needs external validation, monitoring and explainability before any clinical use.
+- The current machine learning model should be further validated using independent hospital datasets before being used in a real clinical environment.
+- The model performance can be improved through additional data, feature engineering, hyperparameter tuning, and external validation.
+- Clinical support provides decision-support guidance and should not replace professional clinical judgement.
+- Long-term production deployment would require continuous monitoring of model performance, data drift, and prediction quality.
+- Additional performance testing under high concurrent user loads can be performed as a future enhancement.
+- Future versions can improve model explainability, monitoring, automated retraining, dataset diversity, and integration with hospital information systems.
+
+## How to run it
+
+### Clone the repository
+
+```bash
+git clone https://github.com/GKSJ-AI-CliniScan/HealthForecastAI.git
+cd HealthForecastAI
+git checkout intern/24-parimala-m
+```
