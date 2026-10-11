@@ -172,6 +172,68 @@ def test_temporal_split_never_lets_a_later_row_train_a_model_tested_on_earlier_r
     assert dates.loc[x_val.index].max() <= dates.loc[x_test.index].min()
 
 
+TEMPORAL_SPLIT = {
+    "test_size": 0.2,
+    "validation_size": 0.2,
+    "random_state": 42,
+    "temporal_when_dated": True,
+}
+
+
+def _same_day_frame() -> tuple[pd.DataFrame, pd.Series, pd.Series]:
+    """Ten days, four admissions each, rows shuffled - so a row-count cut
+    at 24/32 would land mid-day if the split ignored calendar days."""
+    days = pd.date_range("2024-01-01", periods=10, freq="D")
+    stamps = [day + pd.Timedelta(hours=3 * k) for day in days for k in range(4)]
+    frame = pd.DataFrame({"x": range(40)}).sample(frac=1, random_state=0)
+    dates = pd.Series(pd.to_datetime(stamps), index=range(40)).loc[frame.index]
+    target = pd.Series([i % 2 for i in range(40)]).loc[frame.index]
+    return frame, target, dates
+
+
+def test_temporal_split_never_shares_a_calendar_day_between_partitions() -> None:
+    """Every partition must start strictly after the previous one's last day."""
+    frame, target, dates = _same_day_frame()
+    split_config = {**TEMPORAL_SPLIT, "test_size": 0.25, "validation_size": 0.25}
+    x_train, x_val, x_test, *_ = split_dataset(frame, target, dates, split_config)
+
+    train_days = set(dates.loc[x_train.index].dt.date)
+    val_days = set(dates.loc[x_val.index].dt.date)
+    test_days = set(dates.loc[x_test.index].dt.date)
+    assert not train_days & val_days
+    assert not val_days & test_days
+    assert max(train_days) < min(val_days) and max(val_days) < min(test_days)
+
+
+def test_temporal_split_moves_the_boundary_day_to_the_later_partition() -> None:
+    """40 rows at 4/day with 0.3 validation and 0.25 test: the row cuts fall
+    at 18 and 30 - mid-day 5 and mid-day 8 - so both whole days move later."""
+    frame, target, dates = _same_day_frame()
+    split_config = {**TEMPORAL_SPLIT, "test_size": 0.25, "validation_size": 0.3}
+    x_train, x_val, x_test, *_ = split_dataset(frame, target, dates, split_config)
+
+    assert (len(x_train), len(x_val), len(x_test)) == (16, 12, 12)
+    assert dates.loc[x_val.index].min() == pd.Timestamp("2024-01-05")
+    assert dates.loc[x_test.index].min() == pd.Timestamp("2024-01-08")
+
+
+def test_temporal_split_is_deterministic() -> None:
+    frame, target, dates = _same_day_frame()
+    first = split_dataset(frame, target, dates, TEMPORAL_SPLIT)
+    second = split_dataset(frame, target, dates, TEMPORAL_SPLIT)
+    for a, b in zip(first, second, strict=True):
+        assert list(a.index) == list(b.index)
+
+
+def test_temporal_split_rejects_data_from_too_few_days() -> None:
+    """All rows on one day cannot be split without sharing that day."""
+    frame = pd.DataFrame({"x": range(20)})
+    target = pd.Series([i % 2 for i in range(20)])
+    dates = pd.Series(pd.to_datetime(["2024-03-01"] * 20))
+    with pytest.raises(ValueError, match="distinct admission days"):
+        split_dataset(frame, target, dates, TEMPORAL_SPLIT)
+
+
 def test_split_sizes_match_the_configured_fractions() -> None:
     frame = _synthetic_india_frame(50)
     target = pd.Series([1] * 25 + [0] * 25)

@@ -10,47 +10,64 @@
 # way backend/app/services/dataset_import_service.py already supports both
 # for the Postgres import path.
 #
-# SCHEMA CAVEAT: no copy of the India Hospital Readmission export has ever
-# been available in this repository or its CI. The column names and the
-# readmitted vocabulary ("<30" / ">30" / "NO") below are taken from the only
-# executable, tested definition of this dataset's shape that exists in the
-# codebase - the india_hospital_readmission profile and its fixtures in
-# backend/app/services/dataset_import_service.py and
-# backend/tests/test_dataset_import.py - not from a verified real file. If
-# the real Kaggle export differs, update this profile and re-run the tests
-# in ml/tests/ before trusting a trained model.
+# The india_hospital_readmission profile below is verified against the real
+# Kaggle export in ml/data/raw/ (a relational export: patients.csv,
+# admissions.csv, diagnoses.csv, billing.csv, hospitals.csv). It is NOT the
+# single-CSV "<30"/">30"/"NO" shape earlier fixtures assumed.
 
 dataset:
   active: india_hospital_readmission
   profiles:
     india_hospital_readmission:
       source_url: "https://www.kaggle.com/datasets/digutlaranjithkumar/india-hospital-readmission-dataset-20152024"
-      # Relative to the ml/ directory - every module here imports as
-      # `from src....` and is only importable with CWD=ml/ (see
-      # pyproject.toml's pythonpath=["."]), so this path is NOT repo-root
-      # relative even though the download instructions in data/README.md are.
-      raw_path: data/raw/india_hospital_readmission.csv
-      # Mirrors dataset_import_service.NA_TOKENS so the training pipeline and
-      # the Postgres importer treat the same cell as missing the same way.
+      format: relational
+      # Relative to ml/ (modules import as `from src....` with CWD=ml/).
+      raw_dir: data/raw
+      # Joined patients -> admissions (patient_id) -> diagnoses (admission_id).
+      # billing.csv is post-discharge cost and hospitals.csv has no counterpart
+      # in the operational schema, so neither feeds the model (see
+      # src/features/build_features.py ENCOUNTER_FEATURE_COLUMNS).
+      tables:
+        patients: patients.csv
+        admissions: admissions.csv
+        diagnoses: diagnoses.csv
       na_values: ["?", "", "NA", "N/A", "nan", "None", "Unknown/Invalid"]
       id_column: patient_id
       date_column: admission_date
       discharge_date_column: discharge_date
-      encounter_key: null  # no single encounter id column in this export
-      target_column: readmitted
-      readmission_positive_label: "<30"
-      risk_negative_label: "NO"
-      # No death/hospice disposition code is available for this export (its
-      # "department" field carries a different meaning - see the unmapped_note
-      # on dataset_import_service.INDIA_HOSPITAL_READMISSION). Known gap: this
-      # pipeline has no leakage-safe filter for expired/hospice encounters on
-      # the India profile.
+      encounter_key: admission_id
+      # Expired encounters are handled per target (exclude_if below) instead.
       leakage_disposition_column: null
-      drop_columns: [patient_id, admission_date, discharge_date]
-      collapse_columns: [diagnosis]
-      # No pre-aggregated visit-count columns in this export; prior-utilisation
-      # signal instead comes from add_history_features (admission_date based).
+      drop_columns: [patient_id, admission_id, admission_date, discharge_date]
+      # Outcome columns from the export - never features.
+      label_columns: [readmitted_30d, readmitted_7d]
+      # Rare categories are handled by OneHotEncoder(min_frequency) fitted on
+      # the training split only, not by a full-dataset frequency pass.
+      collapse_columns: []
       utilisation_columns: []
+      targets:
+        readmission:
+          description: >-
+            30-day readmission after a live discharge: the export's own
+            readmitted_30d flag. Expired encounters are excluded - a patient
+            who died in hospital cannot be readmitted, and keeping them would
+            teach the model that discharge_type=Expired means "no readmission".
+          positive_if: {readmitted_30d: [1]}
+          exclude_if: {discharge_type: [Expired]}
+          exclude_features: []
+        risk:
+          description: >-
+            Adverse encounter outcome: in-hospital death (discharge_type=Expired)
+            OR 30-day readmission - the broadest adverse-outcome signal this
+            export carries (HealthForecastAI_ML_Design.md section 2).
+            discharge_type is part of the label, so it is not a feature.
+          positive_if: {readmitted_30d: [1], discharge_type: [Expired]}
+          exclude_if: {}
+          exclude_features: [discharge_type]
+      # 90-day readmission: NOT supported. The export has no 90-day label, and
+      # deriving one from admission gaps contradicts its own 30-day labels
+      # (only ~1% of admissions have a next admission within 30 days vs an
+      # 11.8% labelled rate), so a derived label would be fabricated.
     diabetes_130_us:
       source_url: "https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008"
       raw_path: data/raw/diabetic_data.csv
@@ -94,6 +111,23 @@ imbalance:
   # given class weighting is already sufficient per the ML Design doc's own
   # risk mitigation table.
   strategy: class_weight # one of: none | class_weight
+
+# Probability calibration (src/models/calibrate.py), fitted on the validation
+# split after model selection. Class weighting inflates stated probabilities;
+# a calibrated model changes what the API returns and therefore which
+# risk_bands patients fall into, so enabling it for a production model needs
+# the bands reviewed in the same change. "none" keeps the current behaviour.
+calibration:
+  method: none # one of: none | sigmoid | isotonic
+  folds: 5
+
+# How a probability becomes a yes/no prediction for the reported metrics and
+# the promotion check, chosen on validation only (see choose_threshold in
+# src/evaluation/metrics.py). fixed 0.5 is the historical behaviour; the API
+# itself serves a probability and a risk band, not this threshold.
+decision_threshold:
+  strategy: fixed # one of: fixed | max_f1 | min_recall
+  value: 0.5
 
 models:
   logistic_regression:

@@ -35,10 +35,8 @@ def _clear_model_cache():
     model_loader_module.clear_cache()
 
 
-def _tiny_pipeline() -> Pipeline:
-    """A real, fitted sklearn pipeline over FEATURE_COLUMNS - not a mock - so
-    predict_proba() exercises the actual inference call path."""
-    frame = pd.DataFrame(
+def _tiny_training_frame() -> pd.DataFrame:
+    return pd.DataFrame(
         {
             "age": [30, 45, 60, 70, 25, 80],
             "gender": ["Female", "Male", "Female", "Male", "Female", "Male"],
@@ -59,20 +57,27 @@ def _tiny_pipeline() -> Pipeline:
                 "Elective",
                 "Emergency",
             ],
-            "medication_count": [2, 5, 7, 9, 1, 10],
+            "discharge_type": ["Recovered", "Recovered", "LAMA", "Referred", "Recovered", "LAMA"],
+            "number_diagnoses": [1, 2, 3, 4, 1, 4],
             "prior_admission_count": [0, 1, 2, 3, 0, 4],
             "days_since_last_discharge": [None, 100, 50, 20, None, 5],
         }
     )
+
+
+def _tiny_pipeline() -> Pipeline:
+    """A real, fitted sklearn pipeline over FEATURE_COLUMNS - not a mock - so
+    predict_proba() exercises the actual inference call path."""
+    frame = _tiny_training_frame()
     target = pd.Series([0, 0, 1, 1, 0, 1])
     numeric = [
         "age",
         "length_of_stay",
-        "medication_count",
+        "number_diagnoses",
         "prior_admission_count",
         "days_since_last_discharge",
     ]
-    categorical = ["gender", "diagnosis", "admission_type"]
+    categorical = ["gender", "diagnosis", "admission_type", "discharge_type"]
     preprocessor = ColumnTransformer(
         [
             (
@@ -232,6 +237,8 @@ def _make_admission(db_session: Session, patient_id: int, **overrides) -> Admiss
         "time_in_hospital": 5,
         "admission_type": "Emergency",
         "num_medications": 7,
+        "discharge_disposition": "LAMA",
+        "number_diagnoses": 3,
     }
     defaults.update(overrides)
     admission = Admission(patient_id=patient_id, **defaults)
@@ -244,9 +251,9 @@ def _make_admission(db_session: Session, patient_id: int, **overrides) -> Admiss
 def test_feature_row_maps_postgres_columns_onto_training_column_names(
     db_session: Session,
 ) -> None:
-    """age_group/primary_diagnosis/time_in_hospital/num_medications must map
-    back onto age/diagnosis/length_of_stay/medication_count - the exact
-    inverse of dataset_import_service's INDIA_HOSPITAL_READMISSION profile."""
+    """age_group/primary_diagnosis/time_in_hospital/discharge_disposition/
+    number_diagnoses must map onto the training names from the relational
+    export (age/diagnosis/length_of_stay/discharge_type/number_diagnoses)."""
     patient = _make_patient(db_session)
     _make_admission(db_session, patient.id)
 
@@ -256,7 +263,10 @@ def test_feature_row_maps_postgres_columns_onto_training_column_names(
     assert row["age"].iloc[0] == 61
     assert row["diagnosis"].iloc[0] == "Cardiac failure"
     assert row["length_of_stay"].iloc[0] == 5
-    assert row["medication_count"].iloc[0] == 7
+    assert row["discharge_type"].iloc[0] == "LAMA"
+    assert row["number_diagnoses"].iloc[0] == 3
+    assert row["gender"].iloc[0] == "F"  # "Female" normalised to the export code
+    assert "medication_count" not in row.columns
 
 
 def test_feature_row_uses_the_most_recent_admission_when_none_is_given(
@@ -299,3 +309,35 @@ def test_feature_row_raises_when_age_is_unparseable(db_session: Session) -> None
     with pytest.raises(InsufficientPatientDataError) as exc_info:
         FeatureBuilder(db_session).build_for_patient(patient)
     assert "age" in exc_info.value.missing_fields
+
+
+def test_model_loader_serves_a_calibrated_model_through_the_same_call_path(
+    db_session: Session, tmp_path
+) -> None:
+    """ml/src/models/calibrate.py wraps the trained pipeline instead of
+    replacing it. The backend only calls predict_proba(row)[:, 1], so a
+    calibrated artefact must load and score through that exact path, return
+    the calibrated (not the raw) label-1 probability, and band normally."""
+    from src.models.calibrate import fit_calibrated_model
+
+    from app.services.risk_service import categorise_risk
+
+    raw = _tiny_pipeline()
+    calibration_rows = pd.concat([_tiny_training_frame()] * 5, ignore_index=True)
+    calibration_target = pd.Series([0, 0, 1, 1, 0, 1] * 5)
+    calibrated = fit_calibrated_model(
+        raw, calibration_rows, calibration_target, "sigmoid", folds=3, seed=42
+    )
+    record = _register(db_session, tmp_path, "readmission")
+    joblib.dump(calibrated, record.artifact_path)
+
+    patient = _make_patient(db_session)
+    _make_admission(db_session, patient.id)
+    row = FeatureBuilder(db_session).build_for_patient(patient)
+    served, _ = ModelLoader(db_session).get_production_pipeline("readmission")
+    probability = float(served.predict_proba(row)[:, 1][0])
+
+    assert list(served.classes_) == [0, 1]
+    assert probability == pytest.approx(float(calibrated.predict_proba(row)[:, 1][0]))
+    assert probability != pytest.approx(float(raw.predict_proba(row)[:, 1][0]))
+    assert categorise_risk(probability) in {"low", "medium", "high"}

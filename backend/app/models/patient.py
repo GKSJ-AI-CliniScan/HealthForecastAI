@@ -1,11 +1,15 @@
 """Patient ORM model."""
 
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, Index, String, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+
+if TYPE_CHECKING:
+    from app.models.user import User
 
 
 class Patient(Base):
@@ -33,3 +37,11 @@ class Patient(Base):
         server_default=func.now(),
         nullable=False,
     )
+
+    # selectin: one extra query per patient list, not one per row.
+    assigned_doctor: Mapped["User | None"] = relationship(lazy="selectin")
+
+    @property
+    def assigned_doctor_name(self) -> str | None:
+        """Display name only - the doctor's email/role are never exposed here."""
+        return self.assigned_doctor.full_name if self.assigned_doctor else None

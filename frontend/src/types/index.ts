@@ -18,6 +18,8 @@ export interface Patient {
   gender: string | null;
   primary_diagnosis: string | null;
   assigned_doctor_id: number | null;
+  /** Display name of the assigned doctor; never their email or role. */
+  assigned_doctor_name?: string | null;
 }
 
 export type PredictionType = 'risk' | 'readmission';

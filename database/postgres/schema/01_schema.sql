@@ -63,12 +63,17 @@ CREATE TABLE IF NOT EXISTS admissions (
     -- Hospital department (e.g. Cardiology), distinct from admission_type
     -- (Emergency/Elective). Milestone 3: department-level analytics.
     department             VARCHAR(100),
+    -- The source export's own admission id, set only by the dataset importer
+    -- for exact idempotent re-imports (migration 0005). NULL otherwise.
+    source_admission_id    VARCHAR(64),
     CONSTRAINT admissions_date_order_check
         CHECK (discharge_date IS NULL OR admission_date IS NULL OR discharge_date >= admission_date)
 );
 
 CREATE INDEX IF NOT EXISTS idx_admissions_patient ON admissions (patient_id);
 CREATE INDEX IF NOT EXISTS idx_admissions_department ON admissions (department);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_admissions_source_admission_id
+    ON admissions (source_admission_id);
 
 CREATE TABLE IF NOT EXISTS risk_predictions (
     id                       SERIAL PRIMARY KEY,

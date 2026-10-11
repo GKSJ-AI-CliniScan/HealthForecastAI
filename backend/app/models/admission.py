@@ -19,6 +19,7 @@ class Admission(Base):
         ),
         Index("idx_admissions_patient", "patient_id"),
         Index("idx_admissions_department", "department"),
+        Index("uq_admissions_source_admission_id", "source_admission_id", unique=True),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -38,3 +39,7 @@ class Admission(Base):
     # (Emergency/Elective) - Database Design doc's admissions.department,
     # never migrated in Milestone 1. Needed for department-level analytics.
     department: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    # The source export's own admission identifier (e.g. the India export's
+    # admission_id), set only by the dataset importer. NULL for admissions
+    # created in the app or imported before migration 0005.
+    source_admission_id: Mapped[str | None] = mapped_column(String(64), nullable=True)

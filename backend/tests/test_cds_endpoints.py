@@ -248,7 +248,9 @@ def _biased_pipeline(bias_high: bool) -> Pipeline:
             "diagnosis": ["Cardiac", "Diabetes", "Renal"] * 10,
             "length_of_stay": [2, 4, 6, 8, 1, 10] * 5,
             "admission_type": ["Elective", "Emergency"] * 15,
-            "medication_count": [2, 5, 7, 9, 1, 10] * 5,
+            "discharge_type": ["Recovered", "Recovered", "LAMA", "Referred", "Recovered", "LAMA"]
+            * 5,
+            "number_diagnoses": [1, 2, 3, 4, 1, 4] * 5,
             "prior_admission_count": [0, 1, 2, 3, 0, 4] * 5,
             "days_since_last_discharge": [None, 100, 50, 20, None, 5] * 5,
         }
@@ -260,11 +262,11 @@ def _biased_pipeline(bias_high: bool) -> Pipeline:
     numeric = [
         "age",
         "length_of_stay",
-        "medication_count",
+        "number_diagnoses",
         "prior_admission_count",
         "days_since_last_discharge",
     ]
-    categorical = ["gender", "diagnosis", "admission_type"]
+    categorical = ["gender", "diagnosis", "admission_type", "discharge_type"]
     preprocessor = ColumnTransformer(
         [
             (

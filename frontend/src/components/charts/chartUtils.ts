@@ -40,6 +40,45 @@ export function formatValue(value: unknown, format: ValueFormat): string {
   return value.toLocaleString('en-US');
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const HOUR_MS = 60 * 60 * 1000;
+
+/**
+ * Tick label for an epoch-ms time axis plotted between ``startMs`` and
+ * ``endMs``. Precision follows the range: seconds for sub-hour ranges (so
+ * same-minute points get distinct labels), the date whenever the range
+ * crosses a UTC calendar day, and the year only for multi-month ranges.
+ */
+export function formatTimeTick(value: number, startMs: number, endMs: number): string {
+  const span = endMs - startMs;
+  const crossesDay =
+    new Date(startMs).toISOString().slice(0, 10) !== new Date(endMs).toISOString().slice(0, 10);
+  let options: Intl.DateTimeFormatOptions;
+  if (span >= 60 * DAY_MS) {
+    options = { day: 'numeric', month: 'short', year: 'numeric' };
+  } else {
+    options = { hour: '2-digit', minute: '2-digit', hour12: false };
+    if (span < HOUR_MS) {
+      options.second = '2-digit';
+    }
+    if (crossesDay) {
+      options.day = 'numeric';
+      options.month = 'short';
+    }
+  }
+  return new Date(value).toLocaleString('en-GB', { ...options, timeZone: 'UTC' });
+}
+
+/** Full timestamp (to the second, UTC) for tooltips on a time axis. */
+export function formatTimeFull(value: number): string {
+  return `${new Date(value).toLocaleString('en-GB', {
+    dateStyle: 'medium',
+    timeStyle: 'medium',
+    timeZone: 'UTC',
+  })} UTC`;
+}
+
 export function axisTick(format: ValueFormat): (value: number) => string {
   return (value: number) =>
     format === 'percent' ? `${Math.round(value * 100)}%` : value.toLocaleString('en-US');

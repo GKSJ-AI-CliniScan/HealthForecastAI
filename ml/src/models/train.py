@@ -12,31 +12,42 @@ just one.
 """
 
 import argparse
-import json
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-import joblib
+import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 
-from src.data.load_data import binarise_readmission_target, binarise_risk_target, load_raw
+from src.data.load_data import (
+    binarise_readmission_target,
+    binarise_risk_target,
+    file_fingerprint,
+    load_raw,
+    load_relational_export,
+)
 from src.data.preprocess import basic_clean, drop_unused_columns
 from src.data.validate import validate_frame
 from src.evaluation.metrics import (
+    calibration_summary,
+    choose_threshold,
     classification_metrics,
     confusion_counts,
     meets_promotion_thresholds,
+    threshold_metrics,
 )
 from src.features.build_features import (
+    INFERENCE_FEATURE_COLUMNS,
     add_history_features,
     add_utilisation_features,
     build_preprocessor,
 )
+from src.models.artifacts import promote_to_current, write_run
+from src.models.calibrate import fit_calibrated_model, out_of_fold_calibrated
 from src.utils.config import load_config
 
 TARGET_BUILDERS = {
@@ -45,6 +56,50 @@ TARGET_BUILDERS = {
     ),
     "risk": lambda series, profile: binarise_risk_target(series, profile["risk_negative_label"]),
 }
+
+
+def _matches(frame: pd.DataFrame, conditions: dict[str, list[Any]]) -> pd.Series:
+    """True where ANY listed column equals one of its values (OR across columns)."""
+    hit = pd.Series(False, index=frame.index)
+    for column, values in conditions.items():
+        hit |= frame[column].isin(values)
+    return hit
+
+
+def build_target(
+    frame: pd.DataFrame, profile: dict[str, Any], target_name: str
+) -> tuple[pd.DataFrame, pd.Series, list[str], str]:
+    """Return (rows kept, binary target, extra feature columns to drop, definition).
+
+    Profiles with a ``targets`` block (the relational India export) declare
+    each label explicitly from the export's own outcome columns. Older
+    single-CSV profiles keep the "<30"/">30"/"NO" string-label builders.
+    """
+    if "targets" in profile:
+        try:
+            spec = profile["targets"][target_name]
+        except KeyError as exc:
+            raise ValueError(f"Profile defines no '{target_name}' target") from exc
+        excluded = _matches(frame, spec.get("exclude_if") or {})
+        kept = frame[~excluded]
+        target = _matches(kept, spec["positive_if"]).astype(int)
+        definition = " ".join(str(spec.get("description", "")).split())
+        return kept, target, list(spec.get("exclude_features") or []), definition
+
+    if target_name not in TARGET_BUILDERS:
+        raise ValueError(f"Unknown target '{target_name}'. Known targets: {list(TARGET_BUILDERS)}")
+    target = TARGET_BUILDERS[target_name](frame[profile["target_column"]], profile)
+    return frame, target, [], f"string label on {profile['target_column']}"
+
+
+def _period(dates: pd.Series | None, index: pd.Index) -> list[str] | None:
+    """First and last date covered by one split, for provenance."""
+    if dates is None:
+        return None
+    window = dates.loc[index].dropna()
+    if window.empty:
+        return None
+    return [window.min().date().isoformat(), window.max().date().isoformat()]
 
 
 def resolve_profile(config: dict[str, Any], dataset_name: str | None = None) -> dict[str, Any]:
@@ -97,6 +152,18 @@ def compute_scale_pos_weight(y_train: pd.Series) -> float:
     return negatives / positives
 
 
+def _day_boundary(sorted_days: Any, position: int) -> int:
+    """Move a row-count cut back to the first row of its calendar day.
+
+    ``sorted_days`` are ascending, NaT-free day values. Returns the index of
+    the first row whose day equals the day at ``position``, so the whole
+    boundary day falls on the later side of the cut.
+    """
+    if position >= len(sorted_days):
+        return position
+    return int(np.searchsorted(sorted_days, sorted_days[position], side="left"))
+
+
 def split_dataset(
     features: pd.DataFrame,
     target: pd.Series,
@@ -137,9 +204,21 @@ def split_dataset(
             raise ValueError(
                 f"Not enough rows ({total}) to carve out non-empty train/validation/test splits."
             )
-        train_idx = order[:n_train]
-        val_idx = order[n_train : n_train + n_val]
-        test_idx = order[n_train + n_val :]
+        # Cut on calendar days, not row positions: every admission from the
+        # boundary day moves to the later split, so no day is shared between
+        # partitions. Rows without a date stay at the end (in test), as before.
+        days = dates.loc[order].dt.normalize().to_numpy()
+        dated = int(dates.notna().sum())
+        train_end = _day_boundary(days[:dated], n_train)
+        val_end = _day_boundary(days[:dated], n_train + n_val)
+        if train_end <= 0 or val_end <= train_end or val_end >= total:
+            raise ValueError(
+                "Not enough distinct admission days to carve out non-empty "
+                "train/validation/test splits without sharing a day."
+            )
+        train_idx = order[:train_end]
+        val_idx = order[train_end:val_end]
+        test_idx = order[val_end:]
         return (
             features.loc[train_idx],
             features.loc[val_idx],
@@ -189,6 +268,8 @@ def train_one_target(
     profile: dict[str, Any],
     config: dict[str, Any],
     target_name: str,
+    provenance: dict[str, Any] | None = None,
+    profile_name: str | None = None,
 ) -> dict[str, Any]:
     """Train every enabled model for one target on an already-loaded dataframe.
 
@@ -196,20 +277,30 @@ def train_one_target(
     what lets ml/tests/test_train_pipeline.py exercise this against a small
     synthetic fixture, without a real dataset present.
     """
-    if target_name not in TARGET_BUILDERS:
-        raise ValueError(f"Unknown target '{target_name}'. Known targets: {list(TARGET_BUILDERS)}")
-
     prepared, rejections = prepare_features(frame, profile, config.get("preprocessing", {}))
-
-    target_column = profile["target_column"]
-    target = TARGET_BUILDERS[target_name](prepared[target_column], profile)
+    rows_after_validation = len(prepared)
+    prepared, target, excluded_features, definition = build_target(prepared, profile, target_name)
     date_series = None
     date_column = profile.get("date_column")
     if date_column and date_column in prepared.columns:
         date_series = pd.to_datetime(prepared[date_column], errors="coerce")
 
-    without_target = prepared.drop(columns=[target_column])
-    features = drop_unused_columns(without_target, profile.get("drop_columns", []))
+    label_columns = [profile["target_column"]] if "target_column" in profile else []
+    label_columns += profile.get("label_columns", [])
+    without_target = prepared.drop(columns=[c for c in label_columns if c in prepared.columns])
+    features = drop_unused_columns(
+        without_target, list(profile.get("drop_columns", [])) + excluded_features
+    )
+    if profile.get("format") == "relational":
+        # The backend rebuilds this exact row from Postgres - refuse to train
+        # anything it could not serve.
+        expected = [c for c in INFERENCE_FEATURE_COLUMNS if c not in excluded_features]
+        if sorted(features.columns) != sorted(expected):
+            raise ValueError(
+                f"Feature set {sorted(features.columns)} does not match the serving "
+                f"contract {sorted(expected)}."
+            )
+        features = features[expected]
 
     x_train, x_val, x_test, y_train, y_val, y_test = split_dataset(
         features, target, date_series, config["split"]
@@ -252,22 +343,82 @@ def train_one_target(
     best_name = max(candidates, key=lambda name: validation_results[name].get(primary, -1.0))
     best_pipeline = candidates[best_name]
 
-    test_pred = best_pipeline.predict(x_test)
-    test_proba = best_pipeline.predict_proba(x_test)[:, 1]
+    # Calibration and the decision threshold are also settled on validation
+    # before the test split is scored. With calibration on, the threshold is
+    # chosen on out-of-fold calibrated probabilities, so no validation row is
+    # scored by a calibrator that was fitted on it.
+    seed = int(config["split"].get("random_state", 42))
+    calibration_config = config.get("calibration") or {}
+    method = calibration_config.get("method", "none")
+    served: Any = best_pipeline
+    val_raw = best_pipeline.predict_proba(x_val)[:, 1]
+    calibration_info: dict[str, Any] = {"method": method}
+    if method != "none":
+        folds = int(calibration_config.get("folds", 5))
+        val_scores = out_of_fold_calibrated(best_pipeline, x_val, y_val, method, folds, seed)
+        served = fit_calibrated_model(best_pipeline, x_val, y_val, method, folds, seed)
+        calibration_info.update(
+            {
+                "folds": folds,
+                "fitted_on": "validation",
+                "validation_uncalibrated": calibration_summary(y_val, val_raw),
+                "validation_out_of_fold": calibration_summary(y_val, val_scores),
+            }
+        )
+    else:
+        val_scores = val_raw
+        calibration_info["validation"] = calibration_summary(y_val, val_raw)
+
+    threshold_spec = config.get("decision_threshold") or {"strategy": "fixed", "value": 0.5}
+    decision_threshold = choose_threshold(y_val, val_scores, threshold_spec)
+
+    test_proba = served.predict_proba(x_test)[:, 1]
+    test_pred = (test_proba >= decision_threshold).astype(int)
     test_metrics = classification_metrics(y_test, test_pred, test_proba)
     test_metrics.update(confusion_counts(y_test, test_pred))
 
     thresholds = config["evaluation"]["thresholds"]
     promoted = meets_promotion_thresholds(test_metrics, thresholds)
 
+    temporal = date_series is not None and config["split"].get("temporal_when_dated", True)
+    dataset_info: dict[str, Any] = dict(provenance or {})
+    dataset_info.update(
+        {
+            "profile": profile_name or config["dataset"].get("active"),
+            "source_url": profile.get("source_url"),
+            "rows_after_validation": rows_after_validation,
+            "rows_excluded_by_target_rule": rows_after_validation - len(prepared),
+            "training_rows": len(x_train),
+            "target_definition": definition,
+            "feature_columns": list(features.columns),
+            "split": {
+                "strategy": "temporal" if temporal else "stratified_random",
+                "train_period": _period(date_series, x_train.index),
+                "validation_period": _period(date_series, x_val.index),
+                "test_period": _period(date_series, x_test.index),
+            },
+        }
+    )
+
     return {
         "target": target_name,
-        "dataset_profile": config["dataset"].get("active"),
+        "dataset": dataset_info,
+        "dataset_profile": profile_name or config["dataset"].get("active"),
         "best_model": best_name,
         "algorithm": best_name,
         "promoted": promoted,
         "metrics": test_metrics,
         "validation_results": validation_results,
+        "model_params": {k: v for k, v in config["models"][best_name].items() if k != "enabled"},
+        "random_state": seed,
+        "calibration": calibration_info,
+        "decision_threshold": {
+            **threshold_spec,
+            "value": decision_threshold,
+            "selected_on": "validation",
+            "validation": threshold_metrics(y_val, val_scores, decision_threshold),
+        },
+        "test_calibration": calibration_summary(y_test, test_proba),
         "rejected_rows": rejections,
         "split_sizes": {"train": len(x_train), "validation": len(x_val), "test": len(x_test)},
         "class_distribution": {
@@ -279,15 +430,27 @@ def train_one_target(
         "scale_pos_weight": scale_pos_weight,
         "feature_count": features.shape[1],
         "trained_at": datetime.now(UTC).isoformat(),
-        "pipeline": best_pipeline,
+        "pipeline": served,
     }
 
 
 def main() -> None:
-    """Train the requested target(s) and persist each winning pipeline."""
+    """Train the requested target(s) and persist each winning pipeline.
+
+    Every run is saved write-once under <output_dir>/runs/<target>/<version>/
+    (src/models/artifacts.py). Only a run that meets the promotion thresholds
+    replaces the shared <target>_model.joblib / <target>_metrics.json; a
+    failed or interrupted run leaves the previous ones exactly as they were.
+    """
     parser = argparse.ArgumentParser(description="Train patient risk and readmission models")
     parser.add_argument("--config", default=None, help="Path to config.yaml")
     parser.add_argument("--dataset", default=None, help="Dataset profile name override")
+    parser.add_argument(
+        "--output-dir",
+        default=None,
+        help="Write the model and metrics here instead of artifacts.output_dir "
+        "(use for experiments so the active production artifacts are never overwritten)",
+    )
     parser.add_argument(
         "--target",
         choices=sorted(TARGET_BUILDERS),
@@ -297,29 +460,40 @@ def main() -> None:
     args = parser.parse_args()
 
     config = load_config(args.config)
+    profile_name = args.dataset or config["dataset"]["active"]
     profile = resolve_profile(config, args.dataset)
 
-    frame = load_raw(profile["raw_path"], profile.get("na_values"))
+    if profile.get("format") == "relational":
+        frame, provenance = load_relational_export(
+            profile["raw_dir"], profile["tables"], profile.get("na_values")
+        )
+    else:
+        frame = load_raw(profile["raw_path"], profile.get("na_values"))
+        provenance = {"files": {"raw": file_fingerprint(Path(profile["raw_path"]))}}
 
     targets = [args.target] if args.target else list(TARGET_BUILDERS)
-    output_dir = Path(config["artifacts"]["output_dir"])
+    output_dir = Path(args.output_dir or config["artifacts"]["output_dir"])
     output_dir.mkdir(parents=True, exist_ok=True)
 
     any_failed = False
     for target_name in targets:
-        result = train_one_target(frame, profile, config, target_name)
+        result = train_one_target(frame, profile, config, target_name, provenance, profile_name)
         pipeline = result.pop("pipeline")
 
         model_filename = config["artifacts"]["model_filename"].format(target=target_name)
         metrics_filename = config["artifacts"]["metrics_filename"].format(target=target_name)
-        joblib.dump(pipeline, output_dir / model_filename)
-        (output_dir / metrics_filename).write_text(json.dumps(result, indent=2), encoding="utf-8")
+        run_dir, result = write_run(output_dir, target_name, pipeline, result)
 
         print(f"[{target_name}] best_model={result['best_model']} metrics={result['metrics']}")
-        if not result["promoted"]:
+        print(f"[{target_name}] run saved to {run_dir}")
+        if result["promoted"]:
+            promote_to_current(output_dir, run_dir, model_filename, metrics_filename)
+            print(f"[{target_name}] promoted: {output_dir / model_filename} now points to this run")
+        else:
             any_failed = True
             print(
                 f"[{target_name}] FAILED promotion thresholds {config['evaluation']['thresholds']}"
+                f" - {output_dir / model_filename} was left unchanged"
             )
 
     if any_failed:

@@ -337,3 +337,39 @@ def test_repository_and_api_scope_agree(
     }
     from_repo = {p.id for p in PatientRepository(db_session).list_patients(doctor_id=doctor.id)}
     assert from_api == from_repo == {mine["id"]}
+
+
+# --------------------------------------------------------------------------
+# Assigned doctor display name
+# --------------------------------------------------------------------------
+
+
+def test_patient_reads_carry_the_assigned_doctors_name_only(
+    client: TestClient, auth_header, db_session: Session
+) -> None:
+    doctor = make_doctor(db_session, "named.doctor@hospital.org")
+    created = create_patient(client, auth_header, "MRN-NAME-1", assigned_doctor_id=doctor.id)
+    assert created["assigned_doctor_name"] == "Scope Doctor"
+
+    for headers in (doctor_header(doctor), auth_header(Role.HOSPITAL_ADMIN)):
+        body = client.get(f"/api/v1/patients/{created['id']}", headers=headers).json()
+        assert body["assigned_doctor_name"] == "Scope Doctor"
+        assert "named.doctor@hospital.org" not in str(body)
+
+    listed = client.get("/api/v1/patients", headers=admin(auth_header)).json()
+    assert listed[0]["assigned_doctor_name"] == "Scope Doctor"
+
+
+def test_assigned_doctor_name_follows_reassignment(
+    client: TestClient, auth_header, db_session: Session
+) -> None:
+    doctor = make_doctor(db_session, "first.doctor@hospital.org")
+    created = create_patient(client, auth_header, "MRN-NAME-2", assigned_doctor_id=doctor.id)
+    response = client.patch(
+        f"/api/v1/patients/{created['id']}",
+        headers=admin(auth_header),
+        json={"assigned_doctor_id": None},
+    )
+    assert response.json()["assigned_doctor_name"] is None
+    unassigned = create_patient(client, auth_header, "MRN-NAME-3")
+    assert unassigned["assigned_doctor_name"] is None

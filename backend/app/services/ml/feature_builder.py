@@ -1,15 +1,14 @@
 """Assembles a model-ready feature row from Postgres.
 
 The trained pipelines (ml/src/models/train.py) were fit on the India Hospital
-Readmission export's RAW column shape - age, gender, diagnosis,
-length_of_stay, admission_type, medication_count, plus the engineered
-prior_admission_count/days_since_last_discharge - not on the Postgres
-patients/admissions column names, which dataset_import_service.py renames on
-the way in (age -> age_group, diagnosis -> primary_diagnosis, length_of_stay
--> time_in_hospital, medication_count -> num_medications). This module is the
-one place that translation happens, and it imports add_history_features
-directly from ml/src rather than re-deriving it, so a training-time change to
-that function can never silently drift from what inference does with it.
+Readmission relational export's columns - age, gender, diagnosis,
+length_of_stay, admission_type, discharge_type, number_diagnoses, plus the
+engineered prior_admission_count/days_since_last_discharge - not on the
+Postgres column names (age_group, primary_diagnosis, time_in_hospital,
+discharge_disposition). This module is the one place that translation
+happens. It imports the column contract, gender normalisation and
+add_history_features from ml/src rather than re-declaring them, so training
+and inference cannot drift apart.
 """
 
 import sys
@@ -29,23 +28,15 @@ _ML_ROOT = Path(__file__).resolve().parents[4] / "ml"
 if str(_ML_ROOT) not in sys.path:
     sys.path.insert(0, str(_ML_ROOT))
 
-from src.features.build_features import add_history_features  # noqa: E402
+from src.features.build_features import (  # noqa: E402
+    INFERENCE_FEATURE_COLUMNS,
+    add_history_features,
+    normalise_gender,
+)
 
-# The exact column set and order the training pipeline's ColumnTransformer
-# was fit against for the India profile (raw column names, post
-# feature-engineering, pre drop_unused_columns) - see
-# ml/configs/config.yaml's india_hospital_readmission profile and
-# ml/src/models/train.py::train_one_target.
-FEATURE_COLUMNS = [
-    "age",
-    "gender",
-    "diagnosis",
-    "length_of_stay",
-    "admission_type",
-    "medication_count",
-    "prior_admission_count",
-    "days_since_last_discharge",
-]
+# Each pipeline selects the columns it was fit on from this superset (the
+# risk model leaves out discharge_type, which is part of its label).
+FEATURE_COLUMNS = INFERENCE_FEATURE_COLUMNS
 
 
 class InsufficientPatientDataError(Exception):
@@ -94,7 +85,8 @@ class FeatureBuilder:
                     "admission_date": row.admission_date,
                     "length_of_stay": row.time_in_hospital,
                     "admission_type": row.admission_type,
-                    "medication_count": row.num_medications,
+                    "discharge_type": row.discharge_disposition,
+                    "number_diagnoses": row.number_diagnoses,
                 }
                 for row in rows
             ]
@@ -142,11 +134,12 @@ class FeatureBuilder:
             [
                 {
                     "age": age,
-                    "gender": patient.gender,
+                    "gender": normalise_gender(pd.Series([patient.gender])).iloc[0],
                     "diagnosis": patient.primary_diagnosis,
                     "length_of_stay": row["length_of_stay"].iloc[0],
                     "admission_type": row["admission_type"].iloc[0],
-                    "medication_count": row["medication_count"].iloc[0],
+                    "discharge_type": row["discharge_type"].iloc[0],
+                    "number_diagnoses": row["number_diagnoses"].iloc[0],
                     "prior_admission_count": row["prior_admission_count"].iloc[0],
                     "days_since_last_discharge": row["days_since_last_discharge"].iloc[0],
                 }

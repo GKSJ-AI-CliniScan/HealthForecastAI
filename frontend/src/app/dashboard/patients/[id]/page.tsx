@@ -6,7 +6,7 @@ import ForecastReadmissionButton from '@/components/risk/ForecastReadmissionButt
 import ScoreRiskButton from '@/components/risk/ScoreRiskButton';
 import { Badge, Card, Cell, ErrorNote, Row, StatTile, Table } from '@/components/ui';
 import { EmptyState } from '@/components/ui/states';
-import { formatDateTime, formatNumber, humanise } from '@/lib/format';
+import { assignedDoctorLabel, formatNumber, humanise } from '@/lib/format';
 import { apiFetch } from '@/lib/api';
 import { can, getToken, requireUser } from '@/lib/session';
 import type {
@@ -150,9 +150,11 @@ export default async function PatientDetailPage({
       forecast: row.readmission_probability,
     })),
   ]
-    .filter((row) => row.at)
-    .sort((a, b) => (a.at ?? '').localeCompare(b.at ?? ''))
-    .map((row) => ({ ...row, at: formatDateTime(row.at) }));
+    // Epoch ms on a true time axis: predictions made within the same minute
+    // stay distinct points, with the exact time in the tooltip.
+    .map((row) => ({ ...row, at: row.at ? Date.parse(row.at) : Number.NaN }))
+    .filter((row) => Number.isFinite(row.at))
+    .sort((a, b) => a.at - b.at);
 
   return (
     <div className="space-y-6">
@@ -186,7 +188,7 @@ export default async function PatientDetailPage({
           </div>
           <div>
             <dt className="opacity-60">Assigned doctor</dt>
-            <dd>{patient.assigned_doctor_id ?? 'Unassigned'}</dd>
+            <dd>{assignedDoctorLabel(patient, user.profile?.id ?? null)}</dd>
           </div>
         </dl>
       </Card>
@@ -326,6 +328,7 @@ export default async function PatientDetailPage({
               label="Risk score and readmission forecast over time"
               data={predictionRows}
               xKey="at"
+              xType="time"
               series={[
                 { key: 'risk', label: 'Risk score', color: '#6366f1' },
                 { key: 'forecast', label: '30-day readmission forecast', color: '#ef4444' },

@@ -97,6 +97,7 @@ def test_doctor_patient_map_prevents_duplicate_assignments() -> None:
         ("model_metadata", "idx_model_metadata_status"),
         ("admissions", "idx_admissions_department"),
         ("reports", "idx_reports_generated_by"),
+        ("admissions", "uq_admissions_source_admission_id"),
     ],
 )
 def test_documented_indexes_exist(table: str, index: str) -> None:
@@ -196,6 +197,62 @@ def test_reports_generated_by_restricts_user_deletion() -> None:
 def test_reports_file_path_is_unique() -> None:
     """Two report rows can never point at the same stored file."""
     assert Base.metadata.tables["reports"].c.file_path.unique
+
+
+def test_admissions_source_id_is_optional_and_unique() -> None:
+    """Importer provenance: nullable (app-created rows), unique when present."""
+    column = Base.metadata.tables["admissions"].c.source_admission_id
+    assert column.nullable
+    index = next(
+        i
+        for i in Base.metadata.tables["admissions"].indexes
+        if i.name == "uq_admissions_source_admission_id"
+    )
+    assert index.unique
+
+
+def test_migration_0005_preserves_existing_admissions(tmp_path: Path, monkeypatch) -> None:
+    """Upgrading 0004 -> 0005 keeps every row and leaves legacy source ids NULL."""
+    from sqlalchemy import text
+
+    from app.core import config as config_module
+
+    url = f"sqlite+pysqlite:///{tmp_path / 'm0005.db'}"
+    monkeypatch.setattr(config_module.settings, "DATABASE_URL", url)
+    cfg = Config(str(BACKEND_ROOT / "alembic.ini"))
+    cfg.set_main_option("script_location", str(BACKEND_ROOT / "alembic"))
+
+    command.upgrade(cfg, "0004")
+    engine = create_engine(url, future=True)
+    with engine.begin() as conn:
+        conn.execute(text("INSERT INTO patients (medical_record_number) VALUES ('LEGACY-1')"))
+        conn.execute(
+            text("INSERT INTO admissions (patient_id, time_in_hospital) VALUES (1, 4), (1, 6)")
+        )
+    engine.dispose()
+
+    command.upgrade(cfg, "0005")
+    engine = create_engine(url, future=True)
+    try:
+        with engine.connect() as conn:
+            rows = conn.execute(
+                text("SELECT time_in_hospital, source_admission_id FROM admissions ORDER BY id")
+            ).all()
+        assert [tuple(r) for r in rows] == [(4, None), (6, None)]
+        indexes = {i["name"] for i in inspect(engine).get_indexes("admissions")}
+        assert "uq_admissions_source_admission_id" in indexes
+    finally:
+        engine.dispose()
+
+    command.downgrade(cfg, "0004")
+    engine = create_engine(url, future=True)
+    try:
+        columns = {c["name"] for c in inspect(engine).get_columns("admissions")}
+        assert "source_admission_id" not in columns
+        with engine.connect() as conn:
+            assert conn.execute(text("SELECT count(*) FROM admissions")).scalar_one() == 2
+    finally:
+        engine.dispose()
 
 
 def test_migration_upgrades_and_downgrades_cleanly(tmp_path: Path, monkeypatch) -> None:

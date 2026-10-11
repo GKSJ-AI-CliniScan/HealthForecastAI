@@ -14,6 +14,7 @@ collapsed. A row that fails is quarantined with a reason rather than dropped
 silently, so the rejects can be reviewed instead of disappearing.
 """
 
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -71,34 +72,43 @@ DIABETES_130_US = DatasetProfile(
     },
 )
 
-# The dataset named in the approved architecture. Column names follow the field
-# list in HealthForecastAI_ML_Design.md section 3.1; any that the real export does
-# not carry are reported by ImportSummary.missing_columns rather than failing.
-INDIA_HOSPITAL_READMISSION = DatasetProfile(
+
+@dataclass(frozen=True)
+class RelationalDatasetProfile:
+    """A multi-table export joined on its own keys before loading.
+
+    ``tables`` maps each logical table (patients/admissions/diagnoses) onto its
+    file name inside the export directory.
+    """
+
+    name: str
+    tables: dict[str, str]
+    unmapped_note: str = ""
+
+
+# The dataset named in the approved architecture, verified against the real
+# Kaggle files: a relational export joined patients -> admissions
+# (patient_id) -> diagnoses (admission_id).
+INDIA_HOSPITAL_READMISSION = RelationalDatasetProfile(
     name="india_hospital_readmission",
-    patient_key="patient_id",
-    patient_columns={
-        "age": "age_group",
-        "gender": "gender",
-        "diagnosis": "primary_diagnosis",
-    },
-    admission_columns={
-        "admission_date": "admission_date",
-        "discharge_date": "discharge_date",
-        "length_of_stay": "time_in_hospital",
-        "admission_type": "admission_type",
-        "department": "discharge_disposition",
-        "medication_count": "num_medications",
-        "readmitted": "readmitted",
+    tables={
+        "patients": "patients.csv",
+        "admissions": "admissions.csv",
+        "diagnoses": "diagnoses.csv",
     },
     unmapped_note=(
-        "This export carries a 'region' column with no counterpart in the "
-        "patients table, so it is not imported. Raise with the mentor before "
-        "adding a column to the mentor-owned reference schema."
+        "Fields with no column in the operational schema are not imported: "
+        "patients.state/bpl_card/insurance_type/comorbidity_count/prev_admissions, "
+        "admissions.ward_type/hospital_id/num_procedures/charlson_index and lab "
+        "values, and the billing.csv/hospitals.csv tables. admissions.department "
+        "stays empty because the export has no department (ward_type is a care "
+        "unit, not a department). readmitted holds the export's 30-day flag as "
+        "'<30' (1) or 'NO' (0); 'NO' means not readmitted within 30 days. Raise "
+        "with the mentor before adding columns to the mentor-owned schema."
     ),
 )
 
-PROFILES: dict[str, DatasetProfile] = {
+PROFILES: dict[str, DatasetProfile | RelationalDatasetProfile] = {
     DIABETES_130_US.name: DIABETES_130_US,
     INDIA_HOSPITAL_READMISSION.name: INDIA_HOSPITAL_READMISSION,
 }
@@ -114,6 +124,11 @@ class ImportSummary:
     duplicates_dropped: int = 0
     patients_created: int = 0
     admissions_created: int = 0
+    patients_existing: int = 0
+    admissions_existing: int = 0
+    orphan_diagnoses: int = 0
+    legacy_adopted: int = 0
+    dry_run: bool = False
     missing_columns: list[str] = field(default_factory=list)
     rejection_reasons: dict[str, int] = field(default_factory=dict)
 
@@ -131,6 +146,11 @@ class ImportSummary:
             "duplicates_dropped": self.duplicates_dropped,
             "patients_created": self.patients_created,
             "admissions_created": self.admissions_created,
+            "patients_existing": self.patients_existing,
+            "admissions_existing": self.admissions_existing,
+            "orphan_diagnoses": self.orphan_diagnoses,
+            "legacy_adopted": self.legacy_adopted,
+            "dry_run": self.dry_run,
             "missing_columns": self.missing_columns,
             "rejection_reasons": self.rejection_reasons,
         }
@@ -203,6 +223,12 @@ class DatasetImportService:
         if not _to_text(row.get(self.profile.patient_key), 64):
             return "missing_patient_identifier"
 
+        encounter = self.profile.encounter_key
+        if encounter and encounter in row and _to_text(row.get(encounter), 40) is None:
+            # The export carries encounter ids, so a blank one cannot be
+            # matched on re-import - loading it would duplicate on every run.
+            return "missing_encounter_identifier"
+
         age = _age_to_int(row.get("age"))
         if age is not None and not (MIN_AGE <= age <= MAX_AGE):
             return "implausible_age"
@@ -239,7 +265,17 @@ class DatasetImportService:
         summary.missing_columns = [name for name in expected if name not in frame.columns]
 
         before = len(frame)
-        deduped = frame.drop_duplicates(subset=self._encounter_identity(frame))
+        identity = self._encounter_identity(frame)
+        if identity == [self.profile.encounter_key]:
+            # Blank encounter ids are not the same encounter: keep them out of
+            # the duplicate check so validate_row rejects each one, instead of
+            # collapsing them into one row that hides the others.
+            blank = frame[identity[0]].isna()
+            deduped = pd.concat(
+                [frame[~blank].drop_duplicates(subset=identity), frame[blank]]
+            ).sort_index()
+        else:
+            deduped = frame.drop_duplicates(subset=identity)
         summary.duplicates_dropped = before - len(deduped)
         return deduped
 
@@ -287,14 +323,21 @@ class DatasetImportService:
         return values
 
     def import_frame(self, frame: pd.DataFrame, limit: int | None = None) -> ImportSummary:
+        """Load a dataframe and commit; see _load_frame."""
+        return _in_transaction(self.db, lambda: self._load_frame(frame, limit), dry_run=False)
+
+    def _load_frame(self, frame: pd.DataFrame, limit: int | None = None) -> ImportSummary:
         """Load a dataframe into patients and admissions.
 
         One row of the export is one encounter. Rows sharing a patient identifier
         collapse onto a single patient carrying many admissions, which is what
         makes prior-admission history available to the Milestone 2 features.
 
-        Existing patients are reused rather than duplicated, so re-running the
-        import adds encounters instead of a second copy of every person.
+        Existing patients are reused rather than duplicated. When the profile
+        has an encounter key (Diabetes 130-US: encounter_id) it is stored as a
+        namespaced source_admission_id, so re-running the import skips
+        encounters already loaded instead of duplicating them. Exports without
+        that column keep the original behaviour (every run adds its rows).
         """
         summary = ImportSummary(profile=self.profile.name)
         frame = self.clean(frame, summary)
@@ -302,15 +345,36 @@ class DatasetImportService:
             frame = frame.head(limit)
         summary.rows_read = len(frame)
 
+        records = [
+            {str(key): value for key, value in raw.items()}
+            for raw in frame.to_dict(orient="records")
+        ]
+        wanted = [sid for sid in (self._source_id(r) for r in records) if sid is not None]
+        owner: dict[str, str] = {}
+        for chunk in _chunks(wanted):
+            for source_id, mrn in (
+                self.db.query(Admission.source_admission_id, Patient.medical_record_number)
+                .join(Patient, Patient.id == Admission.patient_id)
+                .filter(Admission.source_admission_id.in_(chunk))
+            ):
+                owner[source_id] = mrn
+
         seen: dict[str, Patient] = {}
-        for raw in frame.to_dict(orient="records"):
-            record: dict[str, Any] = {str(key): value for key, value in raw.items()}
+        for record in records:
             reason = self.validate_row(record)
             if reason is not None:
                 summary.reject(reason)
                 continue
 
             key = str(_to_text(record.get(self.profile.patient_key), 64))
+            source_id = self._source_id(record)
+            if source_id is not None and source_id in owner:
+                if owner[source_id] == key:
+                    summary.admissions_existing += 1
+                else:
+                    summary.reject("source_id_belongs_to_another_patient")
+                continue
+
             patient = seen.get(key)
             if patient is None:
                 patient = (
@@ -323,12 +387,332 @@ class DatasetImportService:
                     summary.patients_created += 1
                 seen[key] = patient
 
-            self.db.add(Admission(patient_id=patient.id, **self._admission_values(record)))
+            self.db.add(
+                Admission(
+                    patient_id=patient.id,
+                    source_admission_id=source_id,
+                    **self._admission_values(record),
+                )
+            )
+            if source_id is not None:
+                owner[source_id] = key
             summary.admissions_created += 1
 
-        self.db.commit()
+        self.db.flush()
         return summary
 
-    def import_csv(self, path: str | Path, limit: int | None = None) -> ImportSummary:
-        """Read an export from disk and load it."""
-        return self.import_frame(read_csv(path), limit=limit)
+    def _source_id(self, record: dict[str, Any]) -> str | None:
+        """Namespaced encounter id, e.g. "diabetes_130_us:12522", or None.
+
+        The profile name prefix keeps ids from different exports from ever
+        colliding in the one unique source_admission_id index.
+        """
+        encounter = self.profile.encounter_key
+        if not encounter or encounter not in record:
+            return None
+        value = record.get(encounter)
+        number = _to_int(value)
+        token = str(number) if number is not None else _to_text(value, 40)
+        return None if token is None else f"{self.profile.name}:{token}"
+
+    def import_csv(
+        self, path: str | Path, limit: int | None = None, dry_run: bool = False
+    ) -> ImportSummary:
+        """Read an export from disk and load it in one transaction.
+
+        ``dry_run`` validates and maps every row, reports what would be
+        created, then rolls back so nothing is written.
+        """
+        frame = read_csv(path)
+        return _in_transaction(self.db, lambda: self._load_frame(frame, limit), dry_run)
+
+
+def _in_transaction(db: Session, work: Callable[[], ImportSummary], dry_run: bool) -> ImportSummary:
+    """Run an import as one unit: commit on success, roll back on any error.
+
+    A dry run rolls back unconditionally, so it exercises every validation and
+    mapping rule against the real database without leaving a trace.
+    """
+    try:
+        summary = work()
+        summary.dry_run = dry_run
+        if dry_run:
+            db.rollback()
+        else:
+            db.commit()
+        return summary
+    except Exception:
+        db.rollback()
+        raise
+
+
+_RELATIONAL_COLUMNS = {
+    "patients": ["patient_id", "age", "gender"],
+    "admissions": [
+        "admission_id",
+        "patient_id",
+        "admit_date",
+        "discharge_date",
+        "los_days",
+        "admit_type",
+        "discharge_type",
+        "readmitted_30d",
+    ],
+    "diagnoses": ["admission_id", "diag_desc", "diag_rank"],
+}
+
+
+# Rows per IN (...) lookup - well under every driver's bind-parameter limit.
+_LOOKUP_CHUNK = 1000
+
+
+def _chunks(values: list[Any], size: int = _LOOKUP_CHUNK) -> Iterator[list[Any]]:
+    for start in range(0, len(values), size):
+        yield values[start : start + size]
+
+
+def _admission_key(values: dict[str, Any]) -> tuple[Any, ...]:
+    """Natural identity of an admission, used only to adopt legacy rows.
+
+    Admissions imported before migration 0005 have no source id; an incoming
+    admission adopts the legacy row of the same patient whose mapped tuple
+    matches exactly - verified unique across all 120,000 admissions in the
+    real export (patient + dates alone collide once).
+    """
+    return (
+        values["admission_date"],
+        values["discharge_date"],
+        values["time_in_hospital"],
+        values["admission_type"],
+        values["discharge_disposition"],
+    )
+
+
+class RelationalDatasetImportService:
+    """Loads a relational export (patients/admissions/diagnoses) into Postgres.
+
+    Idempotent: patients are matched on medical_record_number (the source
+    patient_id) and never modified; admissions are matched exactly on
+    source_admission_id (the source admission_id). Rows imported before
+    source ids existed are adopted - their NULL source id is filled in - when
+    they match on the full natural key, so re-running never duplicates them.
+    Lookups are batched, so cost grows with the batch size, not per row.
+    """
+
+    def __init__(self, db: Session, profile: RelationalDatasetProfile) -> None:
+        self.db = db
+        self.profile = profile
+
+    def import_export(
+        self, raw_dir: str | Path, patient_limit: int | None, dry_run: bool = False
+    ) -> ImportSummary:
+        """Read the export's tables from ``raw_dir`` and load them."""
+        directory = Path(raw_dir)
+        frames = {name: read_csv(directory / file) for name, file in self.profile.tables.items()}
+        return self.import_frames(
+            frames["patients"],
+            frames["admissions"],
+            frames["diagnoses"],
+            patient_limit=patient_limit,
+            dry_run=dry_run,
+        )
+
+    def import_frames(
+        self,
+        patients: pd.DataFrame,
+        admissions: pd.DataFrame,
+        diagnoses: pd.DataFrame,
+        patient_limit: int | None,
+        dry_run: bool = False,
+    ) -> ImportSummary:
+        """Load already-read tables in one transaction.
+
+        ``patient_limit`` selects the first N patients (in patients-table order)
+        that have at least one admission and loads each with its full admission
+        history; None loads every such patient.
+        """
+        for name, frame in (
+            ("patients", patients),
+            ("admissions", admissions),
+            ("diagnoses", diagnoses),
+        ):
+            missing = [c for c in _RELATIONAL_COLUMNS[name] if c not in frame.columns]
+            if missing:
+                raise ValueError(f"{name} table is missing expected columns {missing}")
+        if patient_limit is not None and patient_limit < 1:
+            raise ValueError("patient_limit must be a positive number of patients")
+
+        return _in_transaction(
+            self.db,
+            lambda: self._load(patients, admissions, diagnoses, patient_limit),
+            dry_run,
+        )
+
+    def _load(
+        self,
+        patients: pd.DataFrame,
+        admissions: pd.DataFrame,
+        diagnoses: pd.DataFrame,
+        patient_limit: int | None,
+    ) -> ImportSummary:
+        summary = ImportSummary(profile=self.profile.name)
+
+        before = len(patients) + len(admissions)
+        patients = patients.drop_duplicates(subset=["patient_id"])
+        admissions = admissions.drop_duplicates(subset=["admission_id"])
+        summary.duplicates_dropped = before - len(patients) - len(admissions)
+
+        # Verified relationships: an admission must reference a known patient,
+        # a diagnosis a known admission.
+        known_patient = admissions["patient_id"].isin(patients["patient_id"])
+        for _ in range(int((~known_patient).sum())):
+            summary.reject("unknown_patient")
+        admissions = admissions[known_patient]
+        known_admission = diagnoses["admission_id"].isin(admissions["admission_id"])
+        summary.orphan_diagnoses = int((~known_admission).sum())
+        diagnoses = diagnoses[known_admission]
+
+        primary = (
+            diagnoses[diagnoses["diag_rank"] == 1]
+            .drop_duplicates(subset=["admission_id"])
+            .set_index("admission_id")["diag_desc"]
+        )
+        counts = diagnoses.groupby("admission_id").size()
+
+        with_history = patients[patients["patient_id"].isin(admissions["patient_id"])]
+        selected = with_history if patient_limit is None else with_history.head(patient_limit)
+        chosen = admissions[admissions["patient_id"].isin(selected["patient_id"])].copy()
+        chosen["_admit"] = pd.to_datetime(chosen["admit_date"], errors="coerce")
+        chosen = chosen.sort_values("_admit", na_position="first", kind="stable")
+        by_patient = dict(list(chosen.groupby("patient_id", sort=False)))
+
+        # Phase 1 - validate and resolve patients (one lookup per chunk).
+        accepted: list[tuple[str, dict[str, Any], pd.DataFrame]] = []
+        for record in selected.to_dict(orient="records"):
+            history = by_patient[record["patient_id"]]
+            summary.rows_read += len(history)
+            key = _to_text(record.get("patient_id"), 64)
+            reason = self._patient_rejection(key, record)
+            if reason is not None or key is None:
+                for _ in range(len(history)):
+                    summary.reject(reason or "missing_patient_identifier")
+                continue
+            accepted.append((key, record, history))
+
+        keys = [key for key, _, _ in accepted]
+        known: dict[str, Patient] = {}
+        for chunk in _chunks(keys):
+            for patient in self.db.query(Patient).filter(Patient.medical_record_number.in_(chunk)):
+                known[patient.medical_record_number] = patient
+
+        new_patients: list[Patient] = []
+        for key, record, history in accepted:
+            if key in known:
+                summary.patients_existing += 1
+                continue
+            age = _age_to_int(record.get("age"))
+            patient = Patient(
+                medical_record_number=key,
+                age_group=None if age is None else str(age),
+                gender=_to_text(record.get("gender"), 16),
+                primary_diagnosis=_to_text(primary.get(history.iloc[-1]["admission_id"]), 255),
+            )
+            known[key] = patient
+            new_patients.append(patient)
+        self.db.add_all(new_patients)
+        self.db.flush()
+        summary.patients_created = len(new_patients)
+
+        # Phase 2 - existing admissions: exact source ids anywhere in the
+        # table, plus legacy (NULL source id) rows of the patients involved.
+        source_ids = [
+            str(row["admission_id"])
+            for _, _, history in accepted
+            for row in history.to_dict("records")
+        ]
+        claimed: dict[str, int] = {}
+        for chunk in _chunks(source_ids):
+            for source_id, patient_id in self.db.query(
+                Admission.source_admission_id, Admission.patient_id
+            ).filter(Admission.source_admission_id.in_(chunk)):
+                claimed[source_id] = patient_id
+
+        existing_ids = [p.id for p in known.values() if p.id is not None]
+        legacy: dict[tuple[Any, ...], list[Admission]] = {}
+        for chunk in _chunks(existing_ids):
+            for legacy_row in self.db.query(Admission).filter(
+                Admission.patient_id.in_(chunk), Admission.source_admission_id.is_(None)
+            ):
+                natural = _admission_key(
+                    {
+                        "admission_date": legacy_row.admission_date,
+                        "discharge_date": legacy_row.discharge_date,
+                        "time_in_hospital": legacy_row.time_in_hospital,
+                        "admission_type": legacy_row.admission_type,
+                        "discharge_disposition": legacy_row.discharge_disposition,
+                    }
+                )
+                legacy.setdefault((legacy_row.patient_id, *natural), []).append(legacy_row)
+
+        # Phase 3 - insert, adopt, or skip each admission.
+        new_admissions: list[Admission] = []
+        for key, _, history in accepted:
+            patient = known[key]
+            for row in history.to_dict(orient="records"):
+                values, rejection = self._admission_values(row, primary, counts)
+                if rejection is not None:
+                    summary.reject(rejection)
+                    continue
+                source_id = str(row["admission_id"])
+                if source_id in claimed:
+                    if claimed[source_id] != patient.id:
+                        summary.reject("source_id_belongs_to_another_patient")
+                    else:
+                        summary.admissions_existing += 1
+                    continue
+                matches = legacy.get((patient.id, *_admission_key(values)))
+                if matches:
+                    matches.pop(0).source_admission_id = source_id
+                    summary.legacy_adopted += 1
+                else:
+                    new_admissions.append(
+                        Admission(patient_id=patient.id, source_admission_id=source_id, **values)
+                    )
+                claimed[source_id] = patient.id
+        self.db.add_all(new_admissions)
+        self.db.flush()
+        summary.admissions_created = len(new_admissions)
+        return summary
+
+    @staticmethod
+    def _patient_rejection(key: str | None, record: dict[str, Any]) -> str | None:
+        if not key:
+            return "missing_patient_identifier"
+        age = _age_to_int(record.get("age"))
+        if age is not None and not (MIN_AGE <= age <= MAX_AGE):
+            return "implausible_age"
+        return None
+
+    @staticmethod
+    def _admission_values(
+        row: dict[str, Any], primary: pd.Series, counts: pd.Series
+    ) -> tuple[dict[str, Any], str | None]:
+        """Map one export admission onto the admissions table, or name why not."""
+        admitted = _to_date(row.get("admit_date"))
+        discharged = _to_date(row.get("discharge_date"))
+        stay = _to_int(row.get("los_days"))
+        flag = _to_int(row.get("readmitted_30d"))
+        values = {
+            "admission_date": admitted,
+            "discharge_date": discharged,
+            "time_in_hospital": stay,
+            "admission_type": _to_text(row.get("admit_type"), 64),
+            "discharge_disposition": _to_text(row.get("discharge_type"), 128),
+            "number_diagnoses": _to_int(counts.get(row["admission_id"])),
+            "readmitted": None if flag is None else ("<30" if flag == 1 else "NO"),
+        }
+        if admitted is not None and discharged is not None and discharged < admitted:
+            return values, "discharge_before_admission"
+        if stay is not None and stay < 0:
+            return values, "negative_length_of_stay"
+        return values, None

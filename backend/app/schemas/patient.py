@@ -41,6 +41,7 @@ class PatientRead(PatientBase):
 
     id: int
     assigned_doctor_id: int | None = None
+    assigned_doctor_name: str | None = None
 
 
 class PatientAnonymised(BaseModel):

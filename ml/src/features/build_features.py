@@ -2,6 +2,7 @@
 
 from typing import Any
 
+import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -9,6 +10,44 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from src.data.preprocess import split_feature_types
+
+# Training/serving feature contract for the India Hospital Readmission
+# relational export. Only fields the operational Postgres schema also stores
+# are used, so backend/app/services/ml/feature_builder.py can rebuild exactly
+# this row at inference time (it imports these constants rather than
+# re-declaring them). Lab values, Charlson index, ward and insurance exist in
+# the export but have no column in the operational schema; adding them was
+# measured at only +0.013 validation ROC-AUC on the 30-day target, not enough
+# to justify a schema change.
+ENCOUNTER_FEATURE_COLUMNS = [
+    "age",
+    "gender",
+    "diagnosis",
+    "length_of_stay",
+    "admission_type",
+    "discharge_type",
+    "number_diagnoses",
+]
+HISTORY_FEATURE_COLUMNS = ["prior_admission_count", "days_since_last_discharge"]
+INFERENCE_FEATURE_COLUMNS = ENCOUNTER_FEATURE_COLUMNS + HISTORY_FEATURE_COLUMNS
+
+_GENDER_CODES = {"m": "M", "male": "M", "f": "F", "female": "F"}
+
+
+def normalise_gender(series: pd.Series) -> pd.Series:
+    """Map free-text gender onto the export's M/F/Other vocabulary.
+
+    The export codes gender as M/F/Other while the operational schema stores
+    whatever was entered (e.g. "Female"); without this both spellings would
+    be distinct one-hot categories and one of them unseen at inference.
+    """
+
+    def one(value: Any) -> Any:
+        if pd.isna(value) or not str(value).strip():
+            return np.nan
+        return _GENDER_CODES.get(str(value).strip().lower(), "Other")
+
+    return series.map(one)
 
 
 def build_preprocessor(frame: pd.DataFrame, config: dict[str, Any]) -> ColumnTransformer:

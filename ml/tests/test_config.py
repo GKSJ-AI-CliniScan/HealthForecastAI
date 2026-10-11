@@ -43,22 +43,39 @@ def test_both_dataset_profiles_are_defined() -> None:
     assert set(dataset["profiles"]) == {"india_hospital_readmission", "diabetes_130_us"}
 
 
-@pytest.mark.parametrize(
-    "field",
-    [
-        "raw_path",
-        "na_values",
-        "id_column",
-        "target_column",
-        "readmission_positive_label",
-        "risk_negative_label",
-        "drop_columns",
-    ],
-)
-def test_every_profile_defines_the_fields_the_pipeline_reads(field: str) -> None:
+COMMON_FIELDS = ["na_values", "id_column", "drop_columns"]
+SINGLE_CSV_FIELDS = [
+    "raw_path",
+    "target_column",
+    "readmission_positive_label",
+    "risk_negative_label",
+]
+RELATIONAL_FIELDS = ["raw_dir", "tables", "targets", "label_columns", "encounter_key"]
+
+
+@pytest.mark.parametrize("field", COMMON_FIELDS + SINGLE_CSV_FIELDS + RELATIONAL_FIELDS)
+def test_every_profile_defines_the_fields_its_format_reads(field: str) -> None:
     profiles = load_config()["dataset"]["profiles"]
     for name, profile in profiles.items():
-        assert field in profile, f"profile '{name}' is missing '{field}'"
+        relational = profile.get("format") == "relational"
+        required = COMMON_FIELDS + (RELATIONAL_FIELDS if relational else SINGLE_CSV_FIELDS)
+        if field in required:
+            assert field in profile, f"profile '{name}' is missing '{field}'"
+
+
+def test_relational_profile_declares_both_targets_from_real_label_columns() -> None:
+    profile = load_config()["dataset"]["profiles"]["india_hospital_readmission"]
+    assert profile["format"] == "relational"
+    assert set(profile["tables"]) == {"patients", "admissions", "diagnoses"}
+    targets = profile["targets"]
+    assert set(targets) == {"risk", "readmission"}
+    for spec in targets.values():
+        assert set(spec["positive_if"]) <= set(profile["label_columns"]) | {"discharge_type"}
+    # Expired encounters cannot be readmitted: excluded from the readmission label.
+    assert targets["readmission"]["exclude_if"] == {"discharge_type": ["Expired"]}
+    # discharge_type defines part of the risk label, so it must not be a risk feature.
+    assert "discharge_type" in targets["risk"]["exclude_features"]
+    assert "90_day" not in targets and "readmission_90d" not in targets
 
 
 def test_xgboost_is_the_primary_model_and_random_forest_is_supporting() -> None:

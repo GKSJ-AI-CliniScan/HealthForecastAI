@@ -37,6 +37,25 @@ export function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+/**
+ * "Assigned doctor" cell: the doctor's display name (marked when it is the
+ * viewer), a neutral fallback when only the id is known, never a bare id.
+ */
+export function assignedDoctorLabel(
+  patient: { assigned_doctor_id: number | null; assigned_doctor_name?: string | null },
+  viewerId: number | null,
+): string {
+  if (patient.assigned_doctor_id === null) {
+    return 'Unassigned';
+  }
+  const name = patient.assigned_doctor_name?.trim();
+  const self = viewerId !== null && patient.assigned_doctor_id === viewerId;
+  if (name) {
+    return self ? `${name} (you)` : name;
+  }
+  return self ? 'You' : 'Assigned doctor';
+}
+
 /** Turn a {label: count} map into chart rows, largest first. */
 export function toCountRows(counts: Record<string, number>): { name: string; value: number }[] {
   return Object.entries(counts)
