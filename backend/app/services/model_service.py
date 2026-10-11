@@ -148,32 +148,32 @@ def get_active_model_info() -> dict:
 
 
 def get_active_model_metrics() -> dict:
-    """Return evaluation metrics for the active model."""
+    """Return saved evaluation metrics for the active model."""
     metrics_path = Path(__file__).with_name("model_metrics.json")
 
-    metrics = {
-        "accuracy": None,
-        "precision": None,
-        "recall": None,
-        "f1": None,
-        "roc_auc": None,
-        "threshold": None,
-    }
+    keys = (
+        "accuracy",
+        "precision",
+        "recall",
+        "f1",
+        "roc_auc",
+        "threshold",
+    )
 
-    if not metrics_path.exists():
-        return metrics
+    if not metrics_path.is_file():
+        return {key: None for key in keys}
 
     try:
         with metrics_path.open("r", encoding="utf-8") as file:
             saved_metrics = json.load(file)
 
-        for key in metrics:
-            value = saved_metrics.get(key)
+        if not isinstance(saved_metrics, dict):
+            return {key: None for key in keys}
 
-            if value is not None:
-                metrics[key] = float(value)
+        return {
+            key: (float(saved_metrics[key]) if saved_metrics.get(key) is not None else None)
+            for key in keys
+        }
 
     except (OSError, ValueError, TypeError):
-        pass
-
-    return metrics
+        return {key: None for key in keys}

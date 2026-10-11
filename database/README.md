@@ -1,32 +1,44 @@
 # Database
 
-Two stores, deliberately split.
+Two stores were planned. One was built.
 
-| Store      | Holds | Why |
-|------------|-------|-----|
-| PostgreSQL | Users, patients, admissions, predictions, treatment outcomes, audit logs | Relational integrity, constraints, joins for analytics |
-| MongoDB    | Clinical notes, model runs, prediction events | Schema-light documents that change shape as the project grows |
+| Store      | Holds | Status |
+|------------|-------|--------|
+| PostgreSQL | Users, patients, admissions, predictions, treatment outcomes, audit logs | **In use** (Render in production, SQLite for local development) |
+| MongoDB    | Clinical notes, model runs, prediction events | **Not implemented** - see below |
 
 ## PostgreSQL
 
-- `postgres/schema/01_schema.sql` - reference schema, applied automatically by
-  `docker compose up` on a fresh volume.
-- `postgres/migrations/` - Alembic revisions. Generate them from
-  `backend/`, never hand-edit a shipped revision.
-- `postgres/seeds/` - development seed data. Synthetic rows only.
+- `postgres/schema/01_schema.sql` - reference schema. It is generated from
+  `backend/app/models/` (see below) so the two always agree.
+- `postgres/migrations/` - empty. Tables are created from the SQLAlchemy models at
+  startup; no Alembic revisions were written.
+- `postgres/seeds/` - empty. Synthetic demo data is loaded by
+  `backend/scripts/seed_demo_data.py`.
+
+The backend uses SQLAlchemy, so the same code runs on SQLite and Postgres. Only
+`DATABASE_URL` changes.
+
+Regenerate the reference schema after any model change:
 
 ```bash
 cd backend
-alembic revision --autogenerate -m "add treatment outcomes"
-alembic upgrade head
+python scripts/export_schema.py
 ```
+
+Bootstrap and utility scripts in `backend/scripts/`: `seed_admin.py` (first admin),
+`seed_demo_data.py`, `migrate_sqlite_to_postgres.py`, `reset.py` (development only).
 
 ## MongoDB
 
-`mongodb/schemas/collections.md` documents the shape of every collection.
+`mongodb/schemas/collections.md` documents the intended collections. They were not
+built. The model registry reads model files and `metrics.joblib` from
+`MODEL_ARTIFACT_DIR`, and predictions are stored in the PostgreSQL
+`risk_predictions` table. The relational tables covered every feature.
 
 ## Rules
 
 - The reference schema and `backend/app/models/` must agree. If you change one,
   change the other in the same commit.
 - Seed data is synthetic. Never seed from a real hospital extract.
+- Never commit `DATABASE_URL` or any password.

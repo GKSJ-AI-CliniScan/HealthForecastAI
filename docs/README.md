@@ -1,15 +1,39 @@
-# Documentation
+# HealthForecast AI
 
-| Folder | Contents |
-|--------|----------|
-| [01-architecture](01-architecture/) | System architecture, component diagram, data flow |
-| [02-database](02-database/) | ER diagram, schema decisions, indexing notes |
-| [03-api](03-api/) | Endpoint contracts, request/response examples |
-| [04-rbac](04-rbac/) | Roles, permissions and the access matrix |
-| [05-wireframes](05-wireframes/) | UI wireframes and dashboard mockups |
-| [06-milestones](06-milestones/) | **Your milestone reports - this is what gets graded** |
-| [07-testing](07-testing/) | Test plan, coverage notes, validation results |
-| [08-deployment](08-deployment/) | Deployment runbook and live URLs |
-| [brief](brief/) | The original project brief |
+Hospital readmission risk prediction and role-based patient management.
+Intern: Parimala M &middot; Branch: `intern/24-parimala-m`
 
-Write documentation as you build, not the night before a milestone is due.
+## Live
+
+- Frontend: <https://healthforecastai-1.onrender.com>
+- API docs: <https://healthforecastai-sarj.onrender.com/docs>
+
+The free tier sleeps when idle; the first request can take about a minute.
+
+## What it does
+
+- Predicts 30-day readmission risk for diabetic patients and bands it low, medium or high.
+- Lists high-risk patients and forecasts readmissions over 30, 60 or 90 days.
+- Reports treatment effectiveness, healthcare analytics and an anonymised research cohort.
+- Gives clinical recommendations and discharge plans.
+- Four roles with different access: doctor, hospital administrator, researcher, system administrator.
+- User and model management for system administrators.
+
+## Stack
+
+Next.js, TypeScript, Tailwind, Recharts | FastAPI, SQLAlchemy | PostgreSQL |
+scikit-learn, XGBoost | Docker on Render | GitHub Actions
+
+## Run locally
+
+See "How to run it" in [`docs/06-milestones/milestone-4.md`](docs/06-milestones/milestone-4.md).
+
+## Documentation
+
+Start at [`docs/README.md`](docs/README.md). Milestone reports are in
+[`docs/06-milestones`](docs/06-milestones/).
+
+## Limitations
+
+Research prototype on a public dataset. Not clinically validated. See Known gaps in
+the milestone 4 report.

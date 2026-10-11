@@ -56,3 +56,19 @@ def example(user: CurrentUser = Depends(require_permission(Permission.RISK_REPOR
    before you do it.
 4. `backend/tests/test_rbac.py` encodes the restrictions above. If your change
    makes it fail, the change is wrong, not the test.
+
+## How this project implements it
+
+| Rule | Implementation |
+|---|---|
+| Four roles | `doctor`, `hospital_admin`, `researcher`, `system_admin` (`app/core/rbac.py`) |
+| Permission check | `require_permission(Permission.X)` on every protected endpoint; 401 without a token, 403 without the permission |
+| Doctor sees assigned patients only | `patient_service.get_visible_patients` and `risk_service` filter on `assigned_doctor_id` |
+| Researcher sees anonymised data only | `GET /patients/anonymised` returns a pseudo ID (`RSCH-0001`), demographics and latest risk category; no patient ID, MRN or doctor |
+| User and model management | System administrator only (`MODEL_MANAGE` permission for `/models`) |
+| Frontend | The sidebar hides pages the role cannot use. This is convenience only; the server enforces access |
+| Audit | Logins and user changes are written to `audit_logs` |
+| Deleting a user | Soft delete (`is_active = false`) so the audit trail stays valid |
+
+Evidence: `evidence/role_based.png` and `backend/tests/test_rbac.py`.
+[Confirm the "Limited" doctor access to treatment reports matches what your app does, and state it here in one sentence.]

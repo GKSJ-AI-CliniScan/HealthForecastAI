@@ -41,3 +41,68 @@ the backend.
 
 A test plan in this folder: what is covered, what is not, coverage percentage,
 and the validation results for the final model.
+
+---
+
+## Project documentation (HealthForecast AI)
+
+### What CI runs
+
+| Layer | Command |
+|---|---|
+| Backend lint, format, types | `ruff check .`, `black --check .`, `mypy` in `backend/` |
+| Backend tests | `pytest --cov=app` (CI provides a Postgres service) |
+| Frontend | `npm run lint`, `npm run typecheck`, `npm run build` |
+| ML | `ruff check .` in `ml/` |
+| Repository policy | `scripts/ci/check_*.py`, branch name, milestone report structure |
+
+### Covered
+
+| Area | Tests |
+|---|---|
+| RBAC | Each protected endpoint returns 401 without a token and 403 for the wrong role |
+| Risk | Risk banding uses the configured thresholds; unknown patient returns 404 |
+| Treatment | Invalid treatment type is rejected |
+| Analytics | Summary and distributions return the expected shape |
+| Research | Anonymised cohort has no ID, MRN or doctor field |
+
+Result: [n] tests passing, coverage [x]%. [Paste the last lines of `pytest --cov=app`.]
+
+### Not covered
+
+- Frontend component tests: none. Role-based navigation was checked manually.
+- Load and response-time testing: not performed.
+- ML tests check pipeline code only, not model accuracy (accuracy asserts are flaky).
+
+### Manual end-to-end checks
+
+| Check | Result |
+|---|---|
+| Log in as each of the four roles | [pass] |
+| Doctor sees only assigned patients | [pass] |
+| Researcher cannot see patient identifiers | [pass] |
+| Predict risk, then see it on the high-risk list | [pass] |
+| System admin creates and deactivates a user | [pass] |
+| Live Render frontend logs in against the live backend | [pass, date] |
+
+Fill each result from what you actually saw.
+
+### Model validation
+
+| Item | Value |
+|---|---|
+| Split | Train / validation / untouched test |
+| Models compared | Logistic regression, random forest, XGBoost |
+| Selection | Best F1 among models with ROC-AUC >= 0.60 and recall >= 0.50 |
+| Threshold | Best F1 with recall >= 0.50 |
+| Test ROC-AUC, recall, precision, F1 | [from `metrics.joblib`] |
+| Base readmission rate | about 11% |
+
+The model was evaluated only on this public dataset. It is not clinically validated.
+The brief's ROC-AUC target is 0.65; state clearly whether the final model met it.
+
+### Data fixes found during testing
+
+- Gender values "F", "Female", "FeMale" were normalised.
+- Predictions saved for patients that did not exist were removed, and a 404 guard was added.
+- A threshold bug flagged every patient as high risk; fixed by choosing the threshold for best F1 under a recall floor.
