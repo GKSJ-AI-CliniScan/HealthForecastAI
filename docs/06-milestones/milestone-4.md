@@ -128,7 +128,7 @@ The following healthcare workflows were tested:
 - Research cohort ![Research Cohort](evidence/researcher.png)
 - Clinical support ![Clinical Support](evidence/support.png)
 - Reports and exports ![Report Page](evidence/reports.png)
-- Model management
+- Model management ![Model metrics](evidence/image.png) 
 - User Management ![user ManagementPage](evidence/user.png)
 ---
 
