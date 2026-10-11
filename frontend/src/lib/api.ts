@@ -1,5 +1,10 @@
+// Mirrors src/services/api.js: a clean-clone build has no .env files, and a
+// localhost default makes the deployed app call the visitor's own machine.
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000/api/v1';
+  import.meta.env.VITE_API_BASE_URL ??
+  (import.meta.env.PROD
+    ? 'https://healthfor-ai.onrender.com/api/v1'
+    : 'http://localhost:8000/api/v1');
 
 export class ApiError extends Error {
   readonly status: number;

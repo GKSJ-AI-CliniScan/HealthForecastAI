@@ -69,7 +69,7 @@ const SystemSettingsPage = () => {
   };
 
   // Core System attributes state (For System Admin)
-  const [dbURL, setDbURL] = useState('postgresql://stjude_admin:super-secret@hospital-postgres.internal:5432/readmissions');
+  const [dbURL, setDbURL] = useState('');
   const [modelEndpoint, setModelEndpoint] = useState('http://localhost:8001/predict');
   const [backupSchedule, setBackupSchedule] = useState('Daily');
   const [savingSettings, setSavingSettings] = useState(false);
@@ -438,6 +438,7 @@ const SystemSettingsPage = () => {
                 type="text"
                 value={dbURL}
                 onChange={(e) => setDbURL(e.target.value)}
+                placeholder="postgresql://<user>:<password>@<host>:5432/<database>"
                 className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 font-bold text-slate-800 focus:border-red-500 focus:bg-white focus:outline-none shadow-sm"
               />
             </div>

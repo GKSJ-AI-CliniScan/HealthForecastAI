@@ -8,14 +8,21 @@ services:
     buildCommand: |
       pip install --upgrade pip
       pip install -r backend/requirements.txt
+      if [ -n "$MODEL_ARTIFACT_URL" ]; then
+        mkdir -p ml/artifacts
+        curl --fail --silent --show-error --location \
+          --output ml/artifacts/readmission_model.joblib "$MODEL_ARTIFACT_URL"
+      fi
       cd backend
       python -m alembic upgrade head
 
+    # --workers 1: the free plan gives 512 MB, and a second worker importing
+    # scikit-learn plus the RandomForest artifact gets the service OOM-killed.
     startCommand: >
       uvicorn --app-dir backend app.main:app
       --host 0.0.0.0
       --port $PORT
-      --workers 2
+      --workers 1
 
     healthCheckPath: /health
 
@@ -39,9 +46,9 @@ services:
       - key: API_V1_PREFIX
         value: /api/v1
 
-      # ── CORS: replace with your actual Cloudflare Pages domain ───────────────
+      # ── CORS: the browser origins allowed to call this API ────────────────────
       - key: BACKEND_CORS_ORIGINS
-        value: https://healthforecast-ai.pages.dev
+        value: https://healthfor-ai.ram6070246.workers.dev,http://localhost:5173
 
       # ── JWT ───────────────────────────────────────────────────────────────────
       - key: JWT_ALGORITHM
@@ -51,9 +58,17 @@ services:
       - key: REFRESH_TOKEN_EXPIRE_MINUTES
         value: "10080"
 
-      # ── ML artifact path (model is bundled in the repo under ml/artifacts/) ──
+      # ── ML artifact path ─────────────────────────────────────────────────────
+      # The trained model is NOT in the repo - scripts/ci/check_files.py rejects
+      # committed artifacts. The build step downloads it from a public GitHub
+      # Release before the API starts. Without a reachable artifact the /risk
+      # endpoints answer model_loaded=false.
       - key: MODEL_ARTIFACT_DIR
         value: ml/artifacts
+
+      # Direct download link to the .joblib release asset. Set in the dashboard.
+      - key: MODEL_ARTIFACT_URL
+        sync: false
 
       - key: RISK_THRESHOLD_HIGH
         value: "0.20"

@@ -36,7 +36,6 @@ jobs:
         working-directory: backend
         env:
           SECRET_KEY: ci-test-secret-key-not-for-production-use-only
-          DATABASE_URL: sqlite+aiosqlite:///./test.db
           ENVIRONMENT: test
         run: pytest tests/ -v --tb=short
 
@@ -46,7 +45,20 @@ jobs:
     needs: test
 
     steps:
+      - name: Check Render deploy hook
+        id: render
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -n "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::RENDER_DEPLOY_HOOK_URL is not configured; skipping deployment."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Trigger Render deploy hook
+        if: steps.render.outputs.configured == 'true'
         run: |
           curl --fail-with-body --silent --show-error \
             --request POST \

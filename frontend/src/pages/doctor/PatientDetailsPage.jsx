@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { patientService } from '../../services/patientService';
+import { clinicalSupportService } from '../../services/clinicalSupportService';
 import PageHeader from '../../components/common/PageHeader';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 import RiskBadge from '../../components/common/RiskBadge';
 import StatusBadge from '../../components/common/StatusBadge';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorState from '../../components/common/ErrorState';
 import Modal from '../../components/common/Modal';
 import { 
@@ -25,6 +26,13 @@ const PatientDetailsPage = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('notes'); // notes, insights, history, vitals
   const [toastMessage, setToastMessage] = useState('');
+
+  // The decision-support tab is fetched when opened, not with the patient record:
+  // it costs a second query and most visits are to the notes tab.
+  const [insight, setInsight] = useState(null);
+  const [insightLoading, setInsightLoading] = useState(false);
+  const [insightError, setInsightError] = useState(null);
+  const [generatingInsights, setGeneratingInsights] = useState(false);
 
   // Modals state
   const [noteModalOpen, setNoteModalOpen] = useState(false);
@@ -83,12 +91,48 @@ const PatientDetailsPage = () => {
   };
 
   useEffect(() => {
+    setInsight(null);
     fetchPatientData();
   }, [id]);
+
+  const loadInsights = async () => {
+    try {
+      setInsightLoading(true);
+      setInsightError(null);
+      setInsight(await clinicalSupportService.getPatientInsights(id));
+    } catch (err) {
+      setInsightError(err);
+    } finally {
+      setInsightLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'insights' && !insight && !insightLoading && !insightError) {
+      loadInsights();
+    }
+  }, [activeTab]);
 
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(''), 4500);
+  };
+
+  const handleGenerateInsights = async () => {
+    try {
+      setGeneratingInsights(true);
+      const generated = await clinicalSupportService.generateInsights(id);
+      setInsight((prev) => ({ ...(prev || {}), ...generated }));
+      showToast(
+        generated.persisted
+          ? 'Insights saved onto the latest prediction.'
+          : 'Pathway generated. Not saved - this patient has no prediction row to attach it to.'
+      );
+    } catch (err) {
+      alert('Failed to generate insights: ' + err.message);
+    } finally {
+      setGeneratingInsights(false);
+    }
   };
 
   // Add Note Handler
@@ -539,32 +583,105 @@ const PatientDetailsPage = () => {
           {activeTab === 'insights' && (
             <div className="space-y-5">
               <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-xs space-y-5">
-                <div className="flex items-center gap-2 text-zinc-800">
+                <div className="flex flex-wrap items-center gap-2 text-zinc-800">
                   <Brain className="h-5 w-5 text-red-500" />
                   <h3 className="text-sm font-bold">AI Clinical Care Pathways</h3>
                   <span className="ml-auto text-[10px] font-bold text-zinc-500 border border-zinc-200 bg-zinc-50 rounded-full px-2.5 py-0.5 uppercase tracking-wide">
-                    Live Model
+                    {insight?.model?.loaded
+                      ? `${insight.model.name} ${insight.model.version}`
+                      : 'No model loaded'}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                  <div className="bg-zinc-50 border border-zinc-200 p-4 rounded-xl space-y-1.5">
-                    <span className="font-bold text-red-600 text-[10px] uppercase tracking-wider block">Risk Mitigation Strategy</span>
-                    <p className="font-semibold text-zinc-700 leading-relaxed">{patient.clinicalInsights?.riskMitigation}</p>
+                {insightLoading && (
+                  <p className="text-xs font-semibold text-zinc-400 py-4 text-center">
+                    Reading the decision-support record...
+                  </p>
+                )}
+
+                {insightError && (
+                  <div className="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-700">
+                    <span className="font-semibold">{insightError.message}</span>
+                    <button
+                      type="button"
+                      onClick={loadInsights}
+                      className="shrink-0 rounded-lg border border-red-200 bg-white px-3 py-1 font-bold text-red-700 hover:bg-red-100"
+                    >
+                      Retry
+                    </button>
                   </div>
-                  <div className="bg-zinc-50 border border-zinc-200 p-4 rounded-xl space-y-1.5">
-                    <span className="font-bold text-red-600 text-[10px] uppercase tracking-wider block">Diet & Medication Protocol</span>
-                    <p className="font-semibold text-zinc-700 leading-relaxed">{patient.clinicalInsights?.careRecommendations}</p>
-                  </div>
-                  <div className="bg-zinc-50 border border-zinc-200 p-4 rounded-xl space-y-1.5">
-                    <span className="font-bold text-red-600 text-[10px] uppercase tracking-wider block">Follow-Up Action Plan</span>
-                    <p className="font-semibold text-zinc-700 leading-relaxed">{patient.clinicalInsights?.followUpPlanning}</p>
-                  </div>
-                  <div className="bg-zinc-50 border border-zinc-200 p-4 rounded-xl space-y-1.5">
-                    <span className="font-bold text-red-600 text-[10px] uppercase tracking-wider block">Discharge Protocols</span>
-                    <p className="font-semibold text-zinc-700 leading-relaxed">{patient.clinicalInsights?.dischargeRecommendations}</p>
-                  </div>
-                </div>
+                )}
+
+                {!insightLoading && !insightError && insight && (
+                  <>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {insight.modelScored ? (
+                        <>
+                          <RiskBadge risk={insight.riskCategory} />
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-50 px-2.5 py-0.5 text-xs font-bold text-zinc-600 border border-zinc-200">
+                            Model probability: {Math.round(insight.readmissionProbability * 100)}%
+                          </span>
+                          {insight.scoredAt && (
+                            <span className="text-[10px] font-semibold text-zinc-400">
+                              Scored {new Date(insight.scoredAt).toLocaleString()}
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-50 px-2.5 py-0.5 text-xs font-bold text-zinc-500 border border-zinc-200">
+                          Not scored by the model
+                        </span>
+                      )}
+                    </div>
+
+                    {insight.insights ? (
+                      <>
+                        {insight.persisted === false && (
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-amber-600">
+                            Generated now - not saved, this patient has no prediction row
+                          </p>
+                        )}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                          <div className="bg-zinc-50 border border-zinc-200 p-4 rounded-xl space-y-1.5">
+                            <span className="font-bold text-red-600 text-[10px] uppercase tracking-wider block">Risk Mitigation Strategy</span>
+                            <p className="font-semibold text-zinc-700 leading-relaxed">{insight.insights.riskMitigation}</p>
+                          </div>
+                          <div className="bg-zinc-50 border border-zinc-200 p-4 rounded-xl space-y-1.5">
+                            <span className="font-bold text-red-600 text-[10px] uppercase tracking-wider block">Diet &amp; Medication Protocol</span>
+                            <p className="font-semibold text-zinc-700 leading-relaxed">{insight.insights.careRecommendations}</p>
+                          </div>
+                          <div className="bg-zinc-50 border border-zinc-200 p-4 rounded-xl space-y-1.5">
+                            <span className="font-bold text-red-600 text-[10px] uppercase tracking-wider block">Follow-Up Action Plan</span>
+                            <p className="font-semibold text-zinc-700 leading-relaxed">{insight.insights.followUpPlanning}</p>
+                          </div>
+                          <div className="bg-zinc-50 border border-zinc-200 p-4 rounded-xl space-y-1.5">
+                            <span className="font-bold text-red-600 text-[10px] uppercase tracking-wider block">Discharge Protocols</span>
+                            <p className="font-semibold text-zinc-700 leading-relaxed">{insight.insights.dischargeRecommendations}</p>
+                          </div>
+                        </div>
+                        {insight.insights.generatedAt && (
+                          <p className="text-[10px] font-semibold text-zinc-400">
+                            Generated {new Date(insight.insights.generatedAt).toLocaleString()}
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-dashed border-zinc-200 bg-zinc-50 p-4">
+                        <p className="text-xs font-semibold text-zinc-500">
+                          No insights on record for this patient yet.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={handleGenerateInsights}
+                          disabled={generatingInsights}
+                          className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-red-700 disabled:opacity-60"
+                        >
+                          {generatingInsights ? 'Generating...' : 'Generate insights'}
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           )}

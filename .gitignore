@@ -75,7 +75,6 @@ ml/artifacts/*
 *.pth
 *.onnx
 *.pb
-!ml/artifacts/readmission_model.joblib
 !ml/artifacts/metrics.json
 mlruns/
 wandb/

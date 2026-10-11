@@ -20,4 +20,4 @@ class ApiEnvelope(BaseModel, Generic[T]):
     @classmethod
     def ok(cls, payload: Any) -> "ApiEnvelope[Any]":
         """Wrap a payload as a successful response."""
-        return cls[Any](success=True, data=payload)
+        return cls(success=True, data=payload)

@@ -222,3 +222,4 @@ admissions
   ├──────────────→ risk_predictions
   |
   └──────────────→ treatment_outcomes
+```

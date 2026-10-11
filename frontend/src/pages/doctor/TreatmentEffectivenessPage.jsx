@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { treatmentService } from '../../services/treatmentService';
 import PageHeader from '../../components/common/PageHeader';
-import DashboardCard from '../../components/common/DashboardCard';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import DashboardCard from '../../components/common/DashboardCard';
 import ErrorState from '../../components/common/ErrorState';
 import { 
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis

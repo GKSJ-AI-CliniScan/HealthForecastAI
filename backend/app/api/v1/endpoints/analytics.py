@@ -66,13 +66,19 @@ def population_health(user: CanReadPopulation, db: DbSession) -> dict[str, objec
     return analytics_service.population_health_overview(db)
 
 
-@router.get("/hospital-dashboard", response_model=ApiEnvelope[dict[str, object]], include_in_schema=False)
-def hospital_dashboard_compatibility(user: CanReadAnalytics, db: DbSession) -> ApiEnvelope[dict[str, object]]:
+@router.get(
+    "/hospital-dashboard", response_model=ApiEnvelope[dict[str, object]], include_in_schema=False
+)
+def hospital_dashboard_compatibility(
+    user: CanReadAnalytics, db: DbSession
+) -> ApiEnvelope[dict[str, object]]:
     """Compatibility alias for the original React dashboard."""
     return ApiEnvelope.ok(analytics_service.dashboard_summary(db, user))
 
 
 @router.get("/research", response_model=ApiEnvelope[dict[str, object]], include_in_schema=False)
-def research_compatibility(user: CanReadPopulation, db: DbSession) -> ApiEnvelope[dict[str, object]]:
+def research_compatibility(
+    user: CanReadPopulation, db: DbSession
+) -> ApiEnvelope[dict[str, object]]:
     """Compatibility alias returning the aggregate research view."""
     return ApiEnvelope.ok(analytics_service.population_health_overview(db))

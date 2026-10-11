@@ -23,7 +23,9 @@ Db = Annotated[Session, Depends(get_db)]
 @router.get("/dashboard", response_model=ApiEnvelope[dict[str, object]])
 def dashboard(actor: Admin, db: Db) -> ApiEnvelope[dict[str, object]]:
     users = auth_service.list_users(db)
-    logs = list(db.execute(select(AuditLog).order_by(AuditLog.created_at.desc()).limit(10)).scalars())
+    logs = list(
+        db.execute(select(AuditLog).order_by(AuditLog.created_at.desc()).limit(10)).scalars()
+    )
     return ApiEnvelope.ok(
         {
             "usersCount": len(users),
@@ -53,11 +55,18 @@ def users(actor: Admin, db: Db) -> ApiEnvelope[list[UserRead]]:
 @router.post("/users", response_model=ApiEnvelope[UserRead], status_code=status.HTTP_201_CREATED)
 def create_user(payload: dict[str, object], actor: Admin, db: Db) -> ApiEnvelope[UserRead]:
     role = str(payload.get("role", Role.DOCTOR)).replace("-", "_")
+    password = payload.get("password")
+    if not isinstance(password, str) or len(password) < 8:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Password must be a string with at least 8 characters",
+        )
+    department = payload.get("department")
     user_payload = UserCreate(
         email=str(payload.get("email", "")),
         full_name=str(payload.get("full_name") or payload.get("name") or ""),
         role=Role(role),
-        department=payload.get("department"),
+        department=str(department) if department is not None else None,
         password=str(payload.get("password") or "ChangeMeImmediately123!"),
     )
     try:
@@ -70,7 +79,9 @@ def create_user(payload: dict[str, object], actor: Admin, db: Db) -> ApiEnvelope
 @router.put("/users/{user_id}/status", response_model=ApiEnvelope[list[UserRead]])
 def toggle_user_status(user_id: int, actor: Admin, db: Db) -> ApiEnvelope[list[UserRead]]:
     if user_id == actor.id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You cannot change your own status")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="You cannot change your own status"
+        )
     user = auth_service.get_user(db, user_id)
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -88,14 +99,20 @@ def update_user_role(
     try:
         user.role = str(Role(payload["role"].replace("-", "_")))
     except (KeyError, ValueError) as exc:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid role") from exc
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Invalid role"
+        ) from exc
     db.commit()
     return ApiEnvelope.ok([UserRead.model_validate(item) for item in auth_service.list_users(db)])
 
 
 @router.get("/audit-logs", response_model=ApiEnvelope[list[dict[str, object]]])
-def audit_logs(actor: Annotated[User, Depends(require_permission(Permission.AUDIT_LOG_READ))], db: Db) -> ApiEnvelope[list[dict[str, object]]]:
-    rows = list(db.execute(select(AuditLog).order_by(AuditLog.created_at.desc()).limit(500)).scalars())
+def audit_logs(
+    actor: Annotated[User, Depends(require_permission(Permission.AUDIT_LOG_READ))], db: Db
+) -> ApiEnvelope[list[dict[str, object]]]:
+    rows = list(
+        db.execute(select(AuditLog).order_by(AuditLog.created_at.desc()).limit(500)).scalars()
+    )
     return ApiEnvelope.ok(
         [
             {
@@ -113,7 +130,9 @@ def audit_logs(actor: Annotated[User, Depends(require_permission(Permission.AUDI
 
 
 @router.get("/ai-models", response_model=ApiEnvelope[list[dict[str, object]]])
-def ai_models(actor: Annotated[User, Depends(require_permission(Permission.MODEL_MANAGE))]) -> ApiEnvelope[list[dict[str, object]]]:
+def ai_models(
+    actor: Annotated[User, Depends(require_permission(Permission.MODEL_MANAGE))]
+) -> ApiEnvelope[list[dict[str, object]]]:
     info = model_service.model_info()
     return ApiEnvelope.ok([info] if info.get("loaded") else [])
 
@@ -126,7 +145,9 @@ def ai_model_action(
 ) -> ApiEnvelope[list[dict[str, object]]]:
     action = payload.get("action")
     if action not in {"reload", "deploy", "train", "rollback"}:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unsupported model action")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Unsupported model action"
+        )
     if action == "reload":
         model_service.reset_cache()
     info = model_service.model_info()
@@ -134,11 +155,15 @@ def ai_model_action(
 
 
 @router.get("/datasets", response_model=ApiEnvelope[list[dict[str, object]]])
-def datasets(actor: Annotated[User, Depends(require_permission(Permission.RESEARCH_DATASET_EXPORT))]) -> ApiEnvelope[list[dict[str, object]]]:
+def datasets(
+    actor: Annotated[User, Depends(require_permission(Permission.RESEARCH_DATASET_EXPORT))]
+) -> ApiEnvelope[list[dict[str, object]]]:
     return ApiEnvelope.ok([])
 
 
-@router.post("/datasets", response_model=ApiEnvelope[dict[str, object]], status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/datasets", response_model=ApiEnvelope[dict[str, object]], status_code=status.HTTP_201_CREATED
+)
 def upload_dataset(
     payload: dict[str, object],
     actor: Annotated[User, Depends(require_permission(Permission.RESEARCH_DATASET_EXPORT))],

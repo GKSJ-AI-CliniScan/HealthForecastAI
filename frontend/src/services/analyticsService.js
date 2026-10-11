@@ -17,14 +17,14 @@ export const analyticsService = {
             totalAdmissions: stats.total_admissions,
             readmissionRate: stats.readmission_rate * 100,
             avgStayDays: stats.average_length_of_stay,
-            highRiskPatients: stats.risk_distribution?.High || 0
+            highRiskPatients: stats.risk_distribution?.high || 0
           },
           departmentPerformance: mockHospitalAnalytics.departmentPerformance,
           monthlyTrends: mockHospitalAnalytics.monthlyTrends,
           riskDistribution: [
-            { name: 'High Risk', count: stats.risk_distribution?.High || 0 },
-            { name: 'Medium Risk', count: stats.risk_distribution?.Medium || 0 },
-            { name: 'Low Risk', count: stats.risk_distribution?.Low || 0 }
+            { name: 'High Risk', count: stats.risk_distribution?.high || 0 },
+            { name: 'Medium Risk', count: stats.risk_distribution?.medium || 0 },
+            { name: 'Low Risk', count: stats.risk_distribution?.low || 0 }
           ]
         };
       }

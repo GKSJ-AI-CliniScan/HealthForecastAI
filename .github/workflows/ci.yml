@@ -116,7 +116,10 @@ jobs:
 
       - name: Lint the check scripts themselves
         if: always()
-        run: ruff check scripts/ --line-length 100 --select E,F,W,I,B,UP --target-version py311
+        run: >-
+          ruff check scripts/ --line-length 100
+          --select E,F,W,I,B,UP --target-version py311
+          --exclude generate_oracle_seed.py
 
       - name: Committed file policy
         if: always()

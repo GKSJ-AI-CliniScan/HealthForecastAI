@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -35,6 +36,19 @@ class Settings(BaseSettings):
     ACTIVE_RISK_MODEL: str = "readmission_xgboost_v1"
     RISK_THRESHOLD_HIGH: float = 0.20
     RISK_THRESHOLD_MEDIUM: float = 0.12
+
+    @field_validator("DATABASE_URL")
+    @classmethod
+    def require_psycopg3_dialect(cls, value: str) -> str:
+        """Rewrite a bare postgresql:// URL to the psycopg 3 dialect.
+
+        Hosted platforms hand out postgresql://, and SQLAlchemy routes that scheme
+        to psycopg2 - which is not a dependency of this project, so the app dies on
+        its first query with ModuleNotFoundError. Only psycopg 3 is installed.
+        """
+        if value.startswith("postgresql://"):
+            return value.replace("postgresql://", "postgresql+psycopg://", 1)
+        return value
 
     @property
     def cors_origins(self) -> list[str]:

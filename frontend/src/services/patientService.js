@@ -1,9 +1,6 @@
 import apiClient from './api';
 import { mockPatients } from '../data/mockData';
 
-// Simulated delay
-const delay = (ms = 200) => new Promise((resolve) => setTimeout(resolve, ms));
-
 // Retrieve or initialize local session storage for patients to allow persistent demo interactions
 const getPatientsFromStorage = () => {
   const stored = localStorage.getItem('hf_patients');
@@ -55,7 +52,6 @@ export const patientService = {
     } catch (e) {
       console.warn('[patientService] Backend API unreachable. Using persistent local store:', e.message);
     }
-    await delay(150);
     return getPatientsFromStorage();
   },
 
@@ -68,7 +64,6 @@ export const patientService = {
     } catch (e) {
       console.warn(`[patientService] Failed to fetch patient ${id} from API. Falling back to local store:`, e.message);
     }
-    await delay(100);
     const patients = getPatientsFromStorage();
     return patients.find((p) => p.id === id) || null;
   },
@@ -85,7 +80,6 @@ export const patientService = {
     } catch (e) {
       // Fallback
     }
-    await delay(150);
     const patients = getPatientsFromStorage();
     return patients.filter((p) => !doctorName || doctorName === 'All' || p.assignedDoctor === doctorName);
   },
@@ -119,7 +113,6 @@ export const patientService = {
     } catch (e) {
       console.warn('[patientService] API update failed. Updating local storage fallback:', e.message);
     }
-    await delay(150);
     const patients = getPatientsFromStorage();
     const index = patients.findIndex((p) => p.id === id);
     if (index === -1) throw new Error('Patient not found');
@@ -155,17 +148,12 @@ export const patientService = {
           date: today,
         },
       ],
-      clinicalInsights: newPatient.clinicalInsights || {
-        riskMitigation: 'Regular telemetry review and medication titration recommended.',
-        careRecommendations: 'Follow standard post-admission recovery protocol.',
-        followUpPlanning: 'Schedule outpatient clinic visit within 14 days.',
-        dischargeRecommendations: 'Monitor vital signs daily and review diet adherence.',
-      },
     };
 
     try {
       const res = await apiClient.post('/patients', {
         medical_record_number: `MRN-${Date.now()}`,
+        name: payload.name,
         age_group: String(payload.age),
         gender: payload.gender,
         primary_diagnosis: payload.diagnosis,
@@ -186,7 +174,6 @@ export const patientService = {
       console.warn('[patientService] API add failed. Adding to local storage fallback:', e.message);
     }
 
-    await delay(150);
     const patients = getPatientsFromStorage();
     let maxNum = 0;
     for (const p of patients) {
@@ -226,7 +213,6 @@ export const patientService = {
       console.warn('[patientService] API add note failed. Syncing local storage fallback:', e.message);
     }
 
-    await delay(100);
     const patients = getPatientsFromStorage();
     const index = patients.findIndex((p) => p.id === patientId);
     if (index !== -1) {
@@ -248,7 +234,6 @@ export const patientService = {
       console.warn('[patientService] API add treatment failed. Syncing local storage fallback:', e.message);
     }
 
-    await delay(100);
     const patients = getPatientsFromStorage();
     const index = patients.findIndex((p) => p.id === patientId);
     if (index !== -1) {

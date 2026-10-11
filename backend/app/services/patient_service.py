@@ -10,7 +10,7 @@ from __future__ import annotations
 import hashlib
 
 from sqlalchemy import Select, func, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, load_only
 
 from app.core.config import settings
 from app.core.rbac import Role
@@ -19,6 +19,24 @@ from app.models.patient import Patient
 from app.models.user import User
 from app.schemas.patient import PatientCreate, PatientUpdate
 from app.services.auth_service import record_audit
+
+# Columns a list row may touch. Kept in sync with PatientListItem plus created_at,
+# which is loaded because it is a scalar and deferring it would cost a query per
+# row for any caller that reads it.
+LIST_COLUMNS = (
+    Patient.id,
+    Patient.medical_record_number,
+    Patient.age_group,
+    Patient.gender,
+    Patient.race,
+    Patient.primary_diagnosis,
+    Patient.assigned_doctor_id,
+    Patient.treatment_status,
+    Patient.risk_level,
+    Patient.readmission_probability,
+    Patient.discharge_date,
+    Patient.created_at,
+)
 
 
 class PatientAccessError(PermissionError):
@@ -71,7 +89,16 @@ def list_patients(
 
     total = db.execute(select(func.count()).select_from(stmt.subquery())).scalar_one()
 
-    rows = db.execute(stmt.order_by(Patient.id).limit(limit).offset(offset)).scalars().all()
+    # load_only keeps the note/history JSON columns out of the SELECT. Without it
+    # a 50 row page transfers and hydrates ~140 KB of blobs no list view renders,
+    # and any access to a deferred column would still cost one query per row.
+    rows = (
+        db.execute(
+            stmt.order_by(Patient.id).limit(limit).offset(offset).options(load_only(*LIST_COLUMNS))
+        )
+        .scalars()
+        .all()
+    )
 
     return list(rows), total
 

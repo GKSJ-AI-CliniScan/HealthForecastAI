@@ -21,6 +21,7 @@ from app.schemas.patient import (
     AnonymisedPage,
     PatientCreate,
     PatientDetail,
+    PatientListItem,
     PatientPage,
     PatientRead,
     PatientUpdate,
@@ -51,7 +52,7 @@ def list_patients(
 
     rows, total = patient_service.list_patients(db, user, limit=limit, offset=offset, search=search)
     return PatientPage(
-        items=[PatientRead.model_validate(row) for row in rows],
+        items=[PatientListItem.model_validate(row) for row in rows],
         total=total,
         limit=limit,
         offset=offset,
@@ -79,13 +80,13 @@ def list_anonymised_patients(
     )
 
 
-@router.get("/doctor/{doctor_name}", response_model=list[PatientRead], include_in_schema=False)
+@router.get("/doctor/{doctor_name}", response_model=list[PatientListItem], include_in_schema=False)
 def list_doctor_patients_compatibility(
     doctor_name: str, user: CurrentUser, db: DbSession
-) -> list[PatientRead]:
+) -> list[PatientListItem]:
     """Compatibility route; authorization is always based on the JWT caller."""
     rows, _ = patient_service.list_patients(db, user, limit=200, offset=0)
-    return [PatientRead.model_validate(row) for row in rows]
+    return [PatientListItem.model_validate(row) for row in rows]
 
 
 @router.post(
@@ -173,7 +174,9 @@ def add_treatment(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
     treatment = payload.get("treatment", "").strip()
     if not treatment:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Treatment is required")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Treatment is required"
+        )
     history = list(patient.treatment_history or [])
     history.append(treatment)
     patient.treatment_history = history

@@ -14,9 +14,8 @@ dashboards show.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import pandas as pd
 from sqlalchemy import Float, case, cast, func, select
 from sqlalchemy.orm import Session
 
@@ -27,6 +26,9 @@ from app.models.patient import Patient
 from app.models.prediction import RiskPrediction
 from app.models.user import User
 from app.services import model_service
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 RISK_LOW = "low"
 RISK_MEDIUM = "medium"
@@ -52,6 +54,11 @@ def build_feature_frame(
     Columns the caller did not supply are left as None so the pipeline's fitted
     imputers fill them. The count is what the response reports as coverage.
     """
+    # Imported here rather than at module scope: pandas costs close to a second to
+    # import, and only the predictive routes need it. Doing it at boot was what
+    # kept Render's port scan waiting.
+    import pandas as pd
+
     row: dict[str, Any] = dict.fromkeys(feature_columns)
 
     matched = 0

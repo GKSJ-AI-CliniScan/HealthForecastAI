@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { riskService } from '../../services/riskService';
 import { patientService } from '../../services/patientService';
 import PageHeader from '../../components/common/PageHeader';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 import DashboardCard from '../../components/common/DashboardCard';
 import RiskBadge from '../../components/common/RiskBadge';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
 import ErrorState from '../../components/common/ErrorState';
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,

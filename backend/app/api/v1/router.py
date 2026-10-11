@@ -3,8 +3,8 @@
 from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
-    analytics,
     admin,
+    analytics,
     auth,
     clinical_support,
     ml_models,

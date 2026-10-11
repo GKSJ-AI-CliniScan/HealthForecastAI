@@ -31,15 +31,24 @@ jobs:
       - name: Build production bundle
         working-directory: frontend
         env:
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || '/api/v1' }}
+        run: npm run build
+
+      - name: Check Cloudflare credentials
+        id: cloudflare
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
         run: |
-          if [ -z "$VITE_API_BASE_URL" ]; then
-            echo "::error::VITE_API_BASE_URL repository secret is required."
-            exit 1
+          if [ -n "$CF_API_TOKEN" ] && [ -n "$CF_ACCOUNT_ID" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::CF_API_TOKEN and CF_ACCOUNT_ID are not configured; skipping deployment."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
           fi
-          npm run build
 
       - name: Deploy to Cloudflare Pages
+        if: steps.cloudflare.outputs.configured == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}

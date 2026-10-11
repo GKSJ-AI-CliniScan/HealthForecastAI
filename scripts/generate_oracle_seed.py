@@ -336,17 +336,29 @@ CREATE TABLE AUDIT_LOGS (
     ]
     for ha in analytics_data:
         sql_lines.append(
-            f"INSERT INTO HOSPITAL_ANALYTICS (ANALYTICS_ID, REPORT_DATE, TOTAL_ADMISSIONS, READMISSION_RATE, HIGH_RISK_COUNT, AVG_LENGTH_OF_STAY, TREATMENT_SUCCESS_RATE) "
-            f"VALUES ({ha[0]}, TO_DATE('{ha[1]}', 'YYYY-MM-DD'), {ha[2]}, {ha[3]}, {ha[4]}, {ha[5]}, {ha[6]});"
+            "INSERT INTO HOSPITAL_ANALYTICS "
+            "(ANALYTICS_ID, REPORT_DATE, TOTAL_ADMISSIONS, READMISSION_RATE, "
+            "HIGH_RISK_COUNT, AVG_LENGTH_OF_STAY, TREATMENT_SUCCESS_RATE) "
+            f"VALUES ({ha[0]}, TO_DATE('{ha[1]}', 'YYYY-MM-DD'), {ha[2]}, "
+            f"{ha[3]}, {ha[4]}, {ha[5]}, {ha[6]});"
         )
 
     sql_lines.append("")
     sql_lines.append("-- SEED AUDIT LOGS")
     audit_data = [
         (1, 1, 'USER_LOGIN', 'AUTH_SERVICE', 'System Administrator logged in successfully.'),
-        (2, 3, 'VIEW_PATIENT_RECORD', 'PATIENT_1001', 'Dr. Rajesh Reddy accessed medical history for Aarav Patel.'),
-        (3, 1, 'MODEL_RETRAIN', 'RANDOM_FOREST', 'Model retrained on 101,766 records. Test accuracy: 78.71%.'),
-        (4, 2, 'GENERATE_REPORT', 'HOSPITAL_ANALYTICS', 'Hospital Administrator generated monthly readmission performance report.')
+        (
+            2, 3, 'VIEW_PATIENT_RECORD', 'PATIENT_1001',
+            'Dr. Rajesh Reddy accessed medical history for Aarav Patel.',
+        ),
+        (
+            3, 1, 'MODEL_RETRAIN', 'RANDOM_FOREST',
+            'Model retrained on 101,766 records. Test accuracy: 78.71%.',
+        ),
+        (
+            4, 2, 'GENERATE_REPORT', 'HOSPITAL_ANALYTICS',
+            'Hospital Administrator generated monthly readmission performance report.',
+        ),
     ]
     for ad in audit_data:
         sql_lines.append(
