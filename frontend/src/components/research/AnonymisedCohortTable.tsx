@@ -33,7 +33,7 @@ export default function AnonymisedCohortTable({
         {rows.map((row) => (
           <Row key={row.pseudo_id}>
             <Cell>
-              <code className="text-xs">{row.pseudo_id}</code>
+              <span className="font-semibold text-ink">{row.pseudo_id}</span>
             </Cell>
             <Cell>{row.age_group ?? '-'}</Cell>
             <Cell>{row.gender ?? '-'}</Cell>
@@ -41,18 +41,22 @@ export default function AnonymisedCohortTable({
           </Row>
         ))}
       </Table>
-      <nav aria-label="Cohort pages" className="flex items-center justify-between text-sm">
-        <span className="opacity-70">
-          {total.toLocaleString('en-US')} patients · page {page} of {pages}
+      <nav
+        aria-label="Cohort pages"
+        className="flex flex-wrap items-center justify-between gap-3 border-t border-rule pt-4 text-sm"
+      >
+        <span className="text-ink-muted">
+          <span className="font-semibold text-ink">{total.toLocaleString('en-US')}</span> patients,
+          page {page} of {pages}
         </span>
         <span className="flex gap-2">
           {page > 1 && (
-            <Link href={href(page - 1)} className="rounded-md border border-[var(--border)] px-3 py-1">
+            <Link href={href(page - 1)} className="btn btn-secondary btn-sm">
               Previous
             </Link>
           )}
           {page < pages && (
-            <Link href={href(page + 1)} className="rounded-md border border-[var(--border)] px-3 py-1">
+            <Link href={href(page + 1)} className="btn btn-secondary btn-sm">
               Next
             </Link>
           )}

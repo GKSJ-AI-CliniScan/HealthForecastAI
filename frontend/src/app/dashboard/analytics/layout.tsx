@@ -13,8 +13,8 @@ export default async function AnalyticsLayout({ children }: { children: ReactNod
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold">Healthcare analytics</h1>
-        <p className="mt-1 text-sm opacity-70">
+        <h1 className="text-title text-ink">Healthcare analytics</h1>
+        <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
           Aggregated, hospital-wide figures. No individual patient record is shown here.
         </p>
       </div>

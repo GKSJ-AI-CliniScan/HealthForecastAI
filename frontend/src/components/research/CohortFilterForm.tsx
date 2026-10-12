@@ -1,7 +1,6 @@
 import type { ResearchCohortFilters } from '@/types';
 
-const inputClass =
-  'rounded-md border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-sm';
+const inputClass = 'field';
 
 /**
  * Research cohort filters as a plain GET form. Values are passed straight to
@@ -16,17 +15,21 @@ export default function CohortFilterForm({
   action?: string;
 }) {
   return (
-    <form method="get" action={action} className="flex flex-wrap items-end gap-3 text-sm">
-      <label className="flex flex-col gap-1">
-        <span className="opacity-70">Primary diagnosis</span>
+    <form
+      method="get"
+      action={action}
+      className="grid items-end gap-4 text-sm sm:grid-cols-2 lg:grid-cols-[repeat(5,minmax(0,1fr))_auto]"
+    >
+      <label className="flex min-w-0 flex-col gap-1.5">
+        <span className="font-semibold text-ink">Primary diagnosis</span>
         <input name="diagnosis" defaultValue={filters.diagnosis} maxLength={255} className={inputClass} />
       </label>
-      <label className="flex flex-col gap-1">
-        <span className="opacity-70">Gender</span>
+      <label className="flex min-w-0 flex-col gap-1.5">
+        <span className="font-semibold text-ink">Gender</span>
         <input name="gender" defaultValue={filters.gender} maxLength={16} className={inputClass} />
       </label>
-      <label className="flex flex-col gap-1">
-        <span className="opacity-70">Age band</span>
+      <label className="flex min-w-0 flex-col gap-1.5">
+        <span className="font-semibold text-ink">Age band</span>
         <input
           name="age_band"
           defaultValue={filters.age_band}
@@ -35,15 +38,15 @@ export default function CohortFilterForm({
           className={inputClass}
         />
       </label>
-      <label className="flex flex-col gap-1">
-        <span className="opacity-70">Admitted from</span>
+      <label className="flex min-w-0 flex-col gap-1.5">
+        <span className="font-semibold text-ink">Admitted from</span>
         <input type="date" name="date_from" defaultValue={filters.date_from} className={inputClass} />
       </label>
-      <label className="flex flex-col gap-1">
-        <span className="opacity-70">Admitted to</span>
+      <label className="flex min-w-0 flex-col gap-1.5">
+        <span className="font-semibold text-ink">Admitted to</span>
         <input type="date" name="date_to" defaultValue={filters.date_to} className={inputClass} />
       </label>
-      <button type="submit" className="rounded-md border border-[var(--border)] px-3 py-1">
+      <button type="submit" className="btn btn-primary">
         Apply filters
       </button>
     </form>

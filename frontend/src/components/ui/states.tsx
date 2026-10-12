@@ -7,7 +7,7 @@ import RetryButton from './RetryButton';
 
 export function EmptyState({ children }: { children: ReactNode }) {
   return (
-    <p className="rounded-md border border-dashed border-[var(--border)] px-4 py-6 text-center text-sm opacity-70">
+    <p className="rounded-md border border-dashed border-rule-strong bg-sunken/60 px-4 py-8 text-center text-sm text-ink-muted">
       {children}
     </p>
   );
@@ -16,14 +16,18 @@ export function EmptyState({ children }: { children: ReactNode }) {
 /**
  * A failed section. Permission and small-cohort failures are explained, not
  * retried - retrying cannot change them - while a transient failure gets a
- * Retry button.
+ * Retry button. Only a real failure uses the danger colour; a restriction is
+ * shown as information.
  */
 export function SectionError({ error }: { error: UiError }) {
   const retryable = error.kind === 'failed';
+  const tone = retryable
+    ? 'border-danger/40 bg-danger-tint'
+    : 'border-brand/25 bg-brand-tint/70';
   return (
     <div
       role="alert"
-      className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-red-400/50 bg-red-500/10 px-3 py-2 text-sm"
+      className={`flex flex-wrap items-center justify-between gap-3 rounded-md border px-4 py-3 text-sm text-ink ${tone}`}
     >
       <span>{error.message}</span>
       {retryable && <RetryButton />}
@@ -49,7 +53,7 @@ export function LoadingBlock({ label = 'Loading…', height = 160 }: { label?: s
     <div
       role="status"
       aria-live="polite"
-      className="animate-pulse rounded-md bg-black/5 dark:bg-white/5"
+      className="animate-pulse rounded-[10px] border border-rule bg-surface"
       style={{ height }}
     >
       <span className="sr-only">{label}</span>
@@ -61,13 +65,16 @@ export function LoadingBlock({ label = 'Loading…', height = 160 }: { label?: s
 export function PageLoading({ title }: { title: string }) {
   return (
     <div className="space-y-6">
-      <div className="h-7 w-64 animate-pulse rounded bg-black/10 dark:bg-white/10" />
+      <div className="space-y-2">
+        <div className="h-8 w-72 max-w-full animate-pulse rounded-md bg-ink/10" />
+        <div className="h-4 w-96 max-w-full animate-pulse rounded bg-ink/5" />
+      </div>
       <p className="sr-only" role="status">
         Loading {title}…
       </p>
       <div className="grid gap-4 sm:grid-cols-4">
         {[0, 1, 2, 3].map((key) => (
-          <LoadingBlock key={key} height={76} />
+          <LoadingBlock key={key} height={84} />
         ))}
       </div>
       <LoadingBlock height={260} />
@@ -86,6 +93,7 @@ export function LoadedCard<T>({
   isEmpty,
   empty,
   actions,
+  description,
   children,
 }: {
   title: string;
@@ -93,6 +101,7 @@ export function LoadedCard<T>({
   isEmpty?: (data: T) => boolean;
   empty?: string;
   actions?: ReactNode;
+  description?: ReactNode;
   children: (data: T) => ReactNode;
 }) {
   let body: ReactNode;
@@ -104,7 +113,7 @@ export function LoadedCard<T>({
     body = children(result.data);
   }
   return (
-    <Card title={title} actions={actions}>
+    <Card title={title} actions={actions} description={description}>
       {body}
     </Card>
   );

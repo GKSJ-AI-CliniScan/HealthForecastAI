@@ -13,7 +13,7 @@ export default function RetryButton({ label = 'Retry' }: { label?: string }) {
       type="button"
       onClick={() => startTransition(() => router.refresh())}
       disabled={pending}
-      className="rounded-md border border-[var(--border)] px-3 py-1 text-xs disabled:opacity-50"
+      className="btn btn-secondary btn-sm"
     >
       {pending ? 'Retrying…' : label}
     </button>

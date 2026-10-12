@@ -9,7 +9,7 @@ import type { NavLink } from '@/lib/navigation';
 export default function TabNav({ tabs, label }: { tabs: NavLink[]; label: string }) {
   const pathname = usePathname();
   return (
-    <nav aria-label={label} className="flex flex-wrap gap-1 border-b border-[var(--border)]">
+    <nav aria-label={label} className="-mx-1 flex gap-1 overflow-x-auto overflow-y-hidden border-b border-rule px-1">
       {tabs.map((tab) => {
         const active = pathname === tab.href;
         return (
@@ -17,8 +17,10 @@ export default function TabNav({ tabs, label }: { tabs: NavLink[]; label: string
             key={tab.href}
             href={tab.href}
             aria-current={active ? 'page' : undefined}
-            className={`-mb-px border-b-2 px-3 py-2 text-sm ${
-              active ? 'border-indigo-500 font-medium' : 'border-transparent opacity-70 hover:opacity-100'
+            className={`whitespace-nowrap border-b-[3px] px-3 py-2.5 text-[0.9375rem] transition-colors ${
+              active
+                ? 'border-brand font-bold text-brand'
+                : 'border-transparent text-ink-muted hover:border-rule-strong hover:text-ink'
             }`}
           >
             {tab.label}

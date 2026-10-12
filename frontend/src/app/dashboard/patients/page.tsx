@@ -4,7 +4,7 @@ import AnonymisedCohortTable, {
   COHORT_PAGE_SIZE,
 } from '@/components/research/AnonymisedCohortTable';
 import CohortFilterForm, { readCohortFilters } from '@/components/research/CohortFilterForm';
-import { Card, Cell, Row, Table } from '@/components/ui';
+import { Card, Cell, PageHeader, Row, Table } from '@/components/ui';
 import { LoadedCard, SectionError } from '@/components/ui/states';
 import { apiFetch, apiFetchPage } from '@/lib/api';
 import { load } from '@/lib/errors';
@@ -50,53 +50,60 @@ export default async function PatientsPage({
   const error = result.ok ? null : result.error;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold">Patients</h1>
-          <p className="mt-1 text-sm opacity-70">
-            {user.role === 'doctor'
-              ? 'Only the patients assigned to you are listed.'
-              : 'Hospital-wide patient records.'}
-          </p>
-        </div>
-
-        <form method="get" className="flex gap-2">
-          <input
-            type="search"
-            name="q"
-            defaultValue={query}
-            placeholder="Record number or diagnosis"
-            aria-label="Search patients"
-            className="rounded-md border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-sm"
-          />
-          <button
-            type="submit"
-            className="rounded-md border border-[var(--border)] px-3 py-1.5 text-sm"
-          >
-            Search
-          </button>
-        </form>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        title="Patients"
+        description={
+          user.role === 'doctor'
+            ? 'Only the patients assigned to you are listed.'
+            : 'Hospital-wide patient records.'
+        }
+        actions={
+          <form method="get" role="search" className="flex w-full gap-2 sm:w-auto">
+            <input
+              type="search"
+              name="q"
+              defaultValue={query}
+              placeholder="Record number or diagnosis"
+              aria-label="Search patients"
+              className="field min-w-0 sm:w-72"
+            />
+            <button type="submit" className="btn btn-primary">
+              Search
+            </button>
+          </form>
+        }
+      />
 
       {error ? (
         <SectionError error={error} />
       ) : (
-        <Card>
+        <Card
+          description={
+            patients.length === 0
+              ? undefined
+              : patients.length >= 100
+                ? 'Showing the first 100 records. Search to narrow the list.'
+                : `${patients.length} ${patients.length === 1 ? 'record' : 'records'}${query ? ` matching "${query}"` : ''}.`
+          }
+        >
           <Table
             headers={['Record number', 'Age group', 'Gender', 'Primary diagnosis', '']}
             empty={query ? `No patients match "${query}".` : 'No patients yet.'}
           >
             {patients.map((patient) => (
               <Row key={patient.id}>
-                <Cell>{patient.medical_record_number}</Cell>
+                <Cell>
+                  <span className="font-semibold text-ink">{patient.medical_record_number}</span>
+                </Cell>
                 <Cell>{patient.age_group ?? '-'}</Cell>
                 <Cell>{patient.gender ?? '-'}</Cell>
                 <Cell>{patient.primary_diagnosis ?? '-'}</Cell>
                 <Cell>
                   <Link
                     href={`/dashboard/patients/${patient.id}`}
-                    className="underline underline-offset-2"
+                    className="link"
+                    aria-label={`View ${patient.medical_record_number}`}
                   >
                     View
                   </Link>
@@ -127,18 +134,20 @@ async function renderAnonymisedPatients(token: string | undefined, params: Searc
   );
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">Anonymised patient cohort</h1>
-        <p className="mt-1 text-sm opacity-70">
-          De-identified records only: a pseudonymous id, a 10-year age band, gender and primary
-          diagnosis. For statistics and export, use{' '}
-          <Link href="/dashboard/research" className="underline underline-offset-2">
-            Research
-          </Link>
-          .
-        </p>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        title="Anonymised patient cohort"
+        description={
+          <>
+            De-identified records only: a pseudonymous id, a 10-year age band, gender and primary
+            diagnosis. For statistics and export, use{' '}
+            <Link href="/dashboard/research" className="link">
+              Research
+            </Link>
+            .
+          </>
+        }
+      />
       <Card title="Filters">
         <CohortFilterForm filters={filters} />
       </Card>

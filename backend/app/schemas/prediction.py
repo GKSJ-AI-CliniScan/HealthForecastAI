@@ -34,10 +34,27 @@ class RiskPredictionRead(BaseModel):
     id: int
     patient_id: int
     admission_id: int | None = None
-    readmission_probability: float = Field(ge=0.0, le=1.0)
+    readmission_probability: float = Field(
+        ge=0.0,
+        le=1.0,
+        description=(
+            "Experimental model score in [0, 1]; the field name is historical. For "
+            "prediction_type 'risk' it scores the combined outcome 'in-hospital death or "
+            "30-day readmission'; for 'readmission' it scores 30-day readmission after a "
+            "live discharge. It is not a calibrated probability."
+        ),
+    )
     risk_category: str
     prediction_type: str = "risk"
-    confidence_score: float | None = Field(default=None, ge=0.0, le=1.0)
+    confidence_score: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description=(
+            "Readmission forecasts only: max(score, 1 - score), the distance of the score "
+            "from 0.5. It is not a measure of whether the prediction is correct."
+        ),
+    )
     readmission_window: str | None = None
     actual_readmitted: bool | None = None
     outcome_recorded_at: datetime | None = None

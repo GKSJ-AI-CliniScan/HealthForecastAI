@@ -41,7 +41,7 @@ export default function DeleteReportButton({ reportId }: { reportId: number }) {
             type="button"
             onClick={remove}
             disabled={pending}
-            className="rounded-md border border-red-500 px-3 py-1 text-sm text-red-600 disabled:opacity-50"
+            className="btn btn-danger btn-sm"
           >
             {pending ? 'Deleting…' : 'Confirm delete'}
           </button>
@@ -49,7 +49,7 @@ export default function DeleteReportButton({ reportId }: { reportId: number }) {
             type="button"
             onClick={() => setConfirming(false)}
             disabled={pending}
-            className="rounded-md border border-[var(--border)] px-3 py-1 text-sm"
+            className="btn btn-secondary btn-sm"
           >
             Cancel
           </button>
@@ -58,13 +58,13 @@ export default function DeleteReportButton({ reportId }: { reportId: number }) {
         <button
           type="button"
           onClick={() => setConfirming(true)}
-          className="rounded-md border border-[var(--border)] px-3 py-1 text-sm"
+          className="btn btn-secondary btn-sm"
         >
           Delete
         </button>
       )}
       {error && (
-        <span role="alert" className="text-xs text-red-500">
+        <span role="alert" className="text-xs font-semibold text-danger">
           {error}
         </span>
       )}

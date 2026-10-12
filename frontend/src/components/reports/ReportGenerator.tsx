@@ -13,8 +13,7 @@ import type {
   ReportType,
 } from '@/types';
 
-const inputClass =
-  'w-full rounded-md border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-sm';
+const inputClass = 'field';
 
 const MONTH_OPTIONS = [6, 12, 24, 36];
 
@@ -55,7 +54,7 @@ export default function ReportGenerator({ options }: { options: ReportTypeOption
   const selected = options.find((option) => option.type === type) ?? options[0];
 
   if (!selected) {
-    return <p className="text-sm opacity-70">Your role cannot generate any report type.</p>;
+    return <p className="text-sm text-ink-muted">Your role cannot generate any report type.</p>;
   }
 
   function changeType(next: ReportType) {
@@ -100,8 +99,8 @@ export default function ReportGenerator({ options }: { options: ReportTypeOption
   return (
     <form onSubmit={submit} className="space-y-4" aria-label="Generate report">
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="space-y-1 text-sm">
-          <span className="opacity-70">Report type</span>
+        <label className="block space-y-1.5 text-sm">
+          <span className="text-ink-muted">Report type</span>
           <select
             value={selected.type}
             onChange={(event) => changeType(event.target.value as ReportType)}
@@ -114,8 +113,8 @@ export default function ReportGenerator({ options }: { options: ReportTypeOption
             ))}
           </select>
         </label>
-        <label className="space-y-1 text-sm">
-          <span className="opacity-70">Export format</span>
+        <label className="block space-y-1.5 text-sm">
+          <span className="text-ink-muted">Export format</span>
           <select
             value={format}
             onChange={(event) => setFormat(event.target.value as ReportFormat)}
@@ -130,14 +129,14 @@ export default function ReportGenerator({ options }: { options: ReportTypeOption
         </label>
       </div>
 
-      <p className="text-xs opacity-70">{selected.description}</p>
+      <p className="text-sm text-ink-muted">{selected.description}</p>
 
       {selected.filters.length > 0 ? (
         <fieldset className="grid gap-4 sm:grid-cols-3">
-          <legend className="mb-2 text-sm font-medium opacity-80">Filters (optional)</legend>
+          <legend className="mb-3 text-panel text-ink">Filters (optional)</legend>
           {selected.filters.map((key) => (
-            <label key={key} className="space-y-1 text-sm">
-              <span className="opacity-70">{FILTER_LABELS[key]}</span>
+            <label key={key} className="block space-y-1.5 text-sm">
+              <span className="text-ink-muted">{FILTER_LABELS[key]}</span>
               {key === 'months' ? (
                 <select
                   value={values.months ?? ''}
@@ -163,25 +162,25 @@ export default function ReportGenerator({ options }: { options: ReportTypeOption
           ))}
         </fieldset>
       ) : (
-        <p className="text-xs opacity-60">This report type has no filters.</p>
+        <p className="text-sm text-ink-muted">This report type has no filters.</p>
       )}
 
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="submit"
           disabled={pending}
-          className="rounded-md bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+          className="btn btn-primary"
         >
           {pending ? 'Generating…' : 'Generate report'}
         </button>
         {notice && (
-          <p role="status" className="text-sm text-green-600">
+          <p role="status" className="text-sm font-semibold text-zone-low">
             {notice}
           </p>
         )}
       </div>
       {error && (
-        <p role="alert" className="rounded-md border border-red-400/50 bg-red-500/10 px-3 py-2 text-sm">
+        <p role="alert" className="rounded-md border border-danger/40 bg-danger-tint px-3 py-2 text-sm text-ink">
           {error}
         </p>
       )}

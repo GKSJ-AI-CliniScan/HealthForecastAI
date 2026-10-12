@@ -2,6 +2,7 @@ import MonthsFilter, { MONTH_CHOICES } from '@/components/analytics/MonthsFilter
 import CategoryBarChart from '@/components/charts/CategoryBarChart';
 import MultiBarChart from '@/components/charts/MultiBarChart';
 import { StatTile } from '@/components/ui';
+import { SCORE_NOTES, ScoreNote } from '@/components/ui/ModelDisclaimer';
 import { LoadedCard, NoAccess } from '@/components/ui/states';
 import { apiFetch } from '@/lib/api';
 import { load } from '@/lib/errors';
@@ -49,20 +50,24 @@ export default async function RiskDistributionPage({
         empty="No patient has been risk-scored yet."
       >
         {(data) => (
-          <div className="grid gap-6 lg:grid-cols-[auto,1fr]">
-            <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-              {CATEGORIES.map((key) => (
-                <StatTile
-                  key={key}
-                  label={`${CATEGORY_LABELS[key]} risk`}
-                  value={formatNumber(data.risk_distribution[key])}
-                />
-              ))}
+          <div className="space-y-3">
+            <div className="grid gap-6 lg:grid-cols-[auto,1fr]">
+              <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+                {CATEGORIES.map((key) => (
+                  <StatTile
+                    key={key}
+                    label={`${CATEGORY_LABELS[key]} risk`}
+                    value={formatNumber(data.risk_distribution[key])}
+                  />
+                ))}
+              </div>
+              <CategoryBarChart
+                label="Patients per risk category"
+                data={CATEGORIES.map((key) => ({ name: key, value: data.risk_distribution[key] }))}
+              />
             </div>
-            <CategoryBarChart
-              label="Patients per risk category"
-              data={CATEGORIES.map((key) => ({ name: key, value: data.risk_distribution[key] }))}
-            />
+            <ScoreNote>{SCORE_NOTES.scoredOnly}</ScoreNote>
+            <ScoreNote>{SCORE_NOTES.bands}</ScoreNote>
           </div>
         )}
       </LoadedCard>

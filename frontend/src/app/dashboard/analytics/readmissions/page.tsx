@@ -1,7 +1,8 @@
 import MonthsFilter, { MONTH_CHOICES } from '@/components/analytics/MonthsFilter';
 import CategoryBarChart from '@/components/charts/CategoryBarChart';
+import { PALETTE } from '@/components/charts/chartUtils';
 import TrendLineChart from '@/components/charts/TrendLineChart';
-import { StatTile } from '@/components/ui';
+import { MetricStrip, StatTile } from '@/components/ui';
 import { LoadedCard, NoAccess, SectionError } from '@/components/ui/states';
 import { apiFetch } from '@/lib/api';
 import { load } from '@/lib/errors';
@@ -36,15 +37,15 @@ export default async function ReadmissionAnalyticsPage({
   return (
     <div className="space-y-6">
       {summary.ok ? (
-        <div className="grid gap-4 sm:grid-cols-4">
-          <StatTile label="Patients" value={formatNumber(summary.data.total_patients)} />
-          <StatTile label="Admissions" value={formatNumber(summary.data.total_admissions)} />
-          <StatTile label="Readmission rate" value={formatPercent(summary.data.readmission_rate)} />
-          <StatTile
+        <MetricStrip label="Readmission summary">
+          <StatTile variant="plain" label="Patients" value={formatNumber(summary.data.total_patients)} />
+          <StatTile variant="plain" label="Admissions" value={formatNumber(summary.data.total_admissions)} />
+          <StatTile variant="plain" label="Readmission rate" value={formatPercent(summary.data.readmission_rate)} />
+          <StatTile variant="plain"
             label="Avg length of stay"
             value={`${formatNumber(summary.data.average_length_of_stay, 1)} days`}
           />
-        </div>
+        </MetricStrip>
       ) : (
         <SectionError error={summary.error} />
       )}
@@ -68,7 +69,7 @@ export default async function ReadmissionAnalyticsPage({
             <CategoryBarChart
               label="Admissions per month"
               data={rows.map((row) => ({ name: row.month, value: row.total_admissions }))}
-              color="#06b6d4"
+              color={PALETTE[1]}
             />
           </div>
         )}

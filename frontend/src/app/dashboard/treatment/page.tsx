@@ -1,7 +1,8 @@
 import CategoryBarChart from '@/components/charts/CategoryBarChart';
+import { PALETTE, SEMANTIC_COLORS } from '@/components/charts/chartUtils';
 import MultiBarChart from '@/components/charts/MultiBarChart';
 import TrendLineChart from '@/components/charts/TrendLineChart';
-import { Card, Cell, Row, StatTile, Table } from '@/components/ui';
+import { Card, Cell, MetricStrip, Row, StatTile, Table } from '@/components/ui';
 import { EmptyState, LoadedCard, NoAccess, SectionError } from '@/components/ui/states';
 import { apiFetch } from '@/lib/api';
 import { load, type Loaded } from '@/lib/errors';
@@ -29,8 +30,7 @@ const OUTCOME_SERIES = [
   { key: 'unrecorded', label: 'Not recorded' },
 ];
 
-const inputClass =
-  'rounded-md border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-sm';
+const inputClass = 'field';
 
 /** Carry the current filters into a nested form so submitting one does not drop the others. */
 function Hidden({ values }: { values: Record<string, string | undefined> }) {
@@ -115,8 +115,8 @@ export default async function TreatmentEffectivenessPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold">Treatment effectiveness</h1>
-        <p className="mt-1 text-sm opacity-70">
+        <h1 className="text-title text-ink">Treatment effectiveness</h1>
+        <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
           {limited
             ? 'Figures cover only the patients assigned to you.'
             : 'Hospital-wide treatment outcomes.'}{' '}
@@ -124,10 +124,10 @@ export default async function TreatmentEffectivenessPage({
         </p>
       </div>
 
-      <form method="get" className="flex flex-wrap items-end gap-3 text-sm">
+      <form method="get" className="flex flex-wrap items-end gap-4 rounded-[10px] border border-rule bg-surface p-4 text-sm">
         <Hidden values={{ weeks: keep.weeks, diagnosis, reduction }} />
-        <label className="flex flex-col gap-1">
-          <span className="opacity-70">Treatment</span>
+        <label className="flex min-w-0 flex-col gap-1.5">
+          <span className="text-ink-muted">Treatment</span>
           <input
             name="treatment_name"
             defaultValue={treatmentName}
@@ -136,8 +136,8 @@ export default async function TreatmentEffectivenessPage({
             className={inputClass}
           />
         </label>
-        <label className="flex flex-col gap-1">
-          <span className="opacity-70">Department</span>
+        <label className="flex min-w-0 flex-col gap-1.5">
+          <span className="text-ink-muted">Department</span>
           <input
             name="department"
             defaultValue={department}
@@ -146,7 +146,7 @@ export default async function TreatmentEffectivenessPage({
             className={inputClass}
           />
         </label>
-        <button type="submit" className="rounded-md border border-[var(--border)] px-3 py-1">
+        <button type="submit" className="btn btn-secondary btn-sm">
           Apply
         </button>
       </form>
@@ -164,7 +164,7 @@ export default async function TreatmentEffectivenessPage({
               data={rows.map((row) => ({ name: row.treatment_name, value: row.success_rate }))}
               valueFormat="percent"
               horizontal
-              color="#22c55e"
+              color={SEMANTIC_COLORS.improved}
             />
             <Table headers={['Treatment', 'Outcomes', 'Avg recovery score', 'Success rate']}>
               {rows.map((row) => (
@@ -203,7 +203,7 @@ export default async function TreatmentEffectivenessPage({
         isEmpty={(rows) => rows.length === 0}
         empty="No discharged admissions with a recovery score yet."
         actions={
-          <form method="get" className="flex items-center gap-2 text-sm">
+          <form method="get" className="flex flex-wrap items-center gap-2 text-sm">
             <Hidden values={{ treatment_name: treatmentName, department, diagnosis, reduction }} />
             <select name="weeks" defaultValue={keep.weeks} aria-label="Weeks" className={inputClass}>
               {WEEK_CHOICES.map((choice) => (
@@ -212,7 +212,7 @@ export default async function TreatmentEffectivenessPage({
                 </option>
               ))}
             </select>
-            <button type="submit" className="rounded-md border border-[var(--border)] px-3 py-1">
+            <button type="submit" className="btn btn-secondary btn-sm">
               Apply
             </button>
           </form>
@@ -226,7 +226,7 @@ export default async function TreatmentEffectivenessPage({
               score: row.average_recovery_score,
             }))}
             xKey="week"
-            series={[{ key: 'score', label: 'Average recovery score', color: '#22c55e' }]}
+            series={[{ key: 'score', label: 'Average recovery score', color: PALETTE[1] }]}
             valueFormat="decimal"
           />
         )}
@@ -249,8 +249,8 @@ export default async function TreatmentEffectivenessPage({
               }))}
               xKey="department"
               series={[
-                { key: 'success', label: 'Success rate', color: '#22c55e' },
-                { key: 'readmission', label: 'Readmission rate', color: '#ef4444' },
+                { key: 'success', label: 'Success rate', color: SEMANTIC_COLORS.improved },
+                { key: 'readmission', label: 'Readmission rate', color: PALETTE[2] },
               ]}
               valueFormat="percent"
             />
@@ -273,7 +273,7 @@ export default async function TreatmentEffectivenessPage({
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card title="Compare treatments for a diagnosis">
-          <form method="get" className="mb-4 flex flex-wrap gap-2 text-sm">
+          <form method="get" className="mb-5 flex flex-wrap gap-2 text-sm">
             <Hidden values={{ treatment_name: treatmentName, department, weeks: keep.weeks, reduction }} />
             <input
               name="diagnosis"
@@ -284,7 +284,7 @@ export default async function TreatmentEffectivenessPage({
               aria-label="Diagnosis to compare"
               className={`${inputClass} flex-1`}
             />
-            <button type="submit" className="rounded-md border border-[var(--border)] px-3 py-1">
+            <button type="submit" className="btn btn-secondary btn-sm">
               Compare
             </button>
           </form>
@@ -292,7 +292,7 @@ export default async function TreatmentEffectivenessPage({
         </Card>
 
         <Card title="Readmission reduction">
-          <form method="get" className="mb-4 flex flex-wrap gap-2 text-sm">
+          <form method="get" className="mb-5 flex flex-wrap gap-2 text-sm">
             <Hidden values={{ treatment_name: treatmentName, department, weeks: keep.weeks, diagnosis }} />
             <input
               name="reduction"
@@ -303,7 +303,7 @@ export default async function TreatmentEffectivenessPage({
               aria-label="Treatment to evaluate"
               className={`${inputClass} flex-1`}
             />
-            <button type="submit" className="rounded-md border border-[var(--border)] px-3 py-1">
+            <button type="submit" className="btn btn-secondary btn-sm">
               Evaluate
             </button>
           </form>
@@ -351,10 +351,10 @@ function ReductionResult({ result }: { result: Loaded<ReadmissionReduction> | nu
   }
   const data = result.data;
   return (
-    <div className="grid gap-3 sm:grid-cols-3">
-      <StatTile label="With treatment" value={formatPercent(data.treatment_readmission_rate)} />
-      <StatTile label="Baseline" value={formatPercent(data.hospital_baseline_readmission_rate)} />
-      <StatTile label="Admissions" value={formatNumber(data.sample_size)} />
-    </div>
+    <MetricStrip label="Readmission comparison">
+      <StatTile variant="plain" label="With treatment" value={formatPercent(data.treatment_readmission_rate)} />
+      <StatTile variant="plain" label="Baseline" value={formatPercent(data.hospital_baseline_readmission_rate)} />
+      <StatTile variant="plain" label="Admissions" value={formatNumber(data.sample_size)} />
+    </MetricStrip>
   );
 }

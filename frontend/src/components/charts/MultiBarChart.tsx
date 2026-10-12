@@ -12,6 +12,13 @@ import {
 } from 'recharts';
 
 import {
+  AXIS_TICK,
+  FIGURE_CLASS,
+  GRID_PROPS,
+  LEGEND_STYLE,
+  TOOLTIP_CURSOR,
+  TOOLTIP_LABEL_STYLE,
+  TOOLTIP_STYLE,
   axisTick,
   formatValue,
   seriesColor,
@@ -42,17 +49,28 @@ export default function MultiBarChart({
   height?: number;
 }) {
   if (data.length === 0) {
-    return <p className="py-6 text-center text-sm opacity-70">No data to chart.</p>;
+    return <p className="py-6 text-center text-sm text-ink-muted">No data to chart.</p>;
   }
   return (
-    <figure role="img" aria-label={label} style={{ width: '100%', height }}>
+    <figure role="img" aria-label={label} className={FIGURE_CLASS} style={{ width: '100%', height }}>
       <ResponsiveContainer>
         <BarChart data={data} margin={{ top: 8, right: 16, bottom: 8, left: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-          <XAxis dataKey={xKey} tick={{ fontSize: 11 }} />
-          <YAxis tickFormatter={axisTick(valueFormat)} tick={{ fontSize: 11 }} />
-          <Tooltip formatter={(value) => formatValue(value, valueFormat)} />
-          <Legend wrapperStyle={{ fontSize: 12 }} />
+          <CartesianGrid {...GRID_PROPS} vertical={false} />
+          <XAxis dataKey={xKey} tick={AXIS_TICK} stroke="currentColor" strokeOpacity={0.3} />
+          <YAxis
+            tickFormatter={axisTick(valueFormat)}
+            tick={AXIS_TICK}
+            stroke="currentColor"
+            strokeOpacity={0.3}
+            width={48}
+          />
+          <Tooltip
+            contentStyle={TOOLTIP_STYLE}
+            labelStyle={TOOLTIP_LABEL_STYLE}
+            cursor={TOOLTIP_CURSOR}
+            formatter={(value) => formatValue(value, valueFormat)}
+          />
+          <Legend wrapperStyle={LEGEND_STYLE} iconType="square" />
           {series.map((entry, index) => (
             <Bar
               key={entry.key}
@@ -60,7 +78,8 @@ export default function MultiBarChart({
               name={entry.label}
               stackId={stacked ? 'stack' : undefined}
               fill={seriesColor(entry, index)}
-              radius={stacked ? 0 : 4}
+              radius={stacked ? 0 : [4, 4, 0, 0]}
+              maxBarSize={40}
             />
           ))}
         </BarChart>

@@ -19,20 +19,20 @@ export default function DashboardError({
   }, [error]);
 
   return (
-    <div role="alert" className="space-y-3 rounded-lg border border-red-400/50 bg-red-500/10 p-5">
-      <h2 className="font-semibold">Something went wrong loading this page.</h2>
-      <p className="text-sm opacity-80">
+    <div role="alert" className="space-y-3 rounded-[10px] border border-danger/40 bg-danger-tint p-6 text-ink">
+      <h2 className="text-section">Something went wrong loading this page.</h2>
+      <p className="text-sm text-ink-muted">
         The problem has been logged. You can try again, or go back to the overview.
       </p>
       <div className="flex gap-3 text-sm">
         <button
           type="button"
           onClick={reset}
-          className="rounded-md border border-[var(--border)] px-3 py-1.5"
+          className="btn btn-secondary btn-sm"
         >
           Try again
         </button>
-        <a href="/dashboard" className="rounded-md border border-[var(--border)] px-3 py-1.5">
+        <a href="/dashboard" className="btn btn-secondary btn-sm">
           Overview
         </a>
       </div>

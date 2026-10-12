@@ -11,7 +11,19 @@ import {
   YAxis,
 } from 'recharts';
 
-import { axisTick, formatValue, PALETTE, SEMANTIC_COLORS, type ValueFormat } from './chartUtils';
+import {
+  AXIS_TICK,
+  FIGURE_CLASS,
+  GRID_PROPS,
+  PALETTE,
+  SEMANTIC_COLORS,
+  TOOLTIP_CURSOR,
+  TOOLTIP_LABEL_STYLE,
+  TOOLTIP_STYLE,
+  axisTick,
+  formatValue,
+  type ValueFormat,
+} from './chartUtils';
 
 export interface CategoryDatum {
   name: string;
@@ -38,7 +50,7 @@ export default function CategoryBarChart({
   color?: string;
 }) {
   if (data.length === 0) {
-    return <p className="py-6 text-center text-sm opacity-70">No data to chart.</p>;
+    return <p className="py-6 text-center text-sm text-ink-muted">No data to chart.</p>;
   }
   const chartHeight = height ?? (horizontal ? Math.max(160, data.length * 32 + 40) : 240);
   const tick = axisTick(valueFormat);
@@ -46,27 +58,40 @@ export default function CategoryBarChart({
     color ?? SEMANTIC_COLORS[name] ?? PALETTE[index % PALETTE.length];
 
   return (
-    <figure role="img" aria-label={label} style={{ width: '100%', height: chartHeight }}>
+    <figure role="img" aria-label={label} className={FIGURE_CLASS} style={{ width: '100%', height: chartHeight }}>
       <ResponsiveContainer>
         <BarChart
           data={data}
           layout={horizontal ? 'vertical' : 'horizontal'}
           margin={{ top: 8, right: 16, bottom: 8, left: horizontal ? 8 : 0 }}
         >
-          <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+          <CartesianGrid {...GRID_PROPS} vertical={horizontal} horizontal={!horizontal} />
           {horizontal ? (
             <>
-              <XAxis type="number" tickFormatter={tick} tick={{ fontSize: 11 }} />
-              <YAxis type="category" dataKey="name" width={140} tick={{ fontSize: 11 }} />
+              <XAxis type="number" tickFormatter={tick} tick={AXIS_TICK} stroke="currentColor" strokeOpacity={0.3} />
+              <YAxis type="category" dataKey="name" width={150} tick={AXIS_TICK} stroke="currentColor" strokeOpacity={0.3} />
             </>
           ) : (
             <>
-              <XAxis dataKey="name" tick={{ fontSize: 11 }} interval={0} />
-              <YAxis tickFormatter={tick} tick={{ fontSize: 11 }} allowDecimals={valueFormat !== 'number'} />
+              {/* Labels that would collide are skipped; every bar keeps its name in the tooltip. */}
+              <XAxis dataKey="name" tick={AXIS_TICK} interval="preserveStartEnd" minTickGap={8} stroke="currentColor" strokeOpacity={0.3} />
+              <YAxis
+                tickFormatter={tick}
+                tick={AXIS_TICK}
+                allowDecimals={valueFormat !== 'number'}
+                stroke="currentColor"
+                strokeOpacity={0.3}
+                width={48}
+              />
             </>
           )}
-          <Tooltip formatter={(value) => formatValue(value, valueFormat)} />
-          <Bar dataKey="value" name={label} radius={4}>
+          <Tooltip
+            contentStyle={TOOLTIP_STYLE}
+            labelStyle={TOOLTIP_LABEL_STYLE}
+            cursor={TOOLTIP_CURSOR}
+            formatter={(value) => formatValue(value, valueFormat)}
+          />
+          <Bar dataKey="value" name={label} radius={horizontal ? [0, 4, 4, 0] : [4, 4, 0, 0]} maxBarSize={44}>
             {data.map((datum, index) => (
               <Cell key={datum.name} fill={fill(datum.name, index)} />
             ))}

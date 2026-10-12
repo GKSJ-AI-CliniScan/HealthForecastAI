@@ -1,4 +1,5 @@
 import CategoryBarChart from '@/components/charts/CategoryBarChart';
+import { PALETTE } from '@/components/charts/chartUtils';
 import { Cell, Row, Table } from '@/components/ui';
 import { LoadedCard, NoAccess } from '@/components/ui/states';
 import { apiFetch } from '@/lib/api';
@@ -18,8 +19,7 @@ const SORT_FIELDS: { value: DepartmentSortField; label: string }[] = [
 ];
 const ORDERS: SortOrder[] = ['asc', 'desc'];
 
-const inputClass =
-  'rounded-md border border-[var(--border)] bg-[var(--surface)] px-2 py-1 text-sm';
+const inputClass = 'field';
 
 /** Department Performance Dashboard. Sorting and the date window are applied by the backend. */
 export default async function DepartmentPerformancePage({
@@ -50,17 +50,17 @@ export default async function DepartmentPerformancePage({
 
   return (
     <div className="space-y-6">
-      <form method="get" className="flex flex-wrap items-end gap-3 text-sm">
-        <label className="flex flex-col gap-1">
-          <span className="opacity-70">Admitted from</span>
+      <form method="get" className="flex flex-wrap items-end gap-4 rounded-[10px] border border-rule bg-surface p-4 text-sm">
+        <label className="flex min-w-0 flex-col gap-1.5">
+          <span className="text-ink-muted">Admitted from</span>
           <input type="date" name="date_from" defaultValue={dateFrom} className={inputClass} />
         </label>
-        <label className="flex flex-col gap-1">
-          <span className="opacity-70">Admitted to</span>
+        <label className="flex min-w-0 flex-col gap-1.5">
+          <span className="text-ink-muted">Admitted to</span>
           <input type="date" name="date_to" defaultValue={dateTo} className={inputClass} />
         </label>
-        <label className="flex flex-col gap-1">
-          <span className="opacity-70">Sort by</span>
+        <label className="flex min-w-0 flex-col gap-1.5">
+          <span className="text-ink-muted">Sort by</span>
           <select name="sort_by" defaultValue={sortBy} className={inputClass}>
             {SORT_FIELDS.map((field) => (
               <option key={field.value} value={field.value}>
@@ -69,14 +69,14 @@ export default async function DepartmentPerformancePage({
             ))}
           </select>
         </label>
-        <label className="flex flex-col gap-1">
-          <span className="opacity-70">Order</span>
+        <label className="flex min-w-0 flex-col gap-1.5">
+          <span className="text-ink-muted">Order</span>
           <select name="order" defaultValue={order} className={inputClass}>
             <option value="desc">Highest first</option>
             <option value="asc">Lowest first</option>
           </select>
         </label>
-        <button type="submit" className="rounded-md border border-[var(--border)] px-3 py-1">
+        <button type="submit" className="btn btn-secondary btn-sm">
           Apply
         </button>
       </form>
@@ -91,17 +91,17 @@ export default async function DepartmentPerformancePage({
           <div className="space-y-6">
             <div className="grid gap-6 lg:grid-cols-2">
               <div>
-                <h3 className="mb-2 text-sm font-medium opacity-80">Readmission rate</h3>
+                <h3 className="mb-3 text-panel text-ink">Readmission rate</h3>
                 <CategoryBarChart
                   label="Readmission rate by department"
                   data={rows.map((row) => ({ name: row.department, value: row.readmission_rate }))}
                   valueFormat="percent"
                   horizontal
-                  color="#ef4444"
+                  color={PALETTE[2]}
                 />
               </div>
               <div>
-                <h3 className="mb-2 text-sm font-medium opacity-80">Admissions</h3>
+                <h3 className="mb-3 text-panel text-ink">Admissions</h3>
                 <CategoryBarChart
                   label="Admissions by department"
                   data={rows.map((row) => ({ name: row.department, value: row.total_admissions }))}

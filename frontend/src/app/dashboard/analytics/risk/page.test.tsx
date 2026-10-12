@@ -50,6 +50,23 @@ describe('RiskDistributionPage', () => {
     );
   });
 
+  it('says the category counts cover scored patients only and explains the bands', async () => {
+    pageState.apiFetch.mockImplementation(
+      routeResponses({ '/analytics/summary': SUMMARY, '/analytics/trends': [] }),
+    );
+    await renderPage();
+
+    expect(
+      screen.getByText(
+        'Counts cover patients who have been risk-scored only; unscored patients are not included.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/fixed cut-offs of 0\.40 and 0\.70/)).toBeInTheDocument();
+    expect(screen.getByText(/not clinically validated thresholds/)).toBeInTheDocument();
+    // Existing labels and counts are unchanged.
+    expect(screen.getByText('High risk').nextSibling).toHaveTextContent('8');
+  });
+
   it('shows empty states when nothing has been scored', async () => {
     pageState.apiFetch.mockImplementation(
       routeResponses({

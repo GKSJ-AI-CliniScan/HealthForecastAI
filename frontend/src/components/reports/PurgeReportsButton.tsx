@@ -42,12 +42,12 @@ export default function PurgeReportsButton() {
         type="button"
         onClick={purge}
         disabled={pending}
-        className="rounded-md border border-[var(--border)] px-3 py-1 text-xs disabled:opacity-50"
+        className="btn btn-danger btn-sm"
       >
         {pending ? 'Purging…' : 'Purge expired reports'}
       </button>
       {message && (
-        <span role={message.failed ? 'alert' : 'status'} className="text-xs opacity-80">
+        <span role={message.failed ? 'alert' : 'status'} className="text-xs text-ink-muted">
           {message.text}
         </span>
       )}

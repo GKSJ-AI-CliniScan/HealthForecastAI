@@ -2,24 +2,159 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Design tokens - the "observation chart" palette.
+ *
+ * Cool chart-paper canvas, white panels, biro-blue ink for brand and links,
+ * and three zone colours (sage / ochre / crimson) that are reserved for the
+ * LOW / MEDIUM / HIGH score bands so colour never competes with risk meaning.
+ * Values are RGB triplets so Tailwind opacity modifiers work (bg-brand/10).
+ */
 :root {
-  --background: #f7f9fc;
-  --foreground: #0f1c2e;
-  --surface: #ffffff;
-  --border: #dde3ec;
+  --c-canvas: 238 242 244;
+  --c-surface: 255 255 255;
+  --c-sunken: 246 248 249;
+  --c-ink: 22 40 59;
+  --c-ink-muted: 74 90 107;
+  --c-rule: 213 222 228;
+  --c-rule-strong: 182 196 207;
+  --c-brand: 43 76 140;
+  --c-brand-strong: 30 57 110;
+  --c-brand-tint: 231 237 248;
+  --c-brand-deep: 28 52 99;
+  --c-on-brand: 255 255 255;
+  --c-low: 52 110 77;
+  --c-low-tint: 227 239 231;
+  --c-low-fill: 108 168 132;
+  --c-medium: 128 82 10;
+  --c-medium-tint: 245 233 207;
+  --c-medium-fill: 217 164 60;
+  --c-high: 158 46 46;
+  --c-high-tint: 244 223 222;
+  --c-high-fill: 200 85 80;
+  --c-danger: 180 35 24;
+  --c-danger-tint: 253 236 234;
+
+  /* Older names, still used across the app; they now resolve to the tokens. */
+  --background: rgb(var(--c-canvas));
+  --foreground: rgb(var(--c-ink));
+  --surface: rgb(var(--c-surface));
+  --border: rgb(var(--c-rule));
+
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0b1220;
-    --foreground: #e6ecf5;
-    --surface: #131c2b;
-    --border: #23304a;
+    --c-canvas: 14 24 34;
+    --c-surface: 21 34 48;
+    --c-sunken: 18 29 41;
+    --c-ink: 226 233 240;
+    --c-ink-muted: 163 179 194;
+    --c-rule: 42 59 76;
+    --c-rule-strong: 66 86 106;
+    --c-brand: 157 180 234;
+    --c-brand-strong: 189 206 245;
+    --c-brand-tint: 33 50 82;
+    --c-brand-deep: 24 42 78;
+    --c-on-brand: 14 24 34;
+    --c-low: 133 199 158;
+    --c-low-tint: 26 52 39;
+    --c-low-fill: 88 150 112;
+    --c-medium: 232 184 92;
+    --c-medium-tint: 61 46 18;
+    --c-medium-fill: 196 146 52;
+    --c-high: 240 150 144;
+    --c-high-tint: 72 31 31;
+    --c-high-fill: 196 90 84;
+    --c-danger: 248 128 118;
+    --c-danger-tint: 74 27 24;
+
+    color-scheme: dark;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: rgb(var(--c-canvas));
+    color: rgb(var(--c-ink));
+    font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+      sans-serif;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  /* One visible focus ring everywhere, keyboard only. */
+  :focus-visible {
+    outline: 2px solid rgb(var(--c-brand));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-3.5 py-2 text-sm font-semibold leading-5 transition-colors disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-primary {
+    @apply bg-brand text-on-brand hover:bg-brand-strong;
+  }
+
+  .btn-secondary {
+    @apply border border-rule-strong bg-surface text-ink hover:border-brand/60 hover:bg-brand-tint;
+  }
+
+  .btn-quiet {
+    @apply text-brand hover:bg-brand-tint;
+  }
+
+  .btn-danger {
+    @apply border border-danger/50 bg-surface text-danger hover:bg-danger-tint;
+  }
+
+  .btn-sm {
+    @apply px-2.5 py-1.5 text-[0.8125rem];
+  }
+
+  .field {
+    @apply w-full rounded-md border border-rule-strong bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-muted/80 hover:border-ink-muted/60;
+  }
+
+  .field-label {
+    @apply mb-1 block text-sm font-semibold text-ink;
+  }
+
+  .link {
+    @apply font-semibold text-brand underline decoration-brand/40 underline-offset-[3px] hover:decoration-brand;
+  }
+}
+
+/* Recharts colours legend text with its series colour, which pale series fail
+   as text. The swatch keeps the series colour; the words use ink. Outside a
+   layer, because Tailwind would drop a layered class it never sees in source. */
+.recharts-legend-item-text {
+  color: rgb(var(--c-ink)) !important;
 }

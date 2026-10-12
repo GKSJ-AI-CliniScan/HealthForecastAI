@@ -6,6 +6,11 @@ An AI-powered healthcare analytics platform that predicts hospital readmissions,
 identifies high-risk patients, evaluates treatment effectiveness and supports
 proactive patient care planning.
 
+> **Status: experimental decision-support prototype.** HealthForecast AI has not been
+> clinically validated or approved for patient care. Its scores come from models trained
+> on a public research dataset; they are estimates, not diagnoses or calibrated
+> probabilities, and must not replace clinical judgment.
+
 > **Interns start here: [INTERN_GUIDE.md](INTERN_GUIDE.md).**
 > You work on your own branch. Nothing is merged into `main`.
 

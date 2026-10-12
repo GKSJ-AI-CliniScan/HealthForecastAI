@@ -3,7 +3,7 @@ import AnonymisedCohortTable, {
   COHORT_PAGE_SIZE,
 } from '@/components/research/AnonymisedCohortTable';
 import CohortFilterForm, { readCohortFilters } from '@/components/research/CohortFilterForm';
-import { Card, StatTile } from '@/components/ui';
+import { Card, MetricStrip, StatTile } from '@/components/ui';
 import DownloadButton from '@/components/ui/DownloadButton';
 import { LoadedCard, NoAccess } from '@/components/ui/states';
 import { apiFetch, apiFetchPage } from '@/lib/api';
@@ -65,8 +65,8 @@ export default async function ResearchPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold">Research analytics</h1>
-        <p className="mt-1 text-sm opacity-70">
+        <h1 className="text-title text-ink">Research analytics</h1>
+        <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
           Anonymised and aggregated data only. Patients are identified by pseudonym, ages are
           shown as 10-year bands, and any selection smaller than the minimum cohort size is
           refused.
@@ -81,20 +81,20 @@ export default async function ResearchPage({
         <LoadedCard title="Cohort statistics" result={stats}>
           {(data) => (
             <div className="space-y-6">
-              <div className="grid gap-4 sm:grid-cols-3">
-                <StatTile label="Cohort size" value={formatNumber(data.cohort_size)} />
-                <StatTile
+              <MetricStrip label="Cohort summary">
+                <StatTile variant="plain" label="Cohort size" value={formatNumber(data.cohort_size)} />
+                <StatTile variant="plain"
                   label="Age bands"
                   value={formatNumber(Object.keys(data.age_band_distribution).length)}
                 />
-                <StatTile
+                <StatTile variant="plain"
                   label="Diagnoses"
                   value={formatNumber(Object.keys(data.diagnosis_distribution).length)}
                 />
-              </div>
+              </MetricStrip>
               <div className="grid gap-6 lg:grid-cols-3">
                 <div>
-                  <h3 className="mb-2 text-sm font-medium opacity-80">Age band</h3>
+                  <h3 className="mb-3 text-panel text-ink">Age band</h3>
                   <CategoryBarChart
                     label="Cohort by age band"
                     data={toCountRows(data.age_band_distribution).sort((a, b) =>
@@ -103,14 +103,14 @@ export default async function ResearchPage({
                   />
                 </div>
                 <div>
-                  <h3 className="mb-2 text-sm font-medium opacity-80">Gender</h3>
+                  <h3 className="mb-3 text-panel text-ink">Gender</h3>
                   <CategoryBarChart
                     label="Cohort by gender"
                     data={toCountRows(data.gender_distribution)}
                   />
                 </div>
                 <div>
-                  <h3 className="mb-2 text-sm font-medium opacity-80">Diagnosis</h3>
+                  <h3 className="mb-3 text-panel text-ink">Diagnosis</h3>
                   <CategoryBarChart
                     label="Cohort by diagnosis"
                     data={toCountRows(data.diagnosis_distribution)}
@@ -126,7 +126,7 @@ export default async function ResearchPage({
       {canExport && (
         <Card title="Export anonymised dataset">
           <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
-            <p className="opacity-70">
+            <p className="text-ink-muted">
               Downloads the filtered cohort as CSV (pseudonymous id, age band, gender, primary
               diagnosis). The export is recorded in the audit log.
             </p>

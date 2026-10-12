@@ -11,7 +11,7 @@ function describeFilters(report: Report): string {
   if (entries.length === 0) {
     return 'None';
   }
-  return entries.map(([key, value]) => `${FILTER_LABELS[key] ?? key}: ${value}`).join(' · ');
+  return entries.map(([key, value]) => `${FILTER_LABELS[key] ?? key}: ${value}`).join('; ');
 }
 
 /** Report history rows with their download and delete actions. */
@@ -41,7 +41,7 @@ export default function ReportHistory({
           <Cell>{formatDateTime(report.generated_at)}</Cell>
           <Cell>{owner(report.generated_by)}</Cell>
           <Cell>
-            <span className="text-xs opacity-80">{describeFilters(report)}</span>
+            <span className="text-xs text-ink-muted">{describeFilters(report)}</span>
           </Cell>
           <Cell>{formatBytes(report.file_size_bytes)}</Cell>
           <Cell>

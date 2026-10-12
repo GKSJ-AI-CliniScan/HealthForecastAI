@@ -1,7 +1,10 @@
 import Link from 'next/link';
 
 import ForecastChart from '@/components/charts/ForecastChart';
-import { Badge, Card, Cell, Row, StatTile, Table } from '@/components/ui';
+import RiskScoreBar from '@/components/charts/RiskScoreBar';
+import { Card, Cell, MetricStrip, PageHeader, RiskBadge, Row, StatTile, Table } from '@/components/ui';
+import { SCORE_NOTES, ScoreNote, formatModelScore } from '@/components/ui/ModelDisclaimer';
+import { formatDate, roleLabel } from '@/components/ui/labels';
 import { apiFetch } from '@/lib/api';
 import { insightLinks } from '@/lib/navigation';
 import { can, getToken, requireUser } from '@/lib/session';
@@ -49,45 +52,62 @@ export default async function DashboardPage() {
       )
     : null;
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold">
-          Welcome{user.profile ? `, ${user.profile.full_name}` : ''}
-        </h1>
-        <p className="mt-1 text-sm opacity-70">
-          {user.role === 'doctor'
-            ? 'You are seeing the patients assigned to you.'
-            : 'You are seeing hospital-wide data your role permits.'}
-        </p>
-      </div>
+  const shortcuts = [
+    ...(can(user, 'patient:read_assigned') || can(user, 'patient:read_all')
+      ? [{ href: '/dashboard/patients', label: 'View patients' }]
+      : []),
+    ...(can(user, 'user:manage') ? [{ href: '/dashboard/users', label: 'Manage users' }] : []),
+    ...insightLinks(user),
+  ];
 
-      <div className="grid gap-4 sm:grid-cols-3">
+  return (
+    <div className="space-y-8">
+      <PageHeader
+        title={`Welcome${user.profile ? `, ${user.profile.full_name}` : ''}`}
+        description={
+          user.role === 'doctor'
+            ? 'You are seeing the patients assigned to you.'
+            : 'You are seeing hospital-wide data your role permits.'
+        }
+        actions={shortcuts.map((link) => (
+          <Link key={link.href} href={link.href} className="btn btn-secondary btn-sm">
+            {link.label}
+          </Link>
+        ))}
+      />
+
+      <MetricStrip label="Account summary">
         <StatTile
+          variant="plain"
           label={user.role === 'doctor' ? 'Assigned patients' : 'Patients'}
           value={patientCount ?? '-'}
         />
-        <StatTile label="Role" value={user.role} />
-        <StatTile label="Permissions" value={user.permissions.length} />
-      </div>
+        <StatTile variant="plain" label="Role" value={roleLabel(user.role)} />
+        <StatTile variant="plain" label="Permissions" value={user.permissions.length} />
+      </MetricStrip>
 
       {unreachable && (
         <Card title="Backend unavailable">
-          <p className="text-sm opacity-70">
+          <p className="text-sm text-ink-muted">
             The API did not respond. Start it with{' '}
-            <code className="rounded bg-black/10 px-1">uvicorn app.main:app --reload</code> in{' '}
-            <code className="rounded bg-black/10 px-1">backend/</code>.
+            <code className="rounded bg-ink/10 px-1 text-ink">uvicorn app.main:app --reload</code> in{' '}
+            <code className="rounded bg-ink/10 px-1 text-ink">backend/</code>.
           </p>
         </Card>
       )}
 
       {forecast && (
-        <Card title="30-day readmission forecast">
-          <div className="grid gap-4 sm:grid-cols-[auto,1fr]">
-            <div className="flex gap-4 sm:flex-col">
-              <StatTile label="Predicted readmissions" value={forecast.predicted_readmissions} />
+        <Card title="30-day readmission scores (scored patients only)">
+          <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-center">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-1 lg:border-r lg:border-rule lg:pr-6">
               <StatTile
-                label="Predicted rate"
+                variant="bare"
+                label="Scored patients at or above 0.50"
+                value={forecast.predicted_readmissions}
+              />
+              <StatTile
+                variant="bare"
+                label="Share of scored patients"
                 value={`${(forecast.predicted_rate * 100).toFixed(0)}%`}
               />
             </div>
@@ -100,78 +120,68 @@ export default async function DashboardPage() {
               }
             />
           </div>
-          <p className="mt-2 text-xs opacity-60">
-            Scope: {forecast.scope} · Horizon: {forecast.horizon_days} days
-          </p>
+          <div className="mt-5 space-y-1.5 border-t border-rule pt-4">
+            <p className="text-sm text-ink-muted">
+              Patients included: scored patients visible to your role (
+              {forecast.scope === 'doctor' ? 'your assigned patients' : 'hospital-wide'})
+            </p>
+            <p className="text-sm text-ink-muted">Horizon: {forecast.horizon_days} days</p>
+            <ScoreNote>{SCORE_NOTES.aggregateForecast}</ScoreNote>
+          </div>
         </Card>
       )}
 
       {can(user, 'risk_report:read') && (
         <Card title="High-risk patients">
+          <div className="mb-5 space-y-1">
+            <ScoreNote>{SCORE_NOTES.riskScore}</ScoreNote>
+            <ScoreNote>{SCORE_NOTES.bands}</ScoreNote>
+          </div>
           <Table
-            headers={['Patient', 'Risk', 'Probability', 'Scored']}
-            empty="No patients are currently in the high risk band."
+            headers={['Patient', 'Risk', 'Model score', 'Scored']}
+            empty="No scored patient is currently in the high band. Patients who have not been scored are not shown."
           >
             {highRiskPatients.map((prediction) => (
               <Row key={prediction.id}>
                 <Cell>
-                  <Link
-                    href={`/dashboard/patients/${prediction.patient_id}`}
-                    className="underline underline-offset-2"
-                  >
-                    #{prediction.patient_id}
+                  <Link href={`/dashboard/patients/${prediction.patient_id}`} className="link">
+                    Patient #{prediction.patient_id}
                   </Link>
                 </Cell>
                 <Cell>
-                  <Badge>{prediction.risk_category.toUpperCase()}</Badge>
+                  <RiskBadge category={prediction.risk_category} />
                 </Cell>
-                <Cell>{(prediction.readmission_probability * 100).toFixed(0)}%</Cell>
                 <Cell>
-                  {prediction.created_at ? new Date(prediction.created_at).toLocaleDateString() : '-'}
+                  <div className="flex items-center gap-3">
+                    <RiskScoreBar
+                      size="sm"
+                      probability={prediction.readmission_probability}
+                      category={prediction.risk_category}
+                    />
+                    <span className="font-semibold tabular-nums">
+                      {formatModelScore(prediction.readmission_probability)}
+                    </span>
+                  </div>
                 </Cell>
+                <Cell>{formatDate(prediction.created_at)}</Cell>
               </Row>
             ))}
           </Table>
         </Card>
       )}
 
-      <Card title="Your access">
-        <ul className="grid gap-1 text-sm sm:grid-cols-2">
+      <Card
+        title="Your access"
+        description="The actions the backend allows your role. Every request is checked again by the server."
+      >
+        <ul className="grid gap-x-8 gap-y-1.5 text-sm text-ink sm:grid-cols-2 lg:grid-cols-3">
           {user.permissions.map((permission) => (
-            <li key={permission} className="opacity-80">
+            <li key={permission} className="break-words">
               {permission}
             </li>
           ))}
         </ul>
       </Card>
-
-      <div className="flex flex-wrap gap-3 text-sm">
-        {(can(user, 'patient:read_assigned') || can(user, 'patient:read_all')) && (
-          <Link
-            href="/dashboard/patients"
-            className="rounded-md border border-[var(--border)] px-3 py-1.5"
-          >
-            View patients
-          </Link>
-        )}
-        {can(user, 'user:manage') && (
-          <Link
-            href="/dashboard/users"
-            className="rounded-md border border-[var(--border)] px-3 py-1.5"
-          >
-            Manage users
-          </Link>
-        )}
-        {insightLinks(user).map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className="rounded-md border border-[var(--border)] px-3 py-1.5"
-          >
-            {link.label}
-          </Link>
-        ))}
-      </div>
     </div>
   );
 }

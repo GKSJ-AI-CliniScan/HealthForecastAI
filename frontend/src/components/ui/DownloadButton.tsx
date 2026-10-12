@@ -65,12 +65,12 @@ export default function DownloadButton({
         type="button"
         onClick={download}
         disabled={pending}
-        className="rounded-md border border-[var(--border)] px-3 py-1 text-sm disabled:opacity-50"
+        className="btn btn-secondary btn-sm"
       >
         {pending ? 'Preparing…' : label}
       </button>
       {error && (
-        <span role="alert" className="max-w-xs text-xs text-red-500">
+        <span role="alert" className="max-w-xs text-xs font-semibold text-danger">
           {error}
         </span>
       )}

@@ -35,6 +35,17 @@ describe('LoginPage', () => {
     expect(screen.getByLabelText('Password')).toBeInTheDocument();
   });
 
+  it('shows the experimental-status notice before sign-in', () => {
+    render(<LoginPage />);
+    const note = screen.getByRole('note', { name: 'Experimental status' });
+    expect(note).toHaveTextContent('Experimental decision-support prototype.');
+    expect(note).toHaveTextContent('has not been clinically validated or approved for patient care');
+    expect(note).toHaveTextContent('must not replace clinical judgment');
+    // Above the form, so it is read before any credential is typed.
+    const form = screen.getByLabelText('Email').closest('form') as HTMLElement;
+    expect(note.compareDocumentPosition(form) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('never renders the password as readable text', () => {
     render(<LoginPage />);
     expect(screen.getByLabelText('Password')).toHaveAttribute('type', 'password');

@@ -67,8 +67,8 @@ export default async function ReportsPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold">Reports</h1>
-        <p className="mt-1 text-sm opacity-70">
+        <h1 className="text-title text-ink">Reports</h1>
+        <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
           Generate analytics reports as PDF, Excel or CSV. Reports are built from the same
           analytics shown on the dashboards.
         </p>
@@ -84,12 +84,12 @@ export default async function ReportsPage({
         actions={
           <div className="flex flex-wrap items-center gap-3">
             {can(user, 'system:configure') && <PurgeReportsButton />}
-            <form method="get" className="flex items-center gap-2 text-sm">
+            <form method="get" className="flex flex-wrap items-center gap-2 text-sm">
               <select
                 name="report_type"
                 defaultValue={typeFilter}
                 aria-label="Filter by report type"
-                className="rounded-md border border-[var(--border)] bg-[var(--surface)] px-2 py-1"
+                className="field w-auto py-1.5"
               >
                 <option value="">All types</option>
                 {REPORT_TYPES.map((option) => (
@@ -98,7 +98,7 @@ export default async function ReportsPage({
                   </option>
                 ))}
               </select>
-              <button type="submit" className="rounded-md border border-[var(--border)] px-3 py-1">
+              <button type="submit" className="btn btn-secondary btn-sm">
                 Filter
               </button>
             </form>
@@ -116,14 +116,14 @@ export default async function ReportsPage({
               />
               {pages > 1 && (
                 <nav aria-label="Report pages" className="flex items-center justify-between text-sm">
-                  <span className="opacity-70">
-                    {data.total} reports · page {page} of {pages}
+                  <span className="text-ink-muted">
+                    {data.total} reports, page {page} of {pages}
                   </span>
                   <span className="flex gap-2">
                     {page > 1 && (
                       <Link
                         href={pageHref(page - 1)}
-                        className="rounded-md border border-[var(--border)] px-3 py-1"
+                        className="btn btn-secondary btn-sm"
                       >
                         Previous
                       </Link>
@@ -131,7 +131,7 @@ export default async function ReportsPage({
                     {page < pages && (
                       <Link
                         href={pageHref(page + 1)}
-                        className="rounded-md border border-[var(--border)] px-3 py-1"
+                        className="btn btn-secondary btn-sm"
                       >
                         Next
                       </Link>

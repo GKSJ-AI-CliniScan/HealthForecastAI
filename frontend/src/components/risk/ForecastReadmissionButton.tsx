@@ -43,12 +43,12 @@ export default function ForecastReadmissionButton({
         type="button"
         onClick={forecast}
         disabled={pending}
-        className="rounded-md border border-[var(--border)] px-3 py-1.5 text-sm disabled:opacity-50"
+        className="btn btn-secondary btn-sm"
       >
         {pending ? 'Forecasting…' : 'Forecast readmission (most recent admission)'}
       </button>
       {error && (
-        <p role="alert" className="text-xs text-red-500">
+        <p role="alert" className="max-w-xs text-xs font-semibold text-danger">
           {error}
         </p>
       )}
