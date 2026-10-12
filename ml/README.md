@@ -1,55 +1,26 @@
-# HealthForecast AI - Machine Learning
+# ML Testing – HealthForecast AI (Milestone 4)
 
-Readmission risk modelling: data loading, preprocessing, feature engineering,
-training, evaluation and inference.
-
-## Layout
-
-| Path                          | Responsibility |
-|-------------------------------|----------------|
-| `configs/config.yaml`         | Single source of truth for every experiment |
-| `src/data/load_data.py`       | Raw CSV loading and target binarisation |
-| `src/data/preprocess.py`      | Cleaning and column selection |
-| `src/features/build_features.py` | The `ColumnTransformer` pickled with the model |
-| `src/models/train.py`         | Training entrypoint and model selection |
-| `src/models/predict.py`       | Batch and single-record inference |
-| `src/evaluation/metrics.py`   | Accuracy, precision, recall, F1, ROC-AUC, risk banding |
-| `notebooks/`                  | Exploration only - strip outputs before committing |
-| `data/`                       | Never committed. See `data/README.md` |
-| `artifacts/`                  | Never committed. Trained models and metrics |
-
-## Run
-
-```bash
-cd ml
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -r requirements-dev.txt
-
-# 1. download the dataset (see data/README.md)
-# 2. train
-python -m src.models.train --config configs/config.yaml
+## Setup
+1. Copy into `HealthForecastAI/ml/` (next to `src/`, `configs/`, `data/`, `artifacts/`):
+   `tests/`, `ml_adapter.py`, `risk_logic.py`, `pytest.ini`, `generate_validation_report.py`
+2. `pip install -r requirements-test.txt`
+3. Check the `>>> EDIT <<<` block in `ml_adapter.py` (paths, `TEST_SIZE`/`SPLIT_SEED` must match your training split).
+4. Run:
 ```
-
-Training writes `artifacts/readmission_model.joblib` and `artifacts/metrics.json`,
-and exits non-zero if the winning model misses the promotion thresholds in
-`configs/config.yaml`.
-
-## Checks that CI runs
-
-```bash
-ruff check .
-black --check .
-pytest
+REQUIRE_REAL=1 pytest -v -s                 # fails loudly if it can't find your real model/data
+python generate_validation_report.py        # -> validation_report/validation_report.md + plots
 ```
+The header line of the pytest output tells you REAL or DEMO mode. Demo numbers are never valid.
 
-## Rules
-
-- Change hyperparameters in `configs/config.yaml`, never inline in a script.
-- Report all five metrics. The target is imbalanced (roughly 11% positives), so
-  accuracy on its own hides a model that predicts "no readmission" every time.
-- A false negative - a high-risk patient discharged without follow-up - is the
-  expensive error here. Watch recall, not just ROC-AUC.
-- `tests/test_metrics.py` pins the risk bands to the backend. If you change a
-  threshold, change it in `configs/config.yaml`, `backend/app/core/config.py`
-  and `.env.example` together.
+## Test files
+| File | What it proves |
+|---|---|
+| test_cleaning_milestone1.py | Cleaning: no '?', dropped columns, no expired discharges, one row/patient, first encounter kept, idempotent |
+| test_data_validation.py | Dataset integrity, target labels, imbalance, missingness, train/test patient overlap |
+| test_model_performance.py | Accuracy/precision/recall/F1/ROC-AUC vs thresholds, baseline, calibration, lift, overfit gap |
+| test_risk_logic.py | 0.4/0.7 boundaries, invalid scores, recommendations, every band populated, observed risk rises Low→High |
+| test_analytics.py | Treatment/medication tables, recovery summary, dashboard KPIs, age table, CSV report |
+| test_model_robustness.py | NaNs, unseen categories, outliers, determinism, latency, save/load |
+| test_fairness_subgroups.py | AUC by gender / race / age |
+| test_scripts_smoke.py | Milestone2.py runs end-to-end (real mode) |
+| test_api_integration.py | Optional: backend endpoint (set API_URL) |
