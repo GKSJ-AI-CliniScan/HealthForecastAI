@@ -149,6 +149,7 @@ Streamlit Health Status: 200
 | **Backend Integration Test Suite** | 100% pass | **49 / 49 passed** | PASSED |
 | **ML Pipeline Test Suite** | 100% pass | **16 / 16 passed** | PASSED |
 | **Total Automated Tests** | - | **70 passed, 0 failed** | PASSED |
+| **Live Cloud Deployment URL** | Publicly accessible | [Live Streamlit App](https://healthforecastai-hdgfnubyoxrknipcjdaok8.streamlit.app/) | PASSED |
 
 ---
 
