@@ -105,7 +105,7 @@ def recovery_index(
 def _matches_diagnosis(patterns: tuple[str, ...]) -> Any:
     """SQL predicate: primary_diagnosis matches any pattern, case-insensitively."""
     diagnosis = func.lower(func.coalesce(Patient.primary_diagnosis, ""))
-    return or_(diagnosis.ilike(f"%{pattern}%") for pattern in patterns)
+    return or_(*(diagnosis.ilike(f"%{pattern}%") for pattern in patterns))
 
 
 def _cohort_case() -> Any:

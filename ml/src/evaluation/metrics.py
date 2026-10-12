@@ -59,7 +59,7 @@ def meets_promotion_thresholds(metrics: dict[str, float], thresholds: dict[str, 
     )
 
 
-def categorise_risk(probability: float, high: float = 0.70, medium: float = 0.40) -> str:
+def categorise_risk(probability: float, high: float = 0.20, medium: float = 0.12) -> str:
     """Map a probability onto the platform risk bands.
 
     Must stay in sync with backend/app/services/risk_service.py.

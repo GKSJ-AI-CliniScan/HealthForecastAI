@@ -11,6 +11,9 @@ from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.logging_config import logger
 
+if not settings.SECRET_KEY:
+    raise RuntimeError("SECRET_KEY must be configured before starting the API")
+
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
@@ -36,17 +39,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3001",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000",
-    ],
-    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -56,7 +49,7 @@ app.add_middleware(
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Ensure any uncaught server exceptions still include valid CORS response headers."""
-    logger.error("Unhandled server exception on %s: %s", request.url.path, str(exc))
+    logger.exception("Unhandled server exception on %s", request.url.path)
     return JSONResponse(
         status_code=500,
         content={"detail": "An internal server error occurred. Check backend server logs."},

@@ -1,5 +1,10 @@
+// Mirrors src/services/api.js: a clean-clone build has no .env files, and a
+// localhost default makes the deployed app call the visitor's own machine.
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000/api/v1';
+  import.meta.env.VITE_API_BASE_URL ??
+  (import.meta.env.PROD
+    ? 'https://healthfor-ai.onrender.com/api/v1'
+    : 'http://localhost:8000/api/v1');
 
 export class ApiError extends Error {
   readonly status: number;
@@ -13,12 +18,15 @@ export class ApiError extends Error {
 
 /**
  * Thin fetch wrapper for the FastAPI backend.
- * Never store the access token in localStorage - use an httpOnly cookie.
+ *
+ * The caller passes the token explicitly rather than this module reading it
+ * from storage, so there is exactly one place that decides what a request is
+ * authorised as - see src/lib/auth.tsx.
  */
 export async function apiFetch<T>(
   path: string,
   options: RequestInit = {},
-  token?: string,
+  token?: string | null,
 ): Promise<T> {
   const headers = new Headers(options.headers);
   headers.set('Content-Type', 'application/json');
@@ -26,11 +34,32 @@ export async function apiFetch<T>(
     headers.set('Authorization', `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
-
-  if (!response.ok) {
-    throw new ApiError(response.status, `Request to ${path} failed`);
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, { ...options, headers });
+  } catch {
+    throw new ApiError(0, 'Cannot reach the API. Is the backend running?');
   }
 
-  return (await response.json()) as T;
+  if (!response.ok) {
+    let detail = `Request failed (${response.status})`;
+    try {
+      const body = await response.json();
+      if (typeof body?.detail === 'string') detail = body.detail;
+    } catch {
+      /* the error body was not JSON - keep the generic message */
+    }
+    throw new ApiError(response.status, detail);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  const body = await response.json();
+  return (body && body.success === true && 'data' in body ? body.data : body) as T;
+}
+
+export function apiPost<T>(path: string, body: unknown, token?: string | null): Promise<T> {
+  return apiFetch<T>(path, { method: 'POST', body: JSON.stringify(body) }, token);
 }

@@ -1,7 +1,7 @@
 # 📋 Milestone 1: Tasks & Completion Checklist
-**Project:** HealthForecast AI — Hospital Readmission Prediction & Patient Risk Intelligence System
-**Stack:** MERN (MongoDB, Express.js, React 19, Node.js)
-**Milestone Focus:** Week 1 & 2 — Project Initialization, MERN Stack Setup, MVC Backend, Database Models & RBAC
+**Project:** HealthForecast AI — Hospital Readmission Prediction & Patient Risk Intelligence System  
+**Stack:** MERN (MongoDB, Express.js, React 19, Node.js)  
+**Milestone Focus:** Week 1 & 2 — Project Initialization, MERN Stack Setup, MVC Backend, Database Models & RBAC  
 
 ---
 

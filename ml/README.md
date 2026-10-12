@@ -1,3 +1,6 @@
+| `src/data/mappings.py`        | ICD-9 grouping and the dataset id lookups |
+| `src/data/etl.py`             | Loads the cleaned dataset into PostgreSQL |
+| `src/models/train.py`         | Training entrypoint and model selection |
 # HealthForecast AI - Machine Learning
 
 Readmission risk modelling: data loading, preprocessing, feature engineering,
@@ -26,9 +29,21 @@ python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements-dev.txt
 
-# 1. download the dataset (see data/README.md)
-# 2. train
+# 1. download the dataset
+curl -L -o data/raw/diabetic_data.csv https://archive.ics.uci.edu/static/public/296/data.csv
+
+# 2. load it into PostgreSQL (Milestone 1)
+python -m src.data.etl --truncate
+
+# 3. train (Milestone 2)
 python -m src.models.train --config configs/config.yaml
+```
+
+The ETL prints a report of what it did:
+
+```json
+{"raw_rows": 101766, "after_cleaning": {"rows": 69990, "positive_rate": 0.0898},
+ "patients_written": 69990, "admissions_written": 69990}
 ```
 
 Training writes `artifacts/readmission_model.joblib` and `artifacts/metrics.json`,

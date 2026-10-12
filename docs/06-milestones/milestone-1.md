@@ -1,8 +1,7 @@
-# Milestone 1 report - Week 1 & 2 - Project Initialization, Design Process & Core Setup
+# Milestone 1 report - Week 1 & 2
 
-- **Intern name:** Deepak Rajak
-- **Branch:** `intern/deepak-rajak`
-- **Submitted on:** 28 August 2026
+- **Branch:** `main` (reference implementation)
+- **Submitted on:** 2026-09-05
 
 ---
 
@@ -29,250 +28,224 @@
 
 ## What I built
 
-My contribution to Milestone 1 focused on the **AI/ML dataset integration and preprocessing pipeline**.
+### Authentication
 
-### Dataset integration
+`POST /api/v1/auth/login` verifies a bcrypt hash and returns a signed JWT with
+the caller's role and effective permission list. Supporting endpoints: `/auth/me`,
+`/auth/permissions` (drives the frontend navigation) and `/auth/roles`.
 
-- Integrated the Diabetes 130-US Hospitals dataset into the ML project.
-- Implemented dataset loading in `ml/src/data/load_data.py`.
-- Configured the dataset path and target information in `ml/configs/config.yaml`.
-- Verified that the raw dataset contains **101,766 records and 50 columns**.
-- Verified the `readmitted` target distribution:
-  - `NO`: 54,864
-  - `>30`: 35,545
-  - `<30`: 11,357
-- Used `<30` as the positive label for the project's 30-day readmission target.
-- Treated `>30` and `NO` as negative outcomes for the 30-day readmission target.
+Three decisions worth calling out:
 
-### Data preprocessing
+- **The unknown-email path runs a hash comparison anyway**
+  ([`auth_service.authenticate`](../../backend/app/services/auth_service.py)), so
+  response timing does not reveal whether an account exists. The error message is
+  byte-identical to the wrong-password one.
+- **The user row is re-loaded on every request** rather than trusting the role
+  claim in the token. Deactivating an account revokes live sessions immediately
+  instead of at token expiry.
+- **Every login attempt is audited**, success and failure both.
 
-Implemented the shared preprocessing pipeline in:
+### Role-based access control
 
-`ml/src/data/preprocess.py`
+The access matrix from section 4 of the brief is encoded in
+[`app/core/rbac.py`](../../backend/app/core/rbac.py) as `Role`, `Permission` and a
+`PERMISSIONS` mapping. Endpoints declare their requirement with
+`require_permission(...)`; no endpoint reaches a service without one.
 
-The preprocessing workflow includes:
+Live verification of all four roles against every endpoint:
 
-- Handling missing values represented by `?`.
-- Removing configured identifier and high-missingness columns.
-- Removing encounters where a normal future readmission is not possible.
-- Cleaning the diagnosis columns:
-  - `diag_1`
-  - `diag_2`
-  - `diag_3`
-- Removing duplicate records.
-- Preserving the `readmitted` target column for downstream machine learning.
+| Endpoint | Doctor | Hosp. Admin | Researcher | Sys. Admin | No token |
+|---|---|---|---|---|---|
+| `GET /patients` | 200 | 200 | **403** | 200 | 401 |
+| `GET /patients/anonymised` | **403** | **403** | 200 | 200 | 401 |
+| `GET /users` | **403** | **403** | **403** | 200 | 401 |
+| `GET /analytics/summary` | **403** | 200 | 200 | 200 | 401 |
+| `GET /analytics/population-health` | **403** | **403** | 200 | 200 | 401 |
+| `GET /models` | **403** | **403** | **403** | 200 | 401 |
 
-The preprocessing configuration is maintained in:
+### Patient management
 
-`ml/configs/config.yaml`
+Scoping is applied **in the query**, not by filtering results
+([`patient_service.scoped_query`](../../backend/app/services/patient_service.py)):
+a row the caller may not see is never loaded.
 
-The preprocessing pipeline was verified to reduce the dataset from:
+- Doctor → only `assigned_doctor_id = <caller>`
+- Hospital Administrator → hospital wide, read only (no `patient:write`)
+- Researcher → `/patients/anonymised` only, MRN replaced by a salted SHA-256
+  pseudonym that is stable across queries
+- System Administrator → everything
 
-- **101,766 rows × 50 columns**
-- to **99,343 rows × 45 columns**
+A patient outside the caller's caseload returns **404, not 403**. Returning 403
+would confirm the record exists, which is itself a disclosure.
 
-with:
+### Healthcare dashboard
 
-- **0 duplicate records**
-- `readmitted` target preserved.
+Five screens in Next.js 15 (App Router, Tailwind, Recharts): login, dashboard,
+patients + patient detail, analytics, research cohort, user management.
+Navigation is built from the caller's permission list, and the API authorises
+independently — hiding a nav item is convenience, never the boundary.
 
-### Feature engineering structure
+### Dataset integration and preprocessing
 
-Initial feature engineering was prepared in:
+[`ml/src/data/etl.py`](../../ml/src/data/etl.py) loads the raw CSV, runs the
+cleaning pipeline, writes a processed parquet file, and bulk-inserts patients and
+admissions into PostgreSQL.
 
-`ml/src/features/build_features.py`
+Two cleaning decisions change the numbers materially, and both are tested:
 
-A prior-utilisation feature named `prior_visits_total` was added using:
-
-- `number_outpatient`
-- `number_emergency`
-- `number_inpatient`
-
-This provides the initial feature-engineering structure for future readmission-risk modelling.
-
-### ML project structure
-
-The AI/ML work is organized under the separate `ml/` directory so that ML development can proceed independently without interfering with the frontend and backend workstreams.
-
-The ML structure includes:
-
-```text
-ml/
-├── artifacts/
-├── configs/
-│   └── config.yaml
-├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── external/
-├── notebooks/
-├── src/
-│   ├── data/
-│   │   ├── load_data.py
-│   │   └── preprocess.py
-│   ├── evaluation/
-│   │   └── metrics.py
-│   ├── features/
-│   │   └── build_features.py
-│   ├── models/
-│   │   ├── predict.py
-│   │   └── train.py
-│   └── utils/
-└── tests/
-```
-
----
-
+1. **Encounters that cannot be readmitted are removed** — discharge dispositions
+   11, 13, 14, 19, 20, 21 mean the patient died or entered hospice. Keeping them
+   teaches the model "disposition 11 implies no readmission": true, and useless.
+2. **Only the first encounter per patient is kept** — repeat encounters are not
+   independent observations, and leaving them in lets information about one
+   patient land in both the training and the test split.
 
 ## How to run it
 
-Run the following commands from the `ml/` directory.
-
-### Prerequisite: Dataset
-
-The raw Diabetes 130-US Hospitals dataset is not committed to the repository.
-Download the dataset and place `diabetic_data.csv` in:
-
-`ml/data/raw/diabetic_data.csv`
-
-Download instructions are available in `ml/data/README.md`.
-
-After placing the dataset in the required location, run the commands below.
-
-
-### 1. Dataset loading
-
-This command loads the Diabetes 130-US Hospitals dataset and verifies the
-number of records, columns, and target distribution.
+From a clean clone:
 
 ```bash
-python -c "from src.data.load_data import load_raw; df=load_raw('data/raw/diabetic_data.csv'); print('Dataset loaded successfully'); print('Rows:', len(df)); print('Columns:', len(df.columns)); print('Target:', df['readmitted'].value_counts().to_dict())"
+git clone https://github.com/GKSJ-AI-CliniScan/HealthForecastAI.git
+cd HealthForecastAI
+cp .env.example .env
+python -c "import secrets; print(secrets.token_urlsafe(48))"   # paste into SECRET_KEY
 ```
-
-Expected output:
-
-```text
-Dataset loaded successfully
-Rows: 101766
-Columns: 50
-Target: {'NO': 54864, '>30': 35545, '<30': 11357}
-```
-
-### 2. Data preprocessing
-
-This command applies the preprocessing pipeline and verifies the resulting
-dataset shape, duplicate records, and target column.
 
 ```bash
-python -c "from src.data.load_data import load_raw; from src.data.preprocess import basic_clean; from src.utils.config import load_config; df=load_raw('data/raw/diabetic_data.csv'); clean=basic_clean(df, load_config('configs/config.yaml')); print('Original:', df.shape); print('After preprocessing:', clean.shape); print('Duplicates:', clean.duplicated().sum()); print('Target present:', 'readmitted' in clean.columns)"
+docker compose up -d postgres mongodb
 ```
 
-Expected output:
-
-```text
-Original: (101766, 50)
-After preprocessing: (99343, 45)
-Duplicates: 0
-Target present: True
+```bash
+curl -L -o ml/data/raw/diabetic_data.csv https://archive.ics.uci.edu/static/public/296/data.csv
 ```
+
+```bash
+cd backend && pip install -r requirements-dev.txt && SEED_PASSWORD='Demo#Passw0rd' python -m app.db.init_db
+```
+
+```bash
+cd ml && pip install -r requirements-dev.txt && python -m src.data.etl --truncate
+```
+
+```bash
+cd backend && uvicorn app.main:app --reload
+```
+
+```bash
+cd frontend && npm ci && npm run dev
+```
+
+Open <http://localhost:3000> and sign in as any seeded account
+(`dr.reddy@`, `admin.ops@`, `researcher@`, `admin@` — all `@healthforecast.org`).
+
 ## Evidence
 
-The following screenshots provide evidence that the dataset loading and preprocessing
-pipeline were executed successfully.
+### ETL run against the full dataset
 
-### 1. Dataset loading evidence
+```json
+{
+  "raw_rows": 101766,
+  "raw_columns": 50,
+  "after_cleaning": {
+    "rows": 69990,
+    "columns": 60,
+    "positives": 6285,
+    "positive_rate": 0.0898
+  },
+  "patients_written": 69990,
+  "admissions_written": 69990,
+  "patients_assigned_to_doctors": 69990
+}
+```
 
-The dataset loading command was executed successfully from the `ml/` directory.
+### Readmission rate by age band, straight from PostgreSQL
 
-The terminal output verifies:
+```
+ age_group | admissions | readmitted_30d |  pct
+-----------+------------+----------------+-------
+ 0-10      |        153 |              3 |  1.96
+ 10-20     |        534 |             26 |  4.87
+ 20-30     |       1121 |             83 |  7.40
+ 30-40     |       2692 |            188 |  6.98
+ 40-50     |       6828 |            506 |  7.41
+ 50-60     |      12351 |            880 |  7.12
+ 60-70     |      15689 |           1415 |  9.02
+ 70-80     |      17751 |           1817 | 10.24
+ 80-90     |      11110 |           1199 | 10.79
+ 90-100    |       1761 |            168 |  9.54
+```
 
-- Dataset loaded successfully.
-- **101,766 rows** were loaded.
-- **50 columns** were detected.
-- The `readmitted` target distribution was verified:
-  - `NO`: 54,864
-  - `>30`: 35,545
-  - `<30`: 11,357
+Readmission risk rises steadily with age — the clearest single signal in this
+dataset, and a sanity check that the pipeline is not scrambling rows.
 
-![Dataset loading evidence](../05-wireframes/milestone-1-dataset-loading.png)
+### Scoping proven live
 
-### 2. Data preprocessing evidence
+```
+doctor dashboard   {"scope":"caseload","total_patients":34995,"readmission_rate":0.0896,...}
+admin  dashboard   {"scope":"hospital","total_patients":69990,"readmission_rate":0.0898,...}
 
-The preprocessing command was executed successfully using the implemented
-`basic_clean()` pipeline and `config.yaml`.
+patient 1 as owning doctor  -> HTTP 200
+patient 1 as other doctor   -> HTTP 404
+```
 
-The terminal output verifies:
+### Researcher sees pseudonyms only
 
-- Original dataset: **101,766 rows × 50 columns**
-- After preprocessing: **99,343 rows × 45 columns**
-- Duplicate records: **0**
-- `readmitted` target column is preserved.
+```json
+{"items":[{"pseudo_id":"PT-0066DDF28ED99D50","age_group":"50-60",
+           "gender":"Female","primary_diagnosis":"Circulatory"}],"total":69990}
+```
 
-![Data preprocessing evidence](../05-wireframes/milestone-1-preprocessing.png)
+No `medical_record_number`, no `assigned_doctor_id`, no `id`.
 
-### 3. Implementation evidence
+### Test suites
 
-The following project files contain the implementation used for the above results:
-
-- `ml/src/data/load_data.py` — dataset loading functionality.
-- `ml/src/data/preprocess.py` — data preprocessing pipeline.
-- `ml/src/features/build_features.py` — initial feature engineering.
-- `ml/configs/config.yaml` — dataset and preprocessing configuration.
-
-The screenshots contain terminal output and dataset statistics only; no
-real patient-identifiable information is included.
+```
+backend:  83 passed          84% statement coverage
+ml:       41 passed
+frontend: eslint clean, 9 routes build, tsc --noEmit clean
+```
 
 ## Metrics
 
-The following metrics were verified during Milestone 1:
+| Metric | Value |
+|--------|-------|
+| API operations | 33 total: **23 implemented** for this milestone, 10 authorised placeholders for Milestones 2-4 |
+| Database tables | 6, plus `alembic_version` |
+| Raw dataset rows | 101,766 encounters, 50 columns |
+| Rows after cleaning | 69,990 (‑2,904 non-readmittable, ‑28,872 repeat patients) |
+| 30-day readmission rate | 8.98% (6,285 positives) |
+| Average length of stay | 4.27 days |
+| Backend tests / coverage | 83 tests, 84% |
+| ML tests | 41 tests |
+| Frontend routes | 9 |
 
-| Metric | Result |
-|---|---:|
-| Raw dataset records | 101,766 |
-| Raw dataset columns | 50 |
-| Records after preprocessing | 99,343 |
-| Columns after preprocessing | 45 |
-| Duplicate records after preprocessing | 0 |
-| Target column preserved | Yes |
-| Target classes | 3 |
-| Positive class (`<30`) | 11,357 |
-| Negative class (`>30` + `NO`) | 90,409 |
-
-### Dataset target distribution
-
-- `NO`: 54,864
-- `>30`: 35,545
-- `<30`: 11,357
-
-For the 30-day readmission objective, `<30` is treated as the positive class,
-while `>30` and `NO` are treated as negative outcomes.
-
-### Preprocessing result
-
-The preprocessing pipeline reduced the dataset from **101,766 × 50** to
-**99,343 × 45** while preserving the `readmitted` target column and producing
-**0 duplicate records**.
-
-### ML implementation
-
-- Dataset loading module implemented: `ml/src/data/load_data.py`
-- Preprocessing module implemented: `ml/src/data/preprocess.py`
-- Feature engineering module prepared: `ml/src/features/build_features.py`
-- Configuration maintained in: `ml/configs/config.yaml`
+No model has been trained yet, so there are no accuracy, precision, recall, F1 or
+ROC-AUC figures to report. Those are the Milestone 2 deliverable.
 
 ## Known gaps
 
-The following items are not part of the completed ML contribution in Milestone 1
-and will be addressed in later milestones:
+**Carried into later milestones by design**
 
-- Model training and final model selection are not included in this milestone.
-- Model performance optimization and hyperparameter tuning will be performed
-  in a later milestone.
-- The current feature engineering contains the initial `prior_visits_total`
-  feature; additional clinically relevant features will be explored later.
-- The preprocessing pipeline is prepared for downstream machine learning, but
-  the complete prediction workflow will be developed in the next stages.
-- Frontend/backend integration of the ML pipeline is not yet completed.
-- The current milestone focuses on reliable dataset loading, preprocessing,
-  configuration, and initial feature engineering rather than production
-  deployment.
+- Risk prediction, readmission forecasting, treatment effectiveness and clinical
+  decision support endpoints are authorised and routed but return placeholder
+  data. Tagged `TODO(milestone-2)` / `TODO(milestone-3)`.
+- MongoDB is running and its collections documented, but nothing writes to it
+  yet — it holds model runs and prediction events from Milestone 2.
+
+**Real gaps that should be fixed**
+
+- **Token storage.** The frontend keeps the JWT in `sessionStorage`, which is
+  readable by any script on the page, so an XSS bug would expose it. An httpOnly
+  cookie set by the backend is the correct answer and needs CSRF handling.
+  Milestone 4 hardening.
+- **No refresh token.** Access tokens last 30 minutes and the user is then
+  silently logged out on the next request.
+- **Doctor assignment is round-robin.** `assign_patients_to_doctors` in the ETL
+  splits patients evenly so the caseload scope can be demonstrated. Real
+  assignment would come from the hospital's own system.
+- **No rate limiting on `/auth/login`.** Timing and message are constant, but
+  nothing stops repeated attempts.
+- **The ETL is not incremental.** `--truncate` reloads everything; there is no
+  change-data-capture path.
+- **Test coverage is uneven.** 84% overall, but `app/db/` and
+  `app/repositories/` are largely uncovered because nothing calls them yet.

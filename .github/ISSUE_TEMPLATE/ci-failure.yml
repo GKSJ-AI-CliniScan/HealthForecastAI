@@ -33,7 +33,7 @@ body:
       options:
         - Repository checks
         - Backend (FastAPI)
-        - Frontend (Next.js)
+        - Frontend (Vite React)
         - ML pipeline
         - Docker build
         - Branch guard

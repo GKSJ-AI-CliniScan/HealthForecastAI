@@ -1,0 +1,149 @@
+{
+  "model_name": "xgboost_early_readmission",
+  "model_version": "v1",
+  "best_model": "xgboost",
+  "promoted": false,
+  "validation_results": {
+    "xgboost": {
+      "accuracy": 0.7132605619567415,
+      "precision": 0.18851878100637845,
+      "recall": 0.49304911955514363,
+      "f1": 0.2727505767751858,
+      "roc_auc": 0.6628801168284114,
+      "true_negative": 6525,
+      "false_positive": 2290,
+      "false_negative": 547,
+      "true_positive": 532
+    }
+  },
+  "test_results": {
+    "accuracy": 0.7030840556339447,
+    "precision": 0.17916093535075653,
+    "recall": 0.4824074074074074,
+    "f1": 0.261283851554664,
+    "roc_auc": 0.6537370567242202,
+    "true_negative": 6455,
+    "false_positive": 2387,
+    "false_negative": 559,
+    "true_positive": 521
+  },
+  "decision_threshold": 0.3,
+  "risk_bands": {
+    "medium": 0.4,
+    "high": 0.7
+  },
+  "risk_band_distribution": {
+    "low": 8906,
+    "medium": 994,
+    "high": 22
+  },
+  "scale_pos_weight": 3.0,
+  "natural_class_ratio": 7.686728563626434,
+  "feature_count": 41,
+  "processed_feature_count": 182,
+  "feature_columns": [
+    "race",
+    "gender",
+    "age",
+    "admission_type_id",
+    "admission_source_id",
+    "medical_specialty",
+    "num_lab_procedures",
+    "num_procedures",
+    "num_medications",
+    "number_outpatient",
+    "number_emergency",
+    "number_inpatient",
+    "diag_1",
+    "diag_2",
+    "diag_3",
+    "number_diagnoses",
+    "max_glu_serum",
+    "A1Cresult",
+    "metformin",
+    "repaglinide",
+    "nateglinide",
+    "chlorpropamide",
+    "glimepiride",
+    "acetohexamide",
+    "glipizide",
+    "glyburide",
+    "tolbutamide",
+    "pioglitazone",
+    "rosiglitazone",
+    "acarbose",
+    "miglitol",
+    "troglitazone",
+    "tolazamide",
+    "insulin",
+    "glyburide-metformin",
+    "glipizide-metformin",
+    "glimepiride-pioglitazone",
+    "metformin-rosiglitazone",
+    "metformin-pioglitazone",
+    "change",
+    "diabetesMed"
+  ],
+  "removed_constant_columns": [
+    "examide",
+    "citoglipton"
+  ],
+  "removed_high_missing_columns": [
+    "weight",
+    "payer_code"
+  ],
+  "removed_leakage_features": [
+    "discharge_disposition_id",
+    "time_in_hospital"
+  ],
+  "non_readmittable_dispositions": [
+    11,
+    13,
+    14,
+    19,
+    20,
+    21
+  ],
+  "top_drivers": [
+    {
+      "feature": "numeric__number_inpatient",
+      "importance": 0.05192984268069267
+    },
+    {
+      "feature": "categorical__diag_1_434",
+      "importance": 0.01325486321002245
+    },
+    {
+      "feature": "categorical__diag_1_786",
+      "importance": 0.011492219753563404
+    },
+    {
+      "feature": "categorical__diag_3_250",
+      "importance": 0.010995703749358654
+    },
+    {
+      "feature": "numeric__number_emergency",
+      "importance": 0.010806076228618622
+    },
+    {
+      "feature": "categorical__diag_1_820",
+      "importance": 0.009273872710764408
+    },
+    {
+      "feature": "categorical__diag_3_250.6",
+      "importance": 0.008970964699983597
+    },
+    {
+      "feature": "categorical__medical_specialty_Cardiology",
+      "importance": 0.008544758893549442
+    },
+    {
+      "feature": "categorical__nateglinide_infrequent_sklearn",
+      "importance": 0.00846213661134243
+    },
+    {
+      "feature": "categorical__diag_1_250.6",
+      "importance": 0.008329114876687527
+    }
+  ]
+}
