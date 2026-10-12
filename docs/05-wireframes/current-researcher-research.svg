@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1200" width="1440" height="1200" role="img" aria-labelledby="t d" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <title id="t">Researcher: research analytics (current state)</title>
+  <desc id="d">Cohort filters, anonymised statistics, export and anonymised cohort table with privacy scope messaging. Retrospective current-state wireframe, drawn after implementation. Not an original Milestone 1 design. Placeholder text only.</desc>
+  <rect width="1440" height="1200" fill="#EEF2F4"/>
+  <rect x="0" y="0" width="272" height="1200" rx="0" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <rect x="20" y="20" width="32" height="32" rx="8.64" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1" />
+  <path d="M28.666666666666664 28.666666666666664v14.666666666666666M42.0 28.666666666666664v14.666666666666666" stroke="#fff" stroke-width="4.0" stroke-linecap="round" fill="none"/>
+  <path d="M28.666666666666664 40.266666666666666L45.599999999999994 31.466666666666665" stroke="#fff" stroke-width="3.466666666666667" stroke-linecap="round" fill="none"/>
+  <circle cx="45.86666666666666" cy="31.333333333333332" r="2.8666666666666663" fill="#fff" stroke="#fff" stroke-width="0"/>
+  <text x="62" y="42" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">HealthForecast AI</text>
+  <text x="24" y="100" font-size="13" font-weight="600" fill="#5B6B7D" text-anchor="start">Records</text>
+  <rect x="12" y="112" width="248" height="40" rx="8" fill="#FFFFFF" stroke="none" stroke-width="1" />
+  <rect x="30" y="123" width="18" height="18" rx="4" fill="none" stroke="#5B6B7D" stroke-width="1.6" />
+  <text x="60" y="137" font-size="15" font-weight="400" fill="#16283B" text-anchor="start">Overview</text>
+  <rect x="12" y="156" width="248" height="40" rx="8" fill="#FFFFFF" stroke="none" stroke-width="1" />
+  <rect x="30" y="167" width="18" height="18" rx="4" fill="none" stroke="#5B6B7D" stroke-width="1.6" />
+  <text x="60" y="181" font-size="15" font-weight="400" fill="#16283B" text-anchor="start">Patients</text>
+  <text x="24" y="226" font-size="13" font-weight="600" fill="#5B6B7D" text-anchor="start">Insights</text>
+  <rect x="12" y="238" width="248" height="40" rx="8" fill="#FFFFFF" stroke="none" stroke-width="1" />
+  <rect x="30" y="249" width="18" height="18" rx="4" fill="none" stroke="#5B6B7D" stroke-width="1.6" />
+  <text x="60" y="263" font-size="15" font-weight="400" fill="#16283B" text-anchor="start">Analytics</text>
+  <rect x="12" y="282" width="248" height="40" rx="8" fill="#FFFFFF" stroke="none" stroke-width="1" />
+  <rect x="30" y="293" width="18" height="18" rx="4" fill="none" stroke="#5B6B7D" stroke-width="1.6" />
+  <text x="60" y="307" font-size="15" font-weight="400" fill="#16283B" text-anchor="start">Treatment</text>
+  <rect x="12" y="326" width="248" height="40" rx="8" fill="#E7EDF8" stroke="none" stroke-width="1" />
+  <rect x="12" y="334" width="3" height="24" rx="1.5" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1" />
+  <rect x="30" y="337" width="18" height="18" rx="4" fill="none" stroke="#2B4C8C" stroke-width="1.6" />
+  <text x="60" y="351" font-size="15" font-weight="600" fill="#2B4C8C" text-anchor="start">Research</text>
+  <rect x="12" y="370" width="248" height="40" rx="8" fill="#FFFFFF" stroke="none" stroke-width="1" />
+  <rect x="30" y="381" width="18" height="18" rx="4" fill="none" stroke="#5B6B7D" stroke-width="1.6" />
+  <text x="60" y="395" font-size="15" font-weight="400" fill="#16283B" text-anchor="start">Reports</text>
+  <line x1="0" y1="1060" x2="272" y2="1060" stroke="#C9D3DC" stroke-width="1"/>
+  <circle cx="38" cy="1100" r="18" fill="#E7EDF8" stroke="#E7EDF8" stroke-width="1"/>
+  <text x="38" y="1105" font-size="12" font-weight="700" fill="#2B4C8C" text-anchor="middle">AB</text>
+  <text x="64" y="1095" font-size="14" font-weight="600" fill="#16283B" text-anchor="start">Signed-in user (name)</text>
+  <text x="64" y="1114" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Healthcare Researcher</text>
+  <rect x="16" y="1140" width="118" height="36" rx="8" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="75" y="1163" font-size="13" font-weight="600" fill="#16283B" text-anchor="middle">Dark mode</text>
+  <rect x="142" y="1140" width="114" height="36" rx="8" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="199" y="1163" font-size="13" font-weight="600" fill="#16283B" text-anchor="middle">Sign out</text>
+  <rect x="312" y="32" width="1088" height="56" rx="12" fill="#E7EDF8" stroke="#9DB0D6" stroke-width="1" />
+  <text x="328" y="56" font-size="14" font-weight="700" fill="#16283B" text-anchor="start">Experimental decision-support prototype.</text>
+  <text x="328" y="76" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Not clinically validated or approved for patient care; scores are estimates and must not replace clinical judgment.</text>
+  <text x="312" y="140" font-size="30" font-weight="700" fill="#16283B" text-anchor="start">Research analytics</text>
+  <text x="312" y="166" font-size="14" font-weight="400" fill="#5B6B7D" text-anchor="start">Anonymised cohort statistics. No patient identifiers are shown or exported.</text>
+  <rect x="312" y="190" width="1088" height="150" rx="10" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="332" y="222" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">Cohort filters</text>
+  <text x="332" y="240" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Diagnosis</text>
+  <rect x="332" y="250" width="170" height="30" rx="6" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="522" y="240" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Gender</text>
+  <rect x="522" y="250" width="170" height="30" rx="6" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="712" y="240" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Age band</text>
+  <rect x="712" y="250" width="170" height="30" rx="6" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="902" y="240" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">From</text>
+  <rect x="902" y="250" width="170" height="30" rx="6" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="1092" y="240" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">To</text>
+  <rect x="1092" y="250" width="170" height="30" rx="6" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <rect x="332" y="296" width="90" height="30" rx="6" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1" />
+  <text x="377" y="316" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">Apply</text>
+  <rect x="312" y="360" width="1088" height="280" rx="10" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="332" y="392" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">Cohort statistics</text>
+  <text x="332.0" y="420" font-size="14" font-weight="700" fill="#16283B" text-anchor="start">Age band</text>
+  <line x1="332.0" y1="580" x2="651.3333333333333" y2="580" stroke="#5B6B7D" stroke-width="1"/>
+  <rect x="344.7733333333333" y="531.0" width="38.31999999999999" height="49.0" rx="2" fill="#4A52A6" stroke="#4A52A6" stroke-width="1" />
+  <rect x="408.64" y="468.0" width="38.31999999999999" height="112.0" rx="2" fill="#4A52A6" stroke="#4A52A6" stroke-width="1" />
+  <rect x="472.50666666666666" y="503.0" width="38.31999999999999" height="77.0" rx="2" fill="#4A52A6" stroke="#4A52A6" stroke-width="1" />
+  <rect x="536.3733333333332" y="454.0" width="38.31999999999999" height="126.0" rx="2" fill="#4A52A6" stroke="#4A52A6" stroke-width="1" />
+  <rect x="600.24" y="517.0" width="38.31999999999999" height="63.0" rx="2" fill="#4A52A6" stroke="#4A52A6" stroke-width="1" />
+  <text x="681.3333333333333" y="420" font-size="14" font-weight="700" fill="#16283B" text-anchor="start">Gender</text>
+  <line x1="681.3333333333333" y1="580" x2="1000.6666666666665" y2="580" stroke="#5B6B7D" stroke-width="1"/>
+  <rect x="694.1066666666666" y="531.0" width="38.31999999999999" height="49.0" rx="2" fill="#4A52A6" stroke="#4A52A6" stroke-width="1" />
+  <rect x="757.9733333333332" y="468.0" width="38.31999999999999" height="112.0" rx="2" fill="#4A52A6" stroke="#4A52A6" stroke-width="1" />
+  <rect x="821.8399999999999" y="503.0" width="38.31999999999999" height="77.0" rx="2" fill="#4A52A6" stroke="#4A52A6" stroke-width="1" />
+  <rect x="885.7066666666665" y="454.0" width="38.31999999999999" height="126.0" rx="2" fill="#4A52A6" stroke="#4A52A6" stroke-width="1" />
+  <rect x="949.5733333333333" y="517.0" width="38.31999999999999" height="63.0" rx="2" fill="#4A52A6" stroke="#4A52A6" stroke-width="1" />
+  <text x="1030.6666666666665" y="420" font-size="14" font-weight="700" fill="#16283B" text-anchor="start">Diagnosis</text>
+  <line x1="1030.6666666666665" y1="580" x2="1349.9999999999998" y2="580" stroke="#5B6B7D" stroke-width="1"/>
+  <rect x="1043.4399999999998" y="531.0" width="38.31999999999999" height="49.0" rx="2" fill="#4A52A6" stroke="#4A52A6" stroke-width="1" />
+  <rect x="1107.3066666666664" y="468.0" width="38.31999999999999" height="112.0" rx="2" fill="#4A52A6" stroke="#4A52A6" stroke-width="1" />
+  <rect x="1171.1733333333332" y="503.0" width="38.31999999999999" height="77.0" rx="2" fill="#4A52A6" stroke="#4A52A6" stroke-width="1" />
+  <rect x="1235.0399999999997" y="454.0" width="38.31999999999999" height="126.0" rx="2" fill="#4A52A6" stroke="#4A52A6" stroke-width="1" />
+  <rect x="1298.9066666666665" y="517.0" width="38.31999999999999" height="63.0" rx="2" fill="#4A52A6" stroke="#4A52A6" stroke-width="1" />
+  <text x="332" y="624" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">Cohorts smaller than the minimum size are refused to prevent re-identification.</text>
+  <rect x="312" y="660" width="1088" height="90" rx="10" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="332" y="692" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">Export anonymised dataset</text>
+  <rect x="1210" y="690" width="170" height="36" rx="8" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1" />
+  <text x="1295" y="713" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">Download CSV</text>
+  <rect x="312" y="770" width="1088" height="360" rx="10" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="332" y="802" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">Anonymised cohort</text>
+  <line x1="332" y1="840" x2="1380" y2="840" stroke="#5B6B7D" stroke-width="1"/>
+  <text x="344.0" y="830" font-size="13" font-weight="700" fill="#5B6B7D" text-anchor="start">Pseudonymous id</text>
+  <text x="553.6" y="830" font-size="13" font-weight="700" fill="#5B6B7D" text-anchor="start">Age band</text>
+  <text x="763.2" y="830" font-size="13" font-weight="700" fill="#5B6B7D" text-anchor="start">Gender</text>
+  <text x="972.8" y="830" font-size="13" font-weight="700" fill="#5B6B7D" text-anchor="start">Diagnosis</text>
+  <text x="1182.4" y="830" font-size="13" font-weight="700" fill="#5B6B7D" text-anchor="start">Readmitted</text>
+  <line x1="332" y1="880" x2="1380" y2="880" stroke="#C9D3DC" stroke-width="1"/>
+  <rect x="344.0" y="855" width="40" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="553.6" y="855" width="57" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="763.2" y="855" width="74" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="972.8" y="855" width="41" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="1182.4" y="855" width="58" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <line x1="332" y1="920" x2="1380" y2="920" stroke="#C9D3DC" stroke-width="1"/>
+  <rect x="344.0" y="895" width="53" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="553.6" y="895" width="70" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="763.2" y="895" width="87" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="972.8" y="895" width="54" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="1182.4" y="895" width="71" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <line x1="332" y1="960" x2="1380" y2="960" stroke="#C9D3DC" stroke-width="1"/>
+  <rect x="344.0" y="935" width="66" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="553.6" y="935" width="83" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="763.2" y="935" width="50" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="972.8" y="935" width="67" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="1182.4" y="935" width="84" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <line x1="332" y1="1000" x2="1380" y2="1000" stroke="#C9D3DC" stroke-width="1"/>
+  <rect x="344.0" y="975" width="79" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="553.6" y="975" width="46" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="763.2" y="975" width="63" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="972.8" y="975" width="80" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="1182.4" y="975" width="47" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <text x="292" y="1190" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="start">Retrospective current-state wireframe, drawn after implementation. Not an original Milestone 1 design. Placeholder text only.</text>
+</svg>

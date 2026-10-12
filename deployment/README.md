@@ -3,6 +3,10 @@
 Milestone 4 deliverable: the platform runs in Docker locally and on a cloud
 provider.
 
+> **Status.** Nothing has been deployed to a cloud, and the Compose route has
+> not been verified end to end. The open risks, the environment variables and the
+> full runbook are in [`docs/08-deployment`](../docs/08-deployment/README.md).
+
 ## Local (Docker Compose)
 
 ```bash
@@ -16,7 +20,7 @@ docker compose up --build
 | Backend   | <http://localhost:8000> |
 | API docs  | <http://localhost:8000/docs> |
 | Postgres  | `localhost:5432` |
-| MongoDB   | `localhost:27017` |
+| MongoDB   | `localhost:27017` (provisioned, unused by the app) |
 
 Useful commands:
 

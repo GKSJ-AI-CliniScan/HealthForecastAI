@@ -1,5 +1,9 @@
 # MongoDB collections
 
+> **Status (2026-10-12).** These collections describe a design that was **never
+> implemented**: no application code reads from or writes to MongoDB, and all
+> data lives in PostgreSQL. See [`docs/02-database`](../../../docs/02-database/README.md#8-mongodb).
+
 PostgreSQL holds the structured clinical record. MongoDB holds everything with a
 loose or evolving shape.
 

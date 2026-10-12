@@ -5,14 +5,18 @@ Two stores, deliberately split.
 | Store      | Holds | Why |
 |------------|-------|-----|
 | PostgreSQL | Users, patients, admissions, predictions, treatment outcomes, audit logs | Relational integrity, constraints, joins for analytics |
-| MongoDB    | Clinical notes, model runs, prediction events | Schema-light documents that change shape as the project grows |
+| MongoDB    | **Provisioned but not used by the application** (planned for clinical notes, model runs, prediction events) | See [`docs/02-database`](../docs/02-database/README.md#8-mongodb) |
 
 ## PostgreSQL
 
 - `postgres/schema/01_schema.sql` - reference schema, applied automatically by
-  `docker compose up` on a fresh volume.
-- `postgres/migrations/` - Alembic revisions. Generate them from
-  `backend/`, never hand-edit a shipped revision.
+  `docker compose up` on a fresh volume. It matches migration head `0005` but
+  does not create `alembic_version`, so a database it initialised cannot be
+  upgraded with `alembic upgrade head` (see
+  [`docs/02-database`](../docs/02-database/README.md#6-setting-up-a-database-and-the-sql-versus-alembic-conflict)).
+- `postgres/migrations/` - empty. The Alembic revisions (`0001` to `0005`) are in
+  `backend/alembic/versions/`. Generate them from `backend/`, never hand-edit a
+  shipped revision.
 - `postgres/seeds/` - development seed data. Synthetic rows only.
 
 ```bash

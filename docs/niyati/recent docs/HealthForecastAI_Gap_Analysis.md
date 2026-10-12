@@ -1,5 +1,8 @@
 # HealthForecast AI — Gap Analysis
 
+> **Status note (2026-10-12).** A snapshot from 2026-09-22. Its requirement statuses (for example risk prediction, analytics and reporting marked *Not met*) are out of date. Its recommendation to drop MongoDB and to treat India as the primary dataset was **not recorded as approved**; the dataset change was implemented, MongoDB was not removed. This document is kept unchanged as the historical record of the plan; the current documentation is in [`docs/01-architecture`](../../01-architecture/README.md) to [`docs/08-deployment`](../../08-deployment/README.md).
+
+
 **Document Version:** 1.0
 **Companion Document:** `HealthForecastAI_Repository_Audit.md`
 **Audit Date:** 2026-09-22 · Baseline: commit `f962704` on `intern/19-niyati-r`

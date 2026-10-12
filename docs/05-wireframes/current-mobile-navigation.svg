@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 860" width="900" height="860" role="img" aria-labelledby="t d" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <title id="t">Responsive navigation at 390 px (current state)</title>
+  <desc id="d">Phone layout: top bar with a Menu button, shown closed and open. Retrospective current-state wireframe, drawn after implementation. Not an original Milestone 1 design. Placeholder text only.</desc>
+  <rect width="900" height="860" fill="#EEF2F4"/>
+  <rect x="60" y="60" width="360" height="740" rx="24" fill="#FFFFFF" stroke="#9AA9B7" stroke-width="2" />
+  <rect x="60" y="60" width="360" height="64" rx="24" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <rect x="76" y="76" width="32" height="32" rx="8.64" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1" />
+  <path d="M84.66666666666667 84.66666666666667v14.666666666666666M98.0 84.66666666666667v14.666666666666666" stroke="#fff" stroke-width="4.0" stroke-linecap="round" fill="none"/>
+  <path d="M84.66666666666667 96.26666666666667L101.6 87.46666666666667" stroke="#fff" stroke-width="3.466666666666667" stroke-linecap="round" fill="none"/>
+  <circle cx="101.86666666666666" cy="87.33333333333333" r="2.8666666666666663" fill="#fff" stroke="#fff" stroke-width="0"/>
+  <text x="118" y="98" font-size="15" font-weight="700" fill="#16283B" text-anchor="start">HealthForecast AI</text>
+  <rect x="312" y="76" width="92" height="36" rx="8" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="358" y="99" font-size="13" font-weight="600" fill="#16283B" text-anchor="middle">Menu</text>
+  <rect x="76" y="140" width="328" height="56" rx="12" fill="#E7EDF8" stroke="#9DB0D6" stroke-width="1" />
+  <text x="88" y="174" font-size="12" font-weight="700" fill="#16283B" text-anchor="start">Experimental decision-support prototype.</text>
+  <text x="76" y="232" font-size="22" font-weight="700" fill="#16283B" text-anchor="start">Page title</text>
+  <rect x="76" y="260" width="328" height="92" rx="10" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <rect x="76" y="370" width="328" height="92" rx="10" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <rect x="76" y="480" width="328" height="92" rx="10" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <rect x="480" y="60" width="360" height="740" rx="24" fill="#FFFFFF" stroke="#9AA9B7" stroke-width="2" />
+  <rect x="480" y="60" width="360" height="64" rx="24" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <rect x="496" y="76" width="32" height="32" rx="8.64" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1" />
+  <path d="M504.6666666666667 84.66666666666667v14.666666666666666M518.0 84.66666666666667v14.666666666666666" stroke="#fff" stroke-width="4.0" stroke-linecap="round" fill="none"/>
+  <path d="M504.6666666666667 96.26666666666667L521.6 87.46666666666667" stroke="#fff" stroke-width="3.466666666666667" stroke-linecap="round" fill="none"/>
+  <circle cx="521.8666666666667" cy="87.33333333333333" r="2.8666666666666663" fill="#fff" stroke="#fff" stroke-width="0"/>
+  <text x="538" y="98" font-size="15" font-weight="700" fill="#16283B" text-anchor="start">HealthForecast AI</text>
+  <rect x="732" y="76" width="92" height="36" rx="8" fill="#E7EDF8" stroke="#2B4C8C" stroke-width="1" />
+  <text x="778" y="99" font-size="13" font-weight="600" fill="#2B4C8C" text-anchor="middle">Menu</text>
+  <rect x="481" y="124" width="358" height="580" rx="0" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="500" y="148" font-size="12" font-weight="600" fill="#5B6B7D" text-anchor="start">Records</text>
+  <rect x="490" y="158" width="340" height="44" rx="8" fill="#FFFFFF" stroke="none" stroke-width="1" />
+  <rect x="506" y="171" width="18" height="18" rx="4" fill="none" stroke="#5B6B7D" stroke-width="1.6" />
+  <text x="536" y="186" font-size="15" font-weight="400" fill="#16283B" text-anchor="start">Overview</text>
+  <rect x="490" y="204" width="340" height="44" rx="8" fill="#FFFFFF" stroke="none" stroke-width="1" />
+  <rect x="506" y="217" width="18" height="18" rx="4" fill="none" stroke="#5B6B7D" stroke-width="1.6" />
+  <text x="536" y="232" font-size="15" font-weight="400" fill="#16283B" text-anchor="start">Patients</text>
+  <text x="500" y="268" font-size="12" font-weight="600" fill="#5B6B7D" text-anchor="start">Insights</text>
+  <rect x="490" y="278" width="340" height="44" rx="8" fill="#FFFFFF" stroke="none" stroke-width="1" />
+  <rect x="506" y="291" width="18" height="18" rx="4" fill="none" stroke="#5B6B7D" stroke-width="1.6" />
+  <text x="536" y="306" font-size="15" font-weight="400" fill="#16283B" text-anchor="start">Analytics</text>
+  <rect x="490" y="324" width="340" height="44" rx="8" fill="#FFFFFF" stroke="none" stroke-width="1" />
+  <rect x="506" y="337" width="18" height="18" rx="4" fill="none" stroke="#5B6B7D" stroke-width="1.6" />
+  <text x="536" y="352" font-size="15" font-weight="400" fill="#16283B" text-anchor="start">Treatment</text>
+  <rect x="490" y="370" width="340" height="44" rx="8" fill="#E7EDF8" stroke="none" stroke-width="1" />
+  <rect x="506" y="383" width="18" height="18" rx="4" fill="none" stroke="#2B4C8C" stroke-width="1.6" />
+  <text x="536" y="398" font-size="15" font-weight="600" fill="#2B4C8C" text-anchor="start">Research</text>
+  <rect x="490" y="416" width="340" height="44" rx="8" fill="#FFFFFF" stroke="none" stroke-width="1" />
+  <rect x="506" y="429" width="18" height="18" rx="4" fill="none" stroke="#5B6B7D" stroke-width="1.6" />
+  <text x="536" y="444" font-size="15" font-weight="400" fill="#16283B" text-anchor="start">Reports</text>
+  <line x1="481" y1="560" x2="839" y2="560" stroke="#C9D3DC" stroke-width="1"/>
+  <circle cx="516" cy="598" r="16" fill="#E7EDF8" stroke="#E7EDF8" stroke-width="1"/>
+  <text x="542" y="596" font-size="13" font-weight="600" fill="#16283B" text-anchor="start">Signed-in user</text>
+  <text x="542" y="614" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">Healthcare Researcher</text>
+  <rect x="496" y="640" width="156" height="36" rx="8" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="574" y="663" font-size="13" font-weight="600" fill="#16283B" text-anchor="middle">Dark mode</text>
+  <rect x="664" y="640" width="156" height="36" rx="8" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="742" y="663" font-size="13" font-weight="600" fill="#16283B" text-anchor="middle">Sign out</text>
+  <text x="60" y="40" font-size="14" font-weight="700" fill="#16283B" text-anchor="start">Menu closed</text>
+  <text x="480" y="56" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">Groups and links follow each role's permissions</text>
+  <text x="480" y="40" font-size="14" font-weight="700" fill="#16283B" text-anchor="start">Menu open (Researcher shown)</text>
+  <text x="40" y="850" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="start">Retrospective current-state wireframe, drawn after implementation. Not an original Milestone 1 design. Placeholder text only.</text>
+</svg>

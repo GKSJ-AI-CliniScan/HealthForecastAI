@@ -1,5 +1,8 @@
 # HealthForecast AI — Repository Audit
 
+> **Status note (2026-10-12).** A snapshot of the repository on 2026-09-22 (commit `f962704`). Its statements are out of date: for example the API, analytics, reporting and model-registry work it lists as missing now exists. This document is kept unchanged as the historical record of the plan; the current documentation is in [`docs/01-architecture`](../01-architecture/README.md) to [`docs/08-deployment`](../08-deployment/README.md).
+
+
 **Document Version:** 1.0
 **Audit Date:** 2026-09-22
 **Baseline Commit:** `f962704` — "feat(frontend): implement dashboard, authentication and user interface"

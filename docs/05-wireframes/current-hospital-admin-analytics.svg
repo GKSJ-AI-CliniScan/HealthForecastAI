@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900" role="img" aria-labelledby="t d" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <title id="t">Hospital Administrator: analytics (current state)</title>
+  <desc id="d">Healthcare analytics with five tabs, summary strip and trend and distribution charts. Retrospective current-state wireframe, drawn after implementation. Not an original Milestone 1 design. Placeholder text only.</desc>
+  <rect width="1440" height="900" fill="#EEF2F4"/>
+  <rect x="0" y="0" width="272" height="900" rx="0" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <rect x="20" y="20" width="32" height="32" rx="8.64" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1" />
+  <path d="M28.666666666666664 28.666666666666664v14.666666666666666M42.0 28.666666666666664v14.666666666666666" stroke="#fff" stroke-width="4.0" stroke-linecap="round" fill="none"/>
+  <path d="M28.666666666666664 40.266666666666666L45.599999999999994 31.466666666666665" stroke="#fff" stroke-width="3.466666666666667" stroke-linecap="round" fill="none"/>
+  <circle cx="45.86666666666666" cy="31.333333333333332" r="2.8666666666666663" fill="#fff" stroke="#fff" stroke-width="0"/>
+  <text x="62" y="42" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">HealthForecast AI</text>
+  <text x="24" y="100" font-size="13" font-weight="600" fill="#5B6B7D" text-anchor="start">Records</text>
+  <rect x="12" y="112" width="248" height="40" rx="8" fill="#FFFFFF" stroke="none" stroke-width="1" />
+  <rect x="30" y="123" width="18" height="18" rx="4" fill="none" stroke="#5B6B7D" stroke-width="1.6" />
+  <text x="60" y="137" font-size="15" font-weight="400" fill="#16283B" text-anchor="start">Overview</text>
+  <rect x="12" y="156" width="248" height="40" rx="8" fill="#FFFFFF" stroke="none" stroke-width="1" />
+  <rect x="30" y="167" width="18" height="18" rx="4" fill="none" stroke="#5B6B7D" stroke-width="1.6" />
+  <text x="60" y="181" font-size="15" font-weight="400" fill="#16283B" text-anchor="start">Patients</text>
+  <text x="24" y="226" font-size="13" font-weight="600" fill="#5B6B7D" text-anchor="start">Insights</text>
+  <rect x="12" y="238" width="248" height="40" rx="8" fill="#E7EDF8" stroke="none" stroke-width="1" />
+  <rect x="12" y="246" width="3" height="24" rx="1.5" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1" />
+  <rect x="30" y="249" width="18" height="18" rx="4" fill="none" stroke="#2B4C8C" stroke-width="1.6" />
+  <text x="60" y="263" font-size="15" font-weight="600" fill="#2B4C8C" text-anchor="start">Analytics</text>
+  <rect x="12" y="282" width="248" height="40" rx="8" fill="#FFFFFF" stroke="none" stroke-width="1" />
+  <rect x="30" y="293" width="18" height="18" rx="4" fill="none" stroke="#5B6B7D" stroke-width="1.6" />
+  <text x="60" y="307" font-size="15" font-weight="400" fill="#16283B" text-anchor="start">Treatment</text>
+  <rect x="12" y="326" width="248" height="40" rx="8" fill="#FFFFFF" stroke="none" stroke-width="1" />
+  <rect x="30" y="337" width="18" height="18" rx="4" fill="none" stroke="#5B6B7D" stroke-width="1.6" />
+  <text x="60" y="351" font-size="15" font-weight="400" fill="#16283B" text-anchor="start">Reports</text>
+  <line x1="0" y1="760" x2="272" y2="760" stroke="#C9D3DC" stroke-width="1"/>
+  <circle cx="38" cy="800" r="18" fill="#E7EDF8" stroke="#E7EDF8" stroke-width="1"/>
+  <text x="38" y="805" font-size="12" font-weight="700" fill="#2B4C8C" text-anchor="middle">AB</text>
+  <text x="64" y="795" font-size="14" font-weight="600" fill="#16283B" text-anchor="start">Signed-in user (name)</text>
+  <text x="64" y="814" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Hospital Administrator</text>
+  <rect x="16" y="840" width="118" height="36" rx="8" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="75" y="863" font-size="13" font-weight="600" fill="#16283B" text-anchor="middle">Dark mode</text>
+  <rect x="142" y="840" width="114" height="36" rx="8" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="199" y="863" font-size="13" font-weight="600" fill="#16283B" text-anchor="middle">Sign out</text>
+  <rect x="312" y="32" width="1088" height="56" rx="12" fill="#E7EDF8" stroke="#9DB0D6" stroke-width="1" />
+  <text x="328" y="56" font-size="14" font-weight="700" fill="#16283B" text-anchor="start">Experimental decision-support prototype.</text>
+  <text x="328" y="76" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Not clinically validated or approved for patient care; scores are estimates and must not replace clinical judgment.</text>
+  <text x="312" y="140" font-size="30" font-weight="700" fill="#16283B" text-anchor="start">Healthcare analytics</text>
+  <text x="312" y="166" font-size="14" font-weight="400" fill="#5B6B7D" text-anchor="start">Aggregated, hospital-wide figures. No individual patient record is shown here.</text>
+  <text x="324" y="214" font-size="14" font-weight="700" fill="#2B4C8C" text-anchor="start">Readmissions</text>
+  <rect x="312" y="222" width="136" height="3" rx="1" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1" />
+  <text x="468" y="214" font-size="14" font-weight="400" fill="#5B6B7D" text-anchor="start">Patient outcomes</text>
+  <text x="644" y="214" font-size="14" font-weight="400" fill="#5B6B7D" text-anchor="start">Risk distribution</text>
+  <text x="828" y="214" font-size="14" font-weight="400" fill="#5B6B7D" text-anchor="start">Departments</text>
+  <text x="964" y="214" font-size="14" font-weight="400" fill="#5B6B7D" text-anchor="start">Population health</text>
+  <line x1="312" y1="225" x2="1400" y2="225" stroke="#C9D3DC" stroke-width="1"/>
+  <rect x="312" y="250" width="1088" height="90" rx="10" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="332.0" y="284" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Patients</text>
+  <text x="332.0" y="318" font-size="28" font-weight="600" fill="#16283B" text-anchor="start">n</text>
+  <line x1="584.0" y1="264" x2="584.0" y2="326" stroke="#C9D3DC" stroke-width="1"/>
+  <text x="604.0" y="284" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Admissions</text>
+  <text x="604.0" y="318" font-size="28" font-weight="600" fill="#16283B" text-anchor="start">n</text>
+  <line x1="856.0" y1="264" x2="856.0" y2="326" stroke="#C9D3DC" stroke-width="1"/>
+  <text x="876.0" y="284" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Readmission rate</text>
+  <text x="876.0" y="318" font-size="28" font-weight="600" fill="#16283B" text-anchor="start">n %</text>
+  <line x1="1128.0" y1="264" x2="1128.0" y2="326" stroke="#C9D3DC" stroke-width="1"/>
+  <text x="1148.0" y="284" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Avg length of stay</text>
+  <text x="1148.0" y="318" font-size="28" font-weight="600" fill="#16283B" text-anchor="start">n days</text>
+  <rect x="312" y="370" width="1088" height="400" rx="10" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="332" y="402" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">Readmission rate by admission month</text>
+  <text x="1380" y="402" font-size="13" fill="#5B6B7D" text-anchor="end">Period: Last 12 months with data [Apply]</text>
+  <line x1="352" y1="700" x2="816.0" y2="700" stroke="#5B6B7D" stroke-width="1"/>
+  <line x1="352" y1="440" x2="352" y2="700" stroke="#5B6B7D" stroke-width="1"/>
+  <polyline points="352,648 429,596 507,622 584,518 661,557 739,544 816,492" fill="none" stroke="#2B4C8C" stroke-width="2.5"/>
+  <circle cx="352.0" cy="648.0" r="3.5" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1"/>
+  <circle cx="429.3333333333333" cy="596.0" r="3.5" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1"/>
+  <circle cx="506.66666666666663" cy="622.0" r="3.5" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1"/>
+  <circle cx="584.0" cy="518.0" r="3.5" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1"/>
+  <circle cx="661.3333333333333" cy="557.0" r="3.5" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1"/>
+  <circle cx="738.6666666666666" cy="544.0" r="3.5" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1"/>
+  <circle cx="816.0" cy="492.0" r="3.5" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1"/>
+  <line x1="876.0" y1="700" x2="1340.0" y2="700" stroke="#5B6B7D" stroke-width="1"/>
+  <rect x="887.6" y="609.0" width="34.8" height="91.0" rx="2" fill="#2B8C82" stroke="#2B8C82" stroke-width="1" />
+  <rect x="945.6" y="492.0" width="34.8" height="208.0" rx="2" fill="#2B8C82" stroke="#2B8C82" stroke-width="1" />
+  <rect x="1003.6" y="557.0" width="34.8" height="143.0" rx="2" fill="#2B8C82" stroke="#2B8C82" stroke-width="1" />
+  <rect x="1061.6" y="466.0" width="34.8" height="234.0" rx="2" fill="#2B8C82" stroke="#2B8C82" stroke-width="1" />
+  <rect x="1119.6" y="583.0" width="34.8" height="117.0" rx="2" fill="#2B8C82" stroke="#2B8C82" stroke-width="1" />
+  <rect x="1177.6" y="518.0" width="34.8" height="182.0" rx="2" fill="#2B8C82" stroke="#2B8C82" stroke-width="1" />
+  <rect x="1235.6" y="622.0" width="34.8" height="78.0" rx="2" fill="#2B8C82" stroke="#2B8C82" stroke-width="1" />
+  <rect x="1293.6" y="544.0" width="34.8" height="156.0" rx="2" fill="#2B8C82" stroke="#2B8C82" stroke-width="1" />
+  <text x="292" y="890" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="start">Retrospective current-state wireframe, drawn after implementation. Not an original Milestone 1 design. Placeholder text only.</text>
+</svg>

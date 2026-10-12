@@ -1,5 +1,8 @@
 # HealthForecast AI — Milestone 2 Design
 
+> **Status note (2026-10-12).** A design for Milestone 2. The implemented routes differ: forecasts are served at `/api/v1/risk/readmission`, not `/predictions/readmission`, and there is no `/predictions/feedback` route. Results are in [`docs/06-milestones/milestone-2.md`](../../06-milestones/milestone-2.md). This document is kept unchanged as the historical record of the plan; the current documentation is in [`docs/01-architecture`](../../01-architecture/README.md) to [`docs/08-deployment`](../../08-deployment/README.md).
+
+
 **Document Version:** 1.0
 **Scope:** Patient Risk Intelligence, Readmission Prediction, ML Pipeline, Backend ML Integration, API Design, Clinical Insights Engine, Doctor/Admin Dashboards
 **Builds on:** `HealthForecastAI_Repository_Audit.md`, `HealthForecastAI_Gap_Analysis.md`

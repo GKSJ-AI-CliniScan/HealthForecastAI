@@ -29,8 +29,13 @@ python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements-dev.txt
 cp ../.env.example ../.env
+alembic upgrade head            # on an empty PostgreSQL database (head: 0005)
 uvicorn app.main:app --reload
 ```
+
+Endpoints, roles and error codes are documented in
+[`docs/03-api`](../docs/03-api/README.md); the schema and migrations in
+[`docs/02-database`](../docs/02-database/README.md).
 
 Open <http://localhost:8000/docs>.
 

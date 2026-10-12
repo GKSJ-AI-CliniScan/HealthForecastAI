@@ -1,5 +1,8 @@
 # HealthForecast AI - Database Design Document
 
+> **Status note (2026-10-12).** A design, not the implemented schema. It describes sixteen entities; **nine tables** exist (see [`docs/02-database`](../02-database/README.md)). It excludes MongoDB while the brief and Compose include it (it is unused in practice), and names PostgreSQL 15+ while Compose uses 16. Roles, Medications, ReadmissionRecords, RiskScores, PredictionOutcomes, CareRecommendations and PatientJourneyEvents were not created. This document is kept unchanged as the historical record of the plan; the current documentation is in [`docs/01-architecture`](../01-architecture/README.md) to [`docs/08-deployment`](../08-deployment/README.md).
+
+
 **Document Version:** 1.0
 **Companion Documents:** `HealthForecastAI_SRS.md`, `HealthForecastAI_System_Design.md`
 **Project:** HealthForecast AI: Hospital Readmission Prediction & Patient Risk Intelligence System

@@ -57,8 +57,8 @@ Four roles, each with a distinct view of the data. The full access matrix is in
 |-------|-----------|
 | Backend | Python 3.11, FastAPI, SQLAlchemy, Alembic, JWT |
 | Frontend | Next.js 15, React 19, TypeScript, Tailwind CSS, Recharts |
-| Databases | PostgreSQL 16, MongoDB 7 |
-| ML | scikit-learn, XGBoost, Random Forest, TensorFlow, pandas, NumPy |
+| Databases | PostgreSQL 16 (all application data). MongoDB 7 is provisioned in Compose but not used by the application |
+| ML | scikit-learn (logistic regression, random forest), XGBoost, pandas, NumPy. TensorFlow is listed in `ml/requirements.txt` but no code uses it |
 | DevOps | Docker, Docker Compose, GitHub Actions, AWS or Azure |
 
 ## Quick start
@@ -69,6 +69,12 @@ cd HealthForecastAI
 cp .env.example .env
 docker compose up --build
 ```
+
+> The Docker route has **not been verified end to end** and has open risks
+> (frontend-to-backend address, no model files or report storage in the
+> containers, database initialisation). For a known-good route, run the backend
+> and frontend directly with an empty PostgreSQL database and `alembic upgrade
+> head`; both routes are in [`docs/08-deployment`](docs/08-deployment/README.md).
 
 | Service | URL |
 |---------|-----|
@@ -95,14 +101,14 @@ Running each service directly, without Docker, is covered in
 
 ## Milestones
 
-| Milestone | Weeks | Theme |
-|-----------|-------|-------|
-| 1 | 1-2 | Project initialization, design process and core setup |
-| 2 | 3-4 | Risk prediction and readmission forecasting |
-| 3 | 5-6 | Treatment effectiveness analysis and healthcare analytics |
-| 4 | 7-8 | Testing, deployment and documentation |
+| Milestone | Weeks | Theme | Report |
+|-----------|-------|-------|--------|
+| 1 | 1-2 | Project initialization, design process and core setup | [milestone-1](docs/06-milestones/milestone-1.md) |
+| 2 | 3-4 | Risk prediction and readmission forecasting | [milestone-2](docs/06-milestones/milestone-2.md) |
+| 3 | 5-6 | Treatment effectiveness analysis and healthcare analytics | [milestone-3](docs/06-milestones/milestone-3.md) |
+| 4 | 7-8 | Testing, deployment and documentation | [milestone-4](docs/06-milestones/milestone-4.md) (partly complete: not deployed, see the report) |
 
-Report templates and evaluation criteria: [`docs/06-milestones/`](docs/06-milestones/).
+Reports, evaluation criteria and known gaps: [`docs/06-milestones/`](docs/06-milestones/).
 
 ## Continuous integration
 
@@ -134,9 +140,17 @@ Read [INTERN_GUIDE.md](INTERN_GUIDE.md) before your first commit.
 
 ## Dataset
 
-Diabetes 130-US Hospitals (1999-2008), 101,766 encounters.
-Download instructions: [`ml/data/README.md`](ml/data/README.md).
-**The dataset is never committed to this repository.**
+Two public research datasets are supported, and neither is ever committed to
+this repository (download instructions: [`ml/data/README.md`](ml/data/README.md)):
+
+- **India Hospital Readmission (2015 to 2024)**: the dataset the trained models
+  use (the ML configuration's active profile).
+- **Diabetes 130-US Hospitals (1999 to 2008)**, 101,766 encounters: the dataset
+  named in the project brief, kept as a supported fallback. No model in this
+  repository was trained on it.
+
+Which dataset is the official primary one has not been formally decided; see
+[`docs/06-milestones/milestone-4.md`](docs/06-milestones/milestone-4.md#known-gaps).
 
 ## Licence
 

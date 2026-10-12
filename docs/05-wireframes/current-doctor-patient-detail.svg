@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1500" width="1440" height="1500" role="img" aria-labelledby="t d" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <title id="t">Doctor: patient detail (current state)</title>
+  <desc id="d">Breadcrumb, summary strip, demographics, risk and recommendations, risk history, treatment outcomes and admissions. Retrospective current-state wireframe, drawn after implementation. Not an original Milestone 1 design. Placeholder text only.</desc>
+  <rect width="1440" height="1500" fill="#EEF2F4"/>
+  <rect x="0" y="0" width="272" height="1500" rx="0" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <rect x="20" y="20" width="32" height="32" rx="8.64" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1" />
+  <path d="M28.666666666666664 28.666666666666664v14.666666666666666M42.0 28.666666666666664v14.666666666666666" stroke="#fff" stroke-width="4.0" stroke-linecap="round" fill="none"/>
+  <path d="M28.666666666666664 40.266666666666666L45.599999999999994 31.466666666666665" stroke="#fff" stroke-width="3.466666666666667" stroke-linecap="round" fill="none"/>
+  <circle cx="45.86666666666666" cy="31.333333333333332" r="2.8666666666666663" fill="#fff" stroke="#fff" stroke-width="0"/>
+  <text x="62" y="42" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">HealthForecast AI</text>
+  <text x="24" y="100" font-size="13" font-weight="600" fill="#5B6B7D" text-anchor="start">Records</text>
+  <rect x="12" y="112" width="248" height="40" rx="8" fill="#FFFFFF" stroke="none" stroke-width="1" />
+  <rect x="30" y="123" width="18" height="18" rx="4" fill="none" stroke="#5B6B7D" stroke-width="1.6" />
+  <text x="60" y="137" font-size="15" font-weight="400" fill="#16283B" text-anchor="start">Overview</text>
+  <rect x="12" y="156" width="248" height="40" rx="8" fill="#E7EDF8" stroke="none" stroke-width="1" />
+  <rect x="12" y="164" width="3" height="24" rx="1.5" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1" />
+  <rect x="30" y="167" width="18" height="18" rx="4" fill="none" stroke="#2B4C8C" stroke-width="1.6" />
+  <text x="60" y="181" font-size="15" font-weight="600" fill="#2B4C8C" text-anchor="start">Patients</text>
+  <text x="24" y="226" font-size="13" font-weight="600" fill="#5B6B7D" text-anchor="start">Insights</text>
+  <rect x="12" y="238" width="248" height="40" rx="8" fill="#FFFFFF" stroke="none" stroke-width="1" />
+  <rect x="30" y="249" width="18" height="18" rx="4" fill="none" stroke="#5B6B7D" stroke-width="1.6" />
+  <text x="60" y="263" font-size="15" font-weight="400" fill="#16283B" text-anchor="start">Treatment</text>
+  <line x1="0" y1="1360" x2="272" y2="1360" stroke="#C9D3DC" stroke-width="1"/>
+  <circle cx="38" cy="1400" r="18" fill="#E7EDF8" stroke="#E7EDF8" stroke-width="1"/>
+  <text x="38" y="1405" font-size="12" font-weight="700" fill="#2B4C8C" text-anchor="middle">AB</text>
+  <text x="64" y="1395" font-size="14" font-weight="600" fill="#16283B" text-anchor="start">Signed-in user (name)</text>
+  <text x="64" y="1414" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Doctor</text>
+  <rect x="16" y="1440" width="118" height="36" rx="8" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="75" y="1463" font-size="13" font-weight="600" fill="#16283B" text-anchor="middle">Dark mode</text>
+  <rect x="142" y="1440" width="114" height="36" rx="8" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="199" y="1463" font-size="13" font-weight="600" fill="#16283B" text-anchor="middle">Sign out</text>
+  <rect x="312" y="32" width="1088" height="56" rx="12" fill="#E7EDF8" stroke="#9DB0D6" stroke-width="1" />
+  <text x="328" y="56" font-size="14" font-weight="700" fill="#16283B" text-anchor="start">Experimental decision-support prototype.</text>
+  <text x="328" y="76" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Not clinically validated or approved for patient care; scores are estimates and must not replace clinical judgment.</text>
+  <text x="312" y="140" font-size="30" font-weight="700" fill="#16283B" text-anchor="start">MRN-0000 (placeholder)</text>
+  <text x="312" y="166" font-size="14" font-weight="400" fill="#5B6B7D" text-anchor="start">De-identified record. No name, address or date of birth is stored.</text>
+  <rect x="1244" y="122" width="156" height="36" rx="8" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="1322.0" y="145" font-size="13" font-weight="600" fill="#16283B" text-anchor="middle">Back to patients</text>
+  <text x="312" y="108" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Patients / MRN-0000</text>
+  <rect x="312" y="190" width="1088" height="90" rx="10" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="332.0" y="224" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Admissions</text>
+  <text x="332.0" y="258" font-size="28" font-weight="600" fill="#16283B" text-anchor="start">3</text>
+  <line x1="674.6666666666667" y1="204" x2="674.6666666666667" y2="266" stroke="#C9D3DC" stroke-width="1"/>
+  <text x="694.6666666666667" y="224" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Readmissions</text>
+  <text x="694.6666666666667" y="258" font-size="28" font-weight="600" fill="#16283B" text-anchor="start">1</text>
+  <line x1="1037.3333333333335" y1="204" x2="1037.3333333333335" y2="266" stroke="#C9D3DC" stroke-width="1"/>
+  <text x="1057.3333333333335" y="224" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Age group</text>
+  <text x="1057.3333333333335" y="258" font-size="28" font-weight="600" fill="#16283B" text-anchor="start">60-69</text>
+  <rect x="312" y="300" width="631.04" height="130" rx="10" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="332" y="332" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">Demographics</text>
+  <text x="332" y="362" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Gender</text>
+  <text x="552" y="362" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Primary diagnosis</text>
+  <text x="332" y="402" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Assigned doctor</text>
+  <rect x="964.8" y="300" width="435.20000000000005" height="130" rx="10" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="984.8" y="332" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">Readmission history</text>
+  <text x="984.8" y="372" font-size="14" font-weight="400" fill="#16283B" text-anchor="start">Within 30 days</text>
+  <rect x="312" y="450" width="1088" height="380" rx="10" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="332" y="482" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">Risk &amp; recommendations</text>
+  <text x="332" y="528" font-size="15" font-weight="700" fill="#16283B" text-anchor="start">Patient risk score</text>
+  <rect x="726.0" y="508" width="100" height="28" rx="8" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="776.0" y="527" font-size="12" font-weight="600" fill="#16283B" text-anchor="middle">Score risk</text>
+  <rect x="332" y="560" width="189.60000000000002" height="10" rx="5" fill="#E3EFE7" stroke="#346E4D" stroke-width="1" />
+  <rect x="521.6" y="560" width="142.2" height="10" rx="0" fill="#F5E9CF" stroke="#80520A" stroke-width="1" />
+  <rect x="663.8" y="560" width="142.2" height="10" rx="5" fill="#F4DFDE" stroke="#9E2E2E" stroke-width="1" />
+  <rect x="619.14" y="555" width="4" height="20" rx="2" fill="#80520A" stroke="#80520A" stroke-width="1" />
+  <text x="332.0" y="592" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="start">0.00</text>
+  <text x="521.6" y="592" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="middle">0.40</text>
+  <text x="663.8" y="592" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="middle">0.70</text>
+  <text x="806.0" y="592" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="end">1.00</text>
+  <rect x="332" y="604" width="84" height="24" rx="12" fill="#F5E9CF" stroke="#80520A" stroke-width="1" />
+  <text x="374" y="621" font-size="11" font-weight="700" fill="#80520A" text-anchor="middle">MEDIUM</text>
+  <text x="428" y="621" font-size="14" font-weight="700" fill="#16283B" text-anchor="start">Model score 0.61</text>
+  <text x="332" y="654" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">Model name, trained &lt;date&gt; UTC. Scored &lt;date&gt; UTC.</text>
+  <text x="332" y="674" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">Experimental model score; not a calibrated probability.</text>
+  <text x="332" y="692" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">LOW / MEDIUM / HIGH use fixed cut-offs of 0.40 and 0.70.</text>
+  <line x1="856.0" y1="500" x2="856.0" y2="700" stroke="#C9D3DC" stroke-width="1"/>
+  <text x="886.0" y="528" font-size="15" font-weight="700" fill="#16283B" text-anchor="start">30-day readmission forecast</text>
+  <rect x="886.0" y="538" width="230" height="30" rx="8" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="1001.0" y="558" font-size="11" font-weight="600" fill="#16283B" text-anchor="middle">Forecast readmission (most recent admission)</text>
+  <rect x="886.0" y="600" width="181.60000000000002" height="10" rx="5" fill="#E3EFE7" stroke="#346E4D" stroke-width="1" />
+  <rect x="1067.6" y="600" width="136.2" height="10" rx="0" fill="#F5E9CF" stroke="#80520A" stroke-width="1" />
+  <rect x="1203.8" y="600" width="136.2" height="10" rx="5" fill="#F4DFDE" stroke="#9E2E2E" stroke-width="1" />
+  <rect x="1192.72" y="595" width="4" height="20" rx="2" fill="#80520A" stroke="#80520A" stroke-width="1" />
+  <text x="886.0" y="632" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="start">0.00</text>
+  <text x="1067.6" y="632" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="middle">0.40</text>
+  <text x="1203.8" y="632" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="middle">0.70</text>
+  <text x="1340.0" y="632" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="end">1.00</text>
+  <text x="886.0" y="654" font-size="14" font-weight="700" fill="#16283B" text-anchor="start">Model score 0.68  30-day horizon</text>
+  <line x1="332" y1="716" x2="1380" y2="716" stroke="#C9D3DC" stroke-width="1"/>
+  <text x="332" y="748" font-size="15" font-weight="700" fill="#16283B" text-anchor="start">Care &amp; follow-up recommendations</text>
+  <text x="332" y="770" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">Fixed rules from the risk band. Unvalidated; require clinician review.</text>
+  <text x="886.0" y="748" font-size="15" font-weight="700" fill="#16283B" text-anchor="start">Discharge readiness</text>
+  <text x="886.0" y="770" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">Fixed rules from the risk band. Unvalidated; require clinician review.</text>
+  <rect x="312" y="850" width="1088" height="300" rx="10" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="332" y="882" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">Risk history</text>
+  <text x="332" y="902" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">Values shown are experimental model scores, not calibrated probabilities.</text>
+  <rect x="332" y="890" width="1048" height="230" rx="4" fill="#FBFCFD" stroke="#C9D3DC" stroke-width="1" />
+  <rect x="333" y="891" width="1046" height="70" rx="0" fill="#F4DFDE" stroke="none" stroke-width="1" />
+  <rect x="333" y="961" width="1046" height="70" rx="0" fill="#F5E9CF" stroke="none" stroke-width="1" />
+  <rect x="333" y="1031" width="1046" height="88" rx="0" fill="#E3EFE7" stroke="none" stroke-width="1" />
+  <line x1="332" y1="961" x2="1380" y2="961" stroke="#80520A" stroke-width="1" stroke-dasharray="5 4"/>
+  <line x1="332" y1="1031" x2="1380" y2="1031" stroke="#80520A" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="318" y="965" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="end">0.7</text>
+  <text x="318" y="1035" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="end">0.4</text>
+  <line x1="372" y1="1080" x2="1320" y2="1080" stroke="#5B6B7D" stroke-width="1"/>
+  <line x1="372" y1="930" x2="372" y2="1080" stroke="#5B6B7D" stroke-width="1"/>
+  <polyline points="372,960 562,1012 751,998 941,1005 1130,1005 1320,1002" fill="none" stroke="#2B4C8C" stroke-width="2.5"/>
+  <circle cx="372.0" cy="960.0" r="3.5" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1"/>
+  <circle cx="561.6" cy="1012.5" r="3.5" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1"/>
+  <circle cx="751.2" cy="997.5" r="3.5" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1"/>
+  <circle cx="940.8" cy="1005.0" r="3.5" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1"/>
+  <circle cx="1130.4" cy="1005.0" r="3.5" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1"/>
+  <circle cx="1320.0" cy="1002.0" r="3.5" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1"/>
+  <rect x="312" y="1170" width="1088" height="150" rx="10" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="332" y="1202" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">Treatment outcomes</text>
+  <line x1="332" y1="1230" x2="1380" y2="1230" stroke="#5B6B7D" stroke-width="1"/>
+  <text x="344.0" y="1220" font-size="13" font-weight="700" fill="#5B6B7D" text-anchor="start">Admitted</text>
+  <text x="606.0" y="1220" font-size="13" font-weight="700" fill="#5B6B7D" text-anchor="start">Treatment</text>
+  <text x="868.0" y="1220" font-size="13" font-weight="700" fill="#5B6B7D" text-anchor="start">Outcome</text>
+  <text x="1130.0" y="1220" font-size="13" font-weight="700" fill="#5B6B7D" text-anchor="start">Recovery score</text>
+  <line x1="332" y1="1270" x2="1380" y2="1270" stroke="#C9D3DC" stroke-width="1"/>
+  <rect x="344.0" y="1245" width="40" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="606.0" y="1245" width="57" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="868.0" y="1245" width="74" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="1130.0" y="1245" width="41" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <line x1="332" y1="1310" x2="1380" y2="1310" stroke="#C9D3DC" stroke-width="1"/>
+  <rect x="344.0" y="1285" width="53" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="606.0" y="1285" width="70" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="868.0" y="1285" width="87" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="1130.0" y="1285" width="54" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="312" y="1340" width="1088" height="140" rx="10" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="332" y="1372" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">Admission history</text>
+  <line x1="332" y1="1400" x2="1380" y2="1400" stroke="#5B6B7D" stroke-width="1"/>
+  <text x="344.0" y="1390" font-size="13" font-weight="700" fill="#5B6B7D" text-anchor="start">Admitted</text>
+  <text x="606.0" y="1390" font-size="13" font-weight="700" fill="#5B6B7D" text-anchor="start">Discharged</text>
+  <text x="868.0" y="1390" font-size="13" font-weight="700" fill="#5B6B7D" text-anchor="start">Department</text>
+  <text x="1130.0" y="1390" font-size="13" font-weight="700" fill="#5B6B7D" text-anchor="start">Stay (days)</text>
+  <line x1="332" y1="1440" x2="1380" y2="1440" stroke="#C9D3DC" stroke-width="1"/>
+  <rect x="344.0" y="1415" width="40" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="606.0" y="1415" width="57" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="868.0" y="1415" width="74" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="1130.0" y="1415" width="41" height="10" rx="5" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <text x="292" y="1490" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="start">Retrospective current-state wireframe, drawn after implementation. Not an original Milestone 1 design. Placeholder text only.</text>
+</svg>

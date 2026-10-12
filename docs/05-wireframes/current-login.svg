@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900" role="img" aria-labelledby="t d" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <title id="t">Login screen (current state)</title>
+  <desc id="d">Two-panel sign-in: brand panel on the left, notice and form on the right. Retrospective current-state wireframe, drawn after implementation. Not an original Milestone 1 design. Placeholder text only.</desc>
+  <rect width="1440" height="900" fill="#EEF2F4"/>
+  <rect x="0" y="0" width="820" height="900" rx="0" fill="#1B2D52" stroke="none" stroke-width="1" />
+  <rect x="56" y="48" width="32" height="32" rx="8.64" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1" />
+  <path d="M64.66666666666667 56.666666666666664v14.666666666666666M78.0 56.666666666666664v14.666666666666666" stroke="#fff" stroke-width="4.0" stroke-linecap="round" fill="none"/>
+  <path d="M64.66666666666667 68.26666666666667L81.6 59.46666666666667" stroke="#fff" stroke-width="3.466666666666667" stroke-linecap="round" fill="none"/>
+  <circle cx="81.86666666666666" cy="59.33333333333333" r="2.8666666666666663" fill="#fff" stroke="#fff" stroke-width="0"/>
+  <text x="100" y="70" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="start">HealthForecast AI</text>
+  <text x="56" y="318" font-size="36" font-weight="700" fill="#FFFFFF" text-anchor="start">Readmission risk and</text>
+  <text x="56" y="362" font-size="36" font-weight="700" fill="#FFFFFF" text-anchor="start">patient records for hospital</text>
+  <text x="56" y="406" font-size="36" font-weight="700" fill="#FFFFFF" text-anchor="start">care teams.</text>
+  <text x="56" y="470" font-size="15" font-weight="400" fill="#D5DDF0" text-anchor="start">Doctors see their assigned patients, administrators see hospital-wide</text>
+  <text x="56" y="494" font-size="15" font-weight="400" fill="#D5DDF0" text-anchor="start">analytics, and researchers work with anonymised cohorts.</text>
+  <rect x="56" y="750" width="176.0" height="10" rx="5" fill="#E3EFE7" stroke="#346E4D" stroke-width="1" />
+  <rect x="232.0" y="750" width="132.0" height="10" rx="0" fill="#F5E9CF" stroke="#80520A" stroke-width="1" />
+  <rect x="364.0" y="750" width="132.0" height="10" rx="5" fill="#F4DFDE" stroke="#9E2E2E" stroke-width="1" />
+  <rect x="322.4" y="745" width="4" height="20" rx="2" fill="#80520A" stroke="#80520A" stroke-width="1" />
+  <text x="56" y="782" font-size="11" font-weight="400" fill="#D5DDF0" text-anchor="start">0.00</text>
+  <text x="232.0" y="782" font-size="11" font-weight="400" fill="#D5DDF0" text-anchor="middle">0.40</text>
+  <text x="364.0" y="782" font-size="11" font-weight="400" fill="#D5DDF0" text-anchor="middle">0.70</text>
+  <text x="496" y="782" font-size="11" font-weight="400" fill="#D5DDF0" text-anchor="end">1.00</text>
+  <text x="56" y="812" font-size="13" font-weight="400" fill="#D5DDF0" text-anchor="start">Every model score is shown on this 0 to 1 scale, split into low, medium and high</text>
+  <text x="56" y="832" font-size="13" font-weight="400" fill="#D5DDF0" text-anchor="start">bands at fixed cut-offs of 0.40 and 0.70.</text>
+  <rect x="1262" y="24" width="130" height="34" rx="8" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="1327" y="46" font-size="13" font-weight="600" fill="#16283B" text-anchor="middle">Dark mode</text>
+  <text x="900" y="262" font-size="30" font-weight="700" fill="#16283B" text-anchor="start">Sign in</text>
+  <text x="900" y="292" font-size="14" font-weight="400" fill="#5B6B7D" text-anchor="start">Enter your HealthForecast AI email and password.</text>
+  <rect x="900" y="312" width="440" height="100" rx="12" fill="#E7EDF8" stroke="#9DB0D6" stroke-width="1" />
+  <text x="916" y="340" font-size="14" font-weight="700" fill="#16283B" text-anchor="start">Experimental decision-support prototype.</text>
+  <text x="916" y="362" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Not clinically validated or approved for patient care.</text>
+  <text x="916" y="382" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="start">Scores are estimates, not diagnoses.</text>
+  <text x="900" y="440" font-size="14" font-weight="700" fill="#16283B" text-anchor="start">Email</text>
+  <rect x="900" y="450" width="440" height="44" rx="8" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="900" y="526" font-size="14" font-weight="700" fill="#16283B" text-anchor="start">Password</text>
+  <rect x="900" y="536" width="440" height="44" rx="8" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <rect x="900" y="624" width="440" height="46" rx="8" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1" />
+  <text x="1120" y="653" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle">Sign in</text>
+  <rect x="900" y="692" width="440" height="40" rx="8" fill="#F4DFDE" stroke="#9E2E2E" stroke-width="1" stroke-dasharray="5 4"/>
+  <text x="1120" y="717" font-size="12" font-weight="400" fill="#9E2E2E" text-anchor="middle">Error state: message shown here, e.g. incorrect email or password</text>
+  <text x="900" y="800" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="start">Retrospective current-state wireframe, drawn after implementation.</text>
+  <text x="900" y="816" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="start">Not an original Milestone 1 design. Placeholder text only.</text>
+</svg>

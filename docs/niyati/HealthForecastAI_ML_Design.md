@@ -1,5 +1,8 @@
 # HealthForecast AI - Machine Learning Design Document
 
+> **Status note (2026-10-12).** A design written before training. It planned XGBoost as the primary model; in the executed runs **logistic regression** was selected for both targets (validation ROC-AUC), and calibration is switched off. The 0.40 and 0.70 risk bands match the implementation. See [`docs/06-milestones/milestone-2.md`](../06-milestones/milestone-2.md) for the actual results. This document is kept unchanged as the historical record of the plan; the current documentation is in [`docs/01-architecture`](../01-architecture/README.md) to [`docs/08-deployment`](../08-deployment/README.md).
+
+
 **Document Version:** 1.0
 **Companion Documents:** `HealthForecastAI_SRS.md`, `HealthForecastAI_System_Design.md`, `HealthForecastAI_Database_Design.md`
 **Project:** HealthForecast AI: Hospital Readmission Prediction & Patient Risk Intelligence System

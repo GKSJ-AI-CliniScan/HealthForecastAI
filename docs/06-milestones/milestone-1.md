@@ -1,14 +1,18 @@
 # Milestone 1 report - Week 1 & 2 - Project Initialization, Design Process & Core Setup
 
-> **How to use this file**
-> 1. Fill in every section below. Keep all five headings, even if an answer is short.
-> 2. Delete the `_Not started_` line once you begin - that line is what tells CI
->    the report is still a blank template.
-> 3. Commit it on your own branch. Do not open a pull request to `main`.
-
 - **Intern name:** Niyati R
-- **Branch:** `intern/niyati-r`
-- **Submitted on:** 2026-08-31
+- **Branch:** `intern/19-niyati-r` (the report was first submitted from `intern/niyati-r`)
+- **Submitted on:** 2026-08-31 (original submission). Reconciled with the current repository on 2026-10-12; those later corrections are marked as such.
+
+> **Reconciliation note (2026-10-12).** This report was first written on
+> 2026-08-31 and has been checked against the repository as it stands at commit
+> `7b99155`. The original text is kept wherever it is still accurate. Three
+> things changed: (1) figures that have grown since then are shown as *at
+> submission* and *now*; (2) one internal contradiction in the original evidence
+> section is corrected (see Evidence); (3) design deliverables that were not
+> produced at the time are listed honestly, together with the documents that
+> were added later. Work done *later* is labelled so it is not mistaken for
+> Milestone 1 work.
 
 ---
 
@@ -31,12 +35,26 @@
 - Healthcare dashboard functional.
 - Dataset integration and preprocessing completed.
 
+### Where each criterion stands today
+
+| Criterion | Status | Basis |
+|---|---|---|
+| Project initialization and architecture setup | Met | Scaffold, CI and layered backend (commits `d45959c`, `21cd637`); written architecture in [`docs/01-architecture`](../01-architecture/README.md) |
+| Authentication, RBAC, patient management | Met | Commits `2646800`, `6857ce9`, `262df7d`; 579 backend tests pass today; see [`docs/04-rbac`](../04-rbac/README.md) |
+| Healthcare dashboard functional | Met | Commit `f962704`; the interface has since been redesigned (section "Later work") |
+| Dataset integration and preprocessing | Met, with a different dataset than the brief names | The importer supports both datasets; the models were trained on the India export, not Diabetes 130-US (see Known gaps 1 and 2) |
+| Brief item: "Create UI wireframes" | **Not done at the time.** Current-state wireframes were drawn afterwards | [`docs/05-wireframes`](../05-wireframes/README.md), labelled as retrospective |
+| Brief item: "Design system architecture and database schema" | Schema and migrations done; written diagrams were not produced at the time and were added later | [`docs/02-database`](../02-database/README.md), [`docs/01-architecture`](../01-architecture/README.md) |
+
 ---
 
 ## What I built
 
 **Design documents** - `docs/niyati/`: SRS, System Design, Database Design, ML
-Design, Implementation Plan, plus a pre-implementation repository audit.
+Design, Implementation Plan, plus a pre-implementation repository audit. These
+are planning documents. Several of their decisions were later overtaken by the
+implementation (for example MongoDB, the XGBoost-first plan and the sixteen-table
+schema); they are kept as history with a status note rather than rewritten.
 
 **Database.** `backend/alembic/versions/0001_initial_schema.py` is the first
 migration in the repository; `alembic/versions/` was previously empty, so the
@@ -85,21 +103,29 @@ readmission tracking that preserves the source dataset's own labels.
 `scripts/import_dataset.py`. Profile-driven: profiles ship for both the Diabetes
 130-US export named in the brief and the India Hospital Readmission export.
 Validation follows the SRS rules and rejected rows are counted against a named
-reason instead of being dropped silently. `ml/src/data/preprocess.py` now removes
-expired and hospice discharge dispositions before any other step - those patients
-cannot be readmitted, so training on them leaks the target.
+reason instead of being dropped silently. `ml/src/data/preprocess.py` removes
+expired and hospice discharge dispositions before any other step - those
+patients cannot be readmitted, so training on them leaks the target.
 
 **Frontend** - `frontend/src/`: login, dashboard shell with role-aware
 navigation, patient list with search, patient detail with admission history, and
 a user management view. The access token is stored in an httpOnly cookie set by a
 Next route handler, so it never reaches client JavaScript.
 
+### Later work (not part of Milestone 1)
+
+| Date | Work | Where it is reported |
+|---|---|---|
+| 2026-09-23 | Model registry, prediction schema, ML pipeline, inference and clinical decision support | [Milestone 2](milestone-2.md) |
+| 2026-09-27 | Treatment, analytics, research and reporting | [Milestone 3](milestone-3.md) |
+| 2026-10-07 to 10-12 | Dataset pipeline, prediction-safety wording, interface redesign, Forecast H mark and sidebar, theme toggle, documentation | [Milestone 4](milestone-4.md) |
+
 ## How to run it
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/GKSJ-AI-CliniScan/HealthForecastAI.git
 cd HealthForecastAI
-git checkout intern/niyati-r
+git checkout intern/19-niyati-r
 
 # ---- Backend ----
 cd backend
@@ -126,6 +152,11 @@ curl -X POST localhost:8000/api/v1/auth/register \
 python scripts/import_dataset.py ml/data/raw/diabetic_data.csv --limit 500
 ```
 
+Use an empty database for `alembic upgrade head`. Starting the database with the
+Compose init script first conflicts with Alembic (see
+[`docs/02-database`](../02-database/README.md#6-setting-up-a-database-and-the-sql-versus-alembic-conflict)).
+The full runbook is [`docs/08-deployment`](../08-deployment/README.md).
+
 Checks, matching CI:
 
 ```bash
@@ -137,10 +168,15 @@ cd .. && for s in scripts/ci/check_*.py; do python "$s"; done
 
 ## Evidence
 
-Verified end to end against a running server with a real database and migrations
-applied (no mocks):
+> **Correction (2026-10-12).** The original text here said these checks were
+> "verified end to end against a running server with a real database and
+> migrations applied (no mocks)". Known gap 6 of the same report says the
+> environment had no PostgreSQL and no Docker, so the "real database" was a
+> **SQLite** database, with the migration also rendered as PostgreSQL DDL offline.
+> The table below is that SQLite-backed check, as originally recorded. PostgreSQL
+> has been used since (see "Since then").
 
-| Check | Result |
+| Check | Result (as recorded on 2026-08-31, SQLite) |
 |---|---|
 | `alembic upgrade head` on an empty database | 7 tables created |
 | Register first account | `role: system_admin` |
@@ -158,59 +194,78 @@ applied (no mocks):
 The last row is the refused out-of-scope read being recorded, which is the entry
 an investigation would need.
 
-The generated OpenAPI schema is committed at `docs/03-api/openapi.json`, and
-every endpoint is documented in `docs/03-api/README.md`.
+**Since then (verified 2026-10-12):**
+
+| Check | Result |
+|---|---|
+| A development PostgreSQL database (read-only look) | 9 tables plus `alembic_version`, at revision `0005` |
+| Full backend test suite at commit `7b99155` | 579 passed, 33 skipped (live end-to-end suite), 0 failed |
+| Full ML suite | 148 passed |
+| Frontend suite | 222 passed, TypeScript and ESLint exit 0 |
+| Registered API operations | 53, all described in [`docs/03-api`](../03-api/README.md) |
+
+The OpenAPI schema is committed at `docs/03-api/openapi.json` (regenerated on
+2026-10-12; the Milestone 1 export held 33 operations) and every endpoint is
+documented in `docs/03-api/README.md`.
+
+**Design evidence added after the milestone:**
+[architecture](../01-architecture/README.md) (component, request, authentication
+and ML diagrams), [database](../02-database/README.md) (ER diagram, constraints,
+migrations), [RBAC](../04-rbac/README.md) (required versus implemented matrix) and
+[current-state wireframes](../05-wireframes/README.md) (retrospective, not the
+original designs).
 
 ## Metrics
 
-| Metric | Value |
-|---|---|
-| API operations implemented | 33 (17 written this milestone; the rest are mentor placeholders for Milestones 2-4) |
-| Database tables created | 7 |
-| Alembic migrations | 1 (previously 0) |
-| Backend tests | 225 passing |
-| ML tests | 23 passing |
-| Frontend tests | 12 passing |
-| **Total tests** | **260 passing** |
-| Backend coverage | 95% |
-| Dataset rows after preprocessing | not recorded - see Known gaps |
+| Metric | At submission (2026-08-31) | Now (2026-10-12) |
+|---|---|---|
+| API operations | 33 (17 written this milestone; the rest were mentor placeholders) | 53 registered |
+| Database tables | 7 | 9 |
+| Alembic migrations | 1 | 5 (head `0005`) |
+| Backend tests | 225 passing | 579 passed, 33 skipped |
+| ML tests | 23 passing | 148 passed |
+| Frontend tests | 12 passing | 222 passed |
+| **Total** | **260 passing** | 949 passed, 33 skipped |
+| Backend coverage | 95% (as reported then) | Not re-measured; no current figure |
+| Dataset rows after preprocessing | Not recorded then | India export: 120,000 admissions joined for 86,400 patients; 7,413 further rows excluded from the readmission target (deaths), per the training metrics of 2026-10-09 |
 
 ## Known gaps
 
-1. **Dataset not loaded against a real export.** The import pipeline, its
-   validation and its cleaning are implemented and covered by 18 tests, but every
-   fixture is synthetic. No raw dataset is present in this environment, so no row
-   count after preprocessing can be reported. Running
-   `scripts/import_dataset.py` against a downloaded export is the remaining step.
+Each gap is shown with its original wording and its status now.
 
-2. **Dataset choice is unresolved in the repository.** My design documents name
-   the India Hospital Readmission Dataset as primary; the scaffold
-   (`ml/configs/config.yaml`, `ml/data/README.md`, `ml/src/data/`) is wired for
-   Diabetes 130-US. The importer ships profiles for both rather than betting on
-   one, but `ml/configs/config.yaml` still targets Diabetes. Needs a decision.
-
+1. **Dataset not loaded against a real export.** *Original:* the import pipeline
+   was implemented and covered by tests, but every fixture was synthetic.
+   *Now:* resolved for the India export, which has been downloaded, used for
+   training and partly loaded into a development PostgreSQL database
+   (2,036 patients and 3,746 admissions). **The Diabetes 130-US export, which the
+   brief names for this milestone, has no recorded load in the repository
+   evidence.** Its import profile exists and is tested with synthetic data only.
+2. **Dataset choice is unresolved in the repository.** *Original:* the design
+   documents named India as primary while the scaffold targeted Diabetes.
+   *Now:* the ML configuration and the trained models use the India export, and
+   the documentation reflects that, but **no mentor ratification is recorded**, so
+   the brief's requirement and the implementation still differ. Needs a decision.
 3. **The India export has a `region` column with no counterpart** in the
-   `patients` table. It is deliberately not imported, and not forced into `race`,
-   which is a Diabetes-specific column. Adding a column would change a
-   mentor-owned schema file.
-
+   `patients` table. It is deliberately not imported. Unchanged. Several other
+   India fields are also not imported; the list is in
+   [`docs/02-database`](../02-database/README.md#5-dataset-mapping-and-provenance).
 4. **Bootstrap administrator is a timing window.** The first registration on an
    empty database claims `system_admin`. A new environment must be registered
-   against immediately after migrations run. A seeded administrator would remove
-   the window.
-
-5. **Not implemented, and out of this milestone's criteria:** refresh tokens
-   (FR-AUTH-03), password reset (FR-AUTH-04), account lockout (FR-AUTH-05 - needs
-   a `failed_login_attempts` column the reference schema does not carry).
-
-6. **Never run against PostgreSQL.** Docker is unavailable in this environment.
-   Migrations were verified two ways: executed against SQLite (upgrade and
-   downgrade), and rendered as PostgreSQL DDL offline with
-   `alembic upgrade head --sql`, which matches `01_schema.sql`. A run against a
-   real PostgreSQL instance is still outstanding.
-
-7. **`backend/pyproject.toml` had a formatting-config bug** I fixed: `[tool.black]`
-   used `exclude`, which replaces black's defaults rather than adding to them, so
-   `black .` descended into the `.venv` that `INTERN_GUIDE.md` tells you to
-   create. Changed to `extend-exclude`. This affects every intern following the
-   guide and is worth raising.
+   against immediately after migrations run. Unchanged.
+5. **Not implemented:** refresh tokens (FR-AUTH-03), password reset (FR-AUTH-04),
+   account lockout (FR-AUTH-05). Unchanged. Also not implemented, and not
+   promised for this milestone: an audit-log viewer (FR-AUD-04).
+6. **Never run against PostgreSQL.** *Original:* Docker was unavailable.
+   *Now:* PostgreSQL has been used in development and a database sits at
+   revision `0005`. A new conflict has appeared: the Compose init script and
+   Alembic cannot both initialise one database (see
+   [`docs/02-database`](../02-database/README.md#6-setting-up-a-database-and-the-sql-versus-alembic-conflict)).
+   A full `docker compose up` has still not been verified.
+7. **`backend/pyproject.toml` formatting-config bug** fixed during this milestone:
+   `[tool.black]` used `exclude`, which replaces black's defaults, so `black .`
+   descended into the virtual environment. Changed to `extend-exclude`.
+8. **Design deliverables missing at the time (added 2026-10-12).** The brief
+   asks for UI wireframes and a designed architecture and schema. Original
+   wireframes were never produced; the SVG wireframes added later show the
+   implemented interface, not the original designs, and are labelled so. No
+   mentor approval of any design is recorded.

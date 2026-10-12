@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 760" width="1440" height="760" role="img" aria-labelledby="t d" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <title id="t">Empty, loading, error and access states (current state)</title>
+  <desc id="d">Shared states used across pages: empty, loading, section error with retry, no access, and not found. Retrospective current-state wireframe, drawn after implementation. Not an original Milestone 1 design. Placeholder text only.</desc>
+  <rect width="1440" height="760" fill="#EEF2F4"/>
+  <rect x="40" y="40" width="420" height="300" rx="12" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="60" y="74" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">Empty state</text>
+  <text x="60" y="98" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">Dashed outline, plain sentence saying what is missing and</text>
+  <text x="60" y="116" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">what to do.</text>
+  <rect x="80" y="150" width="340" height="120" rx="10" fill="none" stroke="#5B6B7D" stroke-width="1" stroke-dasharray="6 5"/>
+  <text x="250" y="216" font-size="13" font-weight="400" fill="#5B6B7D" text-anchor="middle">No scored patient is currently in the high band.</text>
+  <rect x="500" y="40" width="420" height="300" rx="12" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="520" y="74" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">Loading state</text>
+  <text x="520" y="98" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">Skeleton placeholders sized like the content they replace.</text>
+  <rect x="540" y="150" width="340" height="16" rx="8" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="540" y="180" width="300" height="16" rx="8" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="540" y="210" width="260" height="16" rx="8" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="540" y="240" width="220" height="16" rx="8" fill="#DCE3E9" stroke="none" stroke-width="1" />
+  <rect x="960" y="40" width="420" height="300" rx="12" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="980" y="74" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">Section error</text>
+  <text x="980" y="98" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">Alert panel with the reason and a Retry button; the rest</text>
+  <text x="980" y="116" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">of the page stays usable.</text>
+  <rect x="1000" y="150" width="340" height="90" rx="10" fill="#F4DFDE" stroke="#9E2E2E" stroke-width="1" />
+  <text x="1016" y="184" font-size="14" font-weight="700" fill="#16283B" text-anchor="start">Could not load this section.</text>
+  <rect x="1016" y="198" width="70" height="28" rx="6" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="1051" y="217" font-size="12" font-weight="600" fill="#16283B" text-anchor="middle">Retry</text>
+  <rect x="40" y="380" width="420" height="300" rx="12" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="60" y="414" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">No access</text>
+  <text x="60" y="438" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">Explains the role may not see this section; no data is</text>
+  <text x="60" y="456" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">requested.</text>
+  <rect x="80" y="490" width="340" height="90" rx="10" fill="#E7EDF8" stroke="#9DB0D6" stroke-width="1" />
+  <text x="96" y="528" font-size="14" font-weight="700" fill="#16283B" text-anchor="start">Your role cannot view this section.</text>
+  <rect x="500" y="380" width="420" height="300" rx="12" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="520" y="414" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">Page not found</text>
+  <text x="520" y="438" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">Brand mark, 'Page not found' and a link back to the</text>
+  <text x="520" y="456" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">dashboard.</text>
+  <rect x="694" y="490" width="32" height="32" rx="8.64" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1" />
+  <path d="M702.6666666666666 498.6666666666667v14.666666666666666M716.0 498.6666666666667v14.666666666666666" stroke="#fff" stroke-width="4.0" stroke-linecap="round" fill="none"/>
+  <path d="M702.6666666666666 510.26666666666665L719.6 501.46666666666664" stroke="#fff" stroke-width="3.466666666666667" stroke-linecap="round" fill="none"/>
+  <circle cx="719.8666666666667" cy="501.3333333333333" r="2.8666666666666663" fill="#fff" stroke="#fff" stroke-width="0"/>
+  <text x="710" y="560" font-size="20" font-weight="700" fill="#16283B" text-anchor="middle">Page not found</text>
+  <rect x="630" y="590" width="160" height="34" rx="8" fill="#2B4C8C" stroke="#2B4C8C" stroke-width="1" />
+  <text x="710" y="612" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">Go to your dashboard</text>
+  <rect x="960" y="380" width="420" height="300" rx="12" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="1" />
+  <text x="980" y="414" font-size="17" font-weight="700" fill="#16283B" text-anchor="start">Page error boundary</text>
+  <text x="980" y="438" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">'Something went wrong loading this page' with Try again</text>
+  <text x="980" y="456" font-size="12" font-weight="400" fill="#5B6B7D" text-anchor="start">and Dashboard links.</text>
+  <rect x="1000" y="490" width="340" height="110" rx="10" fill="#F4DFDE" stroke="#9E2E2E" stroke-width="1" />
+  <text x="1016" y="524" font-size="14" font-weight="700" fill="#16283B" text-anchor="start">Something went wrong loading this page.</text>
+  <rect x="1016" y="548" width="80" height="28" rx="6" fill="#FFFFFF" stroke="#B6C4CF" stroke-width="1" />
+  <text x="1056" y="567" font-size="12" font-weight="600" fill="#16283B" text-anchor="middle">Try again</text>
+  <text x="40" y="750" font-size="11" font-weight="400" fill="#5B6B7D" text-anchor="start">Retrospective current-state wireframe, drawn after implementation. Not an original Milestone 1 design. Placeholder text only.</text>
+</svg>

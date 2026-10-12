@@ -1,5 +1,8 @@
 # HealthForecast AI — Milestone 3 Design
 
+> **Status note (2026-10-12).** A design for Milestone 3. Treatment, analytics, research and reporting were built; Synthea (section 0 and 5) was not, and the materialised views of section 2.2 were not created. Results are in [`docs/06-milestones/milestone-3.md`](../../06-milestones/milestone-3.md). This document is kept unchanged as the historical record of the plan; the current documentation is in [`docs/01-architecture`](../../01-architecture/README.md) to [`docs/08-deployment`](../../08-deployment/README.md).
+
+
 **Document Version:** 1.0
 **Scope:** Treatment Effectiveness Analysis, Outcome Analytics, Research Analytics
 **Builds on:** `HealthForecastAI_Repository_Audit.md`, `HealthForecastAI_Gap_Analysis.md`, `HealthForecastAI_Milestone2_Design.md` (this milestone consumes Milestone 2's `risk_predictions` data)

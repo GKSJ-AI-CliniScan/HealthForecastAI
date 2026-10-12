@@ -1,5 +1,8 @@
 # HealthForecastAI — Repository Analysis & Milestone 1 Gap Analysis
 
+> **Status note (2026-10-12).** A snapshot from 2026-08-30, superseded by the 2026-09-22 repository audit. Its gap list is out of date. This document is kept unchanged as the historical record of the plan; the current documentation is in [`docs/01-architecture`](../../01-architecture/README.md) to [`docs/08-deployment`](../../08-deployment/README.md).
+
+
 **Document Version:** 1.0
 **Branch audited:** `intern/niyati-r`
 **Date:** 2026-08-30

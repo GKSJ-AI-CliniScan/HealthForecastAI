@@ -1,5 +1,8 @@
 # HealthForecast AI - Software Requirements Specification
 
+> **Status note (2026-10-12).** A draft written for mentor review; no approval is recorded. Its RBAC matrix (section 9) matches the project brief. Of its success criteria, readmission ROC-AUC 0.75 is **not met** (0.741) and the high-risk F1 of 0.70 is not measured. Unimplemented requirements: FR-AUTH-03/04/05, FR-READM-04, FR-RPT-03 (doctor reports), FR-AUD-04, encryption at rest, and the Synthea dataset. Section 11 names the India dataset as primary, which differs from the brief. This document is kept unchanged as the historical record of the plan; the current documentation is in [`docs/01-architecture`](../01-architecture/README.md) to [`docs/08-deployment`](../08-deployment/README.md).
+
+
 **Document Version:** 1.0
 **Status:** Draft for Internal / Mentor Review
 **Project:** HealthForecast AI: Hospital Readmission Prediction & Patient Risk Intelligence System

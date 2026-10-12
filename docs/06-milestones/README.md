@@ -9,6 +9,18 @@ One report per milestone, on your own branch. This is what gets graded.
 | [milestone-3.md](milestone-3.md) | 5-6 | Treatment effectiveness and healthcare analytics | End of week 6 |
 | [milestone-4.md](milestone-4.md) | 7-8 | Testing, deployment and documentation | End of week 8 |
 
+## Status
+
+| Report | Status | Notes |
+|--------|--------|-------|
+| [milestone-1.md](milestone-1.md) | Written (first submitted 2026-08-31) and reconciled with the current repository | Original wireframes and design diagrams were not produced at the time; later additions are labelled |
+| [milestone-2.md](milestone-2.md) | Written | Models trained and served; one SRS target not met; scores uncalibrated and not clinically validated |
+| [milestone-3.md](milestone-3.md) | Written | Treatment, analytics, research and reports built; treatment outcome data is not real clinical data |
+| [milestone-4.md](milestone-4.md) | Written, **milestone partly complete** | No cloud deployment, URL, performance measurement, presentation or demonstration |
+
+Submission dates for milestones 2 to 4 are for the intern to set when the branch
+is sent to the mentor.
+
 ## Rules
 
 1. Edit the template in place on your branch. Do not rename it.

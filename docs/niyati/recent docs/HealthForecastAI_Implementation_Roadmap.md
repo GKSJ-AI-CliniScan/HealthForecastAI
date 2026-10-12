@@ -1,5 +1,8 @@
 # HealthForecast AI — Implementation Roadmap
 
+> **Status note (2026-10-12).** A roadmap written for Milestones 2 and 3. The work it plans was done in a different order and with some different routes and names; the mentor decisions it asks for in section 1 are still not recorded. This document is kept unchanged as the historical record of the plan; the current documentation is in [`docs/01-architecture`](../../01-architecture/README.md) to [`docs/08-deployment`](../../08-deployment/README.md).
+
+
 **Document Version:** 1.0
 **Synthesizes:** `HealthForecastAI_Repository_Audit.md`, `HealthForecastAI_Gap_Analysis.md`, `HealthForecastAI_Milestone2_Design.md`, `HealthForecastAI_Milestone3_Design.md`
 **Constraint:** every step below must respect `INTERN_GUIDE.md` — work happens on `intern/19-niyati-r` (or its active feature branches), never targets `main`, never edits `.github/**`/`scripts/ci/**`/`backend/tests/test_rbac.py`, never commits `.env`/datasets/model artifacts, and every new endpoint must declare a `require_permission(...)`/`require_role(...)` dependency.

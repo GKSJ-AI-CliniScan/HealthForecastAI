@@ -1,5 +1,8 @@
 # HealthForecast AI - System Design Document
 
+> **Status note (2026-10-12).** A design written before implementation. Where it differs from the code, the code is the truth: the models are logistic regressions, the prediction routes are under `/api/v1/risk`, and the deployed topology is the Compose file. It has not been compared line by line with the implementation. This document is kept unchanged as the historical record of the plan; the current documentation is in [`docs/01-architecture`](../01-architecture/README.md) to [`docs/08-deployment`](../08-deployment/README.md).
+
+
 **Document Version:** 1.0
 **Companion Document:** `HealthForecastAI_SRS.md`
 **Project:** HealthForecast AI: Hospital Readmission Prediction & Patient Risk Intelligence System

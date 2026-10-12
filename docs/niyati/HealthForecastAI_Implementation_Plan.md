@@ -1,5 +1,8 @@
 # HealthForecastAI_Implementation_Plan.md
 
+> **Status note (2026-10-12).** A plan, not a record of what was done. Its checklists are unchecked. Its project-submission step says the branch is merged; `INTERN_GUIDE.md` says nothing is merged and the branch itself is the submission, which is the official rule. This document is kept unchanged as the historical record of the plan; the current documentation is in [`docs/01-architecture`](../01-architecture/README.md) to [`docs/08-deployment`](../08-deployment/README.md).
+
+
 **Document Version:** 1.0
 **Status:** Execution-Ready
 **Companion Documents:** `HealthForecastAI_SRS.md`, `HealthForecastAI_System_Design.md`, `HealthForecastAI_Database_Design.md`, `HealthForecastAI_ML_Design.md`, Original HealthForecast AI Project Document (PDF), Internship Guide
