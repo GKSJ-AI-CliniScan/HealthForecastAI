@@ -10,7 +10,7 @@ export default function ClinicalDashboard() {
   const [avgRecovery, setAvgRecovery] = useState("6.8 Days");
   const [filterCohort, setFilterCohort] = useState("All");
 
-  const [patients, setPatients] = useState([
+  const [patients] = useState([
     { id: "PT-10024", adm: "ADM-9824", name: "James Miller", risk: "HIGH", pct: 89, los: "14 Days", hba1c: "8.4% (Elevated)", status: "Active Care Plan" },
     { id: "PT-10811", adm: "ADM-9412", name: "Martha Jenkins", risk: "HIGH", pct: 92, los: "11 Days", hba1c: "9.1% (Elevated)", status: "Active Care Plan" },
     { id: "PT-12402", adm: "ADM-8730", name: "Robert Vance", risk: "MODERATE", pct: 52, los: "5 Days", hba1c: "7.2% (Normal)", status: "Discharge Ready" },
@@ -119,7 +119,7 @@ export default function ClinicalDashboard() {
       {/* Main Content Area */}
       <main className="flex-1 p-6 max-w-7xl w-full mx-auto space-y-6">
         
-        {/* Top Operational Metrics (Live Connected to Backend) */}
+        {/* Top Operational Metrics */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl shadow-sm">
             <p className="text-xs text-slate-400 uppercase font-semibold">Total Patients Analyzed</p>
