@@ -131,6 +131,9 @@ $ python -c "import urllib.request; resp = urllib.request.urlopen('http://localh
 Streamlit Health Status: 200
 ```
 
+#### Live Deployed Clinical Dashboard:
+![Streamlit Clinical Dashboard Deployment](milestone-4-deployment.png)
+
 ---
 
 ## Metrics
