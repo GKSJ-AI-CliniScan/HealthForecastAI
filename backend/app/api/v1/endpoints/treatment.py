@@ -7,15 +7,16 @@ the treatments they actually prescribe without seeing hospital-wide results.
 Every response is suppressed below a minimum cell size.
 """
 
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import require_any_permission
+from app.api.deps import get_db, holds_permission, require_any_permission
 from app.core.rbac import Permission
-from app.db.session import get_db
 from app.models.user import User
+from app.schemas.analytics import TreatmentEffectivenessSummary, TreatmentSummary
+from app.schemas.common import ApiEnvelope
 from app.schemas.treatment import (
     CareProcessReport,
     MedicationDetail,
@@ -27,6 +28,7 @@ from app.services import auth_service, performance_service, treatment_service
 router = APIRouter()
 
 DbSession = Annotated[Session, Depends(get_db)]
+
 CanReadTreatment = Annotated[
     User,
     Depends(
@@ -35,6 +37,23 @@ CanReadTreatment = Annotated[
         )
     ),
 ]
+
+DiseaseGroup = Annotated[
+    str | None,
+    Query(
+        description=(
+            "Restrict the rollup to one diagnostic group. Omit or 'All' for hospital-wide."
+        ),
+        examples=["DIABETES"],
+    ),
+]
+
+
+def treatment_scope(user: User) -> int | None:
+    """Return the doctor id to narrow the query to, or None for hospital-wide."""
+    if holds_permission(user, Permission.TREATMENT_REPORT_READ):
+        return None
+    return user.id
 
 
 @router.get("", response_model=MedicationReport, summary="Medication outcomes")
@@ -53,6 +72,57 @@ def medication_outcomes(
     """
     auth_service.audit_read(db, user, "treatment.report", f"diagnosis:{diagnosis or 'all'}")
     return MedicationReport(**treatment_service.medication_report(db, user, diagnosis))
+
+
+@router.get(
+    "/effectiveness",
+    response_model=list[TreatmentEffectivenessSummary],
+    summary="Treatment effectiveness summary",
+)
+def list_treatment_effectiveness(
+    user: CanReadTreatment,
+    db: DbSession,
+    disease_group: DiseaseGroup = None,
+) -> list[TreatmentEffectivenessSummary]:
+    """Return effectiveness rollups per treatment regimen."""
+    return treatment_service.get_treatment_effectiveness_summary(
+        db, disease_group, treatment_scope(user)
+    )
+
+
+@router.get(
+    "/summary",
+    response_model=ApiEnvelope[TreatmentSummary],
+    summary="Treatment dashboard summary",
+)
+def treatment_summary(
+    user: CanReadTreatment,
+    db: DbSession,
+    disease_group: DiseaseGroup = None,
+) -> ApiEnvelope[TreatmentSummary]:
+    """Composite payload for the treatment effectiveness dashboard.
+
+    Carries the headline rates, the per-protocol efficacy vs complication
+    matrix, and the recovery trajectory by specialty cohort.
+    """
+    return ApiEnvelope.ok(
+        treatment_service.get_treatment_summary(db, disease_group, treatment_scope(user))
+    )
+
+
+@router.get(
+    "/medications",
+    response_model=ApiEnvelope[list[Any]],
+    summary="Drug regimen outcome analysis",
+)
+def list_medication_outcomes(
+    user: CanReadTreatment,
+    db: DbSession,
+    disease_group: DiseaseGroup = None,
+) -> ApiEnvelope[list[Any]]:
+    """Drug regimen outcome analysis: clinical success against complication rate."""
+    outcomes = treatment_service.get_medication_outcomes(db, disease_group, treatment_scope(user))
+    return ApiEnvelope.ok([outcome.model_dump(by_alias=True) for outcome in outcomes])
 
 
 @router.get(
@@ -87,13 +157,24 @@ def recovery(user: CanReadTreatment, db: DbSession) -> RecoveryReport:
     return RecoveryReport(**treatment_service.recovery_report(db, user))
 
 
-@router.get("/recovery-trends", summary="Recovery across the encounter sequence")
+@router.get(
+    "/recovery-trends",
+    summary="Recovery trends across time / specialty",
+)
 def recovery_trends(
-    user: CanReadTreatment, db: DbSession, buckets: int = Query(default=10, ge=4, le=20)
+    user: CanReadTreatment,
+    db: DbSession,
+    buckets: int = Query(default=10, ge=4, le=20),
+    disease_group: DiseaseGroup = None,
 ) -> dict[str, object]:
-    """Stable-recovery rate across equal-sized cohorts, oldest to newest encounter."""
+    """Recovery trends across sequence cohorts and specialty cohorts."""
     trend = performance_service.sequence_trend(db, user, buckets)
+    m3_trends = treatment_service.get_recovery_trends(db, disease_group, treatment_scope(user))
     return {
+        "success": True,
+        "data": [
+            p.model_dump(by_alias=True) if hasattr(p, "model_dump") else p for p in m3_trends
+        ],
         "scope": trend["scope"],
         "axis": trend["axis"],
         "axis_note": trend["axis_note"],

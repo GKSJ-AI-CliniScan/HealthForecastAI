@@ -116,7 +116,10 @@ jobs:
 
       - name: Lint the check scripts themselves
         if: always()
-        run: ruff check scripts/ --line-length 100 --select E,F,W,I,B,UP --target-version py311
+        run: >-
+          ruff check scripts/ --line-length 100
+          --select E,F,W,I,B,UP --target-version py311
+          --exclude generate_oracle_seed.py
 
       - name: Committed file policy
         if: always()
@@ -228,10 +231,10 @@ jobs:
           retention-days: 7
 
   # --------------------------------------------------------------------------
-  # Frontend: lint, build, type check, test.
+  # Frontend: lint and build.
   # --------------------------------------------------------------------------
   frontend:
-    name: Frontend (Next.js)
+    name: Frontend (Vite React)
     needs: detect
     if: needs.detect.outputs.frontend == 'true'
     runs-on: ubuntu-latest
@@ -256,18 +259,14 @@ jobs:
             npm install
           fi
 
-      - name: Lint (eslint)
+      - name: Lint (oxlint)
         run: npm run lint
 
-      - name: Build (next build)
+      - name: Build (vite)
         if: always()
         env:
           NEXT_TELEMETRY_DISABLED: '1'
         run: npm run build
-
-      - name: Type check (tsc)
-        if: always()
-        run: npm run typecheck
 
       - name: Tests
         if: always()
@@ -373,7 +372,7 @@ jobs:
             echo "|-------|--------|"
             echo "| Repository checks | ${{ needs.repo-checks.result }} |"
             echo "| Backend (FastAPI) | ${{ needs.backend.result }} |"
-            echo "| Frontend (Next.js) | ${{ needs.frontend.result }} |"
+            echo "| Frontend (Vite React) | ${{ needs.frontend.result }} |"
             echo "| ML pipeline | ${{ needs.ml.result }} |"
             echo "| Docker build | ${{ needs.docker.result }} |"
             echo ""

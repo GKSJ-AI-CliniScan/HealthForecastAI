@@ -2,7 +2,7 @@
 
 from functools import lru_cache
 
-from pydantic import model_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -32,13 +32,26 @@ class Settings(BaseSettings):
     CACHE_TTL_SECONDS: int = 60
 
     # CORS - comma separated list of allowed origins
-    BACKEND_CORS_ORIGINS: str = "http://localhost:3000"
+    BACKEND_CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
 
     # ML
     MODEL_ARTIFACT_DIR: str = "ml/artifacts"
     ACTIVE_RISK_MODEL: str = "readmission_xgboost_v1"
     RISK_THRESHOLD_HIGH: float = 0.20
     RISK_THRESHOLD_MEDIUM: float = 0.12
+
+    @field_validator("DATABASE_URL")
+    @classmethod
+    def require_psycopg3_dialect(cls, value: str) -> str:
+        """Rewrite a bare postgresql:// URL to the psycopg 3 dialect.
+
+        Hosted platforms hand out postgresql://, and SQLAlchemy routes that scheme
+        to psycopg2 - which is not a dependency of this project, so the app dies on
+        its first query with ModuleNotFoundError. Only psycopg 3 is installed.
+        """
+        if value.startswith("postgresql://"):
+            return value.replace("postgresql://", "postgresql+psycopg://", 1)
+        return value
 
     @model_validator(mode="after")
     def refuse_unsafe_production(self) -> "Settings":

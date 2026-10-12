@@ -19,6 +19,13 @@ pinned by [`backend/tests/test_rbac.py`](../../backend/tests/test_rbac.py).
 | User management | No | No | No | Yes |
 | Model management | No | No | No | Yes |
 
+**"Limited" on treatment effectiveness reports** is row scope, not a reduced
+report. A doctor gets the same aggregations as an administrator, computed over
+`Patient.assigned_doctor_id = <their id>`; the filter is part of the SQL and
+cannot be widened by a query parameter. The endpoint accepts either arm of the
+grant (`require_any_permission(TREATMENT_REPORT_READ, TREATMENT_REPORT_READ_LIMITED)`),
+so "Limited" is enforced without locking doctors out of their own dashboard.
+
 ## Responsibilities
 
 **Doctor** - monitor patient health risks, review readmission predictions,

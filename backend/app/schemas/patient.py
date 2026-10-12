@@ -13,6 +13,13 @@ class PatientBase(BaseModel):
     gender: str | None = None
     race: str | None = None
     primary_diagnosis: str | None = None
+    clinical_notes: list[dict] | None = None
+    treatment_history: list[str] | None = None
+    recovery_progress: dict | None = None
+    treatment_status: str | None = None
+    risk_level: str | None = None
+    readmission_probability: float | None = None
+    discharge_date: str | None = None
 
 
 class PatientCreate(PatientBase):
@@ -29,6 +36,13 @@ class PatientUpdate(BaseModel):
     race: str | None = None
     primary_diagnosis: str | None = None
     assigned_doctor_id: int | None = None
+    clinical_notes: list[dict] | None = None
+    treatment_history: list[str] | None = None
+    recovery_progress: dict | None = None
+    treatment_status: str | None = None
+    risk_level: str | None = None
+    readmission_probability: float | None = None
+    discharge_date: str | None = None
 
 
 class PatientRead(PatientBase):
@@ -38,6 +52,29 @@ class PatientRead(PatientBase):
 
     id: int
     assigned_doctor_id: int | None = None
+
+
+class PatientListItem(BaseModel):
+    """A row in the patient list.
+
+    The clinical note, treatment history and recovery blobs are left out: no list
+    view renders them, and carrying 50 of them costs about ten times the payload.
+    The detail route still returns the full record.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    medical_record_number: str
+    age_group: str | None = None
+    gender: str | None = None
+    race: str | None = None
+    primary_diagnosis: str | None = None
+    assigned_doctor_id: int | None = None
+    treatment_status: str | None = None
+    risk_level: str | None = None
+    readmission_probability: float | None = None
+    discharge_date: str | None = None
 
 
 class PatientAnonymised(BaseModel):
@@ -70,7 +107,7 @@ class AdmissionRead(BaseModel):
 class PatientPage(BaseModel):
     """A page of patients plus the total the caller is allowed to see."""
 
-    items: list[PatientRead]
+    items: list[PatientListItem]
     total: int
     limit: int
     offset: int

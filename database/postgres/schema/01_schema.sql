@@ -34,6 +34,14 @@ CREATE TABLE IF NOT EXISTS patients (
 
 CREATE INDEX IF NOT EXISTS idx_patients_assigned_doctor ON patients (assigned_doctor_id);
 
+ALTER TABLE patients ADD COLUMN IF NOT EXISTS clinical_notes JSONB;
+ALTER TABLE patients ADD COLUMN IF NOT EXISTS treatment_history JSONB;
+ALTER TABLE patients ADD COLUMN IF NOT EXISTS recovery_progress JSONB;
+ALTER TABLE patients ADD COLUMN IF NOT EXISTS treatment_status VARCHAR(32);
+ALTER TABLE patients ADD COLUMN IF NOT EXISTS risk_level VARCHAR(16);
+ALTER TABLE patients ADD COLUMN IF NOT EXISTS readmission_probability DOUBLE PRECISION;
+ALTER TABLE patients ADD COLUMN IF NOT EXISTS discharge_date VARCHAR(32);
+
 CREATE TABLE IF NOT EXISTS admissions (
     id                     SERIAL PRIMARY KEY,
     patient_id             INTEGER NOT NULL REFERENCES patients (id) ON DELETE CASCADE,

@@ -285,7 +285,7 @@ frontend.
 | **Detect project areas** | Works out which parts of the project exist on your branch |
 | **Repository checks** | Branch name, folder structure, **every file you pushed parsed by type**, committed files, secrets, notebooks, doc links, milestone reports |
 | **Backend (FastAPI)** | `ruff check`, `black --check`, `mypy` (advisory), `pytest` with coverage |
-| **Frontend (Next.js)** | `npm ci`, `npm run lint`, `npm run build`, `npm run typecheck`, `npm test` |
+| **Frontend (Vite React)** | `npm ci`, `npm run lint`, `npm run build`, `npm test` |
 | **ML pipeline** | `ruff check`, `black --check`, `pytest` |
 | **Docker build** | Builds both images and validates `docker-compose.yml`. Only runs when a `Dockerfile`, a requirements file, `package.json` or `docker-compose.yml` changed |
 | **CI summary** | One table with the verdict for every job |

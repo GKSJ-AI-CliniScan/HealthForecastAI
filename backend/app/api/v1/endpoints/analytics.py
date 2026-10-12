@@ -13,6 +13,7 @@ from app.api.deps import CurrentUser, require_permission
 from app.core.rbac import Permission
 from app.db.session import get_db
 from app.models.user import User
+from app.schemas.common import ApiEnvelope
 from app.services import analytics_service, performance_service
 
 router = APIRouter()
@@ -104,3 +105,21 @@ def trends(
     side of the centre line, are reported as signals.
     """
     return performance_service.sequence_trend(db, user, buckets)
+
+
+@router.get(
+    "/hospital-dashboard", response_model=ApiEnvelope[dict[str, object]], include_in_schema=False
+)
+def hospital_dashboard_compatibility(
+    user: CanReadAnalytics, db: DbSession
+) -> ApiEnvelope[dict[str, object]]:
+    """Compatibility alias for the original React dashboard."""
+    return ApiEnvelope.ok(analytics_service.dashboard_summary(db, user))
+
+
+@router.get("/research", response_model=ApiEnvelope[dict[str, object]], include_in_schema=False)
+def research_compatibility(
+    user: CanReadPopulation, db: DbSession
+) -> ApiEnvelope[dict[str, object]]:
+    """Compatibility alias returning the aggregate research view."""
+    return ApiEnvelope.ok(analytics_service.population_health_overview(db))

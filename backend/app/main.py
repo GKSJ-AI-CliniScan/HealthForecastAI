@@ -5,11 +5,15 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from starlette.middleware.base import RequestResponseEndpoint
 
 from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.logging_config import logger
+
+if not settings.SECRET_KEY:
+    raise RuntimeError("SECRET_KEY must be configured before starting the API")
 
 
 @asynccontextmanager
@@ -58,6 +62,17 @@ async def security_headers(request: Request, call_next: RequestResponseEndpoint)
     if request.url.path.startswith(settings.API_V1_PREFIX):
         response.headers.setdefault("Cache-Control", "no-store")
     return response
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    """Ensure any uncaught server exceptions still include valid CORS response headers."""
+    logger.exception("Unhandled server exception on %s", request.url.path)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An internal server error occurred. Check backend server logs."},
+        headers={"Access-Control-Allow-Origin": request.headers.get("origin", "*")},
+    )
 
 
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)

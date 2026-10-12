@@ -75,6 +75,7 @@ ml/artifacts/*
 *.pth
 *.onnx
 *.pb
+!ml/artifacts/metrics.json
 mlruns/
 wandb/
 

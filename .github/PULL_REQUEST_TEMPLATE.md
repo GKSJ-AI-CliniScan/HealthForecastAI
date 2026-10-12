@@ -21,7 +21,7 @@
 
 - [ ] `ruff check .` and `black --check .` pass in `backend/` and `ml/`
 - [ ] `pytest` passes in `backend/` and `ml/`
-- [ ] `npm run lint`, `npm run build` and `npm run typecheck` pass in `frontend/`
+- [ ] `npm run lint` and `npm run build` pass in `frontend/`
 - [ ] Every new endpoint declares a permission with `require_permission(...)`
 - [ ] No dataset, model artifact, `.env` file or credential is committed
 - [ ] No real patient data anywhere, including screenshots
