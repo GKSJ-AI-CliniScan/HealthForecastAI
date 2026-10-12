@@ -36,4 +36,37 @@ describe('DashboardLayout', () => {
     expect(screen.getByRole('main')).toContainElement(screen.getByRole('note'));
     expect(screen.queryByRole('contentinfo')).not.toBeInTheDocument();
   });
+
+  it('offers the theme toggle beside sign out, in the sidebar and in the mobile menu', async () => {
+    render(await DashboardLayout({ children: <p>page content</p> }));
+    expect(screen.getAllByRole('button', { name: 'Dark mode' })).toHaveLength(2);
+    expect(screen.getAllByRole('button', { name: 'Sign out' })).toHaveLength(2);
+  });
+
+  it('puts Users under Administration for a system administrator, without changing the links', async () => {
+    pageState.user = sessionUser('system_admin');
+    render(await DashboardLayout({ children: <p>page content</p> }));
+    const [sidebar] = screen.getAllByRole('navigation', { name: 'Main navigation' });
+    expect([...sidebar.querySelectorAll('a')].map((a) => a.getAttribute('href'))).toEqual([
+      '/dashboard',
+      '/dashboard/patients',
+      '/dashboard/analytics',
+      '/dashboard/treatment',
+      '/dashboard/research',
+      '/dashboard/reports',
+      '/dashboard/users',
+    ]);
+    expect(sidebar).toHaveTextContent('Administration');
+  });
+
+  it.each<Role>(['doctor', 'hospital_admin', 'researcher'])(
+    'shows %s no Administration group',
+    async (role) => {
+      pageState.user = sessionUser(role);
+      render(await DashboardLayout({ children: <p>page content</p> }));
+      const [sidebar] = screen.getAllByRole('navigation', { name: 'Main navigation' });
+      expect(sidebar).not.toHaveTextContent('Administration');
+      expect(sidebar.querySelector('a[href="/dashboard/users"]')).toBeNull();
+    },
+  );
 });

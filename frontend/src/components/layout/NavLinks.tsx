@@ -6,6 +6,8 @@ import { useEffect, useRef } from 'react';
 
 import type { NavLink } from '@/lib/navigation';
 
+import { NavIcon } from './icons';
+
 export interface NavGroup {
   label: string;
   links: NavLink[];
@@ -22,7 +24,8 @@ export function isActive(pathname: string, href: string): boolean {
 /**
  * The dashboard's grouped navigation. The links themselves come from
  * lib/navigation (permission-filtered on the server); this only marks the
- * current one and, inside the mobile menu, closes the menu after navigating.
+ * current one and, inside the mobile menu, closes the menu after navigating or
+ * when Escape is pressed.
  */
 export default function NavLinks({ groups, label }: { groups: NavGroup[]; label: string }) {
   const pathname = usePathname() ?? '';
@@ -35,14 +38,29 @@ export default function NavLinks({ groups, label }: { groups: NavGroup[]; label:
     }
   }, [pathname]);
 
+  useEffect(() => {
+    const menu = ref.current?.closest('details');
+    if (!menu) {
+      return;
+    }
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && menu.open) {
+        menu.open = false;
+        menu.querySelector('summary')?.focus();
+      }
+    };
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
+  }, []);
+
   return (
-    <nav ref={ref} aria-label={label} className="space-y-6">
+    <nav ref={ref} aria-label={label} className="space-y-7">
       {groups
         .filter((group) => group.links.length > 0)
         .map((group) => (
           <div key={group.label}>
-            <p className="px-3 pb-1.5 text-[0.8125rem] font-semibold text-ink-muted">{group.label}</p>
-            <ul className="space-y-0.5">
+            <p className="px-3 pb-2 text-[0.8125rem] font-semibold text-ink-muted">{group.label}</p>
+            <ul className="space-y-1">
               {group.links.map((link) => {
                 const active = isActive(pathname, link.href);
                 return (
@@ -50,12 +68,18 @@ export default function NavLinks({ groups, label }: { groups: NavGroup[]; label:
                     <Link
                       href={link.href}
                       aria-current={active ? 'page' : undefined}
-                      className={`relative flex items-center rounded-md px-3 py-2 text-[0.9375rem] transition-colors ${
+                      className={`group/nav relative flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-[0.9375rem] transition-colors duration-150 ${
                         active
-                          ? 'bg-brand-tint font-bold text-brand before:absolute before:inset-y-1.5 before:left-0 before:w-[3px] before:rounded-full before:bg-brand'
+                          ? 'bg-brand-tint font-semibold text-brand-strong before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-full before:bg-brand'
                           : 'text-ink hover:bg-sunken'
                       }`}
                     >
+                      <NavIcon
+                        href={link.href}
+                        className={`h-[18px] w-[18px] transition-colors duration-150 ${
+                          active ? 'text-brand' : 'text-ink-muted group-hover/nav:text-ink'
+                        }`}
+                      />
                       {link.label}
                     </Link>
                   </li>

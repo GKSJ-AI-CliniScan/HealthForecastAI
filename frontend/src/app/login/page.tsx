@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 
 import BrandMark from '@/components/layout/BrandMark';
+import ThemeToggle from '@/components/layout/ThemeToggle';
 import { ExperimentalNotice } from '@/components/ui/ModelDisclaimer';
 
 /**
@@ -50,7 +51,10 @@ export default function LoginPage() {
     <div className="min-h-screen lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
       <BrandPanel />
 
-      <main className="flex items-center justify-center px-5 py-10 sm:px-8 lg:py-16">
+      <main className="relative flex items-center justify-center px-5 py-10 sm:px-8 lg:py-16">
+        <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
+          <ThemeToggle />
+        </div>
         <div className="w-full max-w-[26rem]">
           <h1 className="text-title text-ink">Sign in</h1>
           <p className="mt-1.5 text-ink-muted">Enter your HealthForecast AI email and password.</p>

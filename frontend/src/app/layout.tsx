@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Atkinson_Hyperlegible_Next } from 'next/font/google';
+import { THEME_INIT_SCRIPT } from '@/components/layout/themeScript';
 import './globals.css';
 
 /*
@@ -27,7 +28,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={sans.variable}>
+    // suppressHydrationWarning: the script below may set data-theme before React loads.
+    <html lang="en" className={sans.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body>{children}</body>
     </html>
   );

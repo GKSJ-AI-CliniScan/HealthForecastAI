@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import NavLinks, { isActive } from './NavLinks';
@@ -61,5 +61,28 @@ describe('NavLinks', () => {
       </details>,
     );
     expect(container.querySelector('details')?.open).toBe(false);
+  });
+
+  it('gives each link a decorative icon that adds nothing to its name', () => {
+    pathname.current = '/dashboard';
+    render(<NavLinks groups={GROUPS} label="Main navigation" />);
+    const link = screen.getByRole('link', { name: 'Patients' });
+    const icon = link.querySelector('svg');
+    expect(icon).toHaveAttribute('aria-hidden', 'true');
+    expect(link).toHaveAccessibleName('Patients');
+  });
+
+  it('closes the mobile menu on Escape', () => {
+    pathname.current = '/dashboard';
+    const { container } = render(
+      <details>
+        <summary>Menu</summary>
+        <NavLinks groups={GROUPS} label="Main navigation" />
+      </details>,
+    );
+    const menu = container.querySelector('details') as HTMLDetailsElement;
+    menu.open = true;
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(menu.open).toBe(false);
   });
 });

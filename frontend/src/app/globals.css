@@ -44,8 +44,41 @@
   color-scheme: light;
 }
 
+/*
+ * Dark theme. An explicit choice (the toggle sets data-theme on <html>) wins;
+ * with none, the system setting decides. The two blocks must stay identical -
+ * globals.test.ts checks that.
+ */
+:root[data-theme='dark'] {
+  --c-canvas: 14 24 34;
+  --c-surface: 21 34 48;
+  --c-sunken: 18 29 41;
+  --c-ink: 226 233 240;
+  --c-ink-muted: 163 179 194;
+  --c-rule: 42 59 76;
+  --c-rule-strong: 66 86 106;
+  --c-brand: 157 180 234;
+  --c-brand-strong: 189 206 245;
+  --c-brand-tint: 33 50 82;
+  --c-brand-deep: 24 42 78;
+  --c-on-brand: 14 24 34;
+  --c-low: 133 199 158;
+  --c-low-tint: 26 52 39;
+  --c-low-fill: 88 150 112;
+  --c-medium: 232 184 92;
+  --c-medium-tint: 61 46 18;
+  --c-medium-fill: 196 146 52;
+  --c-high: 240 150 144;
+  --c-high-tint: 72 31 31;
+  --c-high-fill: 196 90 84;
+  --c-danger: 248 128 118;
+  --c-danger-tint: 74 27 24;
+
+  color-scheme: dark;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --c-canvas: 14 24 34;
     --c-surface: 21 34 48;
     --c-sunken: 18 29 41;
