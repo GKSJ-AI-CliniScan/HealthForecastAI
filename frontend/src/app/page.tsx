@@ -11,7 +11,7 @@ export default function Page() {
 
   if (!mounted) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-slate-900 text-white font-sans text-sm">
+      <div className="flex h-screen w-screen items-center justify-center bg-slate-950 text-white font-sans text-sm">
         Initializing Clinical Decision Intelligence...
       </div>
     );
