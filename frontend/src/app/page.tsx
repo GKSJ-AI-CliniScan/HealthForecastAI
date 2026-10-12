@@ -19,7 +19,7 @@ export default function Page() {
 
   return (
     <iframe
-      src="/index.html"
+      src="/dashboards.html"
       title="HealthForecastAI Clinical Dashboard"
       className="w-screen h-screen border-0 m-0 p-0 block"
       style={{ width: "100vw", height: "100vh" }}
