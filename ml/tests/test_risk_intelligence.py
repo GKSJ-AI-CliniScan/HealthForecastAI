@@ -1,11 +1,19 @@
 """Tests for the risk intelligence layer."""
 
+import sys
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
 from sklearn.linear_model import LogisticRegression
 
-from src.models.risk_intelligence import (
+# Add 'ml' directory to sys.path so pytest can locate 'src'
+ML_ROOT = Path(__file__).resolve().parent.parent
+if str(ML_ROOT) not in sys.path:
+    sys.path.insert(0, str(ML_ROOT))
+
+from src.models.risk_intelligence import (  # noqa: E402, I001
     RECOMMENDATIONS,
     assign_risk_levels,
     predict_risk,
