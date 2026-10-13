@@ -55,7 +55,7 @@ def test_recommendation_matches_risk_level(bundle_and_features):
     bundle, features = bundle_and_features
     result = predict_risk(features, bundle, high_cut=0.7)
 
-    for level, text in zip(result["risk_level"], result["clinical_recommendation"]):
+    for level, text in zip(result["risk_level"], result["clinical_recommendation"], strict=False):
         assert text == RECOMMENDATIONS[level]
 
 
