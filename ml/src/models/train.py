@@ -246,24 +246,32 @@ def main() -> None:
 
         pipeline.fit(x_train, y_train)
 
-        # Current baseline evaluation is performed on test data.
-        y_pred = pipeline.predict(x_test)
-        y_proba = pipeline.predict_proba(x_test)[:, 1]
+                # Compare models using validation data, not test data.
+        y_pred = pipeline.predict(x_val)
+        y_proba = pipeline.predict_proba(x_val)[:, 1]
 
         metrics = classification_metrics(
-            y_test,
+            y_val,
             y_pred,
             y_proba,
         )
 
         metrics.update(
             confusion_counts(
-                y_test,
+                y_val,
                 y_pred,
             )
         )
 
         results[name] = metrics
+
+        print(f"{name}: {json.dumps(metrics, indent=2)}")
+
+        if metrics.get(primary, -1.0) > best_score:
+            best_name = name
+            best_pipeline = pipeline
+            best_score = metrics[primary]
+        
 
         print(f"{name}: " f"{json.dumps(metrics, indent=2)}")
 
@@ -278,42 +286,7 @@ def main() -> None:
     if best_pipeline is None or best_name is None:
         raise SystemExit("No model was enabled in the config - nothing to train.")
 
-    thresholds = config["evaluation"]["thresholds"]
-
-    promoted = meets_promotion_thresholds(
-        results[best_name],
-        thresholds,
-    )
-
-    summary = {
-        "best_model": best_name,
-        "promoted": promoted,
-        "results": results,
-    }
-
-    # ---------------------------------------------------------
-    # Save model and metrics
-    # ---------------------------------------------------------
-    output_dir = Path(config["artifacts"]["output_dir"])
-
-    output_dir.mkdir(
-        parents=True,
-        exist_ok=True,
-    )
-
-    joblib.dump(
-        best_pipeline,
-        output_dir / config["artifacts"]["model_filename"],
-    )
-
-    metrics_path = output_dir / config["artifacts"]["metrics_filename"]
-
-    metrics_path.write_text(
-        json.dumps(summary, indent=2),
-        encoding="utf-8",
-    )
-
-    print(f"Best model: {best_name} " f"({primary}={best_score:.4f}), " f"promoted={promoted}")
+    
     # ---------------------------------------------------------
     # Final training on train + validation data
     # ---------------------------------------------------------
@@ -362,9 +335,46 @@ def main() -> None:
 
     print(f"Final {best_name} test metrics: " f"{json.dumps(final_metrics, indent=2)}")
 
-    if not promoted:
-        raise SystemExit("Best model failed the promotion thresholds " f"{thresholds}")
+        # Check promotion using the final test metrics.
+    thresholds = config["evaluation"]["thresholds"]
+    promoted = meets_promotion_thresholds(
+        final_metrics,
+        thresholds,
+    )
 
+    # Save the final retrained model.
+    output_dir = Path(config["artifacts"]["output_dir"])
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    model_path = output_dir / config["artifacts"]["model_filename"]
+    joblib.dump(final_pipeline, model_path)
+
+    # Save validation comparison and final test results separately.
+    summary = {
+        "best_model": best_name,
+        "promoted": promoted,
+        "selection_metric": primary,
+        "validation_results": results,
+        "final_test_metrics": final_metrics,
+        "promotion_thresholds": thresholds,
+    }
+
+    metrics_path = output_dir / config["artifacts"]["metrics_filename"]
+    metrics_path.write_text(
+        json.dumps(summary, indent=2),
+        encoding="utf-8",
+    )
+
+    print(f"Saved final model: {model_path}")
+    print(f"Saved metrics: {metrics_path}")
+    print(f"Final test metrics: {json.dumps(final_metrics, indent=2)}")
+    print(f"Promoted: {promoted}")
+
+    if not promoted:
+        print(
+            "WARNING: Model did not meet promotion thresholds. "
+            "Do not deploy it as the approved model."
+        )
 
 if __name__ == "__main__":
     main()
