@@ -5,10 +5,10 @@ import { ApiError, apiFetch } from '@/lib/api';
 import type { LoginResponse } from '@/types';
 
 const DEMO_ACCOUNTS = [
-  { label: 'Doctor', email: 'doctor1@hospital.test', password: 'Doctor@123' },
-  { label: 'Hospital admin', email: 'admin@hospital.test', password: 'Admin@123' },
-  { label: 'Researcher', email: 'researcher@hospital.test', password: 'Research@123' },
-  { label: 'System admin', email: 'sysadmin@hospital.test', password: 'SysAdmin@123' },
+  { label: 'Doctor', email: 'doctor1@hospital-demo.com' },
+  { label: 'Hospital admin', email: 'admin@hospital-demo.com' },
+  { label: 'Researcher', email: 'researcher@hospital-demo.com' },
+  { label: 'System admin', email: 'sysadmin@hospital-demo.com' },
 ];
 
 interface LoginFormProps {
@@ -17,7 +17,7 @@ interface LoginFormProps {
 
 export function LoginForm({ onLogin }: LoginFormProps) {
   const [email, setEmail] = useState(DEMO_ACCOUNTS[0].email);
-  const [password, setPassword] = useState(DEMO_ACCOUNTS[0].password);
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -56,7 +56,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
             className="rounded border border-[var(--border)] px-2 py-1 text-xs"
             onClick={() => {
               setEmail(account.email);
-              setPassword(account.password);
+              setPassword('');
             }}
           >
             {account.label}
@@ -92,7 +92,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         {busy ? 'Signing in...' : 'Sign in'}
       </button>
       <p className="text-xs text-slate-500">
-        Demo accounts use synthetic data only. The token is kept in memory, not in localStorage.
+        Demo accounts use synthetic data only. Demo passwords are listed in docs/06-milestones/milestone-1.md. The token is kept in memory, not in localStorage.
       </p>
     </form>
   );

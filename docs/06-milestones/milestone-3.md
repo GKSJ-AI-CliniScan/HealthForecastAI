@@ -41,7 +41,7 @@ git checkout intern/18-raniya-raseen-m-m
 cd backend
 pip install -r requirements.txt -r requirements-dev.txt
 uvicorn app.main:app --reload     # open http://localhost:8000/docs
-# log in at POST /api/v1/auth/login as admin@hospital.test / Admin@123, click Authorize,
+# log in at POST /api/v1/auth/login as admin@hospital-demo.com / Admin@123, click Authorize,
 # then try GET /api/v1/analytics/summary, /analytics/readmissions and /treatment
 ```
 

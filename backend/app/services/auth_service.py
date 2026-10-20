@@ -43,11 +43,17 @@ class AuditEntry:
 
 
 DEMO_ACCOUNTS: list[tuple[str, str, Role, str, str | None]] = [
-    ("doctor1@hospital.test", "Dr. Asha Menon", Role.DOCTOR, "Doctor@123", "Cardiology"),
-    ("doctor2@hospital.test", "Dr. Rahul Verma", Role.DOCTOR, "Doctor@456", "Endocrinology"),
-    ("admin@hospital.test", "Hospital Administrator", Role.HOSPITAL_ADMIN, "Admin@123", None),
-    ("researcher@hospital.test", "Healthcare Researcher", Role.RESEARCHER, "Research@123", None),
-    ("sysadmin@hospital.test", "System Administrator", Role.SYSTEM_ADMIN, "SysAdmin@123", None),
+    ("doctor1@hospital-demo.com", "Dr. Asha Menon", Role.DOCTOR, "Doctor@123", "Cardiology"),
+    ("doctor2@hospital-demo.com", "Dr. Rahul Verma", Role.DOCTOR, "Doctor@456", "Endocrinology"),
+    ("admin@hospital-demo.com", "Hospital Administrator", Role.HOSPITAL_ADMIN, "Admin@123", None),
+    (
+        "researcher@hospital-demo.com",
+        "Healthcare Researcher",
+        Role.RESEARCHER,
+        "Research@123",
+        None,
+    ),
+    ("sysadmin@hospital-demo.com", "System Administrator", Role.SYSTEM_ADMIN, "SysAdmin@123", None),
 ]
 
 _users: dict[int, UserRecord] = {}

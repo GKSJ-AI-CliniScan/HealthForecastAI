@@ -58,7 +58,7 @@ npm install
 npm run dev
 ```
 
-Demo logins (synthetic data): `doctor1@hospital.test` / `Doctor@123`, `admin@hospital.test` / `Admin@123`, `researcher@hospital.test` / `Research@123`, `sysadmin@hospital.test` / `SysAdmin@123`.
+Demo logins (synthetic data): `doctor1@hospital-demo.com` / `Doctor@123`, `admin@hospital-demo.com` / `Admin@123`, `researcher@hospital-demo.com` / `Research@123`, `sysadmin@hospital-demo.com` / `SysAdmin@123`.
 
 ## Evidence
 
