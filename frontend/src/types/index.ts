@@ -35,3 +35,38 @@ export interface HospitalAnalyticsSummary {
   average_length_of_stay: number;
   risk_distribution: Record<RiskCategory, number>;
 }
+
+export interface LoginResponse {
+  access_token: string;
+  token_type: string;
+  role: Role;
+  permissions: string[];
+}
+
+export interface ReadmissionForecast {
+  scope: string;
+  horizon_days: number;
+  predicted_readmissions: number;
+  predicted_rate: number;
+}
+
+export interface MonthlyReadmissions {
+  month: string;
+  admissions: number;
+  readmission_rate: number;
+}
+
+export interface TreatmentSummary {
+  treatment_name: string;
+  patients_treated: number;
+  average_recovery_score: number;
+  readmission_rate: number;
+}
+
+export interface CareRecommendation {
+  patient_id: number;
+  risk_category: RiskCategory;
+  readmission_probability: number;
+  recommendations: string[];
+  follow_up_days: number;
+}

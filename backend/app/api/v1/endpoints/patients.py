@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.deps import CurrentUser, get_current_user, require_permission
 from app.core.rbac import Permission, Role
-from app.schemas.patient import PatientCreate, PatientRead
+from app.schemas.patient import PatientAnonymised, PatientCreate, PatientRead
+from app.services import auth_service, patient_service
 
 router = APIRouter()
 
@@ -18,15 +19,13 @@ def list_patients(user: CurrentUser = Depends(get_current_user)) -> list[Patient
       - hospital_admin  -> hospital wide, read only
       - researcher      -> anonymised records only
       - system_admin    -> everything
-
-    TODO(milestone-1): implement the scoping in app/services/patient_service.py.
     """
     if user.role is Role.RESEARCHER:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Researchers must use /patients/anonymised",
         )
-    return []
+    return [PatientRead.model_validate(p) for p in patient_service.visible_patients(user)]
 
 
 @router.post("", response_model=PatientRead, status_code=status.HTTP_201_CREATED)
@@ -34,22 +33,38 @@ def create_patient(
     payload: PatientCreate,
     user: CurrentUser = Depends(require_permission(Permission.PATIENT_WRITE)),
 ) -> PatientRead:
-    """Create a patient record.
+    """Create a patient record and write an audit log entry."""
+    try:
+        record = patient_service.create_patient(
+            medical_record_number=payload.medical_record_number,
+            age_group=payload.age_group,
+            gender=payload.gender,
+            race=payload.race,
+            primary_diagnosis=payload.primary_diagnosis,
+            assigned_doctor_id=payload.assigned_doctor_id,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+    auth_service.record_audit(f"user:{user.subject}", f"create_patient:{record.id}", "success")
+    return PatientRead.model_validate(record)
 
-    TODO(milestone-1): persist to PostgreSQL and emit an audit log entry.
-    """
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Patient creation is not implemented yet - see TODO(milestone-1)",
-    )
 
-
-@router.get("/anonymised", summary="Anonymised patient cohort for researchers")
+@router.get(
+    "/anonymised",
+    response_model=list[PatientAnonymised],
+    summary="Anonymised patient cohort for researchers",
+)
 def list_anonymised_patients(
     user: CurrentUser = Depends(require_permission(Permission.PATIENT_READ_ANONYMIZED)),
-) -> list[dict[str, str]]:
-    """Return a de-identified cohort.
+) -> list[PatientAnonymised]:
+    """Return a de-identified cohort: pseudonymised ID, no MRN, no direct identifiers."""
+    return [PatientAnonymised(**row) for row in patient_service.anonymised_cohort()]
 
-    TODO(milestone-3): pseudonymise the MRN and strip every direct identifier.
-    """
-    return []
+
+@router.get("/{patient_id}", response_model=PatientRead, summary="One patient")
+def read_patient(patient_id: int, user: CurrentUser = Depends(get_current_user)) -> PatientRead:
+    """Return one patient if the caller may see them, otherwise 404."""
+    record = patient_service.get_visible_patient(user, patient_id)
+    if record is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+    return PatientRead.model_validate(record)

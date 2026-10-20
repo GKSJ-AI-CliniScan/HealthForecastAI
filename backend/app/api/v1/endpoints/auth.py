@@ -1,14 +1,13 @@
-"""Authentication endpoints - Module 1 (User Management).
-
-Milestone 1 owner: wire these to the users table via app/services/auth_service.py.
-"""
+"""Authentication endpoints - Module 1 (User Management)."""
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.deps import CurrentUser, get_current_user
 from app.core.rbac import Role, permissions_for
+from app.core.security import create_access_token
 from app.schemas.token import Token
 from app.schemas.user import UserLogin
+from app.services import auth_service
 
 router = APIRouter()
 
@@ -17,13 +16,18 @@ router = APIRouter()
 def login(payload: UserLogin) -> Token:
     """Authenticate a user and issue an access token.
 
-    TODO(milestone-1): look the user up in PostgreSQL, verify the bcrypt hash
-    with app.core.security.verify_password and record the attempt in audit_logs.
+    Every attempt, successful or not, is written to the audit trail. The error
+    message is the same for an unknown e-mail and a wrong password.
     """
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Login is not implemented yet - see TODO(milestone-1) in auth.py",
-    )
+    user = auth_service.authenticate(payload.email, payload.password)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect e-mail or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    token = create_access_token(subject=str(user.id), role=str(user.role))
+    return Token(access_token=token, role=str(user.role), permissions=permissions_for(user.role))
 
 
 @router.get("/me", summary="Return the authenticated caller and their permissions")

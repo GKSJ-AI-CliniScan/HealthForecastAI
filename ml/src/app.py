@@ -1,8 +1,8 @@
+import joblib
+import numpy as np
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import joblib
-import numpy as np
 
 # 1. Load the saved model and feature columns
 model = joblib.load("../artifacts/risk_model.pkl")
@@ -19,9 +19,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # 3. Define the input format (patient data as a dictionary)
 class PatientData(BaseModel):
     data: dict  # patient features as key-value pairs
+
 
 # 4. Define the categorization logic (same thresholds as before)
 def categorize_risk(score):
@@ -32,10 +34,12 @@ def categorize_risk(score):
     else:
         return "High"
 
+
 # 5. Health check endpoint (to confirm API is running)
 @app.get("/")
 def read_root():
     return {"message": "Patient Risk Prediction API is running"}
+
 
 # 6. Prediction endpoint
 @app.post("/predict-risk")
@@ -49,7 +53,4 @@ def predict_risk(patient: PatientData):
     risk_score = model.predict_proba(input_array)[:, 1][0]
     risk_category = categorize_risk(risk_score)
 
-    return {
-        "risk_score": round(float(risk_score), 4),
-        "risk_category": risk_category
-    }
+    return {"risk_score": round(float(risk_score), 4), "risk_category": risk_category}

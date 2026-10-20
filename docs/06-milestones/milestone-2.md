@@ -2,7 +2,7 @@
 
 - **Intern name:** Raniya Raseen M M
 - **Branch:** `intern/18-raniya-raseen-m-m`
-- **Submitted on:** 2026-10-17
+- **Submitted on:** 2026-10-20
 
 ---
 
@@ -26,36 +26,48 @@
 
 ## What I built
 
-I built the machine-learning side of the platform: a risk model trained on the Diabetes 130-US Hospitals dataset and a small FastAPI service that serves it.
+Two parts: the machine-learning pipeline in `ml/` (my earlier work, deployed on Render) and the risk features of the platform backend.
 
-- **Training:** `ml/src/models/train_model.py` splits the feature-engineered data 80/20 (stratified, `random_state=42`) and trains a Random Forest (100 trees, `class_weight="balanced"`). It prints accuracy, precision, recall, F1, ROC-AUC and a per-class report.
-- **Risk scores:** `ml/src/models/generate_risk_scores.py` uses 5-fold cross-validated probabilities, so each patient's score comes from a model that did not see that patient. It then bands patients as Low (bottom 50%), Medium (next 30%) and High (top 20%) by percentile.
-- **Final model:** `ml/src/models/save_model.py` trains a smaller Random Forest (30 trees, max depth 10) on all rows and saves `risk_model.pkl` and `feature_columns.pkl` to `ml/artifacts/`. I used a smaller model to keep the deployed file small.
-- **Prediction API:** `ml/src/app.py` (FastAPI). `GET /` is a health check. `POST /predict-risk` takes a JSON body `{"data": {feature: value, ...}}` and returns `risk_score` (0-1) and `risk_category` (Low below 0.48, Medium below 0.62, High otherwise). Missing features default to 0. CORS is enabled for a dashboard on `http://localhost:5500`.
-- **Deployment:** the API is deployed on Render at https://healthforecastai.onrender.com (interactive docs at `/docs`).
+**ML pipeline and deployed API (`ml/src`)**
+
+- **Training:** `models/train_model.py` splits the feature-engineered data 80/20 (stratified, `random_state=42`) and trains a Random Forest (100 trees, `class_weight="balanced"`). It prints accuracy, precision, recall, F1 and ROC-AUC.
+- **Risk scores:** `models/generate_risk_scores.py` uses 5-fold cross-validated probabilities, so each patient's score comes from a model that did not see that patient, then bands patients Low (bottom 50%), Medium (next 30%) and High (top 20%).
+- **Final model and API:** `models/save_model.py` trains a smaller Random Forest (30 trees, depth 10) and `app.py` serves it as a FastAPI service, deployed at https://healthforecastai.onrender.com (docs at `/docs`). `POST /predict-risk` returns a score and a Low/Medium/High category.
+
+**Platform backend (`backend/app`)**
+
+- **Risk scoring** (`services/model_service.py`, `endpoints/risk.py`): `POST /risk/predict` scores one admission. The platform ships a transparent baseline (a logistic score over the same admission features: length of stay, medications, lab procedures, diagnoses, prior inpatient and emergency visits, age). If `risk_model.pkl` and `feature_columns.pkl` from `ml/src/models/save_model.py` are placed in `MODEL_ARTIFACT_DIR`, the trained Random Forest is used instead.
+- **High risk cohort:** `GET /risk/high-risk` lists patients above the high threshold (0.70), riskiest first. A doctor sees only their own patients.
+- **Readmission forecasting:** `GET /risk/forecast?horizon_days=` and `/risk/forecast/departments` give expected readmissions and rate for the visible cohort and per department.
+- **Clinical insights** (`services/cds_service.py`, `endpoints/clinical_support.py`): `GET /clinical-support/recommendations/{id}` turns the top risk drivers into care advice and a follow-up date. `GET /clinical-support/discharge-plan/{id}` gives discharge readiness and mitigation steps.
+- **Model information** (`endpoints/ml_models.py`): active model, and the five evaluation metrics of the offline Random Forest (system administrator only).
+- **Dashboard:** high risk list and forecast panels in `frontend/src/components/dashboard/Dashboard.tsx`.
 
 ## How to run it
 
-The dataset is not committed (see `ml/data/README.md`). Download `diabetic_data.csv` into `ml/data/processed/` first, then from the repository root:
+The dataset is not committed (see `ml/data/README.md`). Download `diabetic_data.csv` into `ml/data/processed/`, then:
 
 ```bash
 pip install -r ml/requirements.txt
-
-# 1. clean, 2. build features, 3. train and print metrics
 cd ml/data/processed
 python ../../src/features/preprocess.py
 python ../../src/features/feature_engineering.py
-python ../../src/models/train_model.py
-
-# 4. save the deployable model (writes risk_model.pkl; move it to ml/artifacts/)
+python ../../src/models/train_model.py      # prints the metrics below
 cd ../../src/models
-python save_model.py
-
-# 5. run the API locally
-cd ..
-pip install -r requirements-deploy.txt
-uvicorn app:app --reload        # then open http://localhost:8000/docs
+python save_model.py                         # writes risk_model.pkl (not committed)
 ```
+
+Platform backend:
+
+```bash
+git clone https://github.com/GKSJ-AI-CliniScan/HealthForecastAI
+cd HealthForecastAI
+git checkout intern/18-raniya-raseen-m-m
+cd backend
+pip install -r requirements.txt -r requirements-dev.txt
+uvicorn app.main:app --reload     # open http://localhost:8000/docs
+```
+
 
 ## Evidence
 
@@ -71,17 +83,15 @@ Precision: 0.6120
 Recall: 0.5734
 F1-score: 0.5921
 ROC-AUC: 0.6821
-
-              precision  recall  f1-score  support
-           0       0.65    0.69      0.67    10764
-           1       0.61    0.57      0.59     9285
 ```
 
-The API is live at https://healthforecastai.onrender.com/docs, where `POST /predict-risk` can be tried from the browser.
+The ML API is live at https://healthforecastai.onrender.com/docs.
+
+Running the platform's risk services directly on the 120 seeded synthetic patients gave: 15 high, 52 medium and 53 low risk patients; a 30-day forecast of 56 expected readmissions (rate 0.466) and 112 over 60 days; doctor 1 has 8 high risk patients. A high risk admission (12 days, 35 medications, 3 prior inpatient visits) scores 0.93 and a low risk one scores 0.09.
 
 ## Metrics
 
-All five metrics for the model I evaluated (Random Forest, 100 trees, balanced class weights), on 20,049 held-out patients, treating class 1 ("readmitted") as positive:
+Random Forest (100 trees, balanced class weights), 20,049 held-out patients, class 1 ("readmitted") positive:
 
 | Metric | Value |
 |---|---|
@@ -91,15 +101,15 @@ All five metrics for the model I evaluated (Random Forest, 100 trees, balanced c
 | F1 | 0.592 |
 | ROC-AUC | 0.682 |
 
-I trained one model type only, so there is no model comparison. The result is modest: the model ranks patients better than chance (ROC-AUC 0.68) but is wrong for roughly 4 in 10 patients, so it is suitable for prioritising follow-up, not for making clinical decisions on its own.
+I trained one model type only, so there is no model comparison. The model ranks patients better than chance (ROC-AUC 0.68) but is wrong for about 4 in 10 patients, so it supports prioritising follow-up and must not make clinical decisions on its own. Platform tests for this milestone: 11 (`test_risk_api.py`, `test_risk_service.py`). Endpoints: 9.
 
 ## Known gaps
 
-- **Target definition.** My label (`risk_label`) is 1 if a patient was readmitted at any time (`<30` or `>30`) and 0 if never readmitted. The project brief targets readmission within 30 days. The class balance is therefore about 46% positive, not the roughly 11% a 30-day target would give, and my metrics are not comparable with 30-day results.
-- **Deployed model is not the evaluated model.** The metrics above are for the 100-tree model on a held-out split. The model served by the API is a smaller 30-tree model trained on all rows, so it has no held-out score of its own. I expect it to perform somewhat worse, but I have not measured it.
-- **Possible data leakage.** The same patient can appear several times in the dataset and I split by row, not by patient, so train and test may share patients and the scores may be slightly optimistic.
-- **No readmission forecasting.** I did not build a time-series forecast, a forecasting report or a clinical-insights module. Only individual risk scoring is implemented.
-- **No dashboard in this repository.** There is no dashboard page committed. The API's CORS setting allows a local dashboard on port 5500, but the page itself is not part of this submission.
-- **Fixed thresholds.** The Low/Medium/High cut-offs (0.48 and 0.62) are hard-coded in `app.py`. They were not tuned or calibrated against clinical outcomes.
-- **Model files are committed.** `risk_model.pkl` and `feature_columns.pkl` are in `ml/artifacts/` because the Render deployment loads them, which goes against the repository's rule about model artifacts. They are small (about 3.4 MB) but should be rebuilt in CI or stored elsewhere.
-- **No automated tests** for my scripts or the API.
+- **Target definition.** My label is 1 if a patient was readmitted at any time (`<30` or `>30`), not within 30 days as in the brief. About 46% are positive, not roughly 11%, so these metrics are not comparable with 30-day results.
+- **The served model is not the evaluated model.** The metrics are for the 100-tree model. The deployed API serves a smaller 30-tree model trained on all rows with no held-out score. The platform backend serves the logistic baseline unless the model files are installed, and the baseline has not been validated against real outcomes. Its weights were set by hand.
+- **Possible data leakage.** The same patient can appear several times and I split by row, not by patient, so the scores may be slightly optimistic.
+- **Forecast is not a time series.** The forecast scales each patient's risk by horizon length; it is not a trained forecasting model.
+- **Fixed thresholds.** The cut-offs (0.48 and 0.62 in the ML API, 0.40 and 0.70 in the platform) are hard-coded and not calibrated against clinical outcomes.
+- **Model files are not in the repository.** The repository rules do not allow model files, so `risk_model.pkl` and `feature_columns.pkl` are rebuilt with `save_model.py`. The live Render API needs these files, so it is deployed separately from this branch.
+- **Clinical advice is rule based** and generic. A clinician must review it.
+- **Not run before submission:** the backend tests and `npm run build` were not run on my machine. The CI result is the evidence.

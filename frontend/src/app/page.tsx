@@ -1,4 +1,5 @@
 import { MODULES } from '@/lib/modules';
+import { DashboardShell } from '@/components/dashboard/DashboardShell';
 
 export default function Home() {
   return (
@@ -8,9 +9,10 @@ export default function Home() {
       </p>
       <h1 className="mt-2 text-4xl font-bold tracking-tight">HealthForecast AI</h1>
       <p className="mt-4 max-w-2xl text-lg text-slate-500">
-        Hospital readmission prediction and patient risk intelligence. Replace this
-        placeholder with the dashboard you build for your milestone.
+        Hospital readmission prediction and patient risk intelligence.
       </p>
+
+      <DashboardShell />
 
       <section className="mt-12">
         <h2 className="text-xl font-semibold">Modules</h2>

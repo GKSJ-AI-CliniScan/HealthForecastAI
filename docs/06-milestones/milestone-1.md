@@ -2,7 +2,7 @@
 
 - **Intern name:** Raniya Raseen M M
 - **Branch:** `intern/18-raniya-raseen-m-m`
-- **Submitted on:** 2026-10-17
+- **Submitted on:** 2026-10-20
 
 ---
 
@@ -29,43 +29,56 @@
 
 ## What I built
 
-I completed only the dataset integration and preprocessing part of this milestone. I did not implement authentication, role-based access control, patient management or the dashboard.
+I used an AI assistant (Claude) to help write the backend, dashboard and reports, and I tested what I could. The ML pipeline in `ml/` is my own earlier work.
 
-- **Dataset loading and cleaning** (`ml/src/features/preprocess.py`): reads `diabetic_data.csv` (101,766 encounters), replaces `?` with missing values, drops the columns that are mostly empty (`weight`, `max_glu_serum`, `A1Cresult`, `medical_specialty`, `payer_code`), fills missing `race` with `Unknown`, drops the few rows with a missing diagnosis, and creates the target `risk_label` (1 if the patient was readmitted at any time, 0 if never). The cleaned file has about 100,000 rows (80,195 training plus 20,049 test rows were used later).
-- **Feature engineering** (`ml/src/features/feature_engineering.py`): drops identifier columns (`encounter_id`, `patient_nbr`) and the original `readmitted` column so the answer is not a feature, groups the three diagnosis ICD-9 codes into nine categories (Circulatory, Respiratory, Digestive, Diabetes, Injury, Musculoskeletal, Genitourinary, Neoplasms, Other), and one-hot encodes all text columns, giving 101 model features.
+- **Authentication** (`backend/app/services/auth_service.py`, `api/v1/endpoints/auth.py`): `POST /auth/login` checks a bcrypt password hash and returns a JWT carrying the user's id and role. A wrong password and an unknown e-mail give the same 401 message. Every attempt is written to an audit trail.
+- **Role-based access control** (`core/rbac.py` and `api/deps.py`, provided in the starter): I wired it to real endpoints. Each endpoint uses `require_permission`, so the four roles see different things. A doctor sees only assigned patients, the hospital administrator is read-only, and the researcher gets anonymised data only.
+- **User management** (`endpoints/users.py`): the system administrator can list and create users and read the audit log.
+- **Patient management** (`services/patient_service.py`, `endpoints/patients.py`): list (scoped by role), view one, create (system administrator), and an anonymised cohort for researchers (SHA-256 pseudonym, no MRN, no doctor id, no race). Data is held in memory and seeded with 120 synthetic patients.
+- **Dataset preprocessing** (`ml/src/features/preprocess.py`, `feature_engineering.py`): cleans `diabetic_data.csv` (101,766 encounters), drops mostly-empty columns, groups diagnosis codes into nine categories and one-hot encodes to 101 features.
+- **Dashboard** (`frontend/src/components/dashboard/`): a Next.js login form and a role-aware dashboard that shows only the panels the signed-in role may read.
 
 ## How to run it
 
-Download the dataset into `ml/data/processed/` as described in `ml/data/README.md` (it is not committed), then:
+Download the dataset into `ml/data/processed/` for the ML part (see `ml/data/README.md`). For the platform:
 
 ```bash
 git clone https://github.com/GKSJ-AI-CliniScan/HealthForecastAI
 cd HealthForecastAI
 git checkout intern/18-raniya-raseen-m-m
-pip install -r ml/requirements.txt
-cd ml/data/processed
-python ../../src/features/preprocess.py            # writes diabetic_data_cleaned.csv
-python ../../src/features/feature_engineering.py   # writes diabetic_data_features.csv
+
+# backend (terminal 1) - http://localhost:8000/docs
+cd backend
+pip install -r requirements.txt -r requirements-dev.txt
+uvicorn app.main:app --reload
+
+# frontend (terminal 2) - http://localhost:3000
+cd frontend
+npm install
+npm run dev
 ```
+
+Demo logins (synthetic data): `doctor1@hospital.test` / `Doctor@123`, `admin@hospital.test` / `Admin@123`, `researcher@hospital.test` / `Research@123`, `sysadmin@hospital.test` / `SysAdmin@123`.
 
 ## Evidence
 
-Running `train_model.py` on the feature file reports a training set of (80195, 101) and a test set of (20049, 101), which shows the preprocessing and feature engineering produce 101 usable features for about 100,000 patients. See the Evidence section of `milestone-2.md` for the full terminal output.
+- Running the services directly with Python (not through the web server) on the seeded data gave: 120 patients; doctor 1 sees 60 of them, doctor 2 sees 60, the hospital administrator sees all 120; the researcher's cohort has no `medical_record_number` field; a wrong password is refused and logged.
+- Backend tests that check these rules are in `backend/tests/test_rbac.py`, `test_auth_flow.py` and `test_patients_scope.py`. The CI run for this branch shows their result.
+- The ML preprocessing output (80,195 training and 20,049 test rows, 101 features) is shown in `milestone-2.md`.
 
 ## Metrics
 
-- Dataset rows loaded: 101,766.
-- Rows after cleaning: about 100,244 (80,195 training + 20,049 test).
-- Model features after encoding: 101.
-- Backend API endpoints implemented for this milestone: 0.
-- Database tables created: 0.
-- Backend test coverage: not applicable (no backend code written).
+- Roles implemented: 4 of 4.
+- API endpoints implemented for this milestone: 10 (login, me, roles, list users, create user, audit log, list patients, get patient, create patient, anonymised patients).
+- Backend tests for this milestone: 26 (RBAC 10, security 4, login and users 6, patient scope 6).
+- Dataset rows loaded: 101,766; model features after encoding: 101.
 
 ## Known gaps
 
-- No authentication, JWT tokens or role-based access control for the four roles.
-- No patient management (create, view, update) and no database tables or migrations.
-- No healthcare dashboard and no UI wireframes.
-- No architecture or workflow documentation written by me.
-- Preprocessing keeps all encounters, including several for the same patient, and does not split by patient (see the leakage note in `milestone-2.md`).
-- The scripts read and write CSV files in the folder they are run from, so they must be run from `ml/data/processed/`. A configuration file and proper paths would be cleaner.
+- **No database.** Users and patients live in memory and reset when the server restarts. The PostgreSQL schema in `database/postgres/schema` and the repositories were not wired up. The service functions are the only place that would change.
+- **The platform runs on synthetic patients,** not the Diabetes 130 dataset. The real dataset is only used by the ML pipeline in `ml/`.
+- **No wireframes and no new architecture write-up.** I used the starter's architecture and RBAC documents as they are. `docs/05-wireframes` has not been filled in.
+- **Not run before submission:** I could not run the backend tests or `npm run build` on my own machine before pushing. The CI result for this branch is the evidence.
+- **No refresh tokens, rate limiting or account lockout.** Tokens expire after 30 minutes.
+- The dashboard keeps the token in memory, so a page refresh signs the user out.
+- The ML scripts read and write CSV files in the folder they are run from, so they must be run from `ml/data/processed/`.
