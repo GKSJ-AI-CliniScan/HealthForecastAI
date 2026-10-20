@@ -22,7 +22,7 @@ def hospital_summary(
 @router.get("/readmissions", summary="Readmission analytics series")
 def readmission_analytics(
     user: CurrentUser = Depends(require_permission(Permission.HOSPITAL_ANALYTICS_READ)),
-) -> list[dict[str, float]]:
+) -> list[dict[str, float | str]]:
     """Return admissions and readmission rate per month."""
     return analytics_service.readmission_series()
 

@@ -28,7 +28,7 @@ def treatment_summaries(
     return sorted(summaries, key=lambda s: s.average_recovery_score, reverse=True)
 
 
-def recovery_trend(patients: list[PatientRecord] | None = None) -> list[dict[str, float]]:
+def recovery_trend(patients: list[PatientRecord] | None = None) -> list[dict[str, float | str]]:
     """Average recovery score per admission month, oldest first."""
     cohort = all_patients() if patients is None else patients
     by_month: dict[str, list[float]] = defaultdict(list)

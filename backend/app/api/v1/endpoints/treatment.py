@@ -21,6 +21,6 @@ def list_treatment_effectiveness(
 @router.get("/recovery-trends", summary="Recovery trend series")
 def recovery_trends(
     user: CurrentUser = Depends(require_permission(Permission.TREATMENT_REPORT_READ)),
-) -> list[dict[str, float]]:
+) -> list[dict[str, float | str]]:
     """Return the average recovery score per month."""
     return treatment_service.recovery_trend()

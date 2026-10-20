@@ -31,7 +31,7 @@ def hospital_summary(patients: list[PatientRecord] | None = None) -> HospitalAna
     )
 
 
-def readmission_series(patients: list[PatientRecord] | None = None) -> list[dict[str, float]]:
+def readmission_series(patients: list[PatientRecord] | None = None) -> list[dict[str, float | str]]:
     """Monthly admissions and 30 day readmission rate, oldest month first."""
     cohort = all_patients() if patients is None else patients
     by_month: dict[str, list[PatientRecord]] = defaultdict(list)
